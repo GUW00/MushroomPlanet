@@ -585,7 +585,7 @@ body {
     gap: 0.75rem;
     background: #ffffe1;
     padding: 0.5rem 1rem;
-    font-size: 0.75rem; /* ⬅️ Smaller text size */
+    font-size: 0.70rem; /* ⬅️ Smaller text size */
     font-weight: 600;
     position: fixed;
     top: 100px; /* Adjust this if your header height changes */
@@ -596,7 +596,7 @@ body {
   .mobile-menu a {
     text-decoration: none;
     color: #000;
-    padding: 0.1rem 0.5rem;
+    padding: 0.1rem 0.1rem;
     border-radius: 4px;
     transition: background 0.3s ease;
   }
