@@ -445,15 +445,22 @@ section:target {
 
 /* Make the menu fixed below the header */
 .main-menu {
-  position: fixed; /* Fix the menu just below the header */
-  top: 100px; /* Adjust this based on your header's height */
-  left: 0;
-  width: 100%;
-  background-color: #ffffe1; /* Light cream color */
-  padding: 1rem 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Optional shadow for visual effect */
-  z-index: 1000; /* Keeps the menu above other content */
+  display: flex;
+  flex-wrap: nowrap; /* Prevent wrapping */
+  justify-content: center;
+  gap: 0.5rem;
+  flex-shrink: 1;
+  overflow-x: auto; /* Allow scroll if too tight */
+  padding: 0.5rem;
+}
+
+.main-menu a {
+  white-space: nowrap;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+  flex: 1 1 auto;
   text-align: center;
+  min-width: 0; /* Prevent overflow growth */
 }
 
 /* Style for menu links */
