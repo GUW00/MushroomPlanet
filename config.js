@@ -63,7 +63,6 @@ const config = {
         <a href="nft.html">NFT</a>
         <a href="sporebot.html">Sporebot</a>
         <a href="token.html">Token</a>
-        <a href="price.html">Price</a>
         <a href="rewards.html">Rewards</a>
         <a href="guides.html">Guides</a>
       </div>
