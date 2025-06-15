@@ -262,7 +262,7 @@ nav {
 
 /* Hero */
 .hero {
-  background: url('/images/mushroom-hero.png') center center / cover no-repeat;
+  background: url('/images/mp_bg.png') center center / cover no-repeat;
   color: white;
   text-align: center;
   padding: 6rem 0;
