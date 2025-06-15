@@ -521,7 +521,22 @@ body {
   cursor: pointer;
 }
 
-/* Specific to guides.html */
-body.guides-page {
-  padding-top: 160px; /* Adjust if necessary */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .button-group {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .button-group .button {
+    width: 100%;
+    text-align: center;
+  }
 }
