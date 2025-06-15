@@ -543,14 +543,24 @@ body {
 
 #contract-addresses ul {
   padding-left: 1.25rem;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-all;
-  white-space: normal;
 }
 
 #contract-addresses li {
-  line-height: 1.8;
   font-size: 0.95rem;
+  line-height: 1.8;
+  overflow-wrap: break-word;
   word-break: break-word;
+  white-space: normal;
 }
+
+#contract-addresses li code {
+  display: inline-block;
+  max-width: 100%;
+  word-break: break-all;
+  white-space: normal;
+  font-family: monospace;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+}
+
