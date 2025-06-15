@@ -546,7 +546,7 @@ body {
 }
 
 #contract-addresses li {
-  font-size: 0.95rem;
+  font-size: 0.75rem;
   line-height: 1.8;
   overflow-wrap: break-word;
   word-break: break-word;
