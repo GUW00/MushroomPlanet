@@ -205,7 +205,7 @@ header {
   left: 0;
   width: 100%;
   background-color: #fe0000; /* Red background */
-  padding: 1rem;
+  padding: 0.1rem;
   text-align: center;
   z-index: 999; /* Keeps header on top */
 }
@@ -491,7 +491,7 @@ body {
 /* Optional: for smaller screens, you might need to adjust padding */
 @media (max-width: 600px) {
   body {
-    padding-top: 180px; /* Adjust for smaller screen sizes */
+    padding-top: 135px; /* Adjust for smaller screen sizes */
   }
 }
 
@@ -584,8 +584,8 @@ body {
     flex-wrap: wrap;
     gap: 0.75rem;
     background: #ffffe1;
-    padding: 0.75rem 1rem;
-    font-size: 0.65rem; /* ⬅️ Smaller text size */
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem; /* ⬅️ Smaller text size */
     font-weight: 600;
     position: fixed;
     top: 100px; /* Adjust this if your header height changes */
@@ -596,7 +596,7 @@ body {
   .mobile-menu a {
     text-decoration: none;
     color: #000;
-    padding: 1.5rem 0.5rem;
+    padding: 0.1rem 0.5rem;
     border-radius: 4px;
     transition: background 0.3s ease;
   }
