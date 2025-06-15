@@ -57,34 +57,46 @@
       // Hero section override
       const heroTitle = document.querySelector('.hero h1');
       const heroDesc = document.querySelector('.hero p');
-      const heroBtn = document.querySelector('.hero .button');
+
+      // Clear previous button group (if rerun)
+      const existingGroup = document.querySelector('.hero .button-group');
+      if (existingGroup) existingGroup.remove();
 
       if (heroTitle) heroTitle.textContent = "Sporebot Farming System";
       if (heroDesc) heroDesc.textContent = "Grow your mushroom farm, earn SPORES, brew potions, and explore Web3 — all from Discord.";
 
-      if (heroBtn) {
-        heroBtn.textContent = "Start Farming";
-        heroBtn.href = config.discord.inviteURL;
-        heroBtn.target = "_blank";
-        heroBtn.rel = "noopener noreferrer";
-      }
+      // Create a button group wrapper
+      const buttonGroup = document.createElement('div');
+      buttonGroup.className = 'button-group';
 
+      // First button: Start Farming
+      const heroBtn = document.createElement('a');
+      heroBtn.className = 'button';
+      heroBtn.href = config.discord.inviteURL;
+      heroBtn.target = '_blank';
+      heroBtn.rel = 'noopener noreferrer';
+      heroBtn.textContent = 'Start Farming';
+
+      // Second button: Sporebot Guide
+      const secondBtn = document.createElement('a');
+      secondBtn.className = 'button';
+      secondBtn.href = 'guides.html';
+      secondBtn.textContent = 'Sporebot Guide';
+
+      // Add both buttons to group
+      buttonGroup.appendChild(heroBtn);
+      buttonGroup.appendChild(secondBtn);
+
+      // Append to hero container
+      const heroContainer = document.querySelector('.hero .container');
+      if (heroContainer) heroContainer.appendChild(buttonGroup);
+
+      // Set background image
       const heroSection = document.querySelector('.hero');
       if (heroSection) {
         heroSection.style.backgroundImage = "url('/images/mp.png')";
-
-        // Add second button dynamically
-        const secondBtn = document.createElement('a');
-        secondBtn.className = 'button';
-        secondBtn.href = 'guides.html'; // Change to 'rewards.html' if needed
-        secondBtn.textContent = 'Sporebot Guide';
-        secondBtn.style.marginLeft = '1rem';
-
-        // Append after the first button
-        if (heroBtn && heroBtn.parentNode) {
-          heroBtn.parentNode.appendChild(secondBtn);
-        }
       }
+
     });
 
   </script>
@@ -109,7 +121,6 @@
     <div class="container">
       <h1></h1>
       <p></p>
-      <a class="button"></a>
     </div>
   </section>
 
