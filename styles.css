@@ -554,3 +554,57 @@ body {
   }
 }
 
+/* Hide/show based on screen size */
+.desktop-only {
+  display: block;
+}
+.mobile-only {
+  display: none;
+}
+
+/* Mobile override */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+/* Base mobile menu layout */
+.mobile-menu {
+  display: none; /* default: hidden until mobile */
+}
+
+/* Mobile-only visibility + small text */
+@media (max-width: 768px) {
+  .mobile-only {
+    display: flex !important;
+  }
+
+  .mobile-menu {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    background: #ffffe1;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem; /* ⬅️ Smaller text size */
+    font-weight: 600;
+    position: fixed;
+    top: 100px; /* Adjust this if your header height changes */
+    width: 100%;
+    z-index: 1000;
+  }
+
+  .mobile-menu a {
+    text-decoration: none;
+    color: #000;
+    padding: 1.5rem 0.5rem;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+
+  .mobile-menu a:hover {
+    background: #fd464f;
+    color: #ffffe1;
+  }
+}
+
+}

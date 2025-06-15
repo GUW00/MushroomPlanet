@@ -52,6 +52,10 @@
       <img src="/images/discord.png" alt="Discord" style="height: 1.5em; width: 1.5em;" />
       Discord Guide
     </button>
+    <button onclick="showGuide('reddit')" class="button" style="background: var(--clr-primary); color: var(--clr-dark); border: 2px solid var(--clr-secondary); display: flex; align-items: center; gap: 0.5rem;">
+      <img src="/images/reddit.png" alt="Reddit" style="height: 1.5em; width: 1.5em;" />
+      Reddit Guide
+    </button>
   </div>
 </section>
 
@@ -279,6 +283,14 @@
       <h2>💸 Withdrawals</h2>
       <p>You can now <strong>withdraw</strong> <strong>SHROOMS</strong> and <strong>SPORES</strong> to your wallet instantly. This is done via the `!withdraw` command, but requires </strong>Pixie verification</strong> and linking your wallet with `!register`.</p>
     </div>
+
+    <!-- Quick Access Buttons -->
+    <div style="text-align: center; margin-top: 3rem; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+      <a class="button" href="https://discord.com/invite/RgUh9kHx86" target="_blank" rel="noopener noreferrer" style="min-width: 200px;">
+        START YOUR FARM
+      </a>
+    </div>
+
   </div>
 </section>
 
@@ -347,13 +359,23 @@
       </ul>
     </div>
 
+    <!-- Quick Access Buttons -->
+    <div style="text-align: center; margin-top: 3rem; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+      <a class="button" href="https://dapp.quickswap.exchange/pool/v2/add?tokens=0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1,0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" rel="noopener noreferrer" style="min-width: 200px;">
+        ADD TO THE LP
+      </a>
+    </div>
+
   </div>
 </section>
 
 <!-- Discord Guide -->
 <section id="guide-discord" class="section-dark" style="display: none; padding: 4rem 0;">
   <div class="container">
-    <h2>📘 <strong>Ultimate Guide to Discord</strong></h2>
+    <h2>
+          <img src="/images/discord.png" alt="Discord Icon" style="height: 1.5em; width: 1.5em; vertical-align: middle; margin-right: 0.5rem;" />
+      <strong>Ultimate Guide to Discord</strong>
+    </h2>
 
     <!-- Community Guidelines -->
     <div id="community-guidelines">
@@ -425,13 +447,126 @@
   </div>
 </section>
 
+<!-- Reddit Guide -->
+<section id="guide-reddit" class="section-dark" style="display: none; padding: 4rem 0;">
+  <div class="container">
+    <h2>
+      <img src="/images/reddit.png" alt="Reddit Icon" style="height: 1.5em; width: 1.5em; vertical-align: middle; margin-right: 0.5rem;" />
+      <strong>Ultimate Guide to Reddit</strong>
+    </h2>
+
+    <!-- Subreddit Rules -->
+    <div id="reddit-rules">
+      <h3>📜 MushroomPlanet Rules — Spore of Conduct</h3>
+      <ul>
+        <li>🌿 <strong>Spore of Respect</strong> — No bullying or discrimination. Let’s grow a healthy mycelium of kindness.</li>
+        <li>🖼️ <strong>Mycelium Content Only</strong> — Keep it mushroom-related. Off-topic posts may be composted.</li>
+        <li>⚖️ <strong>Legal Cap</strong> — No illegal substances or activity discussions.</li>
+        <li>🔞 <strong>Mature Mushrooms Only</strong> — 18+ community due to token systems and content.</li>
+        <li>🌼 <strong>Wholesome Fungi</strong> — No NSFW or explicit content. Keep it cozy.</li>
+        <li>🍃 <strong>Artist's Sporespread</strong> — Credit the original creator. Don’t claim others' art.</li>
+        <li>🚫 <strong>No Invasive Species</strong> — No spam or scams.</li>
+        <li>🌱 <strong>Nourishing Feedback</strong> — Critique should help others grow, not rot.</li>
+        <li>🕳️ <strong>Secrets of the Underground</strong> — Respect privacy. No doxxing or sharing personal info.</li>
+        <li>🍄 <strong>Discord Mushroom Farming</strong> — Bans from the subreddit or Discord will forfeit all SHROOMS & SPORES.</li>
+        <li>😎 <strong>Chill Vibes Only</strong> — Relax. Be kind. Grow together like good fungi.</li><p></p>
+      </ul>
+    </div>
+
+    <!-- Forage System -->
+    <div id="reddit-forage">
+      <h3>🌲 How Daily Forage on Reddit Works</h3>
+      <p>Every morning at <strong>4:20 EST</strong>, a new <strong>Daily Forage Thread</strong> is automatically posted on 
+        <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">r/MushroomPlanet</a>.
+      </p>
+
+      <h4>🧭 How to Participate:</h4>
+      <ul>
+        <li>💬 <strong>Comment</strong> <code>!forage</code> on the current day's thread (only once per day).</li>
+        <li>🌱 Earn a daily reward bundle of <strong>SHROOMS and SPORES</strong>.</li>
+        <li>🔁 Your <strong>streak grows</strong> with each consecutive forage.</li>
+      </ul>
+
+      <h4>🎯 Streak-Based Reward System:</h4>
+      <ul>
+        <li>The <strong>higher your streak</strong>, the <strong>greater your daily rewards</strong>.</li>
+        <li>Missing a day will reset your streak — consistency matters!</li>
+      </ul>
+
+      <h4>🏆 Max Daily Rewards:</h4>
+      <ul>
+        <li><strong>6,874 SHROOMS</strong> 💸</li>
+        <li><strong>687,400 SPORES</strong> 🧬</li>
+        <li><em>(Unlocked at the highest streak tier)</em></li>
+      </ul>
+
+      <h4>🪙 Other Useful Reddit Commands:</h4>
+      <ul>
+        <li><code>!faucet</code> — Claim a <strong>one-time bonus</strong> of SHROOMS & SPORES (for new users).</li>
+        <li><code>!link 0xYourWallet</code> — <strong>Link your wallet</strong> to sync Discord and Reddit rewards.</li>
+      </ul>
+    </div>
+
+    <!-- Tip & Raffle Policy -->
+    <div id="reddit-tipping-raffles">
+      <h3>🎁 Tipping & Raffle Guidelines</h3>
+      <ul>
+        <li>🧾 <strong>Only 1 tipping OR raffle post per user per week</strong>, unless:</li>
+        <li>🎯 <strong>Total tips exceed 50k $HROOMS</strong> → then you’re exempt from the weekly limit.</li>
+        <li>🧢 Posts must use the correct flair: “Don’t Mind Tipping” or “Raffle.”</li>
+        <li>💸 <strong>Minimum tip per comment: 420 SHROOMS</strong> from OP.</li>
+        <li>🧺 <strong>Post must total at least 5,000 SHROOMS</strong> in tips from OP to others.</li>
+        <li>🎨 NFT raffles/auctions are already excluded from this rule.</li>
+        <li>🚫 Non-compliant posts will be demonetized.</li>
+      </ul>
+      <p>💬 Constructive comments might be tipped — so share feedback kindly!</p>
+    </div>
+
+    <!-- Sporebot Reddit vs. CommunityCurrency -->
+    <div id="reddit-bots">
+      <h3>🤖 Sporebot vs. CommunityCurrency (CCBot)</h3>
+      <p>
+        <strong>Sporebot</strong> handles <code>!forage</code>, <code>!faucet</code>, and <code>!link</code> commands inside the r/MushroomPlanet Daily Thread.<br />
+        <strong>CCBot</strong> (CommunityCurrency bot) handles wallet management and tips across Reddit broadly.
+      </p>
+
+      <ul>
+        <li>
+          <img src="/images/sporebot.png" alt="Sporebot Icon" style="height: 1.3em; vertical-align: middle; margin-right: 0.4rem;" />
+          <strong>Sporebot</strong> = MushroomPlanet only (connects with Discord + rewards).
+        </li>
+        <li>
+          <strong>🤖 CCBot</strong> = Reddit-wide tipping & on-chain withdrawals.
+        </li> <p></p>
+      </ul>
+
+      <p>Here’s how to use <strong>CCBot</strong>:</p>
+      <ul>
+        <li><code>!register 0xYourWallet</code> — Register your Polygon address</li>
+        <li><code>!tip 100</code> or <code>!tip 100 SHROOM</code> — Tip users</li>
+        <li><code>!withdraw 100 SHROOM</code> — Withdraw to your wallet</li>
+        <li><code>!faucet</code> — Claim a one-time reward</li><p></p>
+      </ul>
+      <p>📘 <a href="https://www.reddit.com/r/communitycurrency/comments/1auwybs/guide_commands_and_post2earn_mining/" target="_blank" rel="noopener noreferrer">View the full CC guide here</a></p>
+    </div>
+
+    <!-- Final Call -->
+    <h2>🧠 Join the Mushroom Planet Movement</h2>
+    <div style="text-align: center; margin-top: 1rem;">
+      <a class="button" href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">VISIT SUBREDDIT</a>
+    </div>
+    <p style="text-align: center; margin-top: 1rem;">The forest is open. Come grow with us 🍄</p>
+  </div>
+</section>
+
 <!-- Toggle Script -->
 <script>
   function showGuide(id) {
     const guides = {
       sporebot: document.getElementById('guide-sporebot'),
       lp: document.getElementById('guide-lp'),
-      discord: document.getElementById('guide-discord')
+      discord: document.getElementById('guide-discord'),
+      reddit: document.getElementById('guide-reddit') // ✅ added missing comma above
     };
 
     // Hide all guides first

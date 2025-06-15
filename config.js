@@ -58,7 +58,7 @@ const config = {
 
   menu: {
     html: `
-      <div class="main-menu">
+      <div class="main-menu desktop-only">
         <a href="index.html">Home</a>
         <a href="nft.html">NFT</a>
         <a href="sporebot.html">Sporebot</a>
@@ -66,8 +66,19 @@ const config = {
         <a href="rewards.html">Rewards</a>
         <a href="guides.html">Guides</a>
       </div>
+
+      <div class="mobile-menu mobile-only">
+        <a href="index.html">Home</a>
+        <a href="nft.html">NFT</a>
+        <a href="sporebot.html">Sporebot</a>
+        <a href="token.html">Token</a>
+        <a href="rewards.html">Rewards</a>
+        <a href="guides.html">Guides</a>
+        </a>
+      </div>
     `
   }
+
 };
 
 export default config;
