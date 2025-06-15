@@ -227,6 +227,12 @@ header {
   }
 }
 
+.nav-links img {
+  display: block;
+  height: 32px;
+  width: auto;
+}
+
 nav {
   display: flex;
   justify-content: space-between;
@@ -445,22 +451,22 @@ section:target {
 
 /* Make the menu fixed below the header */
 .main-menu {
-  display: flex;
-  flex-wrap: nowrap; /* Prevent wrapping */
-  justify-content: center;
-  gap: 0.5rem;
-  flex-shrink: 1;
-  overflow-x: auto; /* Allow scroll if too tight */
-  padding: 0.5rem;
+  position: fixed; /* Fix the menu just below the header */
+  top: 100px; /* Adjust this based on your header's height */
+  left: 0;
+  width: 100%;
+  background-color: #ffffe1; /* Light cream color */
+  padding: 1rem 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Optional shadow for visual effect */
+  z-index: 1000; /* Keeps the menu above other content */
+  text-align: center;
 }
 
-.main-menu a {
-  white-space: nowrap;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.85rem;
-  flex: 1 1 auto;
-  text-align: center;
-  min-width: 0; /* Prevent overflow growth */
+@media (max-width: 600px) {
+  .main-menu a {
+    font-size: 0.75rem; /* Smaller text for mobile */
+    padding: 0.4rem 0.5rem; /* Slightly tighter spacing */
+  }
 }
 
 /* Style for menu links */
@@ -548,3 +554,35 @@ body {
   }
 }
 
+/* Only applies on screens 768px wide or smaller */
+@media (max-width: 768px) {
+  .nav-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+  }
+
+  .nav-links .nav-icon img {
+    height: 36px;
+    width: auto;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+  }
+
+  .nav-links .nav-icon img:hover {
+    transform: scale(1.1);
+  }
+
+  .logo {
+    text-align: center;
+    width: 100%;
+    font-size: 1.2rem;
+    padding: 0.5rem 0;
+  }
+
+  nav.container {
+    flex-direction: column;
+  }
+}
