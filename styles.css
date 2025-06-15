@@ -540,3 +540,17 @@ body {
     text-align: center;
   }
 }
+
+#contract-addresses ul {
+  padding-left: 1.25rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+}
+
+#contract-addresses li {
+  line-height: 1.8;
+  font-size: 0.95rem;
+  word-break: break-word;
+}
