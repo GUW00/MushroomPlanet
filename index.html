@@ -78,12 +78,33 @@
 
   <div id="global-menu"></div>
 
+  <!-- Price Section -->
+<div id="price-bar">
+  <div class="price-content">
+    <img src="/images/shroom.png" alt="$HROOM" />
+    <span>
+      <a href="https://www.geckoterminal.com/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+        $HROOM PRICE: <strong id="shroom-price"></strong>
+      </a>
+    </span>
+
+    <img src="/images/spore.png" alt="SPORE" />
+    <span>
+      <a href="https://www.geckoterminal.com/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+        SPORE PRICE: <strong id="spore-price"></strong>
+      </a>
+    </span>
+  </div>
+</div>
+
 <section class="hero">
   <div class="container">
-    <h1></h1>
-    <p></p>
-    <a class="button" id="discord-button"></a>
-    <a class="button" id="reddit-button" href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">Join Reddit</a>
+    <h1>Welcome to Mushroom Planet</h1>
+    <p>Farm SHROOMS and SPORES, earn NFTs, and build the MushroomPlanet Web3 ecosystem.</p>
+    <div class="button-group">
+      <a class="button guide-button" href="https://discord.com/invite/RgUh9kHx86" target="_blank" rel="noopener noreferrer">Join Discord</a>
+      <a class="button guide-button" href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">Join Reddit</a>
+    </div>
   </div>
 </section>
 
@@ -432,5 +453,30 @@
       });
     });
   </script>
+
+<script type="module">
+  async function updateTokenPrices() {
+    try {
+      // SPORE price from SPORE/SHROOM pool
+      const sporeRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8');
+      const sporeData = await sporeRes.json();
+      const sporePrice = parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(8);
+
+      // SHROOM price from SHROOM/WETH pool
+      const shroomRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28');
+      const shroomData = await shroomRes.json();
+      const shroomPrice = parseFloat(shroomData.data.attributes.base_token_price_usd).toFixed(7);
+
+      // Inject into HTML
+      document.getElementById('spore-price').textContent = `$${sporePrice}`;
+      document.getElementById('shroom-price').textContent = `$${shroomPrice}`;
+    } catch (error) {
+      console.error('Error fetching token prices:', error);
+    }
+  }
+
+  updateTokenPrices();
+</script>
+
 </body>
 </html>

@@ -21,7 +21,27 @@
     </nav>
   </header>
 
+  <!-- Menu Section -->
   <div id="global-menu"></div>
+
+<!-- Price Section -->
+<div id="price-bar">
+  <div class="price-content">
+    <img src="/images/shroom.png" alt="$HROOM" />
+    <span>
+      <a href="https://www.geckoterminal.com/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+        $HROOM PRICE: <strong id="shroom-price"></strong>
+      </a>
+    </span>
+
+    <img src="/images/spore.png" alt="SPORE" />
+    <span>
+      <a href="https://www.geckoterminal.com/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+        SPORE PRICE: <strong id="spore-price"></strong>
+      </a>
+    </span>
+  </div>
+</div>
 
 <!-- Hero Section -->
 <section class="hero">
@@ -36,13 +56,13 @@
     <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
       <!-- Buy Row -->
       <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-        <a class="button" style="min-width: 180px; text-align: center;" href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer">Buy SHROOM</a>
-        <a class="button" style="min-width: 180px; text-align: center;" href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer">Buy SPORE</a>
+        <a class="button guide-button" style="min-width: 180px; text-align: center;" href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer">Buy SHROOM</a>
+        <a class="button guide-button" style="min-width: 180px; text-align: center;" href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer">Buy SPORE</a>
       </div>
 
       <!-- Price Row -->
       <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-        <a class="button" style="min-width: 180px; text-align: center;" href="https://www.geckoterminal.com/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8" target="_blank" rel="noopener noreferrer">View Price</a>
+        <a class="button guide-button" style="min-width: 180px; text-align: center;" href="https://www.geckoterminal.com/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8" target="_blank" rel="noopener noreferrer">View Price</a>
       </div>
     </div>
   </div>
@@ -465,5 +485,30 @@
       if (menuTarget) menuTarget.innerHTML = config.menu.html;
     });
   </script>
+
+<script type="module">
+  async function updateTokenPrices() {
+    try {
+      // SPORE price from SPORE/SHROOM pool
+      const sporeRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8');
+      const sporeData = await sporeRes.json();
+      const sporePrice = parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(8);
+
+      // SHROOM price from SHROOM/WETH pool
+      const shroomRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28');
+      const shroomData = await shroomRes.json();
+      const shroomPrice = parseFloat(shroomData.data.attributes.base_token_price_usd).toFixed(7);
+
+      // Inject into HTML
+      document.getElementById('spore-price').textContent = `$${sporePrice}`;
+      document.getElementById('shroom-price').textContent = `$${shroomPrice}`;
+    } catch (error) {
+      console.error('Error fetching token prices:', error);
+    }
+  }
+
+  updateTokenPrices();
+</script>
+
 </body>
 </html>

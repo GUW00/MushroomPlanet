@@ -21,6 +21,25 @@
 
   <div id="global-menu"></div>
 
+<!-- Price Section -->
+<div id="price-bar">
+  <div class="price-content">
+    <img src="/images/shroom.png" alt="$HROOM" />
+    <span>
+      <a href="https://www.geckoterminal.com/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+        $HROOM PRICE: <strong id="shroom-price"></strong>
+      </a>
+    </span>
+
+    <img src="/images/spore.png" alt="SPORE" />
+    <span>
+      <a href="https://www.geckoterminal.com/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+        SPORE PRICE: <strong id="spore-price"></strong>
+      </a>
+    </span>
+  </div>
+</div>
+
 <!-- Hero Section -->
 <section class="hero">
   <div class="container">
@@ -32,19 +51,19 @@
     </p>
 
     <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem;">
-      <button onclick="showGuide('sporebot')" class="button" style="background: var(--clr-primary); color: var(--clr-dark); border: 2px solid var(--clr-secondary); display: flex; align-items: center; gap: 0.5rem;">
+      <button onclick="showGuide('sporebot')" class="button guide-button" style="background: var(--clr-primary); color: var(--clr-dark); border: 2px solid var(--clr-secondary); display: flex; align-items: center; gap: 0.5rem;">
         <img src="/images/sporebot.png" alt="Sporebot" style="height: 1.5em; width: 1.5em;" />
         Sporebot Guide
       </button>
-      <button onclick="showGuide('lp')" class="button" style="background: var(--clr-primary); color: var(--clr-dark); border: 2px solid var(--clr-secondary); display: flex; align-items: center; gap: 0.5rem;">
+      <button onclick="showGuide('lp')" class="button guide-button" style="background: var(--clr-primary); color: var(--clr-dark); border: 2px solid var(--clr-secondary); display: flex; align-items: center; gap: 0.5rem;">
         <img src="/images/coin.png" alt="LP" style="height: 1.5em; width: 1.5em;" />
         LP Guide
       </button>
-      <button onclick="showGuide('discord')" class="button" style="background: var(--clr-primary); color: var(--clr-dark); border: 2px solid var(--clr-secondary); display: flex; align-items: center; gap: 0.5rem;">
+      <button onclick="showGuide('discord')" class="button guide-button" style="background: var(--clr-primary); color: var(--clr-dark); border: 2px solid var(--clr-secondary); display: flex; align-items: center; gap: 0.5rem;">
         <img src="/images/discord.png" alt="Discord" style="height: 1.5em; width: 1.5em;" />
         Discord Guide
       </button>
-      <button onclick="showGuide('reddit')" class="button" style="background: var(--clr-primary); color: var(--clr-dark); border: 2px solid var(--clr-secondary); display: flex; align-items: center; gap: 0.5rem;">
+      <button onclick="showGuide('reddit')" class="button guide-button" style="background: var(--clr-primary); color: var(--clr-dark); border: 2px solid var(--clr-secondary); display: flex; align-items: center; gap: 0.5rem;">
         <img src="/images/reddit_logo.png" alt="Reddit" style="height: 1.5em; width: 1.5em;" />
         Reddit Guide
       </button>
@@ -611,4 +630,28 @@
       menuTarget.innerHTML = config.menu.html;  // Inject menu into the page dynamically
     }
   });
+</script>
+
+<script type="module">
+  async function updateTokenPrices() {
+    try {
+      // SPORE price from SPORE/SHROOM pool
+      const sporeRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8');
+      const sporeData = await sporeRes.json();
+      const sporePrice = parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(8);
+
+      // SHROOM price from SHROOM/WETH pool
+      const shroomRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28');
+      const shroomData = await shroomRes.json();
+      const shroomPrice = parseFloat(shroomData.data.attributes.base_token_price_usd).toFixed(7);
+
+      // Inject into HTML
+      document.getElementById('spore-price').textContent = `$${sporePrice}`;
+      document.getElementById('shroom-price').textContent = `$${shroomPrice}`;
+    } catch (error) {
+      console.error('Error fetching token prices:', error);
+    }
+  }
+
+  updateTokenPrices();
 </script>

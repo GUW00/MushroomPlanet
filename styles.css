@@ -621,3 +621,38 @@ body {
   }
 }
 
+.guide-button {
+  width: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--clr-primary);
+  color: var(--clr-dark);
+  border: 2px solid var(--clr-secondary);
+}
+
+#price-bar {
+  background-color: #1a1a1a; /* light beige or cream */
+  padding: 0.5rem 1rem;
+  text-align: center;
+  border-bottom: 2px solid var(--clr-secondary);
+  font-family: var(--font-body);
+  z-index: 999;
+}
+
+#price-bar .price-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: 1rem;
+  color: #ffffe1;
+}
+
+#price-bar img {
+  height: 1.5em;
+  width: 1.5em;
+  vertical-align: middle;
+}
