@@ -652,7 +652,8 @@ body {
 }
 
 #price-bar img {
-  height: 1.5em;
-  width: 1.5em;
+  height: 32px !important;
+  width: 32px !important;
   vertical-align: middle;
+  flex-shrink: 0;
 }
