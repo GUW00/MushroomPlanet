@@ -4,7 +4,7 @@
   --clr-text-dark:  var(--clr-sections-altDarkText);
   --clr-primary:    #ffffe1;
   --clr-secondary:  #fece00;
-  --clr-accent:     #ffffe1;
+  --clr-accent:     #99cdfe;
   --clr-dark:       #e8e8d0;
   --clr-light:      #1a1a1a;
 
@@ -41,6 +41,12 @@
 .section-dark p, 
 .section-dark li {
   color: #eaeaea; /* slightly brighter than just var(--clr-...) */
+}
+
+section#faq.section-dark .accordion-content p {
+  color: #1a1a1a !important;
+  font-size: 1.1rem;
+  line-height: 1.9;
 }
 
 .section-light {
@@ -608,3 +614,10 @@ body {
 }
 
 }
+
+@media (max-width: 500px) {
+  .guide-button-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
