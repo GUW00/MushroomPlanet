@@ -35,7 +35,7 @@
       <img src="/images/shroom_small.png" alt="$HROOM" />
       <span>
         <a href="https://www.geckoterminal.com/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
-          $HROOM PRICE: <strong id="shroom-price"></strong>
+          SHROOM PRICE: <strong id="shroom-price"></strong>
         </a>
       </span>
     </div>
@@ -347,7 +347,7 @@
       <div class="accordion-item"><button>💸 How can I tip other users?</button><div class="accordion-content"><p>You can tip other players and earn XP for your <strong>!pixie</strong> by using:<br><code>!tip [amount] [shrooms/spores] @username</code> or by replying to their message.</p></div></div>
       <div class="accordion-item"><button>🎁 How do I participate in an airdrop or raffle?</button><div class="accordion-content"><p>You must be <strong>🌟 PIXIE VERIFIED</strong> in order to enter any airdrop or raffle.</p></div></div>
       <div class="accordion-item"><button>🔐 Why do we require verification and use captcha for withdrawals?</button><div class="accordion-content"><p>Captcha and verification protect the Sporebot economy by ensuring only real users—not bots—can withdraw. This keeps rewards fair and secure.</p></div></div>
-      <div class="accordion-item"><button>☑️ How do I become 🌟 PIXIE VERIFIED?</button><div class="accordion-content"><p>Reach Level 10 with your <strong>!pixie</strong>, then use <strong>!verify</strong> and complete 3 verification challenges: Reaction, Math Puzzle, and Captcha Test.</p></div></div>
+      <div class="accordion-item"><button>☑️ How do I become 🌟 PIXIE VERIFIED?</button><div class="accordion-content"><p>Reach Level 5 with your <strong>!pixie</strong>, then use <strong>!verify</strong> and complete 3 verification challenges: Reaction, Math Puzzle, and Captcha Test.</p></div></div>
       <div class="accordion-item"><button>🧬 How do I level up my !pixie?</button><div class="accordion-content"><p>Earn XP by tipping others, hosting a <strong>!raffle</strong>, creating an <strong>!airdrop</strong>, or chatting:<br><br>
         <ul>
           <li>1 SHROOM = 1 XP</li>
@@ -437,7 +437,7 @@
       // SPORE price from SPORE/SHROOM pool
       const sporeRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8');
       const sporeData = await sporeRes.json();
-      const sporePrice = parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(8);
+      const sporePrice = parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(9);
 
       // SHROOM price from SHROOM/WETH pool
       const shroomRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28');

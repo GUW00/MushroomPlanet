@@ -30,7 +30,7 @@
       <img src="/images/shroom_small.png" alt="$HROOM" />
       <span>
         <a href="https://www.geckoterminal.com/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
-          $HROOM PRICE: <strong id="shroom-price"></strong>
+          SHROOM PRICE: <strong id="shroom-price"></strong>
         </a>
       </span>
     </div>
@@ -72,7 +72,7 @@
     </h2>
 
     <p style="max-width: 800px; margin: 0 auto 2rem; text-align: center; font-size: 1.05rem; line-height: 1.6;">
-      All holders now earn 200,000 SPORES daily in Discord after verifying their wallet, with Kid Shroom continuing to receive monthly rewards as a bonus.
+      All holders now earn <strong>200,000 SPORES</strong> daily in Discord after verifying their wallet, with <a href="https://www.reddit.com/avatar/shop/product/storefront_nft_01HTEC1W862HKT9ZA3TZTB8XBW" target="_blank" rel="noopener noreferrer" style="color: #00b0f4;">Kid Shroom</a>  continuing to receive monthly rewards as a bonus.
       Each Mooshie plays a unique role in the ecosystem and represents a foundational part of our Web3 journey.
     </p>
 
@@ -81,16 +81,16 @@
       <!-- House Mooshie -->
       <div class="card">
         <img src="/images/housemooshie.png" alt="House Mooshie" style="height: 3em; width: 3em; margin-bottom: 0.5rem;" />
-        <h3>House Mooshie</h3>
-        <p>The original spark. House Mooshie was the first to be rewarded and verified — forever a cornerstone of MushroomPlanet’s genesis.</p>
+        <h3>Mooshies House (100)</h3>
+        <p>Launched Oct 2023 - Mooshies House was the first NFT created by Zuko. The original spark of Mushroom Planet’s creation.</p>
         <a class="button" href="https://opensea.io/collection/mooshies-house" target="_blank" rel="noopener noreferrer">BUY NOW (OS)</a>
       </div>
 
       <!-- King Mooshie -->
       <div class="card">
         <img src="/images/kings.png" alt="King Mooshie" style="height: 3em; width: 3em; margin-bottom: 0.5rem;" />
-        <h3>King Mooshie</h3>
-        <p>Powerful and rare, King Mooshie received early airdrops and full verification access. A symbol of royal commitment.</p>
+        <h3>King Mooshie (105)</h3>
+        <p>Launched Feb 2024 - King of the Mooshie Kingdom. King Mooshie was the first Reddit Collectible Avatar.</p>
         <a class="button" href="https://opensea.io/collection/king-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer">BUY NOW (OS)</a>
       </div>
 
@@ -98,15 +98,15 @@
       <div class="card">
         <img src="/images/queen.png" alt="Queen Mooshie" style="height: 3em; width: 3em; margin-bottom: 0.5rem;" />
         <h3>Queen Mooshie</h3>
-        <p>Graceful but mighty. Queen Mooshie, alongside King and House, helped secure the early community airdrops.</p>
+        <p>Launched Mar 2024 - Queen Mooshie, alongside King and House, helped complete the Mooshie Kingdom.</p>
         <a class="button" href="https://opensea.io/collection/queen-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer">BUY NOW (OS)</a>
       </div>
 
       <!-- Kid Shroom -->
       <div class="card">
         <img src="/images/kidshroom.png" alt="Kid Shroom" style="height: 3em; width: 3em; margin-bottom: 0.5rem;" />
-        <h3>Kid Shroom</h3>
-        <p>Currently Holding Kid Shroom earns you monthly SPORE & SHROOM rewards. A must-have for mushroom lovers.</p>
+        <h3>Kid Shroom (500)</h3>
+        <p>Launched Jun 2024 - Currently Avilable! Holding Kid Shroom earns you monthly SPORE & SHROOM rewards.</p>
         <a class="button" href="https://www.reddit.com/avatar/shop/product/storefront_nft_01HTEC1W862HKT9ZA3TZTB8XBW" target="_blank" rel="noopener noreferrer">BUY NOW (REDDIT)</a>
       </div>
 
@@ -114,7 +114,7 @@
       <div class="card">
         <img src="/images/goldmooshie.png" alt="Gold Mooshie" style="height: 3em; width: 3em; margin-bottom: 0.5rem;" />
         <h3>Gold Mooshie</h3>
-        <p>Rare and mysterious. While not yet active in rewards, Gold Mooshie has future plans in development once sold out.</p>
+        <p>Launched Nov 2024 - While not yet active in rewards, Gold Mooshie has future plans in development once sold out.</p>
         <a class="button" href="https://www.reddit.com/avatar/shop/product/storefront_nft_01JCETNAK0KJMKZB3A9G2NQF0R" target="_blank" rel="noopener noreferrer">BUY NOW (REDDIT)</a>
       </div>
 
@@ -157,7 +157,7 @@
       // SPORE price from SPORE/SHROOM pool
       const sporeRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8');
       const sporeData = await sporeRes.json();
-      const sporePrice = parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(8);
+      const sporePrice = parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(9);
 
       // SHROOM price from SHROOM/WETH pool
       const shroomRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28');

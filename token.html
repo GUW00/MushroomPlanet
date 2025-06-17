@@ -32,7 +32,7 @@
       <img src="/images/shroom_small.png" alt="$HROOM" />
       <span>
         <a href="https://www.geckoterminal.com/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
-          $HROOM PRICE: <strong id="shroom-price"></strong>
+          SHROOM PRICE: <strong id="shroom-price"></strong>
         </a>
       </span>
     </div>
@@ -207,7 +207,103 @@
   </div>
 </section>
 
-<section class="faq section-dark">
+<!-- Section: Buttons to Toggle FAQ and Polls -->
+<section class="section-dark" style="text-align: center; padding: 2rem 1rem;">
+  <button class="button" onclick="toggleTokenSection('faq')">📘 FAQ</button>
+  <button class="button" onclick="toggleTokenSection('polls')">🗳️ Polls</button>
+</section>
+
+<!-- Section 4: FAQ -->
+
+<section id="faq-section" class="faq section-dark">
+  <div class="container">
+    <h2>📘 Frequently Asked Questions</h2>
+    <!-- Mushroom Planet Q&A Accordion -->
+    <div id="faq-planet" class="accordion-section">
+      <div class="accordion">
+        <div class="accordion-item">
+          <button>🌍 What is Mushroom Planet?</button>
+          <div class="accordion-content">
+            <p>Mushroom Planet is the vibrant heart of the $HROOM ecosystem, where community-driven farming, digital art, NFTs, lore, and creativity collide. It’s a place where users can engage in farming, earn rewards, and contribute to the growing Web3 universe powered by SHROOMS and SPORES.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button>🛒 How do I buy SHROOMS and SPORES?</button>
+          <div class="accordion-content">
+            <p>SHROOMS and SPORES can be easily purchased through QuickSwap by swapping <strong>WETH</strong> (Wrapped Ether) for either token. Be sure to always double-check the contract addresses to ensure you're interacting with the official tokens.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button>🍄 What is the $HROOM Token?</button>
+          <div class="accordion-content">
+            <p>$HROOM is the primary utility token within the Mushroom Planet ecosystem. It powers the platform, fuels farming activities, enables tipping, and is integral to unlocking rewards and access to various ecosystem features.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button>📜 What are the $HROOM Token Details?</button>
+          <div class="accordion-content">
+            <p><strong>Total Supply:</strong> 6.874 billion • <strong>Symbol:</strong> $HROOM • <strong>Decimals:</strong> 18 • <a href="https://polygonscan.com/address/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank">View on Polygonscan</a></p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button>📈 Where can I see the price of $HROOM?</button>
+          <div class="accordion-content">
+            <p>You can track the real-time price of $HROOM on platforms like <a href="https://www.dexscreener.com" target="_blank">DEXTools</a>, <a href="https://www.geckoterminal.com" target="_blank">GeckoTerminal</a>, and <a href="https://rccmarketcap.com" target="_blank">RCCMarketcap</a> to stay updated with the latest market trends.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button>🌀 What is the SPORE Token?</button>
+          <div class="accordion-content">
+            <p>SPORE is the governance token in the Mushroom Planet ecosystem. It allows community members to participate in key decision-making processes and governance activities, as well as earn rewards by farming and holding $HROOM or NFTs.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button>📜 What are the SPORE Token Details?</button>
+          <div class="accordion-content">
+            <p><strong>Total Supply:</strong> 687.4 billion • <strong>Symbol:</strong> SPR • <strong>Decimals:</strong> 18 • <a href="https://polygonscan.com/address/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank">View on Polygonscan</a></p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button>📦 What was the initial SPORE token allocation?</button>
+          <div class="accordion-content">
+            <p>The initial SPORE token allocation was distributed as follows:</p>
+            <ul>
+              <li>🧊 <strong>Treasury Holdings:</strong> 50%</li>
+              <li>🔁 <strong>LP Rewards & Funding:</strong> 18%</li>
+              <li>🌱 <strong>Sporebot/Reddit Rewards:</strong> 10%</li>
+              <li>🤝 <strong>Events, Collabs, Buybacks:</strong> 10%</li>
+              <li>🎨 <strong>NFT Avatar Rewards:</strong> 8%</li>
+              <li>🛡️ <strong>Contingency:</strong> 4%</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button>💰 How do I earn $HROOMS?</button>
+          <div class="accordion-content">
+            <p>Earn $HROOMS by participating in the Mushroom Planet community. Post engaging content on Reddit, farm and complete tasks in Sporebot on Discord, or receive tips from fellow Shroomies in the ecosystem.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button>📨 How do I tip on Reddit?</button>
+          <div class="accordion-content">
+            <p>Tipping on Reddit is powered by r/CommunityCurrency. You can easily tip others by using bot commands or replying to posts with the command syntax. For full details, refer to the Tipping Guide.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="polls-section" class="faq section-dark" style="display: none;">
   <div class="container">
     <h2>🗳️ Community Poll History</h2>
     <div class="accordion">
@@ -498,7 +594,7 @@
       // SPORE price from SPORE/SHROOM pool
       const sporeRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8');
       const sporeData = await sporeRes.json();
-      const sporePrice = parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(8);
+      const sporePrice = parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(9);
 
       // SHROOM price from SHROOM/WETH pool
       const shroomRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28');
@@ -514,6 +610,21 @@
   }
 
   updateTokenPrices();
+</script>
+
+<script>
+  function toggleTokenSection(section) {
+    const faq = document.getElementById('faq-section');
+    const polls = document.getElementById('polls-section');
+
+    if (section === 'faq') {
+      faq.style.display = 'block';
+      polls.style.display = 'none';
+    } else {
+      faq.style.display = 'none';
+      polls.style.display = 'block';
+    }
+  }
 </script>
 
 </body>
