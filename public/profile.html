@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Connect Your Profile | Mushroom Planet</title>
+  <meta name="description" content="" />
+  <meta property="og:title" content="" />
+  <meta property="og:description" content="" />
+  <meta property="og:image" content="" />
+  <meta property="og:url" content="" />
+  <meta name="theme-color" content="#1a1a1a" />
+
+  <link id="font-link" rel="stylesheet" href="" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <script type="module" src="config.js"></script>
+  <script type="module">
+    import config from './config.js';
+
+    // Set metadata and theme
+    document.title = "Connect Your Profile | " + config.site.title;
+    document.querySelector('meta[name="description"]').content = config.site.description;
+    document.querySelector('meta[property="og:title"]').content = config.metadata.socialCard.title;
+    document.querySelector('meta[property="og:description"]').content = config.metadata.socialCard.description;
+    document.querySelector('meta[property="og:image"]').content = config.metadata.socialCard.image;
+    document.querySelector('meta[property="og:url"]').content = config.site.url + "profile.html";
+
+    const fontParam = config.metadata.googleFonts.join('&family=');
+    document.getElementById('font-link').href = `https://fonts.googleapis.com/css2?family=${fontParam}&display=swap`;
+
+    const root = document.documentElement;
+    const theme = config.theme;
+
+    Object.entries(theme.colors).forEach(([key, val]) => {
+      if (typeof val === 'string') {
+        root.style.setProperty(`--clr-${key}`, val);
+      } else {
+        Object.entries(val).forEach(([subKey, subVal]) => {
+          root.style.setProperty(`--clr-${key}-${subKey}`, subVal);
+        });
+      }
+    });
+
+    root.style.setProperty('--font-heading', theme.fonts.heading);
+    root.style.setProperty('--font-body', theme.fonts.body);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const logo = document.querySelector('.logo');
+      if (logo) logo.textContent = config.site.headerTitle;
+
+      const menuTarget = document.getElementById('global-menu');
+      if (menuTarget) menuTarget.innerHTML = config.menu.html;
+    });
+  </script>
+</head>
+
+<body>
+  <header>
+    <nav class="container">
+      <a href="/" class="logo"></a>
+      <ul class="nav-links">
+        <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
+        <li><a href="https://discord.com/invite/RgUh9kHx86" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
+        <li><a href="/profile.html">PROFILE</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div id="global-menu"></div>
+
+  <!-- Profile Section -->
+  <section class="hero">
+    <div class="container" style="text-align: center;">
+      <h1>Connect Your Discord</h1>
+      <p>Enter your Discord username to view your Mushroom Planet profile.</p>
+
+      <input type="text" id="discord-id" placeholder="Username#0000 or Discord ID" class="button" style="margin-top: 1rem; padding: 0.5rem; width: 280px; background: #fff; color: #000;" />
+      <br />
+      <button class="button" id="connect-btn" style="margin-top: 1rem;">Connect</button>
+
+      <p id="step-message" style="margin-top: 1.5rem;"></p>
+
+      <div id="code-input" style="display: none; margin-top: 1rem;">
+        <input type="text" id="verify-code" placeholder="Enter code from Pixie bot" class="button" style="padding: 0.5rem; width: 220px; background: #fff; color: #000;" />
+        <br />
+        <button class="button" id="verify-btn" style="margin-top: 1rem;">Verify</button>
+      </div>
+
+      <div id="profile-data" style="display: none; margin-top: 2rem;">
+        <h2>Your Profile</h2>
+        <pre id="profile-output" style="text-align: left; background: #111; padding: 1rem; color: #eee; border-radius: 0.5rem;"></pre>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">&copy; 2025 Mushroom Planet. All rights reserved.</div>
+  </footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_REAL_KEY",
+  authDomain: "sporebot-test.firebaseapp.com",
+  databaseURL: "https://sporebot-test-default-rtdb.firebaseio.com",
+  projectId: "sporebot-test",
+  storageBucket: "sporebot-test.appspot.com",
+  messagingSenderId: "YOUR_REAL_SENDER_ID",
+  appId: "YOUR_REAL_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+window.readUserData = async (user_id) => {
+  const response = await fetch(`/api/user/${user_id}`);
+  if (!response.ok) return null;
+  return await response.json();
+};
+
+document.getElementById("connect-btn").onclick = async () => {
+  const discordId = document.getElementById("discord-id").value.trim();
+  if (!discordId) return alert("Please enter your Discord username or ID.");
+
+  document.getElementById("step-message").textContent = "🔍 Looking up user...";
+
+  try {
+    const firebaseData = await window.readUserData(discordId);
+
+    if (!firebaseData?.pixie && !firebaseData?.sporebot) {
+      document.getElementById("step-message").textContent = "❌ User not found.";
+      return;
+    }
+
+    document.getElementById("profile-data").style.display = "block";
+    document.getElementById("step-message").textContent = "✅ Profile loaded!";
+
+    const { pixie, sporebot } = firebaseData;
+    const output = document.getElementById("profile-output");
+
+    function formatSection(title, htmlContent) {
+      return `
+        <button class="accordion">${title}</button>
+        <div class="panel">${htmlContent}</div>
+      `;
+    }
+
+    const nftList = Object.keys(pixie?.Wallet?.NFT || {})
+      .filter(k => k !== "total_nft")
+      .map(k => k.replace(" ID", " #"))
+      .join(", ");
+
+    output.innerHTML = `
+      <h2>👤 Profile Overview</h2>
+      <strong>🎮 Username:</strong> ${pixie?.Misc?.username}<br>
+      <strong>🆔 ID:</strong> ${pixie?.Misc?.user_id}<br>
+      <strong>📅 Joined:</strong> ${pixie?.Misc?.created_at}<br>
+      <strong>🌱 Farm Name:</strong> ${sporebot?.Misc?.custom_name}<br>
+      <hr>
+
+      ${formatSection("🧠 Pixie Stats", `
+        Level: ${pixie?.Pixie?.LvL}<br>
+        XP: ${pixie?.Pixie?.Total_XP} / ${pixie?.Pixie?.XP_Needed}<br>
+        GS: ${pixie?.Pixie?.GS}
+      `)}
+
+      ${formatSection("🧠 Message XP", `
+        Total: ${pixie?.Message_XP?.Total_Message_XP}<br>
+        Streak: ${pixie?.Message_XP?.current_streak}<br>
+        Daily Limit: ${pixie?.Message_XP?.daily_limit}<br>
+        Gifs: ${pixie?.Message_XP?.gifs_used} | Reactions: ${pixie?.Message_XP?.reactions_added}
+      `)}
+
+      ${formatSection("🍄 GoodShroom", `
+        Given: ${pixie?.GoodShroom?.Given} | Received: ${pixie?.GoodShroom?.Received}
+      `)}
+
+      ${formatSection("💰 Wallet", `
+        SHROOM: ${pixie?.Wallet?.shroom_wallet}<br>
+        SPORE: ${pixie?.Wallet?.spore_wallet}<br>
+        NFTs: ${nftList}<br>
+        Address: ${pixie?.Wallet?.Address}
+      `)}
+
+      ${formatSection("🌾 Farm Stats", `
+        Rank: ${sporebot?.Farm?.farm_rank}<br>
+        Stage: ${sporebot?.Farm?.current_stage}<br>
+        Streak: ${sporebot?.Farm?.streak} (Record: ${sporebot?.Farm?.streak_record})<br>
+        Regen Rate: ${sporebot?.Farm?.spore_generation_rate}<br>
+        Lifetime SPORES: ${sporebot?.Farm?.lifetime_spores}<br>
+        Generated: ${sporebot?.Farm?.spores_generated}<br>
+        Toss Well: ${sporebot?.Farm?.toss_well ? "✅" : "❌"}
+      `)}
+
+      ${formatSection("🎒 Inventory", `
+        Artifacts: ${Object.entries(sporebot?.Inventory?.Artifacts || {}).filter(([_, v]) => v).map(([k]) => k).join(", ") || "None"}<br>
+        Items: ${Object.entries(sporebot?.Inventory?.Items || {}).filter(([_, v]) => v).map(([k]) => k).join(", ") || "None"}<br>
+        Potions: ${Object.keys(sporebot?.Inventory?.Potions || {}).filter(k => k.startsWith("Potion_")).length} stored<br>
+        Ingredients: ${Object.entries(sporebot?.Inventory?.Ingredients || {}).map(([k, v]) => `${k} (${v})`).join(", ")}
+      `)}
+
+      ${formatSection("🛡️ Security", `
+        Reddit: ${pixie?.Security?.RedditName} ${pixie?.Security?.RedditLink ? "✅" : "❌"}<br>
+        Verified: ${pixie?.Security?.Verified ? "✅" : "❌"}<br>
+        Withdraw Attempts: ${pixie?.Security?.Withdraw_Attempts}
+      `)}
+
+      ${formatSection("🎁 Tipping", `
+        Given: 🍄 ${pixie?.Tipping?.Total?.Given?.Total_Shrooms} | 🌀 ${pixie?.Tipping?.Total?.Given?.Total_Spores}<br>
+        Received: 🍄 ${pixie?.Tipping?.Total?.Received?.Total_Shrooms} | 🌀 ${pixie?.Tipping?.Total?.Received?.Total_Spores}<br>
+        Airdrops: 🌀 ${pixie?.Tipping?.Airdrop?.Total_Spores}<br>
+        Raffles: 🌀 ${pixie?.Tipping?.Raffle?.Total_Spores}
+      `)}
+
+      <br><em>Data powered by Firebase</em>
+    `;
+
+    // Enable accordion toggle
+    const acc = document.getElementsByClassName("accordion");
+    for (let i = 0; i < acc.length; i++) {
+      acc[i].addEventListener("click", function () {
+        this.classList.toggle("active");
+        const panel = this.nextElementSibling;
+        panel.style.display = panel.style.display === "block" ? "none" : "block";
+      });
+    }
+
+  } catch (err) {
+    document.getElementById("step-message").textContent = "❌ Error loading profile.";
+    console.error(err);
+  }
+};
+
+</script>
+
+</body>
+</html>
