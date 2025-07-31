@@ -19,8 +19,3 @@ build/
 
 # VSCode settings
 .vscode/
-
-# Duplicate or working copies
-/public/styles.css
-/public/config.js
-/public/profile.html
