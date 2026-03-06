@@ -5,14 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>Sporebot | Mushroom Planet</title>
-  <meta name="description" content="Grow your mushroom farm, earn SPORES, brew potions, and explore Web3 — all from Discord." />
+  <meta name="description" content="Grow your mushroom farm, earn SPORES, brew potions, bond with companions, and explore Web3 — all from Discord." />
   <meta property="og:title" content="Sporebot | Mushroom Planet" />
-  <meta property="og:description" content="Grow your mushroom farm, earn SPORES, brew potions, and explore Web3 — all from Discord." />
+  <meta property="og:description" content="Grow your mushroom farm, earn SPORES, brew potions, bond with companions, and explore Web3 — all from Discord." />
   <meta property="og:image" content="/images/social-card.png" />
   <meta property="og:url" content="https://mushroomplanet.xyz/sporebot.html" />
 
   <link id="font-link" rel="stylesheet" href="" />
   <link rel="stylesheet" href="styles.css" />
+<<<<<<< Updated upstream
+=======
+  <script type="module" src="config.js"></script>
+</head>
+
+<body>
+  <header>
+    <nav class="container">
+      <a href="/" class="logo"></a>
+      <ul class="nav-links">
+        <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
+        <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
+        <li><a href="/profile.html">PROFILE</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div id="global-menu"></div>
+
+  <!-- Price Section -->
+  <div id="price-bar">
+    <div class="price-content">
+      <!-- SHROOM Group -->
+      <div class="price-group">
+        <img src="/images/shroom_small.png" alt="$HROOM" />
+        <span>
+          <a href="https://www.geckoterminal.com/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+            SHROOM PRICE: <strong id="shroom-price"></strong>
+          </a>
+        </span>
+      </div>
+      <!-- SPORE Group -->
+      <div class="price-group">
+        <img src="/images/spore_small.png" alt="SPORE" />
+        <span>
+          <a href="https://www.geckoterminal.com/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+            SPORE PRICE: <strong id="spore-price"></strong>
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1>Sporebot Farming System</h1>
+      <p>Grow your mushroom farm, bond with companions, stake SPORES, and explore Web3 — all from Discord.</p>
+      <div class="button-group">
+        <a class="button guide-button" href="https://discord.com/invite/ECauU2KSSt" target="_blank">Start Farming</a>
+        <a class="button guide-button" href="guides.html">Sporebot Guide</a>
+      </div>
+    </div>
+  </section>
+>>>>>>> Stashed changes
 
   <!-- Theme and metadata setup -->
   <script type="module">
@@ -21,7 +76,10 @@
     const root = document.documentElement;
     const theme = config.theme;
 
+<<<<<<< Updated upstream
     // Set SEO and OG tags
+=======
+>>>>>>> Stashed changes
     document.title = "Sporebot | " + config.site.title;
     document.querySelector('meta[name="description"]').content = config.site.description;
     document.querySelector('meta[property="og:title"]').content = config.metadata.socialCard.title;
@@ -29,11 +87,17 @@
     document.querySelector('meta[property="og:image"]').content = config.metadata.socialCard.image;
     document.querySelector('meta[property="og:url"]').content = config.site.url + "/sporebot.html";
 
+<<<<<<< Updated upstream
     // Load fonts
     const fontParam = config.metadata.googleFonts.join('&family=');
     document.getElementById('font-link').href = `https://fonts.googleapis.com/css2?family=${fontParam}&display=swap`;
 
     // Set theme colors and fonts
+=======
+    const fontParam = config.metadata.googleFonts.join('&family=');
+    document.getElementById('font-link').href = `https://fonts.googleapis.com/css2?family=${fontParam}&display=swap`;
+
+>>>>>>> Stashed changes
     Object.entries(theme.colors).forEach(([key, val]) => {
       if (typeof val === 'string') {
         root.style.setProperty(`--clr-${key}`, val);
@@ -124,121 +188,415 @@
     </div>
   </section>
 
-  <!-- Features -->
-<section id="features" class="features section-dark">
-  <div class="container">
-    <h2>Sporebot on Discord</h2>
-    <div class="feature-grid">
-      <div class="card">
-        <h3>✅ Getting Started</h3>
-        <p>First, <strong>Join our Discord</strong> and complete verification. Next, go to the <strong>#sporebot</strong> channel and type <strong>!start</strong> to begin your journey.</strong></p>
+  <!-- Discord Features Section -->
+  <section id="features" class="features section-dark">
+    <div class="container">
+      <h2>Sporebot on Discord</h2>
+      <div class="feature-grid">
+
+        <div class="card">
+          <h3>✅ Getting Started</h3>
+          <p>First, <strong>Join our Discord</strong> and complete verification. Next, go to the <strong>#sporebot</strong> channel and type <strong>!start</strong> to begin your journey.</p>
         </div>
-      <div class="card">
-        <h3>🌱 Plant & Grow</h3>
-        <p>Use <strong>!plant</strong> to sow SHROOMS and generate <strong>SPORES</strong>. Advance through 5 growth stages and boost your SPORE RATE up to <strong>+20%</strong>.</p>
-      </div>
-      <div class="card">
-        <h3>🚜 Harvest & Rank</h3>
-        <p>After 42 days, use <strong>!harvest</strong> to collect your harvest and advance to the next farm rank (Bronze → Diamond), unlocking permanent farm bonuses.</p>
-      </div>
-      <div class="card">
-        <h3>📆 Daily Routine</h3>
-        <p>Every day you can use <strong>!forage</strong>, <strong>!mist</strong>, <strong>!fan</strong>, <strong>!visit</strong>, <strong>!explore</strong>, and more. Each earning you real rewards.</p>
-      </div>
-      <div class="card">
-        <h3>🔎 Explore Forest</h3>
-        <p>Use <strong>!explore</strong> to journey through the Enchanted Forest to discover rare ingredients, scrolls, artifacts, secret caves, and more...</p>
-      </div>
-      <div class="card">
-        <h3>🧪 Brew Potions</h3>
-        <p>Gather ingredients and craft powerful potions with <strong>!brew</strong>. Boost stats that increase your farm bonuses or rewards!</p>
-      </div>
-      <div class="card">
-        <h3>⛏️ Dig for Treasure</h3>
-        <p>Unlock the Golden Shovel with a 7-day <strong>!forage</strong> streak. Then use <strong>!dig</strong> to find SHROOMS, SPORES, NFTs, or Golden Chests.</p>
-      </div>
-      <div class="card">
-        <h3>🧙 Visit Wimblecap</h3>
-        <p>Use <strong>!visit</strong> to meet Wimblecap. Get lore, bonus items, and scroll explanations. Unlock major rewards at <strong>14 and 50 visits</strong>.</p>
+
+        <div class="card">
+          <h3>🌱 Plant & Grow</h3>
+          <p>Use <strong>!plant</strong> to sow SHROOMS and generate <strong>SPORES</strong>. Advance through 5 growth stages and boost your SPORE RATE up to <strong>+20%</strong>.</p>
         </div>
-      <div class="card">
-        <h3>📈 Leaderboards</h3>
-        <p>Track your Pixie XP, forage streaks, and item counts with <strong>!lb</strong> and see how you rank among the community.</p>
+
+        <div class="card">
+          <h3>🚜 Harvest & Rank</h3>
+          <p>After 42 days, use <strong>!harvest</strong> to collect your harvest and advance to the next farm rank (Bronze to Diamond), unlocking permanent farm bonuses.</p>
+        </div>
+
+        <div class="card">
+          <h3>📆 Daily Routine</h3>
+          <p>Every day you can use <strong>!forage</strong>, <strong>!mist</strong>, <strong>!fan</strong>, <strong>!gather</strong>, <strong>!visit</strong>, <strong>!explore</strong>, <strong>!cave</strong>, and more. Each earns you real rewards.</p>
+        </div>
+
+        <div class="card">
+          <h3>🔎 Explore Forest</h3>
+          <p>Use <strong>!explore</strong> to journey through the Enchanted Forest to discover rare ingredients, scrolls, artifacts, secret caves, and more...</p>
+        </div>
+
+        <div class="card">
+          <h3>🧪 Brew Potions</h3>
+          <p>Gather ingredients with <strong>!gather</strong> and craft powerful potions with <strong>!brew</strong>. Boost stats that increase your farm bonuses or rewards!</p>
+        </div>
+
+        <div class="card">
+          <h3>⛏️ Dig for Treasure</h3>
+          <p>Unlock the Golden Shovel with a 7-day <strong>!forage</strong> streak. Then use <strong>!dig</strong> to find SHROOMS, SPORES, NFTs, or Golden Chests.</p>
+        </div>
+
+        <div class="card">
+          <h3>🧙 Visit Wimblecap</h3>
+          <p>Use <strong>!visit</strong> to meet Wimblecap. Get lore, bonus items, and scroll explanations. Unlock major rewards at <strong>14 and 50 visits</strong>.</p>
+        </div>
+
+        <!-- NEW: Companion Pets -->
+        <div class="card">
+          <h3>🐾 Companion Pets</h3>
+          <p>Use <strong>!feed</strong> to bond with one of <strong>12 unique companions</strong>. Each grows with you over 42 days, unlocking a powerful unique ability at <strong>Bond Level 5</strong>.</p>
+        </div>
+
+        <!-- NEW: Staking -->
+        <div class="card">
+          <h3>🏦 Stake SPORES</h3>
+          <p>Use <strong>!stake</strong> to earn <strong>20% APR</strong> on your SPORES. Accumulate <strong>Mycelium Voting Power (MVP)</strong> for future governance. 100M SPORES = 1 Mycelium Node.</p>
+        </div>
+
+        <!-- NEW: Freeze System -->
+        <div class="card">
+          <h3>❄️ Farm Freeze</h3>
+          <p>Going on vacation? Use <strong>!freeze</strong> to pause your farm and protect your planted SHROOMS. Unfreeze anytime after 3 days with <strong>!unfreeze</strong>.</p>
+        </div>
+
+        <div class="card">
+          <h3>📈 Leaderboards</h3>
+          <p>Track your Pixie XP, forage streaks, and item counts with <strong>!lb</strong> and see how you rank among the community.</p>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- Features -->
-<section id="features" class="features section-light">
-  <div class="container">
-    <h2>Sporebot on Reddit</h2>
-    <div class="feature-grid">
+  <!-- Companion Pets Showcase Section -->
+  <section class="features section-light">
+    <div class="container">
+      <h2>🐾 Companion Pets</h2>
+      <p style="max-width: 800px; margin: 0 auto 2rem; text-align: center; font-size: 1.05rem; line-height: 1.6;">
+        Feed SHROOMS into your farm using <strong>!feed</strong> to unlock and bond with one of 12 unique companions. Each companion grows alongside you over 42 days and unlocks a powerful unique ability at <strong>Bond Level 5</strong>. The more you feed, the more companions you unlock.
+      </p>
+      <div class="feature-grid">
 
-    <div class="card">
-      <h3>💧 Faucet System</h3>
-      <p>New users can use <strong>!faucet</strong> to receive a time bonus of<strong> 1,000 SHROOMS</strong> + <strong>100,000 SPORES</strong>. Your Account must meet the required karma and age.
-    </div>
+        <div class="card">
+          <h3>🐢 Turtle</h3>
+          <p><strong>Bonus:</strong> Gather Cooldown Half<br />
+          <strong>Unique (Lv.5):</strong> Use !gather every 30 minutes instead of the normal cooldown.<br />
+          <em>Unlock: 50,000 SHROOMS fed</em></p>
+        </div>
 
-    <div class="card">
-      <h3>🌱 Daily Forage Threads</h3>
-      <p>Once per day you can <strong>!forage</strong> to earn SHROOMS & SPORES. A new thread is posted daily at <strong>4:20 EST</strong>.
-       Maintain your streak to earn more <strong>SHROOMS</strong> and <strong>SPORES</strong> over time.</p>
-    </div>
+        <div class="card">
+          <h3>🐰 Bunny</h3>
+          <p><strong>Bonus:</strong> Double Herb Chance<br />
+          <strong>Unique (Lv.5):</strong> Double herb procs become TRIPLED.<br />
+          <em>Unlock: 100,000 SHROOMS fed</em></p>
+        </div>
 
-    <div class="card">
-      <h3>🍄 Forage Rewards</h3>
-      <p>Each time your <strong>!forage</strong> streak increases so to do your rewards.
-      You can earn a maximum of <strong>1,000 to 6,874 SHROOMS</strong> and up to <strong>687,400 SPORES</strong>.</p>
-    </div>
+        <div class="card">
+          <h3>🦊 Fox</h3>
+          <p><strong>Bonus:</strong> Rare Herb Chance<br />
+          <strong>Unique (Lv.5):</strong> Increased chance to find Voidspore.<br />
+          <em>Unlock: 150,000 SHROOMS fed</em></p>
+        </div>
 
-    <div class="card">
-      <h3>📈 Streak Progression</h3>
-      <p>Longer streaks will earn special flairs. Show your dedication to the Mushroom Planet. Rank up from Bronze Shroomie all the way to Diamond Shroomie!
-    </div>
+        <div class="card">
+          <h3>🐸 Frog</h3>
+          <p><strong>Bonus:</strong> Extra Daily Brews<br />
+          <strong>Unique (Lv.5):</strong> 5% chance to add an extra stat to your brews.<br />
+          <em>Unlock: 200,000 SHROOMS fed</em></p>
+        </div>
 
-    <div class="card">
-      <h3>🔗 Wallet Linking & Rewards</h3>
-      <p>From your Reddit account, use <strong>!link 0xYourWallet</strong> to connect your Discord account.
-      Claim <strong>50,000 SHROOMS</strong> + <strong>5,000,000 SPORES</strong> instantly once verified.</p>
-    </div>
+        <div class="card">
+          <h3>🐺 Wolf</h3>
+          <p><strong>Bonus:</strong> Daily Cave Runs<br />
+          <strong>Unique (Lv.5):</strong> +1 extra continue per cave run.<br />
+          <em>Unlock: 250,000 SHROOMS fed</em></p>
+        </div>
 
-    <div class="card">
-      <h3>✨ Praise the Bot!</h3>
-      <p>Reply <strong>“goodbot”</strong> to any Sporebot message to show your appreciation.
-      For every 100 compliments, one will be randomly be selected for a bonus!
+        <div class="card">
+          <h3>🦆 Duck</h3>
+          <p><strong>Bonus:</strong> Vacation Day Interval<br />
+          <strong>Unique (Lv.5):</strong> Sell vacation days for SHROOMS using !shop.<br />
+          <em>Unlock: 300,000 SHROOMS fed</em></p>
+        </div>
+
+        <div class="card">
+          <h3>🦌 Deer</h3>
+          <p><strong>Bonus:</strong> Harvest Bonus<br />
+          <strong>Unique (Lv.5):</strong> Automatically begin in Germination Stage after !harvest.<br />
+          <em>Unlock: 350,000 SHROOMS fed</em></p>
+        </div>
+
+        <div class="card">
+          <h3>🦉 Owl</h3>
+          <p><strong>Bonus:</strong> Patience (unique mechanic)<br />
+          <strong>Unique (Lv.5):</strong> Equip 2 other companions alongside Owl.<br />
+          <em>Unlock: 420,000 SHROOMS fed</em></p>
+        </div>
+
+        <div class="card">
+          <h3>🐻 Bear</h3>
+          <p><strong>Bonus:</strong> Plant Limit Bonus<br />
+          <strong>Unique (Lv.5):</strong> Bad weather can never reduce !mist or !fan below 1.0x.<br />
+          <em>Unlock: 500,000 SHROOMS fed</em></p>
+        </div>
+
+      </div>
     </div>
+  </section>
+
+  <!-- Reddit Features Section -->
+  <section id="reddit-features" class="features section-dark">
+    <div class="container">
+      <h2>Sporebot on Reddit</h2>
+      <div class="feature-grid">
+
+        <div class="card">
+          <h3>💧 Faucet System</h3>
+          <p>New users can use <strong>!faucet</strong> to receive a one-time bonus of <strong>1,000 SHROOMS</strong> + <strong>100,000 SPORES</strong>. Your account must meet the required karma and age.</p>
+        </div>
+
+        <div class="card">
+          <h3>🌱 Daily Forage Threads</h3>
+          <p>Once per day you can <strong>!forage</strong> to earn SHROOMS & SPORES. A new thread is posted daily at <strong>4:20 EST</strong>. Maintain your streak to earn more over time.</p>
+        </div>
+
+        <div class="card">
+          <h3>🍄 Forage Rewards</h3>
+          <p>Each time your <strong>!forage</strong> streak increases, so do your rewards. You can earn a maximum of <strong>1,000 to 6,874 SHROOMS</strong> and up to <strong>687,400 SPORES</strong>.</p>
+        </div>
+
+        <div class="card">
+          <h3>📈 Streak Progression</h3>
+          <p>Longer streaks earn special flairs. Show your dedication to the Mushroom Planet. Rank up from Bronze Shroomie all the way to Diamond Shroomie!</p>
+        </div>
+
+        <div class="card">
+          <h3>🔗 Wallet Linking & Rewards</h3>
+          <p>From your Reddit account, use <strong>!link 0xYourWallet</strong> to connect your Discord account. Claim <strong>50,000 SHROOMS</strong> + <strong>5,000,000 SPORES</strong> instantly once verified.</p>
+        </div>
+
+        <div class="card">
+          <h3>✨ Praise the Bot!</h3>
+          <p>Reply <strong>"goodbot"</strong> to any Sporebot message to show your appreciation. For every 100 compliments, one will be randomly selected for a bonus!</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="faq section-dark">
+    <div class="container">
+      <h2>📘 Frequently Asked Questions</h2>
+      <p style="text-align: center; max-width: 700px; margin: 0 auto 2rem; color: #ffffe1; font-size: 1.1rem;">
+        Below you'll find answers to the most commonly asked questions. Click a category below to reveal helpful information and detailed explanations.
+      </p>
+
+      <div class="faq-toggle-buttons" style="text-align: center; margin-bottom: 2rem;">
+        <button class="faq-toggle active" data-target="sporebot">Sporebot Q&A</button>
+        <button class="faq-toggle" data-target="verification">Verification Q&A</button>
+        <button class="faq-toggle" data-target="planet">Mushroom Planet Q&A</button>
+        <button class="faq-toggle">
+          <a href="guides.html#sporebot-guide" style="color: inherit; text-decoration: none;">Sporebot Guide</a>
+        </button>
+      </div>
+
+      <!-- Mushroom Planet Q&A Accordion -->
+      <div id="faq-planet" class="accordion-section" style="display: none;">
+        <div class="accordion">
+          <div class="accordion-item"><button>🌍 What is Mushroom Planet?</button><div class="accordion-content"><p><strong>Mushroom Planet</strong> is the official home of everything $HROOM:<br>- 🍄 $HROOM Token<br>- 🎨 NFTs & Avatars<br>- 🖼️ Shroomie Art<br>- 💬 Lore and Community<br><br>Join the sporevolution!</p></div></div>
+
+          <div class="accordion-item"><button>🛒 How do I buy SHROOMS and SPORES?</button><div class="accordion-content">
+            <p><strong>To buy SHROOMS ($HROOM):</strong><br>
+            1. Visit <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank">QuickSwap - SHROOM Trade</a><br>
+            2. Connect your wallet (MetaMask, TrustWallet, etc.)<br>
+            3. Swap <strong>WETH</strong> or <strong>SPORES</strong> for <strong>$HROOM</strong><br>
+            4. Confirm the transaction<br><br>
+
+            <strong>To buy SPORES:</strong><br>
+            1. Visit <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank">QuickSwap - SPORE Trade</a><br>
+            2. Connect your wallet<br>
+            3. Swap <strong>WETH</strong> or <strong>SHROOMS</strong> for <strong>SPORES</strong><br>
+            4. Confirm the transaction<br><br>
+
+            Always double-check token contracts before swapping.
+            </p>
+          </div></div>
+
+          <div class="accordion-item"><button>🍄 What is the $HROOM Token?</button><div class="accordion-content">
+            <p>Mushroom Planet - The Official Home of:<br><br>
+            🍄 <strong>SHROOM Token</strong> ($HROOM)<br>
+            🌀 <strong>SPORE Token</strong> (SPR)<br>
+            🤖 <strong>Sporebot Farming</strong><br>
+            🖼️ <strong>Mooshie NFTs</strong><br>
+            🎨 <strong>Mushroom Art</strong>
+            </p>
+          </div></div>
+
+          <div class="accordion-item"><button>📜 What are the $HROOM Token Details?</button><div class="accordion-content">
+            <p>
+              - 🍄 <strong>Token Name:</strong> Shroom<br>
+              - 🪙 <strong>Symbol:</strong> $HROOM<br>
+              - 🔢 <strong>Total Supply:</strong> 6,874,000,000<br>
+              - 🧾 <strong>Decimals:</strong> 18<br>
+              - 📄 <strong>Contract:</strong> <a href="https://polygonscan.com/address/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank">View on Polygonscan</a><br>
+              - 💧 <strong>Top LP:</strong> <a href="https://polygonscan.com/token/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28#balances" target="_blank">View LP</a><br>
+              - 🔁 <strong>Buy:</strong> <a href="https://quickswap.exchange/#/swap?currency0=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&currency1=0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank">QuickSwap</a><br>
+              - 📉 <strong>Live Price:</strong> <a href="https://www.dextools.io/app/en/polygon/pair-explorer/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28" target="_blank">DEXTools</a>
+            </p>
+          </div></div>
+
+          <div class="accordion-item"><button>📈 Where can I see the price of $HROOM?</button><div class="accordion-content">
+            <p>
+              📊 <a href="https://www.dextools.io/app/en/polygon/pair-explorer/0x7ef9689dc8cbcf121fc4d600362a8ce31e3c2ff3" target="_blank">DEXTools</a><br>
+              📉 <a href="https://www.geckoterminal.com/polygon_pos/pools/0x7ef9689dc8cbcf121fc4d600362a8ce31e3c2ff3" target="_blank">GeckoTerminal</a><br>
+              🌐 <a href="https://rccmarketcap.com/currencies/$hroom" target="_blank">RCCMarketcap</a>
+            </p>
+          </div></div>
+
+          <div class="accordion-item"><button>🌀 What is the SPORE Token?</button><div class="accordion-content">
+            <p>
+              SPORE is a dual-token designed to power the Mushroom Planet Ecosystem.<br><br>
+              Earned via Sporebot, LP, and $HROOM/NFT holding<br>
+              Future governance token for community decisions<br>
+              Used for upgrades, proposals, and staking<br><br>
+              <a href="https://www.reddit.com/r/MushroomPlanet/comments/1hwlmd7/spores_is_officially_live_add_to_the_lp_to_earn/" target="_blank">See full Reddit launch post</a>
+            </p>
+          </div></div>
+
+          <div class="accordion-item"><button>📜 What are the SPORE Token Details?</button><div class="accordion-content">
+            <p>
+              - 🧬 <strong>Token Name:</strong> Spore<br>
+              - 🪙 <strong>Symbol:</strong> (SPR)<br>
+              - 🔢 <strong>Total Supply:</strong> 687,400,000,000<br>
+              - 🧾 <strong>Decimals:</strong> 18<br>
+              - 📄 <strong>Contract:</strong> <a href="https://polygonscan.com/address/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank">View on Polygonscan</a><br>
+              - 💧 <strong>Top LP:</strong> <a href="https://polygonscan.com/token/0x2a91571238303c6700a9336342c754e159243168#balances" target="_blank">View LP</a><br>
+              - 🔁 <strong>DEX:</strong> <a href="https://quickswap.exchange/#/swap?currency0=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&currency1=0x089582AC20ea563c69408a79E1061de594b61bED&swapIndex=0" target="_blank">QuickSwap</a>
+            </p>
+          </div></div>
+
+          <div class="accordion-item"><button>📦 What was the initial SPORE token allocation?</button><div class="accordion-content">
+            <p>
+              - 🧑‍🚀 <strong>Avatar Airdrop:</strong> 10%<br>
+              - 💧 <strong>Liquidity:</strong> 25%<br>
+              - 🔁 <strong>LP Rewards:</strong> 10%<br>
+              - ⛏️ <strong>Mining & Reserve:</strong> 55%
+            </p>
+          </div></div>
+
+          <div class="accordion-item"><button>💰 How do I earn $HROOMS?</button><div class="accordion-content">
+            <p>
+              📬 Post to earn on <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank">r/MushroomPlanet</a><br>
+              🌾 Farm using Sporebot on Discord<br>
+              💸 Receive tips on your posts or comments
+            </p>
+          </div></div>
+
+          <div class="accordion-item"><button>📨 How do I tip on Reddit?</button><div class="accordion-content">
+            <p>
+              Tipping is powered by <a href="https://www.reddit.com/r/communitycurrency/" target="_blank">r/CommunityCurrency</a>.<br>
+              📖 <a href="https://www.reddit.com/r/communitycurrency/comments/1auwybs/guide_commands_and_post2earn_mining/" target="_blank">Click here for full command guide</a>
+            </p>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- Sporebot Q&A Accordion -->
+      <div id="faq-sporebot" class="accordion-section">
+        <div class="accordion">
+          <div class="accordion-item"><button>🌱 How do I start my farm?</button><div class="accordion-content"><p>Type <strong>!start</strong> to launch your farm and receive your initial 1,000 SHROOMS.</p></div></div>
+          <div class="accordion-item"><button>🌾 What does !plant [amount] do?</button><div class="accordion-content"><p>It allows you to plant SHROOMS from your wallet into your farm, boosting your SPORE generation based on your SGR (Spore Generation Rate).</p></div></div>
+          <div class="accordion-item"><button>🍄 How can I check the status of my farm?</button><div class="accordion-content"><p>Use <strong>!farm</strong> to view your farm's current stage, Spore Generation Rate, and other important stats.</p></div></div>
+          <div class="accordion-item"><button>🏠 How can I check my cooldowns?</button><div class="accordion-content"><p>Use <strong>!home</strong> to view your cooldowns, items, artifacts, scrolls, potions, and in-game stats.</p></div></div>
+          <div class="accordion-item"><button>🍂 How does !forage work?</button><div class="accordion-content"><p>Foraging (via <strong>!forage</strong>) lets you gather SHROOMS around your farm. Don't miss a day! Increase your streak and earn bonus rewards.</p></div></div>
+          <div class="accordion-item"><button>🔥 Why is the !forage streak important?</button><div class="accordion-content"><p>It boosts your rewards and unlocks items (like the Golden Shovel) at key milestones. Long streaks also earn special Reddit flairs.</p></div></div>
+          <div class="accordion-item"><button>💧 How does !mist work?</button><div class="accordion-content"><p>Type <strong>!mist</strong> to water your farm and earn SPORES — anywhere from 10,000 to 100,000 SPORES.</p></div></div>
+          <div class="accordion-item"><button>🌬️ How does !fan work?</button><div class="accordion-content"><p>Using <strong>!fan</strong> gives your farm fresh air and earns you 100 to 1,000 SHROOMS.</p></div></div>
+          <div class="accordion-item"><button>🌿 How does !gather work?</button><div class="accordion-content"><p><strong>!gather</strong> lets you collect herbs used for potion brewing. Herbs are the core ingredient in <strong>!brew</strong>. Some companions reduce your gather cooldown!</p></div></div>
+          <div class="accordion-item"><button>⛰️ How does !cave work?</button><div class="accordion-content"><p><strong>!cave</strong> lets you explore underground for gemstones and rare loot. Gemstones can be sold to Rhizo in <strong>!shop</strong> for SPORES. Collect all 5 types for a +25% SGR bonus!</p></div></div>
+          <div class="accordion-item"><button>🌬️ What do the different farm growth stages mean?</button><div class="accordion-content"><p>Your farm progresses through 5 stages, each increasing SPORE yield. Use <strong>!guide</strong> in Discord to learn more about each stage.</p></div></div>
+          <div class="accordion-item"><button>🌲 How does !explore work?</button><div class="accordion-content"><p><strong>!explore</strong> sends you into the forest to find Artifacts, Scrolls, herbs, and secrets.</p></div></div>
+          <div class="accordion-item"><button>🎒 What are Artifacts and Scrolls?</button><div class="accordion-content"><p>They're collectible items you discover while exploring. Gather them all for bonuses and achievements.</p></div></div>
+          <div class="accordion-item"><button>🧙 How does !visit work?</button><div class="accordion-content"><p><strong>!visit</strong> lets you meet Wimblecap for daily lore, items, and helpful insights. Reach 14 and 50 visits for major rewards.</p></div></div>
+          <div class="accordion-item"><button>⛲ How does !toss work?</button><div class="accordion-content"><p>Once unlocked, <strong>!toss</strong> grants a random reward with a rare chance of a big bonus!</p></div></div>
+          <div class="accordion-item"><button>🪓 How does !dig work?</button><div class="accordion-content"><p><strong>!dig</strong> becomes available after a 7-day forage streak and lets you uncover hidden treasures including SHROOMS, SPORES, NFTs, and Golden Chests.</p></div></div>
+          <div class="accordion-item"><button>💼 How do I check my balance?</button><div class="accordion-content"><p>Use the <strong>/balance</strong> command (slash, not bang) to view your farm, Discord, Reddit, and on-chain wallet balances privately.</p></div></div>
+          <div class="accordion-item"><button>🚜 How do I !harvest my farm?</button><div class="accordion-content"><p>Type <strong>!harvest</strong> to collect all SHROOMS/SPORES. In the Sporulation Stage, you also gain bonus rewards and ranking options.</p></div></div>
+          <div class="accordion-item"><button>🎵 How can I restore my forage streak?</button><div class="accordion-content"><p>Visit Wimblecap 14 times to unlock <strong>!flute</strong>, which can restore your streak if it broke within the past 3 days.</p></div></div>
+          <div class="accordion-item"><button>🍄 What's the difference between SHROOMS and SPORES?</button><div class="accordion-content"><p>SHROOMS are planted to generate SPORES. The more you plant, the more SPORES you earn daily. SHROOMS = seed, SPORES = yield.</p></div></div>
+          <div class="accordion-item"><button>📈 How do I increase my Spore Generation Rate?</button><div class="accordion-content"><p>Advance growth stages, use bonuses from potions and NFTs, and harvest during Sporulation to boost your permanent SGR.</p></div></div>
+          <div class="accordion-item"><button>🥇 How do I upgrade my farm rank?</button><div class="accordion-content"><p>Harvest during the Sporulation Stage. You can rank up 4 times (Bronze to Diamond) and gain up to +12% Bonus Spore Yield.</p></div></div>
+          <div class="accordion-item"><button>🐾 How do Companion Pets work?</button><div class="accordion-content"><p>Use <strong>!feed [amount]</strong> to donate SHROOMS and unlock companions. The more you feed, the more companions you unlock. Use <strong>!pet</strong> to view, select, and manage your active companion. Each companion reaches Bond Level 5 after 42 active days and unlocks its unique ability.</p></div></div>
+          <div class="accordion-item"><button>🏦 How does !stake work?</button><div class="accordion-content"><p>Use <strong>!stake [amount]</strong> to stake SPORES and earn <strong>20% APR</strong> (fixed rate). You also accumulate <strong>Mycelium Voting Power (MVP)</strong> for future governance. 100M SPORES = 1 Mycelium Node.</p></div></div>
+          <div class="accordion-item"><button>❄️ How does the !freeze command work?</button><div class="accordion-content"><p>Use <strong>!freeze</strong> to pause your farm if you're going on vacation or need a break. Your planted SHROOMS are protected. After a minimum of 3 days, use <strong>!unfreeze</strong> to resume. You can still view your farm with <strong>!farm</strong> or <strong>!home</strong> while frozen.</p></div></div>
+          <div class="accordion-item"><button>💎 What do I do with gemstones?</button><div class="accordion-content"><p>Gemstones are found in <strong>!cave</strong> and <strong>!dig</strong>. Sell them to <strong>Rhizo</strong> in the <strong>!shop</strong> for SPORES. Collecting all 5 different gemstone types grants you a permanent <strong>+25% SGR</strong> bonus!</p></div></div>
+          <div class="accordion-item"><button>🏪 How does !shop work?</button><div class="accordion-content"><p><strong>!shop</strong> has multiple NPCs:<br>- <strong>Rhizo</strong>: Sell gemstones for SPORES<br>- <strong>Mycelia</strong>: Craft Mystic Herbs<br>- <strong>Potion Market</strong>: Buy/sell potions with other players</p></div></div>
+        </div>
+      </div>
+
+      <!-- Verification Q&A Accordion -->
+      <div id="faq-verification" class="accordion-section" style="display: none;">
+        <div class="accordion">
+          <div class="accordion-item"><button>💸 How can I tip other users?</button><div class="accordion-content"><p>You can tip other players and earn XP for your <strong>!pixie</strong> by using:<br><code>!tip [amount] [shrooms/spores] @username</code> or by replying to their message.</p></div></div>
+          <div class="accordion-item"><button>🎁 How do I participate in an airdrop or raffle?</button><div class="accordion-content"><p>You must be <strong>PIXIE VERIFIED</strong> in order to enter any airdrop or raffle.</p></div></div>
+          <div class="accordion-item"><button>🔐 Why do we require verification and use captcha for withdrawals?</button><div class="accordion-content"><p>Captcha and verification protect the Sporebot economy by ensuring only real users — not bots — can withdraw. This keeps rewards fair and secure for everyone.</p></div></div>
+          <div class="accordion-item"><button>☑️ How do I become PIXIE VERIFIED?</button><div class="accordion-content"><p>Reach <strong>Level 10</strong> with your <strong>!pixie</strong>, then use <strong>!verify</strong> and complete 3 verification challenges: Reaction, Math Puzzle, and Captcha Test. Alternatively, owning a qualifying NFT can bypass the level requirement.</p></div></div>
+          <div class="accordion-item"><button>🧬 How do I level up my !pixie?</button><div class="accordion-content"><p>Earn XP by tipping others, hosting a <strong>!raffle</strong>, creating an <strong>!airdrop</strong>, or chatting:<br><br>
+            <ul>
+              <li>1 SHROOM tipped = 1 XP</li>
+              <li>100 SPORES tipped = 1 XP</li>
+              <li>5 typed characters = 1 XP</li>
+            </ul>
+            Example: typing <code>SPORE</code> = 1 XP
+          </p></div></div>
+          <div class="accordion-item"><button>💬 How does leveling up via messaging work?</button><div class="accordion-content"><p>You earn 1 XP for every 5 characters typed in allowed channels. Active chatting in the community helps your <strong>!pixie</strong> grow!</p></div></div>
+          <div class="accordion-item"><button>🔁 How do I use the !withdraw command?</button><div class="accordion-content"><p>You must be PIXIE VERIFIED.<br><br>
+            Then use:<br>
+            <code>!register [your_polygon_address]</code><br>
+            <code>!withdraw [amount] [shrooms/spores]</code><br>
+            Example: <code>!withdraw 500 shrooms</code><br><br>
+            A captcha will appear to confirm the withdrawal. Daily limits apply: 1M SHROOMS or 100M SPORES per day.
+          </p></div></div>
+          <div class="accordion-item"><button>🧠 What does the !goodshroom (!gs) command do?</button><div class="accordion-content"><p>Each time you level up your Pixie, you earn a Good Shroom Token.<br>
+            Use <code>!gs @username</code> (or reply with <code>!gs</code>) to give:<br>
+            - 1 Good Shroom Token<br>
+            - 6,874 bonus SPORES to the recipient</p></div></div>
+          <div class="accordion-item"><button>❓ What should I do if I don't receive a DM with help or the guide?</button><div class="accordion-content"><p>Make sure your Discord privacy settings allow messages from server members. If not, enable them in your Discord settings or ask a Mod for help.</p></div></div>
+          <div class="accordion-item"><button>🔔 How do notifications work?</button><div class="accordion-content"><p>Tap the bell button on any Raffle or Airdrop message to receive a 30-minute reminder before it ends. Tap again to disable reminders.</p></div></div>
+        </div>
+      </div>
 
     </div>
   </section>
 
-  <!-- FAQ -->
-<section id="faq" class="faq section-dark">
-  <div class="container">
-    <h2>📘 Frequently Asked Questions</h2>
-    <p style="text-align: center; max-width: 700px; margin: 0 auto 2rem; color: #ffffe1; font-size: 1.1rem;">
-    Below you’ll find answers to the most commonly asked questions. Click a category below to reveal helpful information and detailed explanations.
-    </p>
-    
-    <div class="faq-toggle-buttons" style="text-align: center; margin-bottom: 2rem;">
-    <button class="faq-toggle active" data-target="sporebot">Sporebot Q&A</button>
-    <button class="faq-toggle" data-target="verification">Verification Q&A</button>
-    <button class="faq-toggle">
-      <a href="guides.html#sporebot-guide" style="color: inherit; text-decoration: none;">Sporebot Guide</a>
-    </button>
+  <!-- JavaScript: FAQ Toggles + Accordion -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggles = document.querySelectorAll('.faq-toggle');
+      const sections = {
+        sporebot: document.getElementById('faq-sporebot'),
+        verification: document.getElementById('faq-verification'),
+        planet: document.getElementById('faq-planet')
+      };
 
-    </div>
+      let activeSection = 'sporebot';
+      sections[activeSection].style.display = 'block';
 
-    <div id="faq-planet" class="accordion-section" style="display: none;">
-  <div class="accordion">
-    <div class="accordion-item"><button>🌍 What is Mushroom Planet?</button><div class="accordion-content"><p><strong>Mushroom Planet</strong> is the official home of everything $HROOM:<br>- 🍄 $HROOM Token<br>- 🎨 NFTs & Avatars<br>- 🖼️ Shroomie Art<br>- 💬 Lore and Community<br><br>Join the sporevolution!</p></div></div>
+      toggles.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.dataset.target;
+          if (!target) return; // skip the "Sporebot Guide" link button
 
-    <div class="accordion-item"><button>🛒 How do I buy SHROOMS and SPORES?</button><div class="accordion-content">
-      <p><strong>To buy SHROOMS ($HROOM):</strong><br>
-      1. Visit <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank">QuickSwap – SHROOM Trade</a><br>
-      2. Connect your wallet (MetaMask, TrustWallet, etc.)<br>
-      3. Swap <strong>WETH</strong> or <strong>SPORES</strong> for <strong>$HROOM</strong><br>
-      4. Confirm the transaction<br><br>
+          if (activeSection === target) {
+            sections[target].style.display = 'none';
+            btn.classList.remove('active');
+            activeSection = null;
+          } else {
+            Object.entries(sections).forEach(([_, sec]) => sec.style.display = 'none');
+            toggles.forEach(b => b.classList.remove('active'));
+            sections[target].style.display = 'block';
+            btn.classList.add('active');
+            activeSection = target;
+            btn.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
 
+<<<<<<< Updated upstream
       <strong>To buy SPORES:</strong><br>
       1. Visit <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank">QuickSwap – SPORE Trade</a><br>
       2. Connect your wallet<br>
@@ -425,24 +783,49 @@
           // Scroll into view for better UX on mobile
           btn.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+=======
+      document.querySelectorAll('.accordion-item button').forEach(button => {
+        button.addEventListener('click', () => {
+          const item = button.parentElement;
+          const isOpen = item.classList.contains('open');
+          item.parentElement.querySelectorAll('.accordion-item').forEach(i => i.classList.remove('open'));
+          if (!isOpen) item.classList.add('open');
+        });
+>>>>>>> Stashed changes
       });
     });
+  </script>
 
-    // Accordion expand/collapse logic
-    document.querySelectorAll('.accordion-item button').forEach(button => {
-      button.addEventListener('click', () => {
-        const item = button.parentElement;
-        const isOpen = item.classList.contains('open');
+  <!-- Token Price Fetcher -->
+  <script type="module">
+    async function updateTokenPrices() {
+      try {
+        const sporeRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8');
+        const sporeData = await sporeRes.json();
+        const sporePrice = parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(9);
 
-        // Close all in section
-        item.parentElement.querySelectorAll('.accordion-item').forEach(i => i.classList.remove('open'));
+        const shroomRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28');
+        const shroomData = await shroomRes.json();
+        const shroomPrice = parseFloat(shroomData.data.attributes.base_token_price_usd).toFixed(7);
 
+<<<<<<< Updated upstream
         // Open selected
         if (!isOpen) item.classList.add('open');
       });
     });
   });
 </script>
+=======
+        document.getElementById('spore-price').textContent = `$${sporePrice}`;
+        document.getElementById('shroom-price').textContent = `$${shroomPrice}`;
+      } catch (error) {
+        console.error('Error fetching token prices:', error);
+      }
+    }
+
+    updateTokenPrices();
+  </script>
+>>>>>>> Stashed changes
 
 </body>
 </html>

@@ -11,5 +11,11 @@ Thumbs.db
 
 # Env files
 *.env
+<<<<<<< Updated upstream
+=======
+.env
+firebase.json
+firebase-adminsdk.json
+>>>>>>> Stashed changes
 
 devme.md
