@@ -1,21 +1,27 @@
-# Node modules, build artifacts, etc. (if you ever add tooling)
-node_modules/
-dist/
-
-# VS Code workspace settings
-.vscode/
-
 # OS junk
 .DS_Store
 Thumbs.db
 
-# Env files
+# Node/npm stuff
+node_modules/
+package-lock.json
+config.js
+
+# Firebase / secrets
 *.env
-<<<<<<< Updated upstream
-=======
 .env
 firebase.json
 firebase-adminsdk.json
->>>>>>> Stashed changes
 
-devme.md
+# Build artifacts
+dist/
+build/
+
+# Logs
+*.log
+
+# VSCode settings
+.vscode/
+
+# Sensitive guides
+sporebot_guide.txt
