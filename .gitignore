@@ -5,9 +5,12 @@ Thumbs.db
 # Node/npm stuff
 node_modules/
 package-lock.json
+config.js
 
 # Firebase / secrets
 *.env
+.env
+firebase.json
 firebase-adminsdk.json
 
 # Build artifacts
@@ -19,3 +22,6 @@ build/
 
 # VSCode settings
 .vscode/
+
+# Sensitive guides
+sporebot_guide.txt

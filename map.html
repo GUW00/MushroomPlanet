@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>World Map | Mushroom Planet</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"/>
+<link rel="stylesheet" href="styles.css"/>
+<script type="module" src="config.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --y:#fece00;--r:#fd464f;--cr:#ffffe1;--dk:#0d0d0d;
+  --g:#22c55e;--b:#60a5fa;--p:#a855f7;
+  --border:#2a2a2a;--panel:rgba(10,10,10,0.96);
+  --nav-h:58px;--hdr-h:46px;
+}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:#0a0f0a;color:var(--cr);
+  font-family:'VT323',monospace;
+  touch-action:none;-webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+
+/* ===== HEADER ===== */
+#hdr{
+  position:fixed;top:0;left:0;right:0;height:var(--hdr-h);
+  background:#0d0d0d;border-bottom:2px solid var(--y);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;z-index:400;
+}
+.hdr-logo{
+  font-family:'Press Start 2P',monospace;font-size:0.48rem;
+  color:var(--y);text-decoration:none;white-space:nowrap;
+}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.hdr-right a{color:#777;text-decoration:none;font-size:1rem;transition:color .15s;}
+.hdr-right a:hover{color:var(--y);}
+#hdr-username{
+  font-family:'Press Start 2P',monospace;font-size:0.3rem;
+  color:var(--g);display:none;
+}
+
+/* ===== MAP CANVAS AREA ===== */
+#map-area{
+  position:fixed;
+  top:var(--hdr-h);left:0;right:0;
+  bottom:var(--nav-h);
+  overflow:hidden;background:#0a0f0a;
+}
+#map-canvas{
+  display:block;width:100%;height:100%;
+  image-rendering:pixelated;image-rendering:crisp-edges;
+  cursor:pointer;
+}
+
+/* ===== BACK BUTTON ===== */
+#back-btn{
+  position:absolute;top:10px;left:10px;
+  background:rgba(0,0,0,.85);border:2px solid var(--y);
+  color:var(--y);font-family:'Press Start 2P',monospace;font-size:0.32rem;
+  padding:6px 10px;border-radius:3px;cursor:pointer;
+  display:none;z-index:50;transition:background .15s;
+}
+#back-btn:hover{background:var(--y);color:#000;}
+#map-title-badge{
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.85);border:1px solid var(--border);
+  color:var(--y);font-family:'Press Start 2P',monospace;font-size:0.3rem;
+  padding:5px 12px;border-radius:2px;pointer-events:none;z-index:50;
+  white-space:nowrap;
+}
+
+/* ===== BOTTOM NAV ===== */
+#bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);
+  background:#0d0d0d;border-top:2px solid var(--y);
+  display:flex;align-items:stretch;z-index:400;
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
+  background:none;border:none;color:#555;cursor:pointer;
+  font-family:'Press Start 2P',monospace;font-size:0.25rem;
+  transition:color .15s,background .15s;
+  position:relative;padding:6px 4px;
+}
+.nav-btn:hover,.nav-btn.active{color:var(--y);background:rgba(254,206,0,.06);}
+.nav-btn .nav-icon{font-size:1.3rem;line-height:1;}
+.nav-badge{
+  position:absolute;top:6px;right:calc(50% - 16px);
+  width:8px;height:8px;border-radius:50%;
+  background:var(--r);display:none;
+  animation:badge-pulse 1.2s ease-in-out infinite;
+}
+@keyframes badge-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.6;transform:scale(1.3);}}
+
+/* Desktop sidebar */
+@media(min-width:768px){
+  #bottom-nav{
+    top:var(--hdr-h);bottom:0;left:0;right:auto;
+    width:80px;height:auto;flex-direction:column;
+    border-top:none;border-right:2px solid var(--y);
+  }
+  #map-area{left:80px;}
+  .nav-btn{font-size:0.22rem;}
+}
+
+/* ===== ACTION TILES (Farm/Forest bottom bar) ===== */
+#action-bar{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(10,10,10,.95);border-top:2px solid var(--border);
+  display:none;flex-wrap:nowrap;overflow-x:auto;gap:6px;
+  padding:8px 10px;z-index:60;
+}
+#action-bar::-webkit-scrollbar{height:0;}
+.action-tile{
+  flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:8px 10px;border-radius:6px;
+  border:2px solid var(--border);background:#111;
+  cursor:pointer;min-width:70px;transition:border-color .2s,background .2s;
+  font-family:'Press Start 2P',monospace;font-size:0.26rem;
+}
+.action-tile:active{transform:scale(.95);}
+.action-tile .at-icon{font-size:1.4rem;line-height:1;}
+.action-tile .at-label{color:#888;font-size:0.22rem;margin-top:1px;}
+.action-tile.done{border-color:#22c55e;background:rgba(34,197,94,.08);}
+.action-tile.done .at-state{color:#22c55e;}
+.action-tile.pending{border-color:var(--r);background:rgba(253,70,79,.08);animation:tile-warn 2s ease-in-out infinite;}
+.action-tile.pending .at-state{color:var(--r);}
+.action-tile.ready{border-color:var(--y);background:rgba(254,206,0,.06);}
+.action-tile.ready .at-state{color:var(--y);}
+.action-tile.locked{border-color:#333;opacity:.5;cursor:default;}
+.action-tile.locked .at-state{color:#444;}
+.action-tile.harvest-ready{border-color:var(--y);background:rgba(254,206,0,.15);animation:harvest-glow 1.5s ease-in-out infinite;}
+@keyframes tile-warn{0%,100%{border-color:var(--r);}50%{border-color:#ff8888;box-shadow:0 0 8px rgba(253,70,79,.4);}}
+@keyframes harvest-glow{0%,100%{box-shadow:0 0 6px rgba(254,206,0,.4);}50%{box-shadow:0 0 16px rgba(254,206,0,.8);}}
+.at-state{font-size:0.5rem;line-height:1;}
+
+/* ===== POPUP ===== */
+#popup{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(8,8,8,.97);border-top:2px solid var(--y);
+  border-radius:8px 8px 0 0;
+  padding:16px 16px 20px;z-index:200;
+  transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  max-height:60vh;overflow-y:auto;
+}
+#popup.open{transform:translateY(0);}
+#popup::-webkit-scrollbar{width:3px;}
+#popup::-webkit-scrollbar-thumb{background:var(--y);}
+#popup-close{
+  position:absolute;top:10px;right:12px;
+  background:none;border:none;color:#666;cursor:pointer;
+  font-family:'Press Start 2P',monospace;font-size:0.4rem;
+}
+#popup-icon{font-size:2rem;margin-bottom:8px;}
+#popup-title{font-family:'Press Start 2P',monospace;font-size:0.45rem;color:var(--y);margin-bottom:8px;}
+#popup-desc{font-size:1.05rem;color:#aaa;line-height:1.5;margin-bottom:12px;}
+#popup-cmd{
+  display:inline-block;background:#1a1a1a;border:1px solid var(--y);
+  color:var(--y);font-family:'Press Start 2P',monospace;font-size:0.32rem;
+  padding:5px 10px;border-radius:3px;margin-bottom:10px;
+}
+#popup-discord-btn{
+  display:block;width:100%;padding:10px;
+  background:var(--y);color:#000;border:none;
+  font-family:'Press Start 2P',monospace;font-size:0.3rem;
+  border-radius:4px;cursor:pointer;text-align:center;text-decoration:none;
+  margin-top:6px;
+}
+#popup-discord-btn:hover{background:#eab308;}
+.popup-stats{margin-top:8px;}
+.pstat{
+  display:flex;justify-content:space-between;
+  padding:4px 0;border-bottom:1px solid #1a1a1a;font-size:.9rem;
+}
+.pstat:last-child{border:none;}
+.pstat-l{color:#555;}.pstat-v{color:var(--cr);}
+.pstat-v.y{color:var(--y);}.pstat-v.g{color:var(--g);}.pstat-v.b{color:var(--b);}
+
+/* Plot farm info in popup */
+.plots-mini{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:8px 0;
+}
+.plot-mini{
+  aspect-ratio:1;border-radius:2px;border:1px solid #2a2a2a;
+  display:flex;align-items:center;justify-content:center;font-size:.65rem;
+}
+.plot-mini.filled{background:#3a1a06;border-color:#6a3010;}
+.plot-mini.empty{background:#141414;}
+
+/* Stage bar */
+.sbar-wrap{margin:8px 0;}
+.sbar-lbl{display:flex;justify-content:space-between;font-size:.78rem;color:#555;margin-bottom:3px;}
+.sbar{height:6px;background:#222;border-radius:999px;overflow:hidden;}
+.sbar-fill{height:100%;background:linear-gradient(90deg,var(--y),#f97316);border-radius:999px;transition:width .6s;}
+
+/* Gem row */
+.gem-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.gem-chip{
+  padding:3px 8px;border-radius:3px;font-size:.78rem;
+  background:#1a1a1a;border:1px solid #333;color:#555;
+}
+.gem-chip.owned{border-color:var(--y);color:var(--y);}
+
+/* ===== PROFILE MODAL ===== */
+#prof-modal{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.9);display:none;
+  align-items:flex-end;justify-content:center;
+  padding-bottom:var(--nav-h);
+}
+#prof-modal.open{display:flex;}
+#prof-box{
+  background:#0d0d0d;border:2px solid var(--y);border-radius:10px 10px 0 0;
+  width:100%;max-width:560px;max-height:82vh;
+  display:flex;flex-direction:column;
+  animation:slide-up .28s ease;
+}
+@keyframes slide-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+#prof-mhdr{
+  background:var(--y);color:#000;padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+  border-radius:8px 8px 0 0;
+}
+#prof-mtitle{font-family:'Press Start 2P',monospace;font-size:0.46rem;}
+#prof-mclose{font-family:'Press Start 2P',monospace;font-size:0.46rem;background:none;border:none;color:#000;cursor:pointer;}
+#prof-body{overflow-y:auto;flex:1;padding:16px;}
+#prof-body::-webkit-scrollbar{width:3px;}
+#prof-body::-webkit-scrollbar-thumb{background:var(--y);}
+
+/* Profile states */
+.prof-state{display:none;}.prof-state.active{display:block;}
+
+/* Link state */
+.link-intro{font-size:1rem;color:#888;line-height:1.6;margin-bottom:14px;}
+.link-intro strong{color:var(--y);}
+.pin-input{
+  width:100%;background:#1a1a1a;border:2px solid #444;
+  color:var(--cr);font-family:'VT323',monospace;font-size:1.2rem;
+  padding:10px 12px;border-radius:4px;margin-bottom:10px;
+  outline:none;transition:border-color .2s;
+}
+.pin-input:focus{border-color:var(--y);}
+.pin-btn{
+  width:100%;background:var(--y);color:#000;border:none;
+  font-family:'Press Start 2P',monospace;font-size:0.32rem;
+  padding:12px;border-radius:4px;cursor:pointer;transition:background .15s;
+}
+.pin-btn:hover{background:#eab308;}
+.pin-btn:disabled{background:#555;cursor:not-allowed;}
+#prof-status-msg{font-size:.88rem;color:#666;margin-top:8px;min-height:1rem;}
+
+/* Linked state profile card */
+.p-hdr{
+  display:flex;align-items:center;gap:12px;
+  background:#1a1a1a;border:1px solid var(--border);
+  border-radius:6px;padding:12px;margin-bottom:12px;
+}
+.p-av{
+  width:50px;height:50px;border-radius:50%;background:#222;
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;
+}
+.p-nm{font-family:'Press Start 2P',monospace;font-size:0.38rem;margin-bottom:5px;}
+.p-sub{font-size:.82rem;color:#555;}
+.p-bdg{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;}
+.pbadge{
+  font-family:'Press Start 2P',monospace;font-size:0.22rem;
+  padding:2px 6px;border-radius:20px;background:#1e1e1e;border:1px solid #444;
+}
+.pbadge.y{border-color:var(--y);color:var(--y);}
+.pbadge.g{border-color:var(--g);color:var(--g);}
+.pbadge.p{border-color:var(--p);color:var(--p);}
+.pcard{
+  background:#1a1a1a;border:1px solid var(--border);
+  border-radius:6px;padding:10px 12px;margin-bottom:10px;
+}
+.pcard h4{
+  font-family:'Press Start 2P',monospace;font-size:0.26rem;
+  color:var(--y);margin-bottom:7px;padding-bottom:5px;
+  border-bottom:1px solid var(--border);
+}
+.prow{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:3px 0;border-bottom:1px solid #141414;font-size:.88rem;
+}
+.prow:last-child{border:none;}
+.pl{color:#555;}.pv{color:var(--cr);text-align:right;max-width:55%;word-break:break-all;}
+.pv.y{color:var(--y);}.pv.g{color:var(--g);}.pv.b{color:var(--b);}.pv.p{color:var(--p);}
+.unlink-btn{
+  width:100%;background:none;border:1px solid #444;color:#555;
+  font-family:'Press Start 2P',monospace;font-size:0.26rem;
+  padding:8px;border-radius:4px;cursor:pointer;margin-top:8px;transition:all .15s;
+}
+.unlink-btn:hover{border-color:var(--r);color:var(--r);}
+
+/* NFT bot img */
+#prof-bot-img{
+  width:100%;max-width:120px;border-radius:6px;
+  border:1px solid var(--border);margin-bottom:8px;display:none;
+}
+
+/* Loader */
+.loader{
+  display:inline-block;width:14px;height:14px;
+  border:2px solid #333;border-top-color:var(--y);
+  border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== SETTINGS MODAL ===== */
+#settings-modal{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.9);display:none;
+  align-items:flex-end;justify-content:center;
+  padding-bottom:var(--nav-h);
+}
+#settings-modal.open{display:flex;}
+#settings-box{
+  background:#0d0d0d;border:2px solid var(--y);border-radius:10px 10px 0 0;
+  width:100%;max-width:480px;
+  animation:slide-up .28s ease;
+}
+#settings-hdr{
+  background:var(--y);color:#000;padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-radius:8px 8px 0 0;
+}
+#settings-title{font-family:'Press Start 2P',monospace;font-size:0.46rem;}
+#settings-close{font-family:'Press Start 2P',monospace;font-size:0.46rem;background:none;border:none;color:#000;cursor:pointer;}
+#settings-body{padding:16px;}
+.setting-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 0;border-bottom:1px solid var(--border);font-size:1rem;
+}
+.setting-row:last-child{border:none;}
+.setting-lbl{color:#aaa;}
+.toggle-btn{
+  background:#222;border:2px solid #444;color:#555;
+  font-family:'Press Start 2P',monospace;font-size:0.26rem;
+  padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .15s;
+}
+.toggle-btn.on{background:rgba(254,206,0,.1);border-color:var(--y);color:var(--y);}
+.danger-btn{
+  width:100%;background:none;border:1px solid #442222;color:#884444;
+  font-family:'Press Start 2P',monospace;font-size:0.26rem;
+  padding:10px;border-radius:4px;cursor:pointer;margin-top:8px;transition:all .15s;
+}
+.danger-btn:hover{border-color:var(--r);color:var(--r);}
+
+/* ===== HUB PANEL ===== */
+#hub-panel{
+  position:absolute;inset:0;background:rgba(8,8,10,.96);
+  display:none;overflow-y:auto;padding:12px;z-index:80;
+}
+#hub-panel::-webkit-scrollbar{width:3px;}
+#hub-panel::-webkit-scrollbar-thumb{background:var(--y);}
+.hub-title{
+  font-family:'Press Start 2P',monospace;font-size:0.5rem;
+  color:var(--y);text-align:center;margin-bottom:16px;
+}
+.hub-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+.hub-card{background:#111;border:1px solid var(--border);border-radius:6px;padding:12px;}
+.hub-card h3{
+  font-family:'Press Start 2P',monospace;font-size:0.3rem;
+  color:var(--y);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);
+}
+.lb-row{
+  display:flex;align-items:center;gap:8px;
+  padding:4px 0;border-bottom:1px solid #141414;font-size:.88rem;
+}
+.lb-row:last-child{border:none;}
+.lb-rank{color:#555;min-width:20px;font-family:'Press Start 2P',monospace;font-size:0.22rem;}
+.lb-rank.gold{color:var(--y);}
+.lb-rank.silver{color:#aaa;}
+.lb-rank.bronze{color:#c8720a;}
+.lb-name{flex:1;color:var(--cr);}
+.lb-val{color:var(--b);font-size:.82rem;}
+.hub-loading{color:#444;font-size:.9rem;text-align:center;padding:20px;}
+
+/* ===== TRANSITION OVERLAY ===== */
+#transition-overlay{
+  position:absolute;inset:0;background:#000;
+  opacity:0;pointer-events:none;z-index:300;
+  transition:opacity .25s;
+}
+#transition-overlay.fading{opacity:1;}
+
+/* Regression warning overlay */
+#regression-warning{
+  position:absolute;top:50px;left:0;right:0;
+  display:none;justify-content:center;pointer-events:none;z-index:70;
+}
+.reg-badge{
+  background:rgba(253,70,79,.15);border:1px solid var(--r);
+  color:var(--r);font-family:'Press Start 2P',monospace;font-size:0.28rem;
+  padding:5px 12px;border-radius:3px;
+  animation:reg-pulse 2s ease-in-out infinite;
+}
+@keyframes reg-pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@media(min-width:768px){
+  .pcard h4{font-size:0.38rem;}
+  .prow{font-size:1.1rem;}
+  .pl{font-size:1.1rem;}
+  .pv{font-size:1.1rem;}
+  .p-nm{font-size:0.55rem;}
+  .p-sub{font-size:1rem;}
+  .pbadge{font-size:0.5rem;padding:4px 15px;}
+  .nav-btn{font-size:0.3rem;}
+  .nav-btn .nav-icon{font-size:1.6rem;}
+  .action-tile{min-width:90px;padding:10px 14px;}
+  .action-tile .at-icon{font-size:1.8rem;}
+  .action-tile{font-size:0.32rem;}
+  .at-label{font-size:0.28rem;}
+  .at-state{font-size:0.65rem;}
+  #popup-title{font-size:0.6rem;}
+  #popup-desc{font-size:1.2rem;}
+  #popup-cmd{font-size:0.4rem;}
+  #popup-discord-btn{font-size:0.38rem;padding:13px;}
+  .hub-card h3{font-size:0.42rem;}
+  .lb-row{font-size:1.1rem;}
+  .lb-rank{font-size:0.3rem;}
+  .pstat{font-size:1.1rem;}
+  .link-intro{font-size:1.2rem;}
+  .pin-input{font-size:1.4rem;}
+  .pin-btn{font-size:0.38rem;padding:14px;}
+  #prof-mtitle{font-size:0.58rem;}
+  #back-btn{font-size:0.4rem;padding:8px 14px;}
+  #map-title-badge{font-size:0.38rem;padding:6px 16px;}
+  .reg-badge{font-size:0.36rem;}
+  .setting-row{font-size:1.2rem;}
+  .toggle-btn{font-size:0.32rem;}
+  .unlink-btn{font-size:0.32rem;}
+  .p-nm{font-size:0.7rem;}
+  #prof-mtitle{font-size:0.7rem;}
+  #prof-mclose{font-size:0.7rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="hdr">
+  <a href="index.html" class="hdr-logo" id="site-logo">MUSHROOM PLANET</a>
+  <div class="hdr-right">
+    <span id="hdr-username"></span>
+    <a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">Discord</a>
+  </div>
+</header>
+
+<!-- MAP AREA -->
+<div id="map-area">
+  <canvas id="map-canvas"></canvas>
+  <button id="back-btn">&#8592; BACK</button>
+  <div id="map-title-badge">WORLD MAP</div>
+  <div id="transition-overlay"></div>
+  <div id="regression-warning"><div class="reg-badge">FARM REGRESSION RISK!</div></div>
+
+  <!-- Action bar (farm/forest) -->
+  <div id="action-bar"></div>
+
+  <!-- Popup -->
+  <div id="popup">
+    <button id="popup-close">X</button>
+    <div id="popup-icon"></div>
+    <div id="popup-title"></div>
+    <div id="popup-desc"></div>
+    <div id="popup-cmd-wrap" style="display:none"><span id="popup-cmd"></span></div>
+    <a id="popup-discord-btn" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer" style="display:none">GO TO DISCORD</a>
+    <div id="popup-extra"></div>
+  </div>
+
+  <!-- Hub panel -->
+  <div id="hub-panel">
+    <div class="hub-title">COMMUNITY HUB</div>
+    <div class="hub-grid" id="hub-grid">
+      <div class="hub-card"><h3>TOP FARMERS</h3><div id="lb-farmers" class="hub-loading">Loading...</div></div>
+      <div class="hub-card"><h3>TOP FORAGERS</h3><div id="lb-foragers" class="hub-loading">Loading...</div></div>
+      <div class="hub-card"><h3>TOP STAKERS</h3><div id="lb-stakers" class="hub-loading">Loading...</div></div>
+      <div class="hub-card"><h3>COMMUNITY STATS</h3><div id="hub-stats"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav id="bottom-nav">
+  <button class="nav-btn active" data-map="world" id="nav-world">
+    <span class="nav-icon">🌍</span>MAP
+  </button>
+  <button class="nav-btn" data-map="farm" id="nav-farm">
+    <span class="nav-icon">🍄</span>FARM
+    <span class="nav-badge" id="farm-badge"></span>
+  </button>
+  <button class="nav-btn" data-map="forest" id="nav-forest">
+    <span class="nav-icon">🌿</span>FOREST
+  </button>
+  <button class="nav-btn" data-map="hub" id="nav-hub">
+    <span class="nav-icon">🏆</span>HUB
+  </button>
+  <button class="nav-btn" id="nav-profile">
+    <span class="nav-icon">👤</span>PROFILE
+  </button>
+</nav>
+
+<!-- PROFILE MODAL -->
+<div id="prof-modal">
+  <div id="prof-box">
+    <div id="prof-mhdr">
+      <span id="prof-mtitle">FARM PROFILE</span>
+      <button id="prof-mclose">X</button>
+    </div>
+    <div id="prof-body">
+      <!-- State 1: Not linked -->
+      <div class="prof-state active" id="state-unlinked">
+        <p class="link-intro">
+          Link your <strong>Discord account</strong> to view your full farm profile, stats, and daily action status.<br><br>
+          Enter your <strong>Discord User ID</strong> below. We'll send a verification code to your Discord DMs via the bot.
+        </p>
+        <input class="pin-input" type="text" id="link-discord-id" placeholder="Your Discord User ID"/>
+        <button class="pin-btn" id="link-send-btn">SEND VERIFICATION CODE</button>
+        <div id="prof-status-msg"></div>
+        <p style="font-size:.78rem;color:#444;margin-top:10px;line-height:1.5;">
+          Find your Discord ID: Settings > Advanced > Enable Developer Mode > right-click your name > Copy User ID
+        </p>
+      </div>
+      <!-- State 2: Code sent -->
+      <div class="prof-state" id="state-verify">
+        <p class="link-intro">Check your <strong>Discord DMs</strong> for a verification code from the bot. Enter it below:</p>
+        <input class="pin-input" type="text" id="link-code-input" placeholder="6-digit code" maxlength="6"/>
+        <button class="pin-btn" id="link-verify-btn">VERIFY</button>
+        <div id="verify-status-msg" style="font-size:.88rem;color:#666;margin-top:8px;"></div>
+      </div>
+      <!-- State 3: Linked -->
+      <div class="prof-state" id="state-linked">
+        <div class="p-hdr">
+          <div class="p-av">🍄</div>
+          <div>
+            <div class="p-nm" id="pl-name">-</div>
+            <div class="p-sub" id="pl-joined">-</div>
+            <div class="p-bdg">
+              <span class="pbadge y" id="pl-rank">-</span>
+              <span class="pbadge p" id="pl-flair">-</span>
+              <span class="pbadge g" id="pl-verified" style="display:none">PIXIE VERIFIED</span>
+            </div>
+          </div>
+        </div>
+        <div class="pcard">
+          <h4>WALLET</h4>
+          <div class="prow"><span class="pl">SHROOM</span><span class="pv y" id="pl-shroom">-</span></div>
+          <div class="prow"><span class="pl">SPORE</span><span class="pv b" id="pl-spore">-</span></div>
+          <div class="prow"><span class="pl">Planted</span><span class="pv g" id="pl-planted">-</span></div>
+          <div class="prow"><span class="pl">Address</span><span class="pv" id="pl-addr" style="font-size:.7rem">-</span></div>
+        </div>
+        <div class="pcard">
+          <h4>FARM</h4>
+          <div class="prow"><span class="pl">Stage</span><span class="pv g" id="pl-stage">-</span></div>
+          <div class="prow"><span class="pl">Rank</span><span class="pv y" id="pl-fmrank">-</span></div>
+          <div class="prow"><span class="pl">Spores/Day</span><span class="pv b" id="pl-sgr">-</span></div>
+          <div class="prow"><span class="pl">Forage Streak</span><span class="pv" id="pl-streak">-</span></div>
+          <div class="sbar-wrap">
+            <div class="sbar-lbl"><span id="pl-slbl">Stage</span><span id="pl-spct">0%</span></div>
+            <div class="sbar"><div class="sbar-fill" id="pl-sfill" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="pcard">
+          <h4>STAKING</h4>
+          <div class="prow"><span class="pl">Staked</span><span class="pv b" id="pl-staked">-</span></div>
+          <div class="prow"><span class="pl">Pending</span><span class="pv g" id="pl-spend">-</span></div>
+          <div class="prow"><span class="pl">Nodes</span><span class="pv p" id="pl-nodes">-</span></div>
+        </div>
+        <div class="pcard">
+          <h4>COMPANION</h4>
+          <div class="prow"><span class="pl">Active</span><span class="pv" id="pl-comp">-</span></div>
+          <div class="prow"><span class="pl">Bond Level</span><span class="pv y" id="pl-bond">-</span></div>
+          <div class="prow"><span class="pl">Days Active</span><span class="pv" id="pl-cdays">-</span></div>
+        </div>
+        <div class="pcard">
+          <h4>ACTIVE SPOREBOT</h4>
+          <img id="prof-bot-img" alt="Sporebot"/>
+          <div class="prow"><span class="pl">Name</span><span class="pv p" id="pl-bot-name">-</span></div>
+          <div class="prow"><span class="pl">Token ID</span><span class="pv" id="pl-bot-id">-</span></div>
+          <div class="prow"><span class="pl">Rarity</span><span class="pv y" id="pl-bot-rar">-</span></div>
+        </div>
+        <button class="unlink-btn" id="unlink-btn">UNLINK ACCOUNT</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal">
+  <div id="settings-box">
+    <div id="settings-hdr">
+      <span id="settings-title">SETTINGS</span>
+      <button id="settings-close">X</button>
+    </div>
+    <div id="settings-body">
+      <div class="setting-row">
+        <span class="setting-lbl">Tooltips</span>
+        <button class="toggle-btn on" id="tog-tooltips">ON</button>
+      </div>
+      <div class="setting-row">
+        <span class="setting-lbl">Theme</span>
+        <button class="toggle-btn" id="tog-theme">DARK</button>
+      </div>
+      <div class="setting-row">
+        <span class="setting-lbl">Account</span>
+        <button class="toggle-btn" id="settings-link-btn">LINK DISCORD</button>
+      </div>
+      <button class="danger-btn" id="clear-data-btn">CLEAR ALL LOCAL DATA</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIG -->
+<script type="module">
+  import config from './config.js';
+  window.addEventListener('DOMContentLoaded',()=>{
+    const el=document.getElementById('site-logo');
+    if(el) el.textContent=config.site.headerTitle||'MUSHROOM PLANET';
+    window.DISCORD_INVITE=config.discord?.inviteURL||'https://discord.com/invite/ECauU2KSSt';
+    document.querySelectorAll('[href*="discord.com/invite"]').forEach(a=>{
+      if(window.DISCORD_INVITE) a.href=window.DISCORD_INVITE;
+    });
+  });
+</script>
+
+<script>
+'use strict';
+// ================================================================
+// CONSTANTS & STATE
+// ================================================================
+const API_BASE = window.location.port==='8080' ? 'http://localhost:3001' : '';
+const LS = {
+  ID:   'mp_discord_id',
+  VER:  'mp_verified',
+  TIP:  'mp_tooltips',
+  THM:  'mp_theme',
+};
+
+const DISCORD_INVITE = 'https://discord.com/invite/ECauU2KSSt';
+
+const STAGE_ORDER = ['Spore','Germination','Mycelium','Fruiting','Sporulation','Golden_Sporulation'];
+const STAGE_DAYS  = {Spore:0,Germination:5,Mycelium:15,Fruiting:25,Sporulation:42,Golden_Sporulation:294};
+const BOND_REQS   = {1:0,2:7,3:15,4:25,5:42};
+const BOND_LBLS   = {1:'Acquaintance',2:'Friend',3:'Trusted Ally',4:'Soul Bond',5:'Eternal Bond'};
+const CEMOJIS     = {turtle:'🐢',bunny:'🐰',fox:'🦊',frog:'🐸',wolf:'🐺',duck:'🦆',deer:'🦌',owl:'🦉',bear:'🐻',monkey:'🐒',songbird:'🐦',panda:'🐼'};
+const GEMS        = ['Shroomstone_Quartz','Shroomcap_Ruby','Sporelight_Sapphire','Moonglow_Amethyst','Prismcap_Diamond'];
+const GEM_LABELS  = {'Shroomstone_Quartz':'Quartz','Shroomcap_Ruby':'Ruby','Sporelight_Sapphire':'Sapphire','Moonglow_Amethyst':'Amethyst','Prismcap_Diamond':'Diamond'};
+
+let currentMap   = 'world';
+let profileData  = null;
+let dailyData    = null;
+let botImage     = null; // loaded Image object
+let botX = 0, botY = 0, botTargetX = 0, botTargetY = 0;
+let botWaypoints = [];
+let botWpIdx     = 0;
+let botFaceLeft  = false;
+let botBob       = 0;
+let animFrame    = 0;
+let lastTime     = 0;
+
+// Particle systems
+let particles = [];
+let fireflies  = [];
+
+// Canvas
+const canvas  = document.getElementById('map-canvas');
+const ctx     = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+// ================================================================
+// UTILS
+// ================================================================
+const fmt  = n => n==null ? '-' : Number(n).toLocaleString();
+const pct  = n => n==null ? '-' : `${Number(n).toFixed(2)}%`;
+const safe = (v,fb='-') => (v!=null&&v!=='') ? v : fb;
+
+function bondLevel(days){
+  let lv=1;
+  for(const[l,r] of Object.entries(BOND_REQS)) if(days>=r) lv=parseInt(l);
+  return lv;
+}
+function stagePct(name){
+  const i=STAGE_ORDER.indexOf(name);
+  return i<0?0:Math.round((i+1)/STAGE_ORDER.length*100);
+}
+function setEl(id,v){ const e=document.getElementById(id); if(e) e.textContent=v; }
+function noise(x,y){ const n=Math.sin(x*127.1+y*311.7)*43758.5453; return n-Math.floor(n); }
+
+// ================================================================
+// CANVAS SIZING
+// ================================================================
+function resizeCanvas(){
+  const area = document.getElementById('map-area');
+  canvas.width  = area.clientWidth;
+  canvas.height = area.clientHeight;
+  initParticles();
+  initFireflies();
+  if(currentMap==='farm')   recalcFarmWaypoints();
+}
+window.addEventListener('resize', ()=>{ resizeCanvas(); });
+
+// ================================================================
+// PARTICLES
+// ================================================================
+function initParticles(){
+  particles = [];
+  const count = Math.floor(canvas.width * canvas.height / 14000);
+  for(let i=0;i<count;i++) particles.push(makeParticle());
+}
+function makeParticle(){
+  return {
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    vy: -(0.2+Math.random()*0.4),
+    vx: (Math.random()-.5)*0.15,
+    life: Math.random(),
+    maxLife: 0.6+Math.random()*0.4,
+    size: 1.5+Math.random()*2,
+    color: Math.random()<.6?'#fece00':'#ffffe1',
+  };
+}
+function updateParticles(dt){
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];
+    p.x+=p.vx*dt*60; p.y+=p.vy*dt*60;
+    p.life-=dt*0.12;
+    if(p.life<=0||p.y<-10) particles[i]=makeParticle();
+  }
+}
+function drawParticles(){
+  for(const p of particles){
+    ctx.globalAlpha=Math.max(0,p.life)*0.7;
+    ctx.fillStyle=p.color;
+    ctx.fillRect(p.x|0,p.y|0,p.size|0,p.size|0);
+  }
+  ctx.globalAlpha=1;
+}
+
+function initFireflies(){
+  fireflies=[];
+  const count=8+Math.floor(canvas.width/120);
+  for(let i=0;i<count;i++) fireflies.push(makeFirefly());
+}
+function makeFirefly(){
+  return {
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+    vx:(Math.random()-.5)*0.3, vy:(Math.random()-.5)*0.2,
+    phase:Math.random()*Math.PI*2,
+    bright:0,
+  };
+}
+function updateFireflies(dt){
+  for(const f of fireflies){
+    f.x+=f.vx*dt*60; f.y+=f.vy*dt*60;
+    f.phase+=dt*1.8;
+    f.bright=Math.max(0,(Math.sin(f.phase)+1)/2);
+    if(f.x<0)f.x=canvas.width; if(f.x>canvas.width)f.x=0;
+    if(f.y<0)f.y=canvas.height; if(f.y>canvas.height)f.y=0;
+  }
+}
+function drawFireflies(){
+  for(const f of fireflies){
+    ctx.globalAlpha=f.bright*0.6;
+    ctx.fillStyle='#ccff88';
+    ctx.fillRect(f.x|0,f.y|0,2,2);
+  }
+  ctx.globalAlpha=1;
+}
+
+// ================================================================
+// TILE DRAWING HELPERS
+// ================================================================
+function r(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x|0,y|0,w|0,h|0);}
+
+function drawGrass(x,y,w,h){
+  r(x,y,w,h,'#4a7c3f');
+  ctx.fillStyle='#3a6030';
+  for(let ty=y;ty<y+h;ty+=4) for(let tx=x;tx<x+w;tx+=4) if(noise(tx,ty)<.12) ctx.fillRect(tx,ty,4,4);
+  ctx.fillStyle='#5a9248';
+  for(let ty=y;ty<y+h;ty+=4) for(let tx=x;tx<x+w;tx+=4) if(noise(tx+88,ty+66)<.05) ctx.fillRect(tx,ty,4,4);
+}
+function drawWater(x,y,w,h,t){
+  r(x,y,w,h,'#1a508a');
+  const shimmer=Math.sin(t*1.2)*0.5+0.5;
+  ctx.fillStyle=`rgba(42,122,191,${0.3+shimmer*0.3})`;
+  for(let wx=x;wx<x+w;wx+=44) ctx.fillRect(wx,y+(wx*.07%14),28,5);
+  ctx.fillStyle=`rgba(58,138,208,${0.2+shimmer*0.2})`;
+  for(let wx=x+20;wx<x+w;wx+=66) ctx.fillRect(wx,y+h/2+(wx*.05%10),20,3);
+}
+function drawPath(x,y,w,h){
+  r(x,y,w,h,'#b89a58');
+  r(x,y+h*.3|0,w,h*.4|0,'#a88848');
+  ctx.fillStyle='#c8a868';
+  for(let px=x;px<x+w;px+=32) ctx.fillRect(px,y+h*.4|0,18,4);
+}
+function drawTree(x,y,s=1){
+  const W=30*s|0,H=44*s|0;
+  r(x+W*.36|0,y+H*.58|0,W*.28|0,H*.44|0,'#3a2010');
+  r(x+W*.04|0,y+H*.5|0, W*.92|0,H*.5|0, '#162a08');
+  r(x+W*.08|0,y+H*.34|0,W*.84|0,H*.3|0, '#245a15');
+  r(x+W*.18|0,y+H*.18|0,W*.64|0,H*.26|0,'#2d7020');
+  r(x+W*.28|0,y+H*.04|0,W*.44|0,H*.22|0,'#3a8828');
+  r(x+W*.38|0,y+2,       W*.24|0,H*.12|0,'#4e9e38');
+}
+function drawShroom(x,y,s=1){
+  const W=18*s|0,H=22*s|0;
+  r(x+W*.28|0,y+H*.55|0,W*.42|0,H*.47|0,'#ded0b0');
+  r(x,y+H*.46|0,W,H*.27|0,'#881818');
+  r(x+W*.08|0,y+H*.27|0,W*.84|0,H*.3|0,'#cc2828');
+  r(x+W*.18|0,y+H*.1|0, W*.64|0,H*.24|0,'#e03838');
+  r(x+W*.2|0, y+H*.12|0,W*.22|0,H*.16|0,'#fff');
+  r(x+W*.58|0,y+H*.22|0,W*.2|0, W*.15|0,'#fff');
+}
+function drawMountain(x,y){
+  r(x-26,y+30,66,52,'#30281e');r(x-16,y+16,46,22,'#3e342a');
+  r(x-4,y,28,20,'#4e4238');r(x+2,y,14,8,'#dde0e8');
+}
+function drawHouse(x,y,wall,roof,W=52,H=44){
+  r(x+4,y+4,W,H+18,'rgba(0,0,0,.22)');
+  r(x,y+18,W,H,wall);
+  for(let i=0;i<20;i++) r(x+i,y+i,W-i*2,6,roof);
+  r(x+W/2-7,y+H+2,14,18,'#2e1206');
+  r(x+7,y+24,13,11,'#fece00');
+  r(x+12,y+24,2,11,'#b07800');r(x+7,y+29,13,2,'#b07800');
+}
+function drawWell(x,y){
+  r(x-20,y+20,58,30,'#888');r(x-22,y+14,62,12,'#aaa');r(x-22,y+36,62,8,'#999');
+  r(x-16,y+18,50,22,'#1e508a');r(x-8,y+22,34,5,'#3a88bf');
+  r(x-18,y-20,8,42,'#5a3010');r(x+28,y-20,8,42,'#5a3010');
+  for(let i=0;i<12;i++) r(x-20+i,y-20-i,60-i*4,5,'#8a5828');
+  r(x+4,y+4,12,12,'#8a6840');r(x+9,y-18,2,22,'#c8a868');
+}
+
+// ================================================================
+// WORLD MAP DRAW
+// ================================================================
+const WORLD_ZONES = [
+  { id:'forest', name:'MYCELIUM FOREST', icon:'🌿', cx:.15, cy:.5,
+    desc:'Ancient forest full of herbs, cave systems, pets, and rare items to discover.',
+    color:'#2d7a3f' },
+  { id:'farm',   name:'YOUR FARM',       icon:'🍄', cx:.5,  cy:.45,
+    desc:'Your personal mushroom farm. Grow SHROOMS through 6 stages over 42 days.',
+    color:'#5a9040' },
+  { id:'hub',    name:'COMMUNITY HUB',   icon:'🏆', cx:.82, cy:.48,
+    desc:'Leaderboards, community stats, active stakers, and global events.',
+    color:'#c8a060' },
+];
+
+function drawWorldMap(t){
+  const W=canvas.width, H=canvas.height;
+  drawGrass(0,0,W,H);
+
+  // Water (top-right lake)
+  drawWater(W*.65,0,W*.35,H*.22,t);
+  r(W*.65-2,H*.2,W*.35+2,10,'#b89a58');
+
+  // River
+  drawWater(W*.48,H*.22,W*.04,H*.3,t);
+
+  // Paths
+  drawPath(W*.15,H*.46,W*.7,18);
+  drawPath(W*.48,H*.2,18,H*.28);
+
+  // Forest zone (left)
+  r(0,H*.08,W*.28,H*.85,'#1a3a10');
+  ctx.fillStyle='#162e0e';
+  for(let ty=H*.08;ty<H*.93;ty+=4) for(let tx=0;tx<W*.28;tx+=4) if(noise(tx+300,ty+200)<.14) ctx.fillRect(tx,ty,4,4);
+  for(let ty=H*.08;ty<H*.93;ty+=2){
+    const ex=W*.26+Math.sin(ty*.04)*18+noise(0,ty)*24;
+    r(ex,ty,28,2,'#2d5a1e'); r(ex+20,ty,20,2,'#367028');
+  }
+  for(let ty=H*.1;ty<H*.9;ty+=34)
+    for(let tx=8;tx<W*.25;tx+=38)
+      if(noise(tx,ty)<.78) drawTree(tx+noise(tx,ty)*14,ty+noise(ty,tx)*10,1.1);
+  for(let ty=H*.1;ty<H*.9;ty+=28) drawTree(W*.22+Math.sin(ty*.05)*16,ty,1.0);
+
+  // Farm zone (center - farmhouse silhouette)
+  const fx=W*.44, fy=H*.18;
+  drawHouse(fx,fy,'#6a3a1e','#8a2020',70,55);
+  r(fx+26,fy+55,18,H*.2,'#b89a58');
+
+  // Hub zone (right - village)
+  drawHouse(W*.76,H*.32,'#d49060','#a04820');
+  drawHouse(W*.84,H*.28,'#6a9a48','#3a6820',45,38);
+  drawHouse(W*.78,H*.42,'#9a7848','#6a4a20',50,40);
+  r(W*.74,H*.5,W*.14,10,'#b08840');
+
+  // Mountains (far right)
+  for(let my=H*.05;my<H*.85;my+=80) drawMountain(W*.95+Math.sin(my*.08)*20,my);
+
+  // Border trees
+  for(let bx=W*.3;bx<W*.65;bx+=52){ drawTree(bx,8,.85); drawTree(bx+20,H-48,.85); }
+  for(let by=80;by<H-60;by+=52) drawTree(W-52,by,.85);
+
+  // Scattered shrooms
+  [[W*.35,H*.35],[W*.42,H*.6],[W*.55,H*.38],[W*.62,H*.65],[W*.72,H*.55]].forEach(([sx,sy])=>drawShroom(sx,sy,1.1));
+
+  // Zone clickable areas - glowing rings
+  WORLD_ZONES.forEach(zone=>{
+    const cx=zone.cx*W, cy=zone.cy*H;
+    const pulse=Math.sin(t*2+zone.cx*5)*0.3+0.7;
+    ctx.beginPath();ctx.arc(cx,cy,30,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(254,206,0,${pulse*0.8})`;ctx.lineWidth=3;ctx.stroke();
+    ctx.beginPath();ctx.arc(cx,cy,26,0,Math.PI*2);
+    ctx.fillStyle=`rgba(254,206,0,${pulse*0.15})`;ctx.fill();
+    ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(zone.icon,cx,cy);
+    // Label
+    ctx.font='bold 7px "Press Start 2P"';
+    ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(cx-40,cy+32,80,14);
+    ctx.fillStyle='#fece00';ctx.fillText(zone.name,cx,cy+39);
+    ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  });
+
+  // Daily pending glow on farm pin
+  if(hasPendingDaily()){
+    const zone=WORLD_ZONES.find(z=>z.id==='farm');
+    const cx=zone.cx*W, cy=zone.cy*H;
+    const pulse=Math.sin(t*3)*0.4+0.6;
+    ctx.beginPath();ctx.arc(cx,cy,38,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(253,70,79,${pulse*0.9})`;ctx.lineWidth=2;ctx.stroke();
+  }
+
+  drawParticles();
+  drawFireflies();
+}
+
+// ================================================================
+// FARM MAP
+// ================================================================
+let farmLayout = {};
+
+function recalcFarmWaypoints(){
+  const W=canvas.width, H=canvas.height;
+  const ab=document.getElementById('action-bar');
+  const abH=ab.style.display!=='none'?70:0;
+  const availH=H-abH;
+  const cx=W/2, topY=availH*.08;
+
+  farmLayout = {
+    houseX:cx-40, houseY:topY,
+    houseW:80, houseH:60,
+    plotsX:cx-105, plotsY:topY+80,
+    plotsW:210,
+    wellX:cx-120, wellY:availH*.68,
+    cx, availH,
+  };
+
+  // Patrol waypoints: around house and plots
+  const {houseX,houseY,houseW,houseH,plotsX,plotsY,plotsW,wellX,wellY}=farmLayout;
+  botWaypoints=[
+    [houseX-20,        houseY+houseH/2],
+    [houseX+houseW/2,  houseY-15],
+    [houseX+houseW+20, houseY+houseH/2],
+    [plotsX+plotsW+15, plotsY+30],
+    [plotsX+plotsW+10, plotsY+70],
+    [plotsX+plotsW/2,  plotsY+110],
+    [plotsX-15,        plotsY+70],
+    [plotsX-10,        plotsY+30],
+    [wellX+10,         wellY+15],
+    [cx,               houseY+houseH+10],
+  ];
+  if(!botX){ botX=botWaypoints[0][0]; botY=botWaypoints[0][1]; }
+}
+
+function drawFarmMap(t, dt){
+  const {houseX,houseY,houseW,houseH,plotsX,plotsY,plotsW,wellX,wellY,cx,availH}=farmLayout;
+  const W=canvas.width;
+  if(!houseX) return;
+
+  // Background
+  drawGrass(0,0,W,availH);
+  // Dirt ground around farm
+  r(plotsX-18,plotsY-12,plotsW+36,140,'#7a5830');
+
+  // Paths
+  drawPath(cx-9,houseY+houseH,18,plotsY-houseY-houseH);
+  drawPath(cx-9,plotsY+115,18,wellY-plotsY-115);
+
+  // Border trees
+  for(let tx=0;tx<W;tx+=52){ drawTree(tx,availH-52,.85); }
+  for(let tx=0;tx<W;tx+=60){ drawTree(tx,0,.75); }
+  for(let ty=50;ty<availH-50;ty+=55){ drawTree(0,ty,.8); drawTree(W-38,ty,.8); }
+
+  // Draw farmhouse (larger, detailed)
+  drawFarmhouse(houseX,houseY,houseW,houseH);
+
+  // Farm well
+  drawWell(wellX,wellY);
+
+  // Plot grid (7 cols x 6 rows = 42)
+  drawFarmPlots(plotsX,plotsY,plotsW,t);
+
+  // Particles (stage dependent)
+  drawStageParticles(t,plotsX,plotsY,plotsW);
+
+  // Sporebot NPC
+  updateBot(dt);
+  drawBot();
+
+  // Floating spores always
+  drawParticles();
+}
+
+function drawFarmhouse(x,y,W,H){
+  // Shadow
+  r(x+6,y+6,W+12,H+20,'rgba(0,0,0,.3)');
+  // Walls
+  r(x,y+H*.32|0,W,H*.68|0,'#6a3a1e');
+  // Roof
+  for(let i=0;i<22;i++) r(x+i,y+i,W-i*2,6,'#8a2020');
+  for(let i=0;i<18;i++) r(x+i+2,y+i-2,W-i*2-4,5,'#bb3333');
+  // Windows
+  r(x+8,y+H*.38|0,14,12,'#fece00');r(x+W-22,y+H*.38|0,14,12,'#fece00');
+  r(x+14,y+H*.38|0,2,12,'#b08000');r(x+W-16,y+H*.38|0,2,12,'#b08000');
+  r(x+8,y+(H*.38+5)|0,14,2,'#b08000');r(x+W-22,y+(H*.38+5)|0,14,2,'#b08000');
+  // Door
+  r(x+W/2-8,y+H*.55|0,16,H*.45+1|0,'#2e1206');
+  r(x+W/2+4,y+H*.72|0,3,4,'#fece00');
+  // Chimney
+  r(x+W-18,y-12,12,20,'#4a3020');r(x+W-20,y-16,16,6,'#3a2010');
+  // Door step
+  r(x+W/2-10,y+H-2,20,5,'#c8a868');
+}
+
+function drawFarmPlots(px,py,pw,t){
+  const cols=7, rows=6;
+  const plotW=Math.floor(pw/cols)-3;
+  const plotH=16;
+  const planted=profileData?.sporebot?.Balance?.shroom_farm||0;
+  const filled=Math.min(42,Math.round(planted/1_000_000));
+  const stage=profileData?.sporebot?.Farm?.current_stage||'Inactive';
+  const regression=getRegression();
+
+  // Soil bed
+  r(px-12,py-10,pw+24,rows*(plotH+3)+20,'#6a4820');
+
+  let idx=0;
+  for(let row=0;row<rows;row++){
+    for(let col=0;col<cols;col++){
+      const bx=px+col*(plotW+3);
+      const by=py+row*(plotH+3);
+      const isFilled=idx<filled;
+      // Soil
+      if(regression>=3){
+        r(bx,by,plotW,plotH,'#3a1808');
+        // Crack texture
+        ctx.strokeStyle='#2a0e04';ctx.lineWidth=1;
+        ctx.beginPath();ctx.moveTo(bx+3,by+3);ctx.lineTo(bx+8,by+8);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(bx+plotW-4,by+4);ctx.lineTo(bx+plotW-9,by+10);ctx.stroke();
+      } else if(regression===2){
+        r(bx,by,plotW,plotH,'#4a2010');
+        ctx.fillStyle='rgba(255,140,0,.18)';ctx.fillRect(bx,by,plotW,plotH);
+      } else {
+        r(bx,by,plotW,plotH,'#4a2408');
+        for(let rl=0;rl<plotH;rl+=4) r(bx,by+rl,plotW,2,'#3a1a04');
+      }
+      // Mushroom if filled
+      if(isFilled){
+        const shroomSize=stage==='Fruiting'||stage==='Sporulation'||stage==='Golden_Sporulation'?1.0:
+                         stage==='Mycelium'?.85:
+                         stage==='Germination'?.65:.5;
+        const shroomX=bx+plotW/2-9*shroomSize;
+        const shroomY=by-shroomSize*14;
+        drawShroom(shroomX,shroomY,shroomSize);
+        // Golden tint for high stages
+        if(stage==='Sporulation'||stage==='Golden_Sporulation'){
+          ctx.fillStyle=`rgba(255,220,0,${Math.sin(t*2+idx*.3)*.08+.05})`;
+          ctx.fillRect(bx,by,plotW,plotH);
+        }
+      }
+      // Mycelium web lines
+      if(isFilled&&(stage==='Mycelium'||stage==='Fruiting'||stage==='Sporulation'||stage==='Golden_Sporulation')){
+        ctx.strokeStyle='rgba(180,255,180,.25)';ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(bx+plotW/2,by+plotH);
+        if(row<rows-1) ctx.lineTo(bx+plotW/2,by+plotH+3);
+        ctx.stroke();
+      }
+      idx++;
+    }
+  }
+}
+
+function drawStageParticles(t,px,py,pw){
+  const stage=profileData?.sporebot?.Farm?.current_stage||'Inactive';
+  if(stage==='Fruiting'||stage==='Sporulation'||stage==='Golden_Sporulation'){
+    for(const p of particles){
+      if(p.x>=px&&p.x<=px+pw){
+        ctx.globalAlpha=Math.max(0,p.life)*0.9;
+        ctx.fillStyle=stage==='Golden_Sporulation'?'#ffd700':'#fece00';
+        ctx.fillRect(p.x|0,p.y|0,2,2);
+      }
+    }
+    ctx.globalAlpha=1;
+  }
+}
+
+// ================================================================
+// SPOREBOT NPC
+// ================================================================
+function loadBotImage(){
+  const bot=profileData?.sporebot?.Inventory?.Active_Sporebot;
+  if(!bot?.image) return;
+  const img=new Image();
+  img.crossOrigin='anonymous';
+  img.onload=()=>{ botImage=img; };
+  img.onerror=()=>{ botImage=null; };
+  img.src=bot.image;
+}
+
+function recalcFarmWaypointsIfNeeded(){
+  if(!farmLayout.houseX) recalcFarmWaypoints();
+}
+
+function updateBot(dt){
+  if(!botWaypoints.length) return;
+  const target=botWaypoints[botWpIdx];
+  if(!target) return;
+  const dx=target[0]-botX, dy=target[1]-botY;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  const speed=38*dt;
+  if(dist<speed+1){
+    botX=target[0]; botY=target[1];
+    // Pick next waypoint randomly
+    let next=Math.floor(Math.random()*botWaypoints.length);
+    if(next===botWpIdx) next=(next+1)%botWaypoints.length;
+    botWpIdx=next;
+  } else {
+    if(dx<-1) botFaceLeft=true;
+    if(dx>1)  botFaceLeft=false;
+    botX+=dx/dist*speed;
+    botY+=dy/dist*speed;
+  }
+  botBob+=dt*4;
+}
+
+function drawBot(){
+  const bx=botX|0, by=(botY+Math.sin(botBob)*2)|0;
+  const size=32;
+  // Shadow
+  ctx.fillStyle='rgba(0,0,0,.3)';
+  ctx.beginPath();ctx.ellipse(bx,by+size/2+2,10,4,0,0,Math.PI*2);ctx.fill();
+
+  if(botImage){
+    ctx.save();
+    if(botFaceLeft){
+      ctx.translate(bx+size/2,0);ctx.scale(-1,1);
+      ctx.drawImage(botImage,-size/2,by-size/2,size,size);
+    } else {
+      ctx.drawImage(botImage,bx-size/2,by-size/2,size,size);
+    }
+    ctx.restore();
+  } else {
+    // Fallback pixel robot
+    const px=bx-size/2, py=by-size/2;
+    r(px+6,py+2,size-12,size-12,'#888');
+    r(px+4,py,size-8,8,'#666');
+    r(px+size/2-3,py-6,6,6,'#888');r(px+size/2,py-8,2,4,'#fece00');
+    r(px+7,py+6,8,6,'#fece00');r(px+size-15,py+6,8,6,'#fece00');
+    r(px+2,py+14,6,size-20,'#777');r(px+size-8,py+14,6,size-20,'#777');
+    r(px+8,py+size-12,size-16,10,'#777');
+    // Eyes
+    ctx.fillStyle='#fece00';
+    ctx.fillRect(px+9,py+8,5,4);ctx.fillRect(px+size-14,py+8,5,4);
+  }
+}
+
+// ================================================================
+// FOREST MAP
+// ================================================================
+const FOREST_ZONES=[
+  {id:'gather',name:'HERB GATHER',icon:'🌿',cx:.18,cy:.3,
+   cmd:'!gather',desc:'Collect herbs every hour for potion brewing. Fox companion unlocks rare herbs.',
+   daily:'daily_herb'},
+  {id:'cave',name:'THE CAVE',icon:'⛏️',cx:.78,cy:.38,
+   cmd:'!cave',desc:'Mine rare gemstones. Collect all 5 types for +25% SGR bonus. Costs 10,000 SPORES.',
+   daily:'daily_cave'},
+  {id:'pets',name:'PET SANCTUARY',icon:'🐾',cx:.18,cy:.68,
+   cmd:'!pet',desc:'Adopt and bond with 12 unique companions. Each grants special bonuses.',
+   daily:null},
+  {id:'shop',name:'MARKET',icon:'💰',cx:.62,cy:.25,
+   cmd:'!shop',desc:'Visit Rhizo and Mycelia. Sell gemstones for SPORES, buy/sell potions.',
+   daily:null},
+  {id:'explore',name:'EXPLORE',icon:'🔎',cx:.5,cy:.55,
+   cmd:'!explore',desc:'Explore the forest paths for artifacts, scrolls, and hidden secrets.',
+   daily:'daily_explore'},
+  {id:'dig',name:'DIG SPOT',icon:'⛏',cx:.38,cy:.75,
+   cmd:'!dig',desc:'Dig for buried treasures and rare items. Requires the Golden Shovel.',
+   daily:'daily_dig'},
+];
+
+function drawForestMap(t){
+  const W=canvas.width, H=canvas.height;
+  const ab=document.getElementById('action-bar');
+  const abH=ab.style.display!=='none'?70:0;
+  const availH=H-abH;
+
+  // Deep forest base
+  r(0,0,W,availH,'#1a3a10');
+  ctx.fillStyle='#162e0e';
+  for(let ty=0;ty<availH;ty+=4) for(let tx=0;tx<W;tx+=4) if(noise(tx+300,ty+200)<.14) ctx.fillRect(tx,ty,4,4);
+
+  // Lighter clearing in center
+  ctx.fillStyle='rgba(74,120,63,.3)';
+  ctx.beginPath();ctx.ellipse(W*.5,availH*.5,W*.32,availH*.3,0,0,Math.PI*2);ctx.fill();
+
+  // Paths between zones
+  ctx.strokeStyle='#9a7840';ctx.lineWidth=12;ctx.setLineDash([20,12]);
+  [[.18,.3,.5,.55],[.5,.55,.78,.38],[.5,.55,.18,.68],[.5,.55,.62,.25],[.5,.55,.38,.75]].forEach(([x1,y1,x2,y2])=>{
+    ctx.beginPath();ctx.moveTo(x1*W,y1*availH);ctx.lineTo(x2*W,y2*availH);ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  // Dense trees around edges
+  for(let tx=0;tx<W;tx+=36) drawTree(tx,availH-50,.9);
+  for(let tx=0;tx<W;tx+=42) drawTree(tx,0,.8);
+  for(let ty=50;ty<availH-50;ty+=44){ drawTree(0,ty,.85); drawTree(W-32,ty,.85); }
+
+  // Cave entrance (right side)
+  const cx2=W*.78, cy2=availH*.38;
+  r(cx2-50,cy2-40,120,90,'#3a2818');
+  r(cx2-30,cy2-70,80,50,'#4a3828');
+  ctx.fillStyle='#050200';
+  ctx.beginPath();ctx.arc(cx2,cy2,32,Math.PI,0);
+  ctx.rect(cx2-32,cy2,64,40);ctx.fill();
+  // Crystal glow in cave
+  ctx.fillStyle=`rgba(136,170,255,${Math.sin(t*1.5)*.3+.3})`;
+  ctx.fillRect(cx2-18,cy2+10,8,8);ctx.fillRect(cx2+10,cy2+18,6,6);
+
+  // Flower clearing (pets area)
+  [[W*.12,availH*.6],[W*.16,availH*.72],[W*.24,availH*.65],[W*.2,availH*.78]].forEach(([fx,fy])=>{
+    r(fx+1,fy+1,5,5,'#fece00');
+    r(fx-3,fy+2,4,3,'#ff7730');r(fx+6,fy+2,4,3,'#ff7730');
+    r(fx+1,fy-3,3,4,'#ff7730');r(fx+1,fy+6,3,4,'#ff7730');
+  });
+
+  // Ambient companion in pets area
+  const comp=profileData?.sporebot?.Companion?.active;
+  if(comp){
+    const emoji=CEMOJIS[comp]||'🐾';
+    ctx.font=`${20+Math.sin(t*1.5)*2}px serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.globalAlpha=0.85+Math.sin(t*1.5)*.15;
+    ctx.fillText(emoji,W*.2,availH*.7);
+    ctx.globalAlpha=1;
+    ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  }
+
+  // Gem display bar
+  drawGemBar(0,availH-36,W,36);
+
+  // Zone indicators
+  FOREST_ZONES.forEach(zone=>{
+    const zx=zone.cx*W, zy=zone.cy*availH;
+    const done=dailyData&&zone.daily?dailyData[zone.daily]===true:false;
+    const pulse=Math.sin(t*2.2+zone.cx*6)*.3+.7;
+    ctx.beginPath();ctx.arc(zx,zy,26,0,Math.PI*2);
+    ctx.strokeStyle=done?`rgba(34,197,94,${pulse*.8})`:`rgba(254,206,0,${pulse*.8})`;
+    ctx.lineWidth=2.5;ctx.stroke();
+    ctx.beginPath();ctx.arc(zx,zy,22,0,Math.PI*2);
+    ctx.fillStyle=done?`rgba(34,197,94,${pulse*.12})`:`rgba(254,206,0,${pulse*.1})`;
+    ctx.fill();
+    ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(zone.icon,zx,zy);
+    ctx.font='bold 6px "Press Start 2P"';
+    ctx.fillStyle='rgba(0,0,0,.75)';ctx.fillRect(zx-36,zy+28,72,13);
+    ctx.fillStyle=done?'#22c55e':'#fece00';
+    ctx.fillText(zone.name,zx,zy+34.5);
+    ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  });
+
+  // Falling leaf particles (reuse particle system tinted green)
+  for(const p of particles){
+    ctx.globalAlpha=Math.max(0,p.life)*.5;
+    ctx.fillStyle='#4a8030';
+    ctx.fillRect(p.x|0,p.y|0,3,3);
+  }
+  ctx.globalAlpha=1;
+  drawFireflies();
+}
+
+function drawGemBar(x,y,w,h){
+  r(x,y,w,h,'rgba(10,10,10,.85)');
+  r(x,y,w,1,'#2a2a2a');
+  const items=profileData?.sporebot?.Inventory?.Items||{};
+  const gemW=Math.floor(w/GEMS.length);
+  GEMS.forEach((gem,i)=>{
+    const owned=items[gem]&&items[gem]>0;
+    const gx=x+i*gemW;
+    ctx.font='bold 7px "Press Start 2P"';ctx.textAlign='center';
+    ctx.fillStyle=owned?'#fece00':'#333';
+    ctx.fillText(GEM_LABELS[gem]||gem,gx+gemW/2,y+h/2+3);
+    if(owned){
+      ctx.fillStyle='rgba(254,206,0,.15)';ctx.fillRect(gx,y,gemW,h);
+    }
+  });
+  ctx.textAlign='left';
+}
+
+// ================================================================
+// MAIN GAME LOOP
+// ================================================================
+function gameLoop(ts){
+  const dt=Math.min((ts-lastTime)/1000,.05);
+  lastTime=ts;
+  animFrame=ts*.001;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.imageSmoothingEnabled=false;
+
+  updateParticles(dt);
+  updateFireflies(dt);
+
+  if(currentMap==='world')  drawWorldMap(animFrame);
+  else if(currentMap==='farm')   drawFarmMap(animFrame,dt);
+  else if(currentMap==='forest') drawForestMap(animFrame);
+
+  requestAnimationFrame(gameLoop);
+}
+
+// ================================================================
+// MAP NAVIGATION
+// ================================================================
+function goToMap(mapId, skipTransition=false){
+  if(skipTransition){
+    _applyMap(mapId);return;
+  }
+  const overlay=document.getElementById('transition-overlay');
+  overlay.classList.add('fading');
+  setTimeout(()=>{
+    _applyMap(mapId);
+    overlay.classList.remove('fading');
+  },250);
+}
+
+function _applyMap(mapId){
+  currentMap=mapId;
+  // Nav buttons
+  document.querySelectorAll('.nav-btn[data-map]').forEach(b=>b.classList.toggle('active',b.dataset.map===mapId));
+  // Back button
+  document.getElementById('back-btn').style.display=mapId==='world'?'none':'block';
+  // Title
+  const titles={world:'WORLD MAP',farm:'FARM MAP',forest:'FOREST MAP',hub:'COMMUNITY HUB'};
+  document.getElementById('map-title-badge').textContent=titles[mapId]||'MAP';
+  // Hub panel
+  document.getElementById('hub-panel').style.display=mapId==='hub'?'block':'none';
+  // Action bar
+  const ab=document.getElementById('action-bar');
+  if(mapId==='farm'){
+    ab.style.display='flex';
+    buildFarmActionBar();
+    recalcFarmWaypoints();
+    loadBotImage();
+  } else if(mapId==='forest'){
+    ab.style.display='flex';
+    buildForestActionBar();
+  } else {
+    ab.style.display='none';
+  }
+  // Regression warning
+  const rw=document.getElementById('regression-warning');
+  rw.style.display=(mapId==='farm'&&getRegression()>=2)?'flex':'none';
+  // Close popup
+  closePopup();
+  // Hub load
+  if(mapId==='hub') loadHubData();
+}
+
+// ================================================================
+// ACTION BARS
+// ================================================================
+function buildFarmActionBar(){
+  const ab=document.getElementById('action-bar');
+  const farm=profileData?.sporebot?.Farm||{};
+  const daily=dailyData||profileData?.sporebot?.Daily_Check||{};
+  const stage=farm.current_stage||'Inactive';
+  const canHarvest=stage==='Sporulation'||stage==='Golden_Sporulation';
+
+  const actions=[
+    {id:'forage',icon:'🍂',label:'Forage',key:'daily_forage',cmd:'!forage',
+     desc:'Your most important daily action. Earns SHROOMS based on your streak. Keeps your farm growing.',required:true},
+    {id:'mist',  icon:'💧',label:'Mist',  key:'daily_mist',  cmd:'!mist',
+     desc:'Waters your farm, earns SPORES, and prevents regression. Must do every 3 days minimum.'},
+    {id:'fan',   icon:'🌬',label:'Fan',   key:'daily_fan',   cmd:'!fan',
+     desc:'Fans your farm for SHROOM reward and prevents regression. Works together with !mist.'},
+    {id:'toss',  icon:'⛲',label:'Toss',  key:'daily_toss',  cmd:'!toss',
+     desc:'Toss SHROOMS into the Wishing Well for random SPORE rewards and luck bonuses.'},
+    {id:'harvest',icon:'🚜',label:'Harvest',key:null,cmd:'!harvest',
+     desc:'Harvest your farm after 42 days to advance your Farm Rank and earn a permanent +3% yield bonus.',
+     harvestOnly:true},
+  ];
+
+  ab.innerHTML=actions.map(a=>{
+    if(a.harvestOnly){
+      const cls=canHarvest?'harvest-ready':'locked';
+      const state=canHarvest?'HARVEST!':'NOT READY';
+      return `<div class="action-tile ${cls}" data-action="${a.id}" data-cmd="${a.cmd}" data-desc="${a.desc}" data-label="${a.label}">
+        <span class="at-icon">${a.icon}</span>
+        <span class="at-state">${state}</span>
+        <span class="at-label">${a.label}</span>
+      </div>`;
+    }
+    const done=daily[a.key]===true;
+    const cls=done?'done':(a.required&&!done?'pending':'ready');
+    const state=done?'✓ DONE':(a.required&&!done?'⚠ DO THIS!':'READY');
+    return `<div class="action-tile ${cls}" data-action="${a.id}" data-cmd="${a.cmd}" data-desc="${a.desc}" data-label="${a.label}">
+      <span class="at-icon">${a.icon}</span>
+      <span class="at-state">${state}</span>
+      <span class="at-label">${a.label}</span>
+    </div>`;
+  }).join('');
+
+  ab.querySelectorAll('.action-tile').forEach(tile=>{
+    tile.addEventListener('click',()=>showActionPopup(tile));
+  });
+}
+
+function buildForestActionBar(){
+  const ab=document.getElementById('action-bar');
+  const daily=dailyData||profileData?.sporebot?.Daily_Check||{};
+  const fActions=[
+    {icon:'🌿',label:'Gather',cmd:'!gather',key:'daily_herb',
+     desc:'Collect herbs hourly for potion brewing. Fox companion unlocks rare herb variants.'},
+    {icon:'⛏',label:'Cave',  cmd:'!cave',  key:'daily_cave',
+     desc:'Enter the cave to mine gemstones. Costs 10,000 SPORES. Collect all 5 types for +25% SGR.'},
+    {icon:'🔎',label:'Explore',cmd:'!explore',key:'daily_explore',
+     desc:'Explore the forest for artifacts, scrolls, and hidden treasures.'},
+    {icon:'⛏',label:'Dig',   cmd:'!dig',   key:'daily_dig',
+     desc:'Dig for buried items. Requires the Golden Shovel (earned at Day 7 forage streak).'},
+  ];
+  ab.innerHTML=fActions.map(a=>{
+    const done=daily[a.key]===true;
+    const cls=done?'done':'ready';
+    const state=done?'✓ DONE':'READY';
+    return `<div class="action-tile ${cls}" data-cmd="${a.cmd}" data-desc="${a.desc}" data-label="${a.label||a.cmd}">
+      <span class="at-icon">${a.icon}</span>
+      <span class="at-state">${state}</span>
+      <span class="at-label">${a.label}</span>
+    </div>`;
+  }).join('');
+  ab.querySelectorAll('.action-tile').forEach(tile=>{
+    tile.addEventListener('click',()=>showActionPopup(tile));
+  });
+}
+
+function showActionPopup(tile){
+  const cmd=tile.dataset.cmd;
+  const desc=tile.dataset.desc;
+  const label=tile.dataset.label||cmd;
+  setEl('popup-icon', tile.querySelector('.at-icon').textContent);
+  setEl('popup-title',label.toUpperCase());
+  setEl('popup-desc', desc);
+  setEl('popup-cmd',  cmd);
+  document.getElementById('popup-cmd-wrap').style.display='block';
+  document.getElementById('popup-discord-btn').style.display='block';
+  document.getElementById('popup-extra').innerHTML='';
+  openPopup();
+}
+
+// ================================================================
+// CANVAS TAP HANDLER
+// ================================================================
+canvas.addEventListener('click', e=>{
+  const rect=canvas.getBoundingClientRect();
+  const mx=(e.clientX-rect.left)*(canvas.width/rect.width);
+  const my=(e.clientY-rect.top)*(canvas.height/rect.height);
+  handleTap(mx,my);
+});
+canvas.addEventListener('touchend', e=>{
+  e.preventDefault();
+  const t2=e.changedTouches[0];
+  const rect=canvas.getBoundingClientRect();
+  const mx=(t2.clientX-rect.left)*(canvas.width/rect.width);
+  const my=(t2.clientY-rect.top)*(canvas.height/rect.height);
+  handleTap(mx,my);
+},{passive:false});
+
+function handleTap(mx,my){
+  if(currentMap==='world'){
+    const W=canvas.width, H=canvas.height;
+    for(const zone of WORLD_ZONES){
+      const dx=mx-zone.cx*W, dy=my-zone.cy*H;
+      if(Math.sqrt(dx*dx+dy*dy)<40){
+        if(zone.id==='hub') goToMap('hub');
+        else goToMap(zone.id);
+        return;
+      }
+    }
+  } else if(currentMap==='farm'){
+    const {plotsX,plotsY,plotsW,wellX,wellY}=farmLayout;
+    // Tap on plot area
+    if(mx>=plotsX-15&&mx<=plotsX+plotsW+15&&my>=plotsY-15&&my<=plotsY+150){
+      showFarmPlotsPopup();return;
+    }
+    // Tap on well
+    if(Math.abs(mx-(wellX))<35&&Math.abs(my-(wellY+25))<35){
+      showWellPopup();return;
+    }
+    // Tap on farmhouse
+    const {houseX,houseY,houseW,houseH}=farmLayout;
+    if(mx>=houseX-10&&mx<=houseX+houseW+10&&my>=houseY-20&&my<=houseY+houseH+10){
+      showFarmhousePopup();return;
+    }
+  } else if(currentMap==='forest'){
+    const W=canvas.width;
+    const ab=document.getElementById('action-bar');
+    const abH=ab.style.display!=='none'?70:0;
+    const availH=canvas.height-abH;
+    for(const zone of FOREST_ZONES){
+      const dx=mx-zone.cx*W, dy=my-zone.cy*availH;
+      if(Math.sqrt(dx*dx+dy*dy)<36){
+        showForestZonePopup(zone);return;
+      }
+    }
+  }
+}
+
+// ================================================================
+// POPUPS
+// ================================================================
+function openPopup(){ document.getElementById('popup').classList.add('open'); }
+function closePopup(){ document.getElementById('popup').classList.remove('open'); }
+document.getElementById('popup-close').addEventListener('click',closePopup);
+
+function showFarmPlotsPopup(){
+  const farm=profileData?.sporebot?.Farm||{};
+  const bal=profileData?.sporebot?.Balance||{};
+  const stage=farm.current_stage||'Inactive';
+  const planted=bal.shroom_farm||0;
+  const filled=Math.min(42,Math.round(planted/1_000_000));
+  const pLimit=profileData?.sporebot?.Stats?.Plant_Limit||2000000;
+
+  setEl('popup-icon','🍄');
+  setEl('popup-title','YOUR PLOTS');
+  document.getElementById('popup-desc').innerHTML='';
+  document.getElementById('popup-cmd-wrap').style.display='none';
+  document.getElementById('popup-discord-btn').style.display='none';
+
+  // Mini plot grid
+  let plotsHtml=`<div class="plots-mini">`;
+  for(let i=0;i<42;i++){
+    plotsHtml+=`<div class="plot-mini ${i<filled?'filled':'empty'}">${i<filled?'🍄':''}</div>`;
+  }
+  plotsHtml+=`</div>`;
+
+  document.getElementById('popup-extra').innerHTML=`
+    ${plotsHtml}
+    <div class="popup-stats">
+      <div class="pstat"><span class="pstat-l">Planted</span><span class="pstat-v y">${fmt(planted)} SHROOMS</span></div>
+      <div class="pstat"><span class="pstat-l">Plots Filled</span><span class="pstat-v">${filled} / 42</span></div>
+      <div class="pstat"><span class="pstat-l">Plant Limit</span><span class="pstat-v b">${fmt(pLimit)}</span></div>
+      <div class="pstat"><span class="pstat-l">Stage</span><span class="pstat-v g">${stage}</span></div>
+      <div class="pstat"><span class="pstat-l">Spores/Day</span><span class="pstat-v y">${fmt(farm.spore_generation_rate)}</span></div>
+    </div>
+    <a class="popup-discord-btn" href="${DISCORD_INVITE}" target="_blank" rel="noopener noreferrer" style="margin-top:10px;display:block">USE !PLANT IN DISCORD</a>
+  `;
+  openPopup();
+}
+
+function showWellPopup(){
+  setEl('popup-icon','⛲');
+  setEl('popup-title','WISHING WELL');
+  setEl('popup-desc','Toss SHROOMS into the Wishing Well for random SPORE rewards and luck bonuses. Duck companion lets you shop via the well.');
+  setEl('popup-cmd','!toss');
+  document.getElementById('popup-cmd-wrap').style.display='block';
+  document.getElementById('popup-discord-btn').style.display='block';
+  document.getElementById('popup-extra').innerHTML='';
+  openPopup();
+}
+
+function showFarmhousePopup(){
+  const farm=profileData?.sporebot?.Farm||{};
+  setEl('popup-icon','🏠');
+  setEl('popup-title','FARMHOUSE');
+  setEl('popup-desc','Your mushroom farm home. Check your farm status with !farm and manage your daily routine from here.');
+  document.getElementById('popup-cmd-wrap').style.display='none';
+  document.getElementById('popup-discord-btn').style.display='none';
+  document.getElementById('popup-extra').innerHTML=`
+    <div class="popup-stats">
+      <div class="pstat"><span class="pstat-l">Farm Rank</span><span class="pstat-v y">${safe(farm.farm_rank,'BRONZE')}</span></div>
+      <div class="pstat"><span class="pstat-l">Stage</span><span class="pstat-v g">${safe(farm.current_stage,'Inactive')}</span></div>
+      <div class="pstat"><span class="pstat-l">Streak</span><span class="pstat-v">${farm.streak!=null?farm.streak+' days':'-'}</span></div>
+      <div class="pstat"><span class="pstat-l">Lifetime SPORES</span><span class="pstat-v b">${fmt(farm.lifetime_spores)}</span></div>
+    </div>
+    <div class="sbar-wrap" style="margin-top:8px">
+      <div class="sbar-lbl"><span>${safe(farm.current_stage,'Inactive')}</span><span>${stagePct(farm.current_stage)}%</span></div>
+      <div class="sbar"><div class="sbar-fill" style="width:${stagePct(farm.current_stage)}%"></div></div>
+    </div>
+    <a class="popup-discord-btn" href="${DISCORD_INVITE}" target="_blank" rel="noopener noreferrer" style="margin-top:10px;display:block">USE !FARM IN DISCORD</a>
+  `;
+  openPopup();
+}
+
+function showForestZonePopup(zone){
+  const daily=dailyData||profileData?.sporebot?.Daily_Check||{};
+  const done=zone.daily?daily[zone.daily]===true:false;
+  setEl('popup-icon',zone.icon);
+  setEl('popup-title',zone.name);
+  setEl('popup-desc',zone.desc);
+  setEl('popup-cmd',zone.cmd);
+  document.getElementById('popup-cmd-wrap').style.display='block';
+  document.getElementById('popup-discord-btn').style.display='block';
+
+  let extra='';
+  if(zone.id==='cave'){
+    const items=profileData?.sporebot?.Inventory?.Items||{};
+    const ownedGems=GEMS.filter(g=>items[g]&&items[g]>0);
+    extra=`<div class="gem-row">${GEMS.map(g=>`<span class="gem-chip ${items[g]>0?'owned':''}">${GEM_LABELS[g]}</span>`).join('')}</div>`;
+  }
+  if(done) extra+=`<div style="margin-top:8px;color:#22c55e;font-size:.88rem;">✓ Completed today</div>`;
+  document.getElementById('popup-extra').innerHTML=extra;
+  openPopup();
+}
+
+// ================================================================
+// HUB DATA
+// ================================================================
+async function loadHubData(){
+  try{
+    const res=await fetch(`${API_BASE}/api/leaderboard`);
+    if(!res.ok) throw new Error('no data');
+    const data=await res.json();
+    renderLeaderboard('lb-farmers', data.farmers||[]);
+    renderLeaderboard('lb-foragers',data.foragers||[]);
+    renderLeaderboard('lb-stakers', data.stakers||[]);
+    if(data.stats){
+      const el=document.getElementById('hub-stats');
+      el.innerHTML=`
+        <div class="lb-row"><span class="lb-name">Total Staked</span><span class="lb-val">${fmt(data.stats.total_staked)} SPORE</span></div>
+        <div class="lb-row"><span class="lb-name">Active Stakers</span><span class="lb-val">${data.stats.staker_count||'-'}</span></div>
+        <div class="lb-row"><span class="lb-name">Active Farms</span><span class="lb-val">${data.stats.farm_count||'-'}</span></div>
+      `;
+    }
+  }catch(e){
+    ['lb-farmers','lb-foragers','lb-stakers'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.innerHTML='<div class="hub-loading">Connect server to view</div>';
+    });
+  }
+}
+function renderLeaderboard(elId, entries){
+  const el=document.getElementById(elId);
+  if(!el) return;
+  if(!entries.length){el.innerHTML='<div class="hub-loading">No data</div>';return;}
+  const rankClass=['gold','silver','bronze'];
+  el.innerHTML=entries.slice(0,10).map((e,i)=>`
+    <div class="lb-row">
+      <span class="lb-rank ${rankClass[i]||''}">#${i+1}</span>
+      <span class="lb-name">${e.username||e.id||'Unknown'}</span>
+      <span class="lb-val">${fmt(e.value)}</span>
+    </div>
+  `).join('');
+}
+
+// ================================================================
+// DAILY STATUS & REGRESSION
+// ================================================================
+function hasPendingDaily(){
+  const daily=dailyData||profileData?.sporebot?.Daily_Check||{};
+  return !daily.daily_forage||!daily.daily_mist||!daily.daily_fan;
+}
+function getRegression(){
+  // Returns 0,2,3 based on days since mist/fan
+  const farm=profileData?.sporebot?.Farm||{};
+  const lastMist=farm.last_mist_date||farm.mist_date||null;
+  const lastFan =farm.last_fan_date ||farm.fan_date ||null;
+  if(!lastMist&&!lastFan) return 0;
+  const now=Date.now();
+  const mDays=lastMist?Math.floor((now-new Date(lastMist).getTime())/86400000):99;
+  const fDays=lastFan ?Math.floor((now-new Date(lastFan).getTime())/86400000):99;
+  const worst=Math.min(mDays,fDays);
+  if(worst>=3) return 3;
+  if(worst>=2) return 2;
+  return 0;
+}
+function stagePct2(name){ // alias
+  const i=STAGE_ORDER.indexOf(name);
+  return i<0?0:Math.round((i+1)/STAGE_ORDER.length*100);
+}
+
+// ================================================================
+// PROFILE SYSTEM
+// ================================================================
+function getLinkedId(){ return localStorage.getItem(LS.ID); }
+function isVerified(){  return localStorage.getItem(LS.VER)==='true'; }
+
+function showProfileState(state){
+  document.querySelectorAll('.prof-state').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(`state-${state}`);
+  if(el) el.classList.add('active');
+}
+
+async function loadAndRenderProfile(uid){
+  if(!uid) return;
+  try{
+    const res=await fetch(`${API_BASE}/api/user/${uid}`);
+    if(!res.ok) return;
+    const data=await res.json();
+    if(!data||(!data.sporebot&&!data.pixie)) return;
+    profileData=data;
+    renderProfileLinked(data);
+    updateNavBadge();
+  }catch(e){ console.error(e); }
+}
+
+function renderProfileLinked(data){
+  const s=data.sporebot||{};
+  const p=data.pixie||{};
+  const farm=s.Farm||{},bal=s.Balance||{};
+  const staking=s.Staking||{},comp=s.Companion||{};
+  const misc=s.Misc||{},inv=s.Inventory||{};
+  const wallet=p.Wallet||{},sec=p.Security||{};
+  const flair=p.Flair||{};
+
+  setEl('pl-name',   safe(misc.username||wallet.username,'Unknown Farmer'));
+  setEl('pl-joined', `Joined: ${safe(p.Misc?.created_at||misc.created_at,'Unknown')}`);
+  setEl('pl-rank',   safe(farm.farm_rank,'BRONZE'));
+  setEl('pl-flair',  safe(flair.Flair,'SPROUT'));
+  if(sec.Verified) document.getElementById('pl-verified').style.display='inline-block';
+  setEl('pl-shroom',  fmt(wallet.shroom_wallet));
+  setEl('pl-spore',   fmt(wallet.spore_wallet));
+  setEl('pl-planted', fmt(bal.shroom_farm));
+  const addr=wallet.Address||'';
+  setEl('pl-addr', addr?`${addr.slice(0,6)}...${addr.slice(-4)}`:'Not registered');
+  setEl('pl-stage',  safe(farm.current_stage,'Inactive'));
+  setEl('pl-fmrank', safe(farm.farm_rank,'BRONZE'));
+  setEl('pl-sgr',    farm.spore_generation_rate!=null?`${Number(farm.spore_generation_rate).toLocaleString()} / day`:'-');
+  setEl('pl-streak', farm.streak!=null?`${farm.streak} days`:'-');
+  const sp=stagePct(farm.current_stage);
+  const sfill=document.getElementById('pl-sfill');
+  if(sfill) sfill.style.width=`${sp}%`;
+  setEl('pl-slbl', safe(farm.current_stage,'Inactive'));
+  setEl('pl-spct', `${sp}%`);
+  const staked=staking.staked_spores||0;
+  setEl('pl-staked', fmt(staked));
+  setEl('pl-spend',  fmt(staking.pending_rewards));
+  setEl('pl-nodes',  staked>0?Math.floor(staked/100_000_000).toString():'0');
+  const activeKey=comp.active;
+  if(activeKey){
+    const pets=comp.pets||{};const pd=pets[activeKey]||{};
+    let days=pd.total_days||0;
+    if(comp.adopted_at){const a=new Date(comp.adopted_at.replace(' ','T')+'Z');days+=Math.floor((Date.now()-a.getTime())/86400000);}
+    const bl=bondLevel(days);
+    setEl('pl-comp',  `${CEMOJIS[activeKey]||'🐾'} ${activeKey.charAt(0).toUpperCase()+activeKey.slice(1)}`);
+    setEl('pl-bond',  `Lv.${bl} - ${BOND_LBLS[bl]}`);
+    setEl('pl-cdays', `${days} days`);
+  } else {
+    setEl('pl-comp','-');setEl('pl-bond','-');setEl('pl-cdays','-');
+  }
+  const bot=inv.Active_Sporebot||{};
+  if(bot.token_id){
+    setEl('pl-bot-name',  bot.title||bot.name||`Sporebot #${bot.token_id}`);
+    setEl('pl-bot-id',    `#${bot.token_id}`);
+    setEl('pl-bot-rar',   bot.rarity_score?`Score: ${bot.rarity_score}`:'-');
+    const img=document.getElementById('prof-bot-img');
+    if(bot.image&&img){img.src=bot.image;img.style.display='block';}
+  } else {
+    setEl('pl-bot-name','No Sporebot active');
+    setEl('pl-bot-id','-');setEl('pl-bot-rar','-');
+  }
+  // Username in header
+  const uname=misc.username||wallet.username||'FARMER';
+  setEl('hdr-username',uname.substring(0,12).toUpperCase());
+  document.getElementById('hdr-username').style.display='block';
+  showProfileState('linked');
+}
+
+function updateNavBadge(){
+  const badge=document.getElementById('farm-badge');
+  if(badge) badge.style.display=hasPendingDaily()?'block':'none';
+}
+
+// Profile modal open/close
+document.getElementById('nav-profile').addEventListener('click',()=>{
+  document.getElementById('prof-modal').classList.add('open');
+  if(isVerified()&&getLinkedId()){
+    if(!profileData) loadAndRenderProfile(getLinkedId());
+    else showProfileState('linked');
+  }
+});
+document.getElementById('prof-mclose').addEventListener('click',()=>{
+  document.getElementById('prof-modal').classList.remove('open');
+});
+document.getElementById('prof-modal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('prof-modal'))
+    document.getElementById('prof-modal').classList.remove('open');
+});
+
+// Send code
+document.getElementById('link-send-btn').addEventListener('click',async()=>{
+  const uid=document.getElementById('link-discord-id').value.trim();
+  if(!uid){setEl('prof-status-msg','Please enter your Discord User ID.');return;}
+  const btn=document.getElementById('link-send-btn');
+  btn.disabled=true;btn.textContent='SENDING...';
+  setEl('prof-status-msg','');
+  try{
+    const res=await fetch(`${API_BASE}/api/send-code`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({discord_id:uid})});
+    const data=await res.json();
+    if(res.ok){
+      localStorage.setItem(LS.ID,uid);
+      if(data.code){
+        // TESTING mode - auto-fill and verify
+        const vres=await fetch(`${API_BASE}/api/verify-code`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({discord_id:uid,code:String(data.code)})});
+        if(vres.ok){
+          localStorage.setItem(LS.VER,'true');
+          await loadAndRenderProfile(uid);
+          return;
+        }
+      }
+      showProfileState('verify');
+    } else {
+      setEl('prof-status-msg',data.error||'Failed to send code. Check your Discord ID.');
+      btn.disabled=false;btn.textContent='SEND VERIFICATION CODE';
+    }
+  }catch(e){
+    setEl('prof-status-msg','Server connection failed.');
+    btn.disabled=false;btn.textContent='SEND VERIFICATION CODE';
+  }
+});
+
+// Verify code
+document.getElementById('link-verify-btn').addEventListener('click',async()=>{
+  const code=document.getElementById('link-code-input').value.trim();
+  const uid=getLinkedId();
+  if(!code||!uid){setEl('verify-status-msg','Missing code or ID.');return;}
+  const btn=document.getElementById('link-verify-btn');
+  btn.disabled=true;btn.textContent='VERIFYING...';
+  try{
+    const res=await fetch(`${API_BASE}/api/verify-code`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({discord_id:uid,code})});
+    const data=await res.json();
+    if(res.ok){
+      localStorage.setItem(LS.VER,'true');
+      await loadAndRenderProfile(uid);
+    } else {
+      setEl('verify-status-msg',data.error||'Invalid code. Try again.');
+      btn.disabled=false;btn.textContent='VERIFY';
+    }
+  }catch(e){
+    setEl('verify-status-msg','Server connection failed.');
+    btn.disabled=false;btn.textContent='VERIFY';
+  }
+});
+
+// Unlink
+document.getElementById('unlink-btn').addEventListener('click',()=>{
+  localStorage.removeItem(LS.ID);localStorage.removeItem(LS.VER);
+  profileData=null;botImage=null;
+  document.getElementById('hdr-username').style.display='none';
+  document.getElementById('farm-badge').style.display='none';
+  showProfileState('unlinked');
+});
+
+// ================================================================
+// SETTINGS
+// ================================================================
+document.getElementById('nav-hub').addEventListener('click',()=>goToMap('hub'));
+
+// Nav map buttons
+document.querySelectorAll('.nav-btn[data-map]').forEach(btn=>{
+  btn.addEventListener('click',()=>goToMap(btn.dataset.map));
+});
+
+// Back button
+document.getElementById('back-btn').addEventListener('click',()=>goToMap('world'));
+
+// Settings (reuse a nav approach - add settings trigger somewhere)
+// Settings accessible from profile modal bottom or long-press (add a gear icon to header)
+const settingsIcon=document.createElement('button');
+settingsIcon.id='settings-trigger';
+settingsIcon.style.cssText='background:none;border:none;cursor:pointer;font-size:1.1rem;color:#666;padding:4px;';
+settingsIcon.textContent='⚙';
+settingsIcon.title='Settings';
+settingsIcon.addEventListener('click',()=>document.getElementById('settings-modal').classList.add('open'));
+document.querySelector('.hdr-right').prepend(settingsIcon);
+
+document.getElementById('settings-close').addEventListener('click',()=>document.getElementById('settings-modal').classList.remove('open'));
+document.getElementById('settings-modal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('settings-modal'))
+    document.getElementById('settings-modal').classList.remove('open');
+});
+document.getElementById('settings-link-btn').addEventListener('click',()=>{
+  document.getElementById('settings-modal').classList.remove('open');
+  document.getElementById('prof-modal').classList.add('open');
+});
+document.getElementById('clear-data-btn').addEventListener('click',()=>{
+  if(confirm('Clear all local data? You will need to re-link your account.')){
+    Object.values(LS).forEach(k=>localStorage.removeItem(k));
+    profileData=null;botImage=null;
+    document.getElementById('hdr-username').style.display='none';
+    document.getElementById('farm-badge').style.display='none';
+    showProfileState('unlinked');
+    document.getElementById('settings-modal').classList.remove('open');
+  }
+});
+
+// Toggles
+['tooltips','theme'].forEach(key=>{
+  const btn=document.getElementById(`tog-${key}`);
+  const stored=localStorage.getItem(LS[key.toUpperCase()]||`mp_${key}`);
+  if(stored==='false'){btn.classList.remove('on');btn.textContent=key==='theme'?'CREAM':'OFF';}
+  btn.addEventListener('click',()=>{
+    const isOn=btn.classList.toggle('on');
+    btn.textContent=key==='theme'?(isOn?'DARK':'CREAM'):(isOn?'ON':'OFF');
+    localStorage.setItem(`mp_${key}`,isOn.toString());
+  });
+});
+
+// ================================================================
+// BOOT
+// ================================================================
+window.addEventListener('DOMContentLoaded',()=>{
+  resizeCanvas();
+  // Auto-load if already linked
+  if(isVerified()&&getLinkedId()){
+    loadAndRenderProfile(getLinkedId());
+  }
+  // Start loop
+  requestAnimationFrame(ts=>{ lastTime=ts; requestAnimationFrame(gameLoop); });
+  // Default map
+  goToMap('world',true);
+});
+
+// Update discord invite links once config loads
+window.addEventListener('load',()=>{
+  const inv=window.DISCORD_INVITE||DISCORD_INVITE;
+  document.querySelectorAll('[href*="discord.com/invite"]').forEach(a=>a.href=inv);
+  document.getElementById('popup-discord-btn').href=inv;
+});
+</script>
+</body>
+</html>
