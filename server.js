@@ -4,7 +4,7 @@ import admin from 'firebase-admin';
 import fs from 'fs';
 import dotenv from 'dotenv';
 dotenv.config();
-
+TESTING=true;
 // Load Firebase Admin SDK
 const serviceAccount = JSON.parse(fs.readFileSync('./firebase.json', 'utf8'));
 
