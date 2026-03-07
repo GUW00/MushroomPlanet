@@ -17,9 +17,11 @@ const db = admin.database();
 const app = express();
 app.use(cors({
   origin: ['https://mushroomplanet.earth', 'http://localhost:8080'],
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
   credentials: true,
 }));
+app.options('*', cors());
 app.use(express.json());
 app.use(express.static('public'));
 
