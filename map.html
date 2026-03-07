@@ -152,11 +152,20 @@ html,body{
 #popup.open{transform:translateY(0);}
 #popup::-webkit-scrollbar{width:3px;}
 #popup::-webkit-scrollbar-thumb{background:var(--y);}
-#popup-close{
-  position:absolute;top:10px;right:12px;
-  background:none;border:none;color:#666;cursor:pointer;
-  font-family:'Press Start 2P',monospace;font-size:0.4rem;
+#popup-close{display:none;}
+#popup-btn-row{
+  display:flex;gap:6px;margin-top:9px;align-items:stretch;
 }
+#popup-close-btn{
+  flex:0 0 12%;padding:0;
+  background:var(--r);border:2px solid var(--r);color:#000;
+  font-family:'Press Start 2P',monospace;font-size:0.5rem;
+  border-radius:4px;cursor:pointer;text-align:center;
+  transition:border-color .15s,color .15s;
+  display:flex;align-items:center;justify-content:center;
+}
+#popup-close-btn:hover{background:#c0303a;border-color:#c0303a;}
+#popup-discord-btn{flex:1;}
 #popup-icon{font-size:2rem;margin-bottom:8px;}
 #popup-title{font-family:'Press Start 2P',monospace;font-size:0.45rem;color:var(--y);margin-bottom:8px;}
 #popup-desc{font-size:1.05rem;color:#aaa;line-height:1.5;margin-bottom:12px;}
@@ -166,11 +175,12 @@ html,body{
   padding:5px 10px;border-radius:3px;margin-bottom:10px;
 }
 #popup-discord-btn{
-  display:block;width:100%;padding:10px;
+  display:flex;align-items:center;justify-content:center;
+  padding:0;
   background:var(--y);color:#000;border:none;
   font-family:'Press Start 2P',monospace;font-size:0.3rem;
   border-radius:4px;cursor:pointer;text-align:center;text-decoration:none;
-  margin-top:6px;
+  margin-top:0;min-height:44px;
 }
 #popup-discord-btn:hover{background:#eab308;}
 .popup-stats{margin-top:8px;}
@@ -470,7 +480,10 @@ html,body{
     <div id="popup-title"></div>
     <div id="popup-desc"></div>
     <div id="popup-cmd-wrap" style="display:none"><span id="popup-cmd"></span></div>
-    <a id="popup-discord-btn" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer" style="display:none">GO TO DISCORD</a>
+    <div id="popup-btn-row" style="display:none">
+      <button id="popup-close-btn">X</button>
+      <a id="popup-discord-btn" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">GO TO DISCORD</a>
+    </div>
     <div id="popup-extra"></div>
   </div>
 
@@ -478,7 +491,7 @@ html,body{
   <div id="hub-panel">
     <div class="hub-title">COMMUNITY HUB</div>
     <div class="hub-grid" id="hub-grid">
-      <div class="hub-card"><h3>TOP FARMERS</h3><div id="lb-farmers" class="hub-loading">Loading...</div></div>
+      <div class="hub-card"><h3>TOP 10 FARMERS</h3><div id="lb-farmers" class="hub-loading">Loading...</div></div>
       <div class="hub-card"><h3>TOP FORAGERS</h3><div id="lb-foragers" class="hub-loading">Loading...</div></div>
       <div class="hub-card"><h3>TOP STAKERS</h3><div id="lb-stakers" class="hub-loading">Loading...</div></div>
       <div class="hub-card"><h3>COMMUNITY STATS</h3><div id="hub-stats"></div></div>
@@ -634,7 +647,7 @@ html,body{
 // ================================================================
 // CONSTANTS & STATE
 // ================================================================
-const API_BASE = window.location.port==='8080' ? 'http://localhost:3001' : 'https://api.mushroomplanet.earth';
+const API_BASE = 'http://localhost:3001';
 console.log('API_BASE:', API_BASE, '| port:', window.location.port, '| href:', window.location.href);
 const LS = {
   ID:   'mp_discord_id',
@@ -700,6 +713,7 @@ function resizeCanvas(){
   const area = document.getElementById('map-area');
   canvas.width  = area.clientWidth;
   canvas.height = area.clientHeight;
+  sporeParts=[];
   initParticles();
   initFireflies();
   if(currentMap==='farm')   recalcFarmWaypoints();
@@ -818,6 +832,15 @@ function drawShroom(x,y,s=1){
   r(x+W*.2|0, y+H*.12|0,W*.22|0,H*.16|0,'#fff');
   r(x+W*.58|0,y+H*.22|0,W*.2|0, W*.15|0,'#fff');
 }
+function drawShroomGold(x,y,s=1){
+  const W=18*s|0,H=22*s|0;
+  r(x+W*.28|0,y+H*.55|0,W*.42|0,H*.47|0,'#e8d890');
+  r(x,y+H*.46|0,W,H*.27|0,'#b8860b');
+  r(x+W*.08|0,y+H*.27|0,W*.84|0,H*.3|0,'#daa520');
+  r(x+W*.18|0,y+H*.1|0, W*.64|0,H*.24|0,'#fece00');
+  r(x+W*.2|0, y+H*.12|0,W*.22|0,H*.16|0,'#fffacd');
+  r(x+W*.58|0,y+H*.22|0,W*.2|0, W*.15|0,'#fffacd');
+}
 function drawMountain(x,y){
   r(x-26,y+30,66,52,'#30281e');r(x-16,y+16,46,22,'#3e342a');
   r(x-4,y,28,20,'#4e4238');r(x+2,y,14,8,'#dde0e8');
@@ -848,7 +871,7 @@ const WORLD_ZONES = [
   { id:'farm',   name:'YOUR FARM',       icon:'🍄', cx:.5,  cy:.45,
     desc:'Your personal mushroom farm. Grow SHROOMS through 6 stages over 42 days.',
     color:'#5a9040' },
-  { id:'hub',    name:'COMMUNITY HUB',   icon:'🏆', cx:.82, cy:.48,
+  { id:'hub',    name:'COMMUNITY HUB',   icon:'🏆', cx:.5,  cy:.82,
     desc:'Leaderboards, community stats, active stakers, and global events.',
     color:'#c8a060' },
 ];
@@ -857,16 +880,20 @@ function drawWorldMap(t){
   const W=canvas.width, H=canvas.height;
   drawGrass(0,0,W,H);
 
-  // Water (top-right lake)
-  drawWater(W*.65,0,W*.35,H*.22,t);
-  r(W*.65-2,H*.2,W*.35+2,10,'#b89a58');
-
-  // River
-  drawWater(W*.48,H*.22,W*.04,H*.3,t);
+  // Body of water - bottom right only
+  drawWater(W*.72,H*.72,W*.28,H*.28,t);
+  r(W*.72-2,H*.72,4,H*.28,'#b89a58');
+  r(W*.72,H*.72-2,W*.28,4,'#b89a58');
 
   // Paths
   drawPath(W*.15,H*.46,W*.7,18);
-  drawPath(W*.48,H*.2,18,H*.28);
+  drawPath(W*.48,H*.42,18,H*.15);
+
+  // Farm dirt patches (center area)
+  r(W*.36,H*.28,W*.28,H*.08,'#7a5830');r(W*.37,H*.29,W*.26,H*.06,'#6a4820');
+  r(W*.36,H*.38,W*.28,H*.08,'#7a5830');r(W*.37,H*.39,W*.26,H*.06,'#6a4820');
+  r(W*.38,H*.26,W*.04,H*.2,'#8a6030');
+  for(let dx=0;dx<5;dx++) for(let dy=0;dy<2;dy++) if(noise(dx*17,dy*31)<.5) r(W*.37+dx*W*.05,H*.29+dy*H*.09,W*.04,H*.06,'#5a3810');
 
   // Forest zone (left)
   r(0,H*.08,W*.28,H*.85,'#1a3a10');
@@ -880,27 +907,27 @@ function drawWorldMap(t){
     for(let tx=8;tx<W*.25;tx+=38)
       if(noise(tx,ty)<.78) drawTree(tx+noise(tx,ty)*14,ty+noise(ty,tx)*10,1.1);
   for(let ty=H*.1;ty<H*.9;ty+=28) drawTree(W*.22+Math.sin(ty*.05)*16,ty,1.0);
+  // Mushrooms scattered inside forest
+  [[W*.06,H*.2],[W*.12,H*.35],[W*.18,H*.55],[W*.08,H*.65],[W*.2,H*.25],[W*.14,H*.75],[W*.04,H*.45]].forEach(([sx,sy])=>drawShroom(sx,sy,0.9));
 
   // Farm zone (center - farmhouse silhouette)
   const fx=W*.44, fy=H*.18;
   drawHouse(fx,fy,'#6a3a1e','#8a2020',70,55);
   r(fx+26,fy+55,18,H*.2,'#b89a58');
 
-  // Hub zone (right - village)
-  drawHouse(W*.76,H*.32,'#d49060','#a04820');
-  drawHouse(W*.84,H*.28,'#6a9a48','#3a6820',45,38);
-  drawHouse(W*.78,H*.42,'#9a7848','#6a4a20',50,40);
-  r(W*.74,H*.5,W*.14,10,'#b08840');
+  // Hub zone (bottom center - village)
+  drawHouse(W*.42,H*.72,'#d49060','#a04820');
+  drawHouse(W*.51,H*.7,'#6a9a48','#3a6820',45,38);
+  drawHouse(W*.44,H*.8,'#9a7848','#6a4a20',50,40);
+  r(W*.4,H*.86,W*.14,10,'#b08840');
 
-  // Mountains (far right)
-  for(let my=H*.05;my<H*.85;my+=80) drawMountain(W*.95+Math.sin(my*.08)*20,my);
+  // Mountains (right side, stop before water)
+  for(let my=H*.05;my<H*.65;my+=80) drawMountain(W*.9+Math.sin(my*.08)*14,my);
 
-  // Border trees
-  for(let bx=W*.3;bx<W*.65;bx+=52){ drawTree(bx,8,.85); drawTree(bx+20,H-48,.85); }
-  for(let by=80;by<H-60;by+=52) drawTree(W-52,by,.85);
-
-  // Scattered shrooms
-  [[W*.35,H*.35],[W*.42,H*.6],[W*.55,H*.38],[W*.62,H*.65],[W*.72,H*.55]].forEach(([sx,sy])=>drawShroom(sx,sy,1.1));
+  // Border trees - top only, right side stops before water
+  for(let bx=W*.3;bx<W*.65;bx+=52){ drawTree(bx,8,.85); }
+  for(let bx=W*.3;bx<W*.68;bx+=52){ drawTree(bx+20,H*.6,.85); }
+  for(let by=80;by<H*.65;by+=52) drawTree(W-52,by,.85);
 
   // Zone clickable areas - glowing rings
   WORLD_ZONES.forEach(zone=>{
@@ -945,11 +972,11 @@ function recalcFarmWaypoints(){
   const cx=W/2, topY=availH*.08;
 
   farmLayout = {
-    houseX:cx-40, houseY:topY,
-    houseW:80, houseH:60,
-    plotsX:cx-105, plotsY:topY+80,
-    plotsW:210,
-    wellX:cx-120, wellY:availH*.68,
+    houseX:cx-50, houseY:topY,
+    houseW:100, houseH:72,
+    plotsX:cx-130, plotsY:topY+96,
+    plotsW:260,
+    wellX:cx-150, wellY:availH*.7,
     cx, availH,
   };
 
@@ -1033,14 +1060,22 @@ function drawFarmhouse(x,y,W,H){
 function drawFarmPlots(px,py,pw,t){
   const cols=7, rows=6;
   const plotW=Math.floor(pw/cols)-3;
-  const plotH=16;
+  const plotH=plotW;
   const planted=profileData?.sporebot?.Balance?.shroom_farm||0;
   const filled=Math.min(42,Math.round(planted/1_000_000));
   const stage=profileData?.sporebot?.Farm?.current_stage||'Inactive';
   const regression=getRegression();
 
   // Soil bed
-  r(px-12,py-10,pw+24,rows*(plotH+3)+20,'#6a4820');
+  const totalH=rows*(plotH+3)+20;
+  r// Farm Boost NFT count
+  const nftWallet=profileData?.pixie?.Wallet?.NFT||{};
+  let farmBoostCount=0;
+  for(const[k,v] of Object.entries(nftWallet)){
+    if(k.includes('Farm Boost')&&v&&typeof v==='object') farmBoostCount+=parseInt(v.count||1);
+  }
+  // Soil bed
+  r(px-12,py-10,pw+24,totalH,'#6a4820');
 
   let idx=0;
   for(let row=0;row<rows;row++){
@@ -1062,19 +1097,40 @@ function drawFarmPlots(px,py,pw,t){
         r(bx,by,plotW,plotH,'#4a2408');
         for(let rl=0;rl<plotH;rl+=4) r(bx,by+rl,plotW,2,'#3a1a04');
       }
-      // Mushroom if filled
+      // Mushrooms per plot: 1 per 250K, up to 4
       if(isFilled){
-        const shroomSize=stage==='Fruiting'||stage==='Sporulation'||stage==='Golden_Sporulation'?1.0:
-                         stage==='Mycelium'?.85:
-                         stage==='Germination'?.65:.5;
-        const shroomX=bx+plotW/2-9*shroomSize;
-        const shroomY=by-shroomSize*14;
-        drawShroom(shroomX,shroomY,shroomSize);
+        const shroomsInPlot=Math.min(4,Math.max(1,Math.ceil((planted/filled)/250000)));
+        // Scale shroom to fit 1-4 inside the square plot
+        const cell=shroomsInPlot>=3?(plotW/2):(plotW/(shroomsInPlot+0.5));
+        const shroomSize=Math.max(0.35,Math.min(0.9,(cell/22)));
+        const sw=18*shroomSize, sh=22*shroomSize;
+        const pad=2;
+        // Grid positions: 2x2 for 4, 2+1 for 3, row for 1-2
+        let positions=[];
+        if(shroomsInPlot===4){
+          const hx=plotW/2, hy=plotH/2;
+          positions=[[pad,pad],[hx+pad,pad],[pad,hy+pad],[hx+pad,hy+pad]];
+        } else if(shroomsInPlot===3){
+          const hx=plotW/2, hy=plotH/2;
+          positions=[[plotW/4-sw/2,pad],[hx+pad,pad],[pad+hx/2-sw/2,hy+pad]];
+        } else if(shroomsInPlot===2){
+          positions=[[pad,plotH/2-sh/2],[plotW/2+pad,plotH/2-sh/2]];
+        } else {
+          positions=[[plotW/2-sw/2,plotH/2-sh/2]];
+        }
+        positions.forEach(([ox,oy])=>{
+          drawShroom(bx+ox,by+oy,shroomSize);
+        });
         // Golden tint for high stages
         if(stage==='Sporulation'||stage==='Golden_Sporulation'){
           ctx.fillStyle=`rgba(255,220,0,${Math.sin(t*2+idx*.3)*.08+.05})`;
           ctx.fillRect(bx,by,plotW,plotH);
         }
+      }
+      // Farm Boost NFT: gold shroom on empty plots after filled ones
+      if(farmBoostCount>0&&!isFilled&&(idx-filled)<farmBoostCount){
+        const gs=Math.max(0.5,Math.min(1.1,(plotW/20)));
+        drawShroomGold(bx+plotW/2-9*gs,by+plotH/2-11*gs,gs);
       }
       // Mycelium web lines
       if(isFilled&&(stage==='Mycelium'||stage==='Fruiting'||stage==='Sporulation'||stage==='Golden_Sporulation')){
@@ -1089,8 +1145,64 @@ function drawFarmPlots(px,py,pw,t){
   }
 }
 
+// Blue spore particles rising from filled plots
+let sporeParts=[];
+function initSporeParts(plotsX,plotsY,plotsW,filled){
+  if(sporeParts.length) return;
+  const cols=7, rows=6;
+  const plotW=Math.floor(plotsW/7)-3;
+  const plotH=plotW;
+  for(let i=0;i<filled;i++){
+    const col=i%cols, row=Math.floor(i/cols);
+    const bx=plotsX+col*(plotW+3)+plotW/2;
+    const by=plotsY+row*(plotH+3)+plotH/2;
+    for(let j=0;j<3;j++) sporeParts.push(makeSpore(bx,by));
+  }
+}
+function makeSpore(originX,originY){
+  return {
+    ox:originX, oy:originY,
+    x:originX+(Math.random()-.5)*14,
+    y:originY+Math.random()*8,
+    vy:-(0.3+Math.random()*0.5),
+    vx:(Math.random()-.5)*0.3,
+    life:Math.random(),
+    maxLife:0.5+Math.random()*0.5,
+    size:1+Math.random()*2,
+  };
+}
+function resetSpore(p){
+  p.x=p.ox+(Math.random()-.5)*14;
+  p.y=p.oy+Math.random()*8;
+  p.vy=-(0.3+Math.random()*0.5);
+  p.vx=(Math.random()-.5)*0.3;
+  p.life=0.6+Math.random()*0.4;
+}
 function drawStageParticles(t,px,py,pw){
   const stage=profileData?.sporebot?.Farm?.current_stage||'Inactive';
+  const planted=profileData?.sporebot?.Balance?.shroom_farm||0;
+  const filled=Math.min(42,Math.round(planted/1_000_000));
+
+  // Blue spores from filled plots always
+  if(filled>0){
+    initSporeParts(px,py,pw,filled);
+    for(const p of sporeParts){
+      p.x+=p.vx; p.y+=p.vy;
+      p.life-=0.008;
+      if(p.life<=0) resetSpore(p);
+      const alpha=Math.max(0,p.life)*0.85;
+      ctx.globalAlpha=alpha;
+      ctx.fillStyle='#60a5fa';
+      ctx.beginPath();ctx.arc(p.x|0,p.y|0,p.size,0,Math.PI*2);ctx.fill();
+      // soft glow
+      ctx.globalAlpha=alpha*0.3;
+      ctx.fillStyle='#93c5fd';
+      ctx.beginPath();ctx.arc(p.x|0,p.y|0,p.size+1.5,0,Math.PI*2);ctx.fill();
+    }
+    ctx.globalAlpha=1;
+  }
+
+  // Golden stage overlay particles
   if(stage==='Fruiting'||stage==='Sporulation'||stage==='Golden_Sporulation'){
     for(const p of particles){
       if(p.x>=px&&p.x<=px+pw){
@@ -1203,44 +1315,157 @@ function drawForestMap(t){
   const abH=ab.style.display!=='none'?70:0;
   const availH=H-abH;
 
-  // Deep forest base
-  r(0,0,W,availH,'#1a3a10');
+  // Deep forest base - layered greens
+  r(0,0,W,availH,'#122810');
+  ctx.fillStyle='#0e2008';
+  for(let ty=0;ty<availH;ty+=4) for(let tx=0;tx<W;tx+=4) if(noise(tx+300,ty+200)<.18) ctx.fillRect(tx,ty,4,4);
+  ctx.fillStyle='#1e3a14';
+  for(let ty=0;ty<availH;ty+=4) for(let tx=0;tx<W;tx+=4) if(noise(tx+500,ty+400)<.08) ctx.fillRect(tx,ty,4,4);
+
+  // Mossy ground patches
+  [[W*.3,availH*.4,80,50],[W*.55,availH*.6,60,40],[W*.2,availH*.7,70,45],[W*.7,availH*.5,55,35],[W*.45,availH*.25,65,40]].forEach(([mx,my,mw,mh])=>{
+    ctx.fillStyle='rgba(40,90,30,.4)';
+    ctx.beginPath();ctx.ellipse(mx,my,mw,mh,0,0,Math.PI*2);ctx.fill();
+  });
   ctx.fillStyle='#162e0e';
   for(let ty=0;ty<availH;ty+=4) for(let tx=0;tx<W;tx+=4) if(noise(tx+300,ty+200)<.14) ctx.fillRect(tx,ty,4,4);
 
-  // Lighter clearing in center
-  ctx.fillStyle='rgba(74,120,63,.3)';
-  ctx.beginPath();ctx.ellipse(W*.5,availH*.5,W*.32,availH*.3,0,0,Math.PI*2);ctx.fill();
+  // Scattered trees throughout forest - dense and varied
+  const treePositions=[
+    [.05,.1],[.15,.08],[.28,.05],[.55,.08],[.68,.06],[.82,.1],[.93,.08],
+    [.02,.3],[.08,.5],[.04,.7],[.1,.85],[.92,.25],[.96,.5],[.88,.72],[.94,.88],
+    [.22,.15],[.35,.12],[.72,.18],[.85,.3],[.25,.88],[.42,.92],[.6,.9],[.78,.85],
+    [.32,.35],[.42,.28],[.6,.32],[.7,.42],[.3,.62],[.65,.68],[.55,.78],
+  ];
+  treePositions.forEach(([px,py])=>drawTree(px*W-15,py*availH-20,0.8+noise(px*100,py*100)*.5));
 
-  // Paths between zones
-  ctx.strokeStyle='#9a7840';ctx.lineWidth=12;ctx.setLineDash([20,12]);
-  [[.18,.3,.5,.55],[.5,.55,.78,.38],[.5,.55,.18,.68],[.5,.55,.62,.25],[.5,.55,.38,.75]].forEach(([x1,y1,x2,y2])=>{
-    ctx.beginPath();ctx.moveTo(x1*W,y1*availH);ctx.lineTo(x2*W,y2*availH);ctx.stroke();
+  // Extra edge trees for density
+  for(let tx=0;tx<W;tx+=38) drawTree(tx,availH-52,.85);
+  for(let tx=0;tx<W;tx+=44) drawTree(tx,-10,.75);
+  for(let ty=60;ty<availH-60;ty+=46){ drawTree(-10,ty,.8); drawTree(W-28,ty,.8); }
+
+  // Scattered mushrooms throughout forest floor
+  [[W*.1,availH*.2],[W*.22,availH*.38],[W*.08,availH*.55],[W*.18,availH*.72],
+   [W*.3,availH*.18],[W*.75,availH*.22],[W*.88,availH*.45],[W*.82,availH*.65],
+   [W*.55,availH*.15],[W*.48,availH*.82],[W*.62,availH*.75],[W*.35,availH*.7]
+  ].forEach(([sx,sy])=>drawShroom(sx,sy,0.85+noise(sx,sy)*.4));
+
+  // ---- HERB GATHER area (top-left clearing) ----
+  const hx=W*.18, hy=availH*.3;
+  ctx.fillStyle='rgba(50,110,35,.5)';
+  ctx.beginPath();ctx.ellipse(hx,hy,58,42,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(80,160,50,.25)';
+  ctx.beginPath();ctx.ellipse(hx,hy,44,32,-0.3,0,Math.PI*2);ctx.fill();
+  // Herb plants
+  [[-28,-12],[-14,10],[0,-18],[18,6],[30,-8],[-8,20],[22,-20]].forEach(([ox,oy])=>{
+    const hpx=hx+ox, hpy=hy+oy;
+    r(hpx-1,hpy,2,10,'#3a5a20');
+    r(hpx-5,hpy-4,10,6,'#4a8a28');
+    r(hpx-3,hpy-8,6,5,'#5aaa32');
+    r(hpx-7,hpy-2,6,4,'#3a7a20');
+    r(hpx+2,hpy-2,6,4,'#3a7a20');
   });
-  ctx.setLineDash([]);
+  // Small flowers in herb patch
+  [[-20,8],[10,-14],[26,12],[-6,-6]].forEach(([ox,oy])=>{
+    const fx=hx+ox, fy=hy+oy;
+    const flicker=Math.sin(t*2.5+ox)*.3+.7;
+    ctx.fillStyle=`rgba(100,220,80,${flicker})`;
+    r(fx-1,fy-3,2,6,'#3a6020');
+    r(fx-3,fy-1,6,2,'#5ac040');r(fx-1,fy-3,2,2,'#5ac040');r(fx-1,fy+1,2,2,'#5ac040');
+    r(fx,fy-1,2,2,'#ffffff');
+  });
 
-  // Dense trees around edges
-  for(let tx=0;tx<W;tx+=36) drawTree(tx,availH-50,.9);
-  for(let tx=0;tx<W;tx+=42) drawTree(tx,0,.8);
-  for(let ty=50;ty<availH-50;ty+=44){ drawTree(0,ty,.85); drawTree(W-32,ty,.85); }
-
-  // Cave entrance (right side)
+  // ---- CAVE entrance (right side) ----
   const cx2=W*.78, cy2=availH*.38;
-  r(cx2-50,cy2-40,120,90,'#3a2818');
-  r(cx2-30,cy2-70,80,50,'#4a3828');
+  // Rocky cliff face
+  r(cx2-70,cy2-80,180,130,'#2a2018');
+  r(cx2-55,cy2-95,150,50,'#363028');
+  r(cx2-60,cy2-60,170,100,'#322820');
+  // Rock shading
+  r(cx2-65,cy2-75,20,120,'#1e1810');r(cx2+85,cy2-70,20,110,'#1e1810');
+  r(cx2-40,cy2-90,130,18,'#423a2a');
+  // Cave mouth
   ctx.fillStyle='#050200';
-  ctx.beginPath();ctx.arc(cx2,cy2,32,Math.PI,0);
-  ctx.rect(cx2-32,cy2,64,40);ctx.fill();
-  // Crystal glow in cave
-  ctx.fillStyle=`rgba(136,170,255,${Math.sin(t*1.5)*.3+.3})`;
-  ctx.fillRect(cx2-18,cy2+10,8,8);ctx.fillRect(cx2+10,cy2+18,6,6);
-
-  // Flower clearing (pets area)
-  [[W*.12,availH*.6],[W*.16,availH*.72],[W*.24,availH*.65],[W*.2,availH*.78]].forEach(([fx,fy])=>{
-    r(fx+1,fy+1,5,5,'#fece00');
-    r(fx-3,fy+2,4,3,'#ff7730');r(fx+6,fy+2,4,3,'#ff7730');
-    r(fx+1,fy-3,3,4,'#ff7730');r(fx+1,fy+6,3,4,'#ff7730');
+  ctx.beginPath();ctx.arc(cx2,cy2,36,Math.PI,0);
+  ctx.rect(cx2-36,cy2,72,44);ctx.fill();
+  // Cave inner glow
+  const cg=ctx.createRadialGradient(cx2,cy2+10,4,cx2,cy2+10,32);
+  cg.addColorStop(0,`rgba(100,130,255,${Math.sin(t*1.5)*.2+.25})`);
+  cg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=cg;ctx.fillRect(cx2-36,cy2-10,72,54);
+  // Crystals
+  [[cx2-20,cy2+12],[cx2+14,cy2+20],[cx2-6,cy2+8]].forEach(([kx,ky])=>{
+    ctx.fillStyle=`rgba(136,170,255,${Math.sin(t*1.8+kx)*.4+.4})`;
+    ctx.beginPath();ctx.moveTo(kx,ky-10);ctx.lineTo(kx-5,ky+2);ctx.lineTo(kx+5,ky+2);ctx.closePath();ctx.fill();
   });
+  // Rock debris around cave
+  [[cx2-52,cy2+30,14,8],[cx2+44,cy2+24,18,10],[cx2-30,cy2+48,22,12],[cx2+20,cy2+44,16,9]].forEach(([rx,ry,rw,rh])=>{
+    r(rx,ry,rw,rh,'#2e2418');
+  });
+
+  // ---- PET SANCTUARY (left mid) ----
+  const px2=W*.18, py2=availH*.68;
+  ctx.fillStyle='rgba(60,130,45,.35)';
+  ctx.beginPath();ctx.ellipse(px2,py2,52,38,0,0,Math.PI*2);ctx.fill();
+  // Flowers
+  [[-30,-10],[-16,12],[0,-16],[18,8],[28,-6],[-8,18],[22,-18],[-22,4],[8,16]].forEach(([ox,oy])=>{
+    const fx=px2+ox, fy=py2+oy;
+    const flicker=Math.sin(t*2+ox*.1)*.3+.7;
+    r(fx+1,fy+1,4,4,`rgba(254,206,0,${flicker})`);
+    r(fx-3,fy+2,4,3,'#ff7730');r(fx+5,fy+2,4,3,'#ff9940');
+    r(fx+1,fy-3,3,4,'#ff8830');r(fx+1,fy+5,3,4,'#ee6620');
+    r(fx+2,fy+3,2,2,'#fff8c0');
+  });
+
+  // ---- MARKET (top right area) ----
+  const mkx=W*.62, mky=availH*.25;
+  drawHouse(mkx-26,mky-30,'#d49060','#a04820',52,42);
+  drawHouse(mkx+20,mky-22,'#7a9a58','#3a6820',38,34);
+  r(mkx-30,mky+14,90,8,'#b08840');
+  // Market stall awning
+  r(mkx-34,mky-18,38,6,'#cc3322');
+  for(let ax=0;ax<38;ax+=6) r(mkx-34+ax,mky-18,3,6,'#aa2211');
+
+  // ---- DIG SPOT (bottom center-left) ----
+  const dx2=W*.38, dy2=availH*.75;
+  // Disturbed earth mound
+  ctx.fillStyle='#5a3a18';
+  ctx.beginPath();ctx.ellipse(dx2,dy2,48,28,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#4a2e10';
+  ctx.beginPath();ctx.ellipse(dx2,dy2,36,20,0.2,0,Math.PI*2);ctx.fill();
+  // Dirt texture
+  for(let di=0;di<12;di++){
+    const dox=(noise(di,1)-.5)*70, doy=(noise(di,2)-.5)*38;
+    r(dx2+dox-3,dy2+doy-2,6+noise(di,3)*8|0,3,'#6a4820');
+  }
+  // Pile of dug dirt on side
+  r(dx2+30,dy2-8,28,16,'#6a4820');r(dx2+32,dy2-12,22,10,'#7a5828');
+  r(dx2+36,dy2-16,14,8,'#8a6830');
+  // Shovel sticking out
+  r(dx2-8,dy2-32,6,36,'#7a5030');
+  r(dx2-14,dy2-34,18,10,'#8a8a8a');r(dx2-16,dy2-38,22,8,'#999');
+  r(dx2-14,dy2-36,22,2,'#aaa');
+  // Sparkle hint of treasure
+  const sparkle=Math.sin(t*3)*.5+.5;
+  ctx.fillStyle=`rgba(254,206,0,${sparkle*.8})`;
+  ctx.fillRect(dx2-4,dy2+4,6,6);
+  ctx.fillStyle=`rgba(254,206,0,${sparkle*.4})`;
+  ctx.fillRect(dx2-10,dy2+2,4,4);ctx.fillRect(dx2+6,dy2+6,4,4);
+
+  // ---- EXPLORE zone (center) ----
+  const ex=W*.5, ey=availH*.55;
+  // Ancient stone marker
+  r(ex-6,ey-24,12,28,'#5a5248');r(ex-8,ey-26,16,6,'#6a625a');
+  r(ex-10,ey-20,20,4,'#4a4440');
+  // Glowing runes on stone
+  ctx.fillStyle=`rgba(180,255,140,${Math.sin(t*1.2)*.4+.3})`;
+  r(ex-3,ey-20,6,3,'rgba(180,255,140,0.5)');
+  r(ex-4,ey-14,8,2,'rgba(180,255,140,0.4)');
+  r(ex-2,ey-9,4,3,'rgba(180,255,140,0.5)');
+  // Ground circle around marker
+  ctx.strokeStyle='rgba(140,200,100,.3)';ctx.lineWidth=2;ctx.setLineDash([6,8]);
+  ctx.beginPath();ctx.arc(ex,ey,30,0,Math.PI*2);ctx.stroke();
+  ctx.setLineDash([]);
 
   // Ambient companion in pets area
   const comp=profileData?.sporebot?.Companion?.active;
@@ -1249,7 +1474,7 @@ function drawForestMap(t){
     ctx.font=`${20+Math.sin(t*1.5)*2}px serif`;
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.globalAlpha=0.85+Math.sin(t*1.5)*.15;
-    ctx.fillText(emoji,W*.2,availH*.7);
+    ctx.fillText(emoji,px2,py2-8);
     ctx.globalAlpha=1;
     ctx.textAlign='left';ctx.textBaseline='alphabetic';
   }
@@ -1460,7 +1685,7 @@ function showActionPopup(tile){
   setEl('popup-desc', desc);
   setEl('popup-cmd',  cmd);
   document.getElementById('popup-cmd-wrap').style.display='block';
-  document.getElementById('popup-discord-btn').style.display='block';
+  document.getElementById('popup-btn-row').style.display='flex';
   document.getElementById('popup-extra').innerHTML='';
   openPopup();
 }
@@ -1529,6 +1754,7 @@ function handleTap(mx,my){
 function openPopup(){ document.getElementById('popup').classList.add('open'); }
 function closePopup(){ document.getElementById('popup').classList.remove('open'); }
 document.getElementById('popup-close').addEventListener('click',closePopup);
+document.getElementById('popup-close-btn').addEventListener('click',closePopup);
 
 function showFarmPlotsPopup(){
   const farm=profileData?.sporebot?.Farm||{};
@@ -1542,23 +1768,23 @@ function showFarmPlotsPopup(){
   setEl('popup-title','YOUR PLOTS');
   document.getElementById('popup-desc').innerHTML='';
   document.getElementById('popup-cmd-wrap').style.display='none';
+  document.getElementById('popup-btn-row').style.display='flex';
   document.getElementById('popup-discord-btn').style.display='none';
 
-  // Mini plot grid
-  let plotsHtml=`<div class="plots-mini">`;
-  for(let i=0;i<42;i++){
-    plotsHtml+=`<div class="plot-mini ${i<filled?'filled':'empty'}">${i<filled?'🍄':''}</div>`;
+  const nftWallet=profileData?.pixie?.Wallet?.NFT||{};
+  let farmBoostCount=0;
+  for(const[k,v] of Object.entries(nftWallet)){
+    if(k.includes('Farm Boost')&&v&&typeof v==='object') farmBoostCount+=parseInt(v.count||1);
   }
-  plotsHtml+=`</div>`;
 
   document.getElementById('popup-extra').innerHTML=`
-    ${plotsHtml}
     <div class="popup-stats">
       <div class="pstat"><span class="pstat-l">Planted</span><span class="pstat-v y">${fmt(planted)} SHROOMS</span></div>
       <div class="pstat"><span class="pstat-l">Plots Filled</span><span class="pstat-v">${filled} / 42</span></div>
       <div class="pstat"><span class="pstat-l">Plant Limit</span><span class="pstat-v b">${fmt(pLimit)}</span></div>
       <div class="pstat"><span class="pstat-l">Stage</span><span class="pstat-v g">${stage}</span></div>
       <div class="pstat"><span class="pstat-l">Spores/Day</span><span class="pstat-v y">${fmt(farm.spore_generation_rate)}</span></div>
+      <div class="pstat"><span class="pstat-l">Farm Boost NFTs</span><span class="pstat-v y">${farmBoostCount>0?farmBoostCount+' owned':'None'}</span></div>
     </div>
     <a class="popup-discord-btn" href="${DISCORD_INVITE}" target="_blank" rel="noopener noreferrer" style="margin-top:10px;display:block">USE !PLANT IN DISCORD</a>
   `;
@@ -1571,7 +1797,7 @@ function showWellPopup(){
   setEl('popup-desc','Toss SHROOMS into the Wishing Well for random SPORE rewards and luck bonuses. Duck companion lets you shop via the well.');
   setEl('popup-cmd','!toss');
   document.getElementById('popup-cmd-wrap').style.display='block';
-  document.getElementById('popup-discord-btn').style.display='block';
+  document.getElementById('popup-btn-row').style.display='flex';
   document.getElementById('popup-extra').innerHTML='';
   openPopup();
 }
@@ -1582,7 +1808,7 @@ function showFarmhousePopup(){
   setEl('popup-title','FARMHOUSE');
   setEl('popup-desc','Your mushroom farm home. Check your farm status with !farm and manage your daily routine from here.');
   document.getElementById('popup-cmd-wrap').style.display='none';
-  document.getElementById('popup-discord-btn').style.display='none';
+  document.getElementById('popup-btn-row').style.display='none';
   document.getElementById('popup-extra').innerHTML=`
     <div class="popup-stats">
       <div class="pstat"><span class="pstat-l">Farm Rank</span><span class="pstat-v y">${safe(farm.farm_rank,'BRONZE')}</span></div>
@@ -1607,7 +1833,7 @@ function showForestZonePopup(zone){
   setEl('popup-desc',zone.desc);
   setEl('popup-cmd',zone.cmd);
   document.getElementById('popup-cmd-wrap').style.display='block';
-  document.getElementById('popup-discord-btn').style.display='block';
+  document.getElementById('popup-btn-row').style.display='flex';
 
   let extra='';
   if(zone.id==='cave'){

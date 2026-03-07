@@ -4,7 +4,7 @@ import admin from 'firebase-admin';
 import fs from 'fs';
 import dotenv from 'dotenv';
 dotenv.config();
-// Load Firebase Admin SDK
+
 const serviceAccount = JSON.parse(fs.readFileSync('./firebase.json', 'utf8'));
 
 admin.initializeApp({
@@ -27,16 +27,12 @@ app.use(express.static('public'));
 
 // ----------------------------------------------------------------
 // POST /api/send-code
-// Body: { discord_id: "123456789" }
-// Writes VerifyCode + DM_Pending to Firebase. Bot polls DM_Pending
-// and sends the DM, then clears the flag.
 // ----------------------------------------------------------------
 app.post('/api/send-code', async (req, res) => {
   const discord = req.body.discord_id;
   if (!discord) return res.status(400).json({ success: false, message: 'Missing Discord ID' });
 
   try {
-    // Check user exists
     const userSnap = await db.ref(`Pixie/Users/${discord}`).get();
     if (!userSnap.exists()) {
       return res.status(404).json({
@@ -65,7 +61,6 @@ app.post('/api/send-code', async (req, res) => {
 
 // ----------------------------------------------------------------
 // POST /api/verify-code
-// Body: { discord_id: "123456789", code: "123456" }
 // ----------------------------------------------------------------
 app.post('/api/verify-code', async (req, res) => {
   const { discord_id, code } = req.body;
@@ -101,7 +96,6 @@ app.post('/api/verify-code', async (req, res) => {
 
 // ----------------------------------------------------------------
 // GET /api/user/:id
-// Lookup by Discord ID or username
 // ----------------------------------------------------------------
 app.get('/api/user/:id', async (req, res) => {
   const input = req.params.id;
@@ -119,7 +113,6 @@ app.get('/api/user/:id', async (req, res) => {
       });
     }
 
-    // Fallback: scan by username
     const [allPixie, allSporebot] = await Promise.all([
       db.ref('Pixie/Users').get(),
       db.ref('Sporebot/Users').get(),
@@ -161,21 +154,16 @@ app.get('/api/user/:id', async (req, res) => {
 
 // ----------------------------------------------------------------
 // GET /api/leaderboard
-// Returns top 10 farmers, foragers, stakers
 // ----------------------------------------------------------------
 app.get('/api/leaderboard', async (req, res) => {
   try {
-    const [sporebotSnap, pixieSnap] = await Promise.all([
-      db.ref('Sporebot/Users').get(),
-      db.ref('Pixie/Users').get(),
-    ]);
+    const sporebotSnap = await db.ref('Sporebot/Users').get();
 
     const farmers  = [];
     const foragers = [];
     const stakers  = [];
     let total_staked = 0, staker_count = 0, farm_count = 0;
 
-    // Farm + staking data from Sporebot/Users (matches lb.py build_farm_embed / build_plant_embed)
     if (sporebotSnap.exists()) {
       sporebotSnap.forEach(child => {
         const data     = child.val();
@@ -185,17 +173,13 @@ app.get('/api/leaderboard', async (req, res) => {
         const staking  = data?.Staking || {};
 
         const shroom_farm = balance.shroom_farm || 0;
-        const streak          = farm.streak || 0;
-        const staked          = staking.staked_spores || 0;
-        const stage           = farm.current_stage;
+        const streak      = farm.streak || 0;
+        const staked      = staking.staked_spores || 0;
+        const stage       = farm.current_stage;
 
-        // Top Farmers = lifetime_spores (matches build_plant_embed shroom_farm / spore_rate logic)
         if (shroom_farm > 0) farmers.push({ id: child.key, username, value: shroom_farm });
-
-        // Top Foragers = forage streak (matches build_farm_embed streak)
         if (streak > 0) foragers.push({ id: child.key, username, value: streak });
 
-        // Top Stakers
         if (staked > 0) {
           stakers.push({ id: child.key, username, value: staked });
           total_staked += staked;
