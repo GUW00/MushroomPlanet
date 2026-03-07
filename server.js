@@ -184,13 +184,13 @@ app.get('/api/leaderboard', async (req, res) => {
         const balance  = data?.Balance || {};
         const staking  = data?.Staking || {};
 
-        const lifetime_spores = farm.lifetime_spores || 0;
+        const shroom_farm = balance.shroom_farm || 0;
         const streak          = farm.streak || 0;
         const staked          = staking.staked_spores || 0;
         const stage           = farm.current_stage;
 
         // Top Farmers = lifetime_spores (matches build_plant_embed shroom_farm / spore_rate logic)
-        if (lifetime_spores > 0) farmers.push({ id: child.key, username, value: lifetime_spores });
+        if (shroom_farm > 0) farmers.push({ id: child.key, username, value: shroom_farm });
 
         // Top Foragers = forage streak (matches build_farm_embed streak)
         if (streak > 0) foragers.push({ id: child.key, username, value: streak });
