@@ -4,7 +4,6 @@ import admin from 'firebase-admin';
 import fs from 'fs';
 import dotenv from 'dotenv';
 dotenv.config();
-TESTING=true;
 // Load Firebase Admin SDK
 const serviceAccount = JSON.parse(fs.readFileSync('./firebase.json', 'utf8'));
 
@@ -13,9 +12,14 @@ admin.initializeApp({
   databaseURL: 'https://drbots---live-default-rtdb.firebaseio.com',
 });
 
+const TESTING = process.env.TESTING === 'true';
 const db = admin.database();
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ['https://mushroomplanet.earth', 'http://localhost:8080'],
+  methods: ['GET', 'POST'],
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -220,8 +224,8 @@ app.get('/api/leaderboard', async (req, res) => {
 // ----------------------------------------------------------------
 // Start server
 // ----------------------------------------------------------------
-const TESTING = process.env.TESTING === 'true';
 const PORT = process.env.PORT || 3001;
+console.log(`[CONFIG] TESTING=${TESTING}`);
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
