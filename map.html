@@ -1673,7 +1673,7 @@ function drawForestMap(t){
   ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(vx-38,vy+12,76,13);
   ctx.fillStyle='#fece00';ctx.fillText('WIMBLECAP',vx,vy+19);
   ctx.textAlign='left';
-  
+
   // ---- HERB GATHER area (top-left clearing) ----
   const hx=W*.18, hy=availH*.3;
   ctx.fillStyle='rgba(50,110,35,.5)';
@@ -1932,9 +1932,10 @@ function buildFarmActionBar(){
   const farm=profileData?.sporebot?.Farm||{};
   const daily=dailyData||profileData?.sporebot?.Daily_Check||{};
   const stage=farm.current_stage||'Inactive';
-  const canHarvest=stage==='Sporulation'||stage==='Golden_Sporulation';
 
   const actions=[
+    {id:'items',icon:'🎒',label:'Items',key:null,cmd:null,
+     desc:'View your full inventory.',isItems:true},
     {id:'forage',icon:'🍂',label:'Forage',key:'daily_forage',cmd:'!forage',
      desc:'Your most important daily action. Earns SHROOMS based on your streak. Keeps your farm growing.',required:true},
     {id:'mist',  icon:'💧',label:'Mist',  key:'daily_mist',  cmd:'!mist',
@@ -1943,18 +1944,13 @@ function buildFarmActionBar(){
      desc:'Fans your farm for SHROOM reward and prevents regression. Works together with !mist.'},
     {id:'toss',  icon:'⛲',label:'Toss',  key:'daily_toss',  cmd:'!toss',
      desc:'Toss SHROOMS into the Wishing Well for random SPORE rewards and luck bonuses.'},
-    {id:'harvest',icon:'🚜',label:'Harvest',key:null,cmd:'!harvest',
-     desc:'Harvest your farm after 42 days to advance your Farm Rank and earn a permanent +3% yield bonus.',
-     harvestOnly:true},
   ];
 
   ab.innerHTML=actions.map(a=>{
-    if(a.harvestOnly){
-      const cls=canHarvest?'harvest-ready':'locked';
-      const state=canHarvest?'HARVEST!':'NOT READY';
-      return `<div class="action-tile ${cls}" data-action="${a.id}" data-cmd="${a.cmd}" data-desc="${a.desc}" data-label="${a.label}">
+    if(a.isItems){
+      return `<div class="action-tile ready" data-action="items" style="border-color:#a855f7">
         <span class="at-icon">${a.icon}</span>
-        <span class="at-state">${state}</span>
+        <span class="at-state" style="color:#a855f7">ITEMS</span>
         <span class="at-label">${a.label}</span>
       </div>`;
     }
@@ -1969,7 +1965,8 @@ function buildFarmActionBar(){
   }).join('');
 
   ab.querySelectorAll('.action-tile').forEach(tile=>{
-    tile.addEventListener('click',()=>showActionPopup(tile));
+    if(tile.dataset.action==='items') tile.addEventListener('click',showItemsPopup);
+    else tile.addEventListener('click',()=>showActionPopup(tile));
   });
 }
 
@@ -2288,6 +2285,125 @@ function showPotionStationPopup(){
 
   html+='</div>';
   html+=`<a class="popup-discord-btn" href="${DISCORD_INVITE}" target="_blank" rel="noopener noreferrer" style="margin-top:10px;display:block">USE !BREW IN DISCORD</a>`;
+  document.getElementById('popup-extra').innerHTML=html;
+  openPopup();
+}
+function showItemsPopup(){
+  const inv=profileData?.sporebot?.Inventory||{};
+  const items=inv.Items||{};
+  const artifacts=inv.Artifacts||{};
+  const scrolls=inv.Scrolls||{};
+  const gemstones=inv.Gemstones||{};
+  const farm=profileData?.sporebot?.Farm||{};
+
+  function row(label,val,color=''){
+    return `<div class="pstat"><span class="pstat-l">${label}</span><span class="pstat-v ${color}">${val}</span></div>`;
+  }
+  function img(file,size=16){
+    return `<img src="/images/${file}.png" style="width:${size}px;height:${size}px;object-fit:contain;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">`;
+  }
+
+  let html='';
+
+  // ---- ITEMS ----
+  const ITEM_MAP={
+    Golden_Shovel:  {label:'Golden Shovel',  file:'cave',    desc:'Unlocks !dig command'},
+    Elder_Pipe:     {label:'Elder Pipe',     file:'campfire',desc:'Resets !forage/!mist/!fan (7d cooldown)'},
+    Feather:        {label:'Feather',        file:'explore', desc:'+5% APY bonus'},
+    Wildtongue_Gemstone:{label:'Wildtongue Gemstone',file:'mythic',desc:'+5% APY bonus'},
+    Mooshie_Gemstone:   {label:'Mooshie Gemstone',   file:'gold',  desc:'Mooshie bonus'},
+    King_Totem:     {label:'King Totem',     file:'king',    desc:'Rare totem'},
+    Queen_Totem:    {label:'Queen Totem',    file:'queen',   desc:'Rare totem'},
+    Kid_Totem:      {label:'Kid Totem',      file:'shroomies',desc:'Rare totem'},
+    Gold_Totem:     {label:'Gold Totem',     file:'gold',    desc:'Rare totem'},
+    Miner_Helmet:   {label:'Miner Helmet',   file:'cave',    desc:'Cave gear'},
+    Well_Access:    {label:'Well Access',    file:'mist',    desc:'Unlocks !toss command'},
+  };
+
+  const ownedItems=Object.entries(items).filter(([,v])=>v&&v!==false);
+  html+=`<div style="font-family:'Press Start 2P',monospace;font-size:0.26rem;color:#fece00;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid #222;">ITEMS</div>`;
+  html+='<div class="popup-stats">';
+  if(ownedItems.length){
+    ownedItems.forEach(([k,v])=>{
+      const m=ITEM_MAP[k]||{label:k.replace(/_/g,' '),file:'inventory',desc:''};
+      const qty=typeof v==='number'&&v>1?` x${v}`:'';
+      html+=`<div class="pstat"><span class="pstat-l">${img(m.file)}${m.label}${qty}</span><span class="pstat-v g" style="font-size:.7rem">${m.desc}</span></div>`;
+    });
+  } else {
+    html+=row('No items yet','','');
+  }
+  html+='</div>';
+
+  // ---- GEMSTONES ----
+  const GEM_MAP={
+    Shroomstone_Quartz: {label:'Quartz',    file:'bronze'},
+    Shroomcap_Ruby:     {label:'Ruby',      file:'rare'},
+    Sporelight_Sapphire:{label:'Sapphire',  file:'silver'},
+    Moonglow_Amethyst:  {label:'Amethyst',  file:'mythic'},
+    Prismcap_Diamond:   {label:'Diamond',   file:'gold'},
+  };
+  html+=`<div style="font-family:'Press Start 2P',monospace;font-size:0.26rem;color:#60a5fa;margin:10px 0 5px;padding-bottom:4px;border-bottom:1px solid #222;">GEMSTONES</div>`;
+  html+='<div class="popup-stats">';
+  const gemEntries=Object.entries(GEM_MAP);
+  const hasGems=gemEntries.some(([k])=>gemstones[k]>0);
+  if(hasGems){
+    gemEntries.forEach(([k,m])=>{
+      const amt=gemstones[k]||0;
+      if(amt>0) html+=`<div class="pstat"><span class="pstat-l">${img(m.file)}${m.label}</span><span class="pstat-v b">x${amt}</span></div>`;
+    });
+  } else {
+    html+=row('No gemstones yet — use !cave','','');
+  }
+  html+='</div>';
+
+  // ---- ARTIFACTS ----
+  const ART_LABELS={
+    Elderwood_Bow:'Elderwood Bow',Wizard_Staff:'Wizard Staff',Reshi_Shield:'Reshi Shield',
+    Spell_Book:'Spell Book',Wizard_Hat:'Wizard Hat',Healing_Potion:'Healing Potion',
+    Mooshie_Ring:'Mooshie Ring',Magical_Mirror:'Magical Mirror',
+    Deathcap_Dagger:'Deathcap Dagger',Arcane_Amulet:'Arcane Amulet',
+  };
+  const ownedArts=Object.entries(artifacts).filter(([,v])=>v&&v!==false);
+  const artTotal=Object.keys(ART_LABELS).length;
+  html+=`<div style="font-family:'Press Start 2P',monospace;font-size:0.26rem;color:#f97316;margin:10px 0 5px;padding-bottom:4px;border-bottom:1px solid #222;">ARTIFACTS (${ownedArts.length}/${artTotal})</div>`;
+  html+='<div class="popup-stats">';
+  if(ownedArts.length){
+    ownedArts.forEach(([k])=>{
+      html+=`<div class="pstat"><span class="pstat-l">${img('artifacts')}${ART_LABELS[k]||k.replace(/_/g,' ')}</span><span class="pstat-v y">Found</span></div>`;
+    });
+  } else {
+    html+=row('None yet — use !explore','','');
+  }
+  html+='</div>';
+
+  // ---- SCROLLS ----
+  const SCROLL_NAMES={One:'I',Two:'II',Three:'III',Four:'IV',Five:'V',Six:'VI',Seven:'VII',Eight:'VIII',Nine:'IX',Ten:'X'};
+  const ownedScrolls=Object.entries(scrolls).filter(([,v])=>v&&v!==false);
+  const scrollTotal=Object.keys(SCROLL_NAMES).length;
+  html+=`<div style="font-family:'Press Start 2P',monospace;font-size:0.26rem;color:#a855f7;margin:10px 0 5px;padding-bottom:4px;border-bottom:1px solid #222;">SCROLLS (${ownedScrolls.length}/${scrollTotal})</div>`;
+  html+='<div class="popup-stats">';
+  if(ownedScrolls.length){
+    ownedScrolls.forEach(([k])=>{
+      html+=`<div class="pstat"><span class="pstat-l">Scroll ${SCROLL_NAMES[k]||k}</span><span class="pstat-v p">Discovered</span></div>`;
+    });
+  } else {
+    html+=row('None yet — use !explore','','');
+  }
+  html+='</div>';
+
+  // ---- VACATION DAYS ----
+  html+=`<div class="popup-stats" style="margin-top:8px;">`;
+  html+=row('Vacation Days',farm.vacation_days||0,'y');
+  html+='</div>';
+
+  html+=`<a class="popup-discord-btn" href="${DISCORD_INVITE}" target="_blank" rel="noopener noreferrer" style="margin-top:10px;display:block">SEE INVENTORY IN DISCORD</a>`;
+
+  document.getElementById('popup-icon').innerHTML=`${img('inventory',32)}`;
+  setEl('popup-title','INVENTORY');
+  document.getElementById('popup-desc').innerHTML='';
+  document.getElementById('popup-cmd-wrap').style.display='none';
+  document.getElementById('popup-btn-row').style.display='flex';
+  document.getElementById('popup-discord-btn').style.display='none';
   document.getElementById('popup-extra').innerHTML=html;
   openPopup();
 }
