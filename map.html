@@ -1263,18 +1263,18 @@ function recalcFarmWaypoints(){
   // Scale everything to fit within availH
   // Budget: topY(6%) + houseH(~72) + path + plotGrid + path + well row
   // Fit plotsW and plot sizes to available width and height
-  const topY=availH*.05;
-  const houseH=Math.min(72, availH*.1);
-  const houseW=Math.min(100, W*.3);
   const plotsW=Math.min(260, W*.78);
   const cols=7, plotW=Math.floor(plotsW/cols)-3;
   const plotH=plotW;
   const plotGridH=6*(plotH+3)+20;
-  const plotsY=topY+houseH+Math.min(30, availH*.04);
-  const wellRow=plotsY+plotGridH+Math.min(40, availH*.05);
+  const plotsY=availH*.03;
+  const houseH=Math.min(72, availH*.12);
+  const houseW=Math.min(100, W*.3);
+  const houseY=plotsY+plotGridH+Math.min(18, availH*.03);
+  const wellRow=houseY+houseH+Math.min(22, availH*.04);
 
   farmLayout = {
-    houseX:cx-houseW/2, houseY:topY,
+    houseX:cx-houseW/2, houseY,
     houseW, houseH,
     plotsX:cx-plotsW/2, plotsY,
     plotsW,
@@ -1283,19 +1283,18 @@ function recalcFarmWaypoints(){
     cx, availH,
   };
 
-  const {houseX,houseY,houseW:hW,houseH:hH,plotsX,plotsW:pW,wellX,wellY}=farmLayout;
-  const houseW2=hW, houseH2=hH;
+  const houseX=cx-houseW/2;
   botWaypoints=[
-    [houseX-20,           houseY+houseH2/2],
-    [houseX+houseW2/2,    houseY-15],
-    [houseX+houseW2+20,   houseY+houseH2/2],
-    [plotsX+pW+15,        plotsY+30],
-    [plotsX+pW+10,        plotsY+plotGridH/2],
-    [plotsX+pW/2,         plotsY+plotGridH/2],
-    [plotsX-15,           plotsY+plotGridH/2],
-    [plotsX-10,           plotsY+30],
-    [wellX+10,            wellY+15],
-    [cx,                  houseY+houseH2+10],
+    [houseX-20,           houseY+houseH/2],
+    [houseX+houseW/2,     houseY-15],
+    [houseX+houseW+20,    houseY+houseH/2],
+    [cx-plotsW/2+plotsW+15, plotsY+30],
+    [cx-plotsW/2+plotsW+10, plotsY+plotGridH/2],
+    [cx,                    plotsY+plotGridH/2],
+    [cx-plotsW/2-15,        plotsY+plotGridH/2],
+    [cx-plotsW/2-10,        plotsY+30],
+    [cx-plotsW/2+(plotsW/7)*1.5+10, wellRow+15],
+    [cx,                    houseY+houseH+10],
   ];
   if(!botX){ botX=botWaypoints[0][0]; botY=botWaypoints[0][1]; }
 }
@@ -1304,15 +1303,17 @@ function drawFarmMap(t, dt){
   const {houseX,houseY,houseW,houseH,plotsX,plotsY,plotsW,wellX,wellY,cx,availH}=farmLayout;
   const W=canvas.width;
   if(!houseX) return;
+  const plotW=Math.floor(plotsW/7)-3;
+  const plotGridH=6*(plotW+3)+20;
 
   // Background
   drawGrass(0,0,W,availH);
   // Dirt ground around farm
   r(plotsX-18,plotsY-12,plotsW+36,140,'#7a5830');
 
-  // Paths
-  drawPath(cx-9,houseY+houseH,18,plotsY-houseY-houseH);
-  drawPath(cx-9,plotsY+115,18,wellY-plotsY-115);
+  // Paths - plots down to house, house down to well row
+  drawPath(cx-9,plotsY+plotGridH,18,houseY-(plotsY+plotGridH));
+  drawPath(cx-9,houseY+houseH,18,wellY-houseY-houseH);
 
   // Border trees
   for(let tx=0;tx<W;tx+=52){ drawTree(tx,availH-52,.85); }
