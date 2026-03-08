@@ -1118,7 +1118,36 @@ function drawWell(x,y){
   for(let i=0;i<12;i++) r(x-20+i,y-20-i,60-i*4,5,'#8a5828');
   r(x+4,y+4,12,12,'#8a6840');r(x+9,y-18,2,22,'#c8a868');
 }
-
+function drawPotionStation(x,y){
+  // Base table
+  r(x-20,y+18,58,10,'#5a3a1e');
+  r(x-22,y+14,62,8,'#7a5228');
+  // Legs
+  r(x-16,y+28,8,20,'#5a3a1e');
+  r(x+26,y+28,8,20,'#5a3a1e');
+  // Cauldron body
+  r(x-10,y,36,22,'#333');
+  r(x-12,y+4,40,16,'#2a2a2a');
+  r(x-8,y+2,32,4,'#444');
+  // Cauldron rim
+  r(x-14,y-2,44,6,'#555');
+  // Brew glow
+  const glow=Math.sin(Date.now()*.002)*.3+.5;
+  ctx.fillStyle=`rgba(160,80,255,${glow})`;
+  ctx.beginPath();ctx.ellipse(x+8,y+10,12,6,0,0,Math.PI*2);ctx.fill();
+  // Bubbles
+  [[x,y+2],[x+12,y-2],[x+6,y-5]].forEach(([bx2,by2])=>{
+    ctx.globalAlpha=glow*0.7;
+    ctx.fillStyle='#c084fc';
+    ctx.beginPath();ctx.arc(bx2,by2,2,0,Math.PI*2);ctx.fill();
+  });
+  ctx.globalAlpha=1;
+  // Label
+  ctx.font='bold 6px "Press Start 2P"';ctx.textAlign='center';
+  ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(x-30,y+44,76,13);
+  ctx.fillStyle='#c084fc';ctx.fillText('POTIONS',x+8,y+51);
+  ctx.textAlign='left';
+}
 // ================================================================
 // WORLD MAP DRAW
 // ================================================================
@@ -1223,34 +1252,50 @@ function drawWorldMap(t){
 let farmLayout = {};
 
 function recalcFarmWaypoints(){
-  const W=canvas.width, H=canvas.height;
+  const W=canvas.width;
   const ab=document.getElementById('action-bar');
   const abH=ab.style.display!=='none'?70:0;
-  const availH=H-abH;
-  const cx=W/2, topY=availH*.08;
+  const availH=canvas.parentElement.clientHeight-abH;
+  canvas.style.height=availH+'px';
+  canvas.height=availH;
+  const cx=W/2;
+
+  // Scale everything to fit within availH
+  // Budget: topY(6%) + houseH(~72) + path + plotGrid + path + well row
+  // Fit plotsW and plot sizes to available width and height
+  const topY=availH*.05;
+  const houseH=Math.min(72, availH*.1);
+  const houseW=Math.min(100, W*.3);
+  const plotsW=Math.min(260, W*.78);
+  const cols=7, plotW=Math.floor(plotsW/cols)-3;
+  const plotH=plotW;
+  const plotGridH=6*(plotH+3)+20;
+  const plotsY=topY+houseH+Math.min(30, availH*.04);
+  const wellRow=plotsY+plotGridH+Math.min(40, availH*.05);
 
   farmLayout = {
-    houseX:cx-50, houseY:topY,
-    houseW:100, houseH:72,
-    plotsX:cx-130, plotsY:topY+96,
-    plotsW:260,
-    wellX:cx-150, wellY:availH*.7,
+    houseX:cx-houseW/2, houseY:topY,
+    houseW, houseH,
+    plotsX:cx-plotsW/2, plotsY,
+    plotsW,
+    wellX:cx-plotsW/2-50, wellY:wellRow,
+    potionX:cx+plotsW/2+10, potionY:wellRow,
     cx, availH,
   };
 
-  // Patrol waypoints: around house and plots
-  const {houseX,houseY,houseW,houseH,plotsX,plotsY,plotsW,wellX,wellY}=farmLayout;
+  const {houseX,houseY,houseW:hW,houseH:hH,plotsX,plotsW:pW,wellX,wellY}=farmLayout;
+  const houseW2=hW, houseH2=hH;
   botWaypoints=[
-    [houseX-20,        houseY+houseH/2],
-    [houseX+houseW/2,  houseY-15],
-    [houseX+houseW+20, houseY+houseH/2],
-    [plotsX+plotsW+15, plotsY+30],
-    [plotsX+plotsW+10, plotsY+70],
-    [plotsX+plotsW/2,  plotsY+110],
-    [plotsX-15,        plotsY+70],
-    [plotsX-10,        plotsY+30],
-    [wellX+10,         wellY+15],
-    [cx,               houseY+houseH+10],
+    [houseX-20,           houseY+houseH2/2],
+    [houseX+houseW2/2,    houseY-15],
+    [houseX+houseW2+20,   houseY+houseH2/2],
+    [plotsX+pW+15,        plotsY+30],
+    [plotsX+pW+10,        plotsY+plotGridH/2],
+    [plotsX+pW/2,         plotsY+plotGridH/2],
+    [plotsX-15,           plotsY+plotGridH/2],
+    [plotsX-10,           plotsY+30],
+    [wellX+10,            wellY+15],
+    [cx,                  houseY+houseH2+10],
   ];
   if(!botX){ botX=botWaypoints[0][0]; botY=botWaypoints[0][1]; }
 }
@@ -1326,7 +1371,7 @@ function drawFarmPlots(px,py,pw,t){
 
   // Soil bed
   const totalH=rows*(plotH+3)+20;
-  r// Farm Boost NFT count
+  // Farm Boost NFT count
   const nftWallet=profileData?.pixie?.Wallet?.NFT||{};
   let farmBoostCount=0;
   for(const[k,v] of Object.entries(nftWallet)){
@@ -1389,6 +1434,10 @@ function drawFarmPlots(px,py,pw,t){
       if(farmBoostCount>0&&!isFilled&&(idx-filled)<farmBoostCount){
         const gs=Math.max(0.5,Math.min(1.1,(plotW/20)));
         drawShroomGold(bx+plotW/2-9*gs,by+plotH/2-11*gs,gs);
+        // Gold NFT plots also seed blue spores
+        if(!sporeParts.find(p=>p.ox===bx+plotW/2)){
+          for(let j=0;j<2;j++) sporeParts.push(makeSpore(bx+plotW/2,by+plotH/2));
+        }
       }
       // Mycelium web lines
       if(isFilled&&(stage==='Mycelium'||stage==='Fruiting'||stage==='Sporulation'||stage==='Golden_Sporulation')){
@@ -1837,16 +1886,20 @@ function _applyMap(mapId){
   document.getElementById('hub-panel').style.display=mapId==='hub'?'block':'none';
   // Action bar
   const ab=document.getElementById('action-bar');
+  const mapArea=document.getElementById('map-area');
   if(mapId==='farm'){
     ab.style.display='flex';
     buildFarmActionBar();
     recalcFarmWaypoints();
     loadBotImage();
+    mapArea.style.overflowY='hidden';
   } else if(mapId==='forest'){
+    mapArea.style.overflowY='hidden';
     ab.style.display='flex';
     buildForestActionBar();
   } else {
     ab.style.display='none';
+    mapArea.style.overflowY='hidden';
   }
   // Regression warning
   const rw=document.getElementById('regression-warning');
@@ -1953,8 +2006,10 @@ function showActionPopup(tile){
 // ================================================================
 canvas.addEventListener('click', e=>{
   const rect=canvas.getBoundingClientRect();
-  const mx=(e.clientX-rect.left)*(canvas.width/rect.width);
-  const my=(e.clientY-rect.top)*(canvas.height/rect.height);
+  const scaleX=canvas.width/rect.width;
+  const scaleY=canvas.height/(rect.height+(canvas.parentElement.scrollTop*(rect.height/canvas.parentElement.clientHeight)));
+  const mx=(e.clientX-rect.left)*scaleX;
+  const my=(e.clientY-rect.top+canvas.parentElement.scrollTop)*(canvas.width/rect.width);
   handleTap(mx,my);
 });
 canvas.addEventListener('touchend', e=>{
@@ -1962,7 +2017,7 @@ canvas.addEventListener('touchend', e=>{
   const t2=e.changedTouches[0];
   const rect=canvas.getBoundingClientRect();
   const mx=(t2.clientX-rect.left)*(canvas.width/rect.width);
-  const my=(t2.clientY-rect.top)*(canvas.height/rect.height);
+  const my=(t2.clientY-rect.top+canvas.parentElement.scrollTop)*(canvas.width/rect.width);
   handleTap(mx,my);
 },{passive:false});
 
@@ -1986,6 +2041,11 @@ function handleTap(mx,my){
     // Tap on well
     if(Math.abs(mx-(wellX))<35&&Math.abs(my-(wellY+25))<35){
       showWellPopup();return;
+    }
+    // Tap on potion station
+    const {potionX,potionY}=farmLayout;
+    if(potionX&&Math.abs(mx-potionX)<40&&Math.abs(my-(potionY+15))<40){
+      showPotionStationPopup();return;
     }
     // Tap on farmhouse
     const {houseX,houseY,houseW,houseH}=farmLayout;
@@ -2060,6 +2120,61 @@ function showWellPopup(){
   openPopup();
 }
 
+function showPotionStationPopup(){
+  setEl('popup-icon','🧪');
+  setEl('popup-title','POTION STATION');
+  document.getElementById('popup-desc').innerHTML='';
+  document.getElementById('popup-cmd-wrap').style.display='none';
+  document.getElementById('popup-btn-row').style.display='flex';
+  document.getElementById('popup-discord-btn').style.display='none';
+
+  const inv=profileData?.sporebot?.Inventory||{};
+  const potions=inv.Potions||{};
+  const ingredients=inv.Ingredients||{};
+  const active=potions.Active_Potion;
+  const brewing=profileData?.sporebot?.Skills?.Brewing||{};
+
+  // Active potion
+  let html='<div class="popup-stats">';
+  if(active&&typeof active==='object'){
+    const stats=Object.entries(active)
+      .filter(([k])=>!['name','emoji','Potion Score','Potion_Score'].includes(k))
+      .map(([k,v])=>`<div class="pstat"><span class="pstat-l">${k.replace(/_/g,' ')}</span><span class="pstat-v g">${typeof v==='number'&&!['Extra_Brews','Plant_Limit'].includes(k)?v+'%':v}</span></div>`)
+      .join('');
+    html+=`<div class="pstat"><span class="pstat-l">Active Potion</span><span class="pstat-v p">${active.emoji||'🧪'} ${active.name||'Unknown'}</span></div>${stats}`;
+  } else {
+    html+=`<div class="pstat"><span class="pstat-l">Active Potion</span><span class="pstat-v">None</span></div>`;
+  }
+
+  // Stored potions
+  const stored=Object.entries(potions).filter(([k])=>k.startsWith('Potion_'));
+  if(stored.length){
+    html+=`<div class="pstat"><span class="pstat-l">Stored</span><span class="pstat-v">${stored.length} potion${stored.length>1?'s':''}</span></div>`;
+    stored.forEach(([k,v])=>{
+      if(typeof v==='object') html+=`<div class="pstat"><span class="pstat-l" style="padding-left:8px">${v.emoji||'🧪'} ${v.name||k}</span><span class="pstat-v" style="font-size:.75rem">${v['Potion Score']?'Score: '+Number(v['Potion Score']).toFixed(1):''}</span></div>`;
+    });
+  }
+
+  // Brewing level
+  html+=`<div class="pstat"><span class="pstat-l">Brewing Level</span><span class="pstat-v y">${brewing.level||1}</span></div>`;
+  html+=`<div class="pstat"><span class="pstat-l">Brews Today</span><span class="pstat-v">${potions.Brews||0}</span></div>`;
+
+  // Ingredients
+  const ingList=Object.entries(ingredients).filter(([,v])=>v>0);
+  if(ingList.length){
+    html+=`<div class="pstat"><span class="pstat-l">Ingredients</span><span class="pstat-v b">${ingList.length} types</span></div>`;
+    ingList.forEach(([k,v])=>{
+      html+=`<div class="pstat"><span class="pstat-l" style="padding-left:8px">${k}</span><span class="pstat-v">${v}</span></div>`;
+    });
+  } else {
+    html+=`<div class="pstat"><span class="pstat-l">Ingredients</span><span class="pstat-v">None</span></div>`;
+  }
+
+  html+='</div>';
+  html+=`<a class="popup-discord-btn" href="${DISCORD_INVITE}" target="_blank" rel="noopener noreferrer" style="margin-top:10px;display:block">USE !BREW IN DISCORD</a>`;
+  document.getElementById('popup-extra').innerHTML=html;
+  openPopup();
+}
 function showFarmhousePopup(){
   const farm=profileData?.sporebot?.Farm||{};
   setEl('popup-icon','🏠');
@@ -2396,6 +2511,7 @@ function renderWalletModal(){
   if(addrEl) addrEl.textContent=addr?`${addr.slice(0,6)}...${addr.slice(-4)}`:'Not registered';
   const setOC=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v!=null?fmt(v):'Not synced'; };
   const onchain=wallet.Onchain||{};
+
   setOC('wl-oc-shroom', onchain.shroom_balance??null);
   setOC('wl-oc-spore',  onchain.spore_balance??null);
 
