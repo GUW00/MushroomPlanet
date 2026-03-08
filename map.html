@@ -1946,10 +1946,21 @@ function buildFarmActionBar(){
      desc:'Toss SHROOMS into the Wishing Well for random SPORE rewards and luck bonuses.'},
   ];
 
+  const TILE_IMG={
+    items:  'backpack',
+    forage: 'forage',
+    mist:   'mist',
+    fan:    'fan',
+    toss:   'well',
+  };
   ab.innerHTML=actions.map(a=>{
+    const imgFile=TILE_IMG[a.id]||null;
+    const iconHtml=imgFile
+      ?`<img src="/images/${imgFile}.png" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">`
+      :`<span class="at-icon">${a.icon}</span>`;
     if(a.isItems){
       return `<div class="action-tile ready" data-action="items" style="border-color:#a855f7">
-        <span class="at-icon">${a.icon}</span>
+        ${iconHtml}
         <span class="at-state" style="color:#a855f7">ITEMS</span>
         <span class="at-label">${a.label}</span>
       </div>`;
@@ -1958,7 +1969,7 @@ function buildFarmActionBar(){
     const cls=done?'done':(a.required&&!done?'pending':'ready');
     const state=done?'✓ DONE':(a.required&&!done?'⚠ DO THIS!':'READY');
     return `<div class="action-tile ${cls}" data-action="${a.id}" data-cmd="${a.cmd}" data-desc="${a.desc}" data-label="${a.label}">
-      <span class="at-icon">${a.icon}</span>
+      ${iconHtml}
       <span class="at-state">${state}</span>
       <span class="at-label">${a.label}</span>
     </div>`;
@@ -2307,17 +2318,17 @@ function showItemsPopup(){
 
   // ---- ITEMS ----
   const ITEM_MAP={
-    Golden_Shovel:  {label:'Golden Shovel',  file:'cave',    desc:'Unlocks !dig command'},
-    Elder_Pipe:     {label:'Elder Pipe',     file:'campfire',desc:'Resets !forage/!mist/!fan (7d cooldown)'},
-    Feather:        {label:'Feather',        file:'explore', desc:'+5% APY bonus'},
-    Wildtongue_Gemstone:{label:'Wildtongue Gemstone',file:'mythic',desc:'+5% APY bonus'},
-    Mooshie_Gemstone:   {label:'Mooshie Gemstone',   file:'gold',  desc:'Mooshie bonus'},
-    King_Totem:     {label:'King Totem',     file:'king',    desc:'Rare totem'},
-    Queen_Totem:    {label:'Queen Totem',    file:'queen',   desc:'Rare totem'},
-    Kid_Totem:      {label:'Kid Totem',      file:'shroomies',desc:'Rare totem'},
-    Gold_Totem:     {label:'Gold Totem',     file:'gold',    desc:'Rare totem'},
-    Miner_Helmet:   {label:'Miner Helmet',   file:'cave',    desc:'Cave gear'},
-    Well_Access:    {label:'Well Access',    file:'mist',    desc:'Unlocks !toss command'},
+    Golden_Shovel:      {label:'Golden Shovel',       file:'shovel',           desc:'Unlocks !dig command'},
+    Elder_Pipe:         {label:'Elder Pipe',          file:'pipe',             desc:'Resets !forage/!mist/!fan (7d cooldown)'},
+    Feather:            {label:'Feather',             file:'feather',          desc:'+5% APY bonus'},
+    Wildtongue_Gemstone:{label:'Wildtongue Gemstone', file:'gemstone',         desc:'+5% APY bonus'},
+    Mooshie_Gemstone:   {label:'Mooshie Gemstone',    file:'mooshie_gemstone', desc:'Mooshie bonus'},
+    King_Totem:         {label:'King Totem',          file:'king',             desc:'Rare totem'},
+    Queen_Totem:        {label:'Queen Totem',         file:'queen',            desc:'Rare totem'},
+    Kid_Totem:          {label:'Kid Totem',           file:'shroomies',        desc:'Rare totem'},
+    Gold_Totem:         {label:'Gold Totem',          file:'kings',            desc:'Rare totem'},
+    Miner_Helmet:       {label:'Miner Helmet',        file:'miner_helmet',     desc:'Cave gear'},
+    Well_Access:        {label:'Well Access',         file:'well',             desc:'Unlocks !toss command'},
   };
 
   const ownedItems=Object.entries(items).filter(([,v])=>v&&v!==false);
@@ -2325,7 +2336,7 @@ function showItemsPopup(){
   html+='<div class="popup-stats">';
   if(ownedItems.length){
     ownedItems.forEach(([k,v])=>{
-      const m=ITEM_MAP[k]||{label:k.replace(/_/g,' '),file:'inventory',desc:''};
+      const m=ITEM_MAP[k]||{label:k.replace(/_/g,' '),file:'purple_gemstone',desc:''};
       const qty=typeof v==='number'&&v>1?` x${v}`:'';
       html+=`<div class="pstat"><span class="pstat-l">${img(m.file)}${m.label}${qty}</span><span class="pstat-v g" style="font-size:.7rem">${m.desc}</span></div>`;
     });
@@ -2336,11 +2347,11 @@ function showItemsPopup(){
 
   // ---- GEMSTONES ----
   const GEM_MAP={
-    Shroomstone_Quartz: {label:'Quartz',    file:'bronze'},
-    Shroomcap_Ruby:     {label:'Ruby',      file:'rare'},
-    Sporelight_Sapphire:{label:'Sapphire',  file:'silver'},
-    Moonglow_Amethyst:  {label:'Amethyst',  file:'mythic'},
-    Prismcap_Diamond:   {label:'Diamond',   file:'gold'},
+    Shroomstone_Quartz: {label:'Quartz',   file:'white_gemstone'},
+    Shroomcap_Ruby:     {label:'Ruby',     file:'red_gemstone'},
+    Sporelight_Sapphire:{label:'Sapphire', file:'torq_gemstone'},
+    Moonglow_Amethyst:  {label:'Amethyst', file:'purple_gemstone'},
+    Prismcap_Diamond:   {label:'Diamond',  file:'gold'},
   };
   html+=`<div style="font-family:'Press Start 2P',monospace;font-size:0.26rem;color:#60a5fa;margin:10px 0 5px;padding-bottom:4px;border-bottom:1px solid #222;">GEMSTONES</div>`;
   html+='<div class="popup-stats">';
@@ -2368,8 +2379,15 @@ function showItemsPopup(){
   html+=`<div style="font-family:'Press Start 2P',monospace;font-size:0.26rem;color:#f97316;margin:10px 0 5px;padding-bottom:4px;border-bottom:1px solid #222;">ARTIFACTS (${ownedArts.length}/${artTotal})</div>`;
   html+='<div class="popup-stats">';
   if(ownedArts.length){
+    const ART_IMG={
+    Elderwood_Bow:'Bow', Wizard_Staff:'wizardstaff', Reshi_Shield:'crystal-ball',
+    Spell_Book:'scroll (2)', Wizard_Hat:'magic-wand', Healing_Potion:'potion1',
+    Mooshie_Ring:'magic-ring', Magical_Mirror:'magic-mirror',
+    Deathcap_Dagger:'sword (2)', Arcane_Amulet:'lamp',
+  };
     ownedArts.forEach(([k])=>{
-      html+=`<div class="pstat"><span class="pstat-l">${img('artifacts')}${ART_LABELS[k]||k.replace(/_/g,' ')}</span><span class="pstat-v y">Found</span></div>`;
+      const artFile=ART_IMG[k]||'artifacts';
+      html+=`<div class="pstat"><span class="pstat-l">${img(artFile)}${ART_LABELS[k]||k.replace(/_/g,' ')}</span><span class="pstat-v y">Found</span></div>`;
     });
   } else {
     html+=row('None yet — use !explore','','');
@@ -2377,18 +2395,12 @@ function showItemsPopup(){
   html+='</div>';
 
   // ---- SCROLLS ----
-  const SCROLL_NAMES={One:'I',Two:'II',Three:'III',Four:'IV',Five:'V',Six:'VI',Seven:'VII',Eight:'VIII',Nine:'IX',Ten:'X'};
+  const scrollTotal=10;
   const ownedScrolls=Object.entries(scrolls).filter(([,v])=>v&&v!==false);
-  const scrollTotal=Object.keys(SCROLL_NAMES).length;
-  html+=`<div style="font-family:'Press Start 2P',monospace;font-size:0.26rem;color:#a855f7;margin:10px 0 5px;padding-bottom:4px;border-bottom:1px solid #222;">SCROLLS (${ownedScrolls.length}/${scrollTotal})</div>`;
+  html+=`<div style="font-family:'Press Start 2P',monospace;font-size:0.26rem;color:#a855f7;margin:10px 0 5px;padding-bottom:4px;border-bottom:1px solid #222;">SCROLLS</div>`;
   html+='<div class="popup-stats">';
-  if(ownedScrolls.length){
-    ownedScrolls.forEach(([k])=>{
-      html+=`<div class="pstat"><span class="pstat-l">Scroll ${SCROLL_NAMES[k]||k}</span><span class="pstat-v p">Discovered</span></div>`;
-    });
-  } else {
-    html+=row('None yet — use !explore','','');
-  }
+  html+=`<div class="pstat"><span class="pstat-l">${img('scroll (2)')}Scrolls Found</span><span class="pstat-v p">${ownedScrolls.length} / ${scrollTotal}</span></div>`;
+  if(ownedScrolls.length===0) html+=row('None yet - use !explore','','');
   html+='</div>';
 
   // ---- VACATION DAYS ----
