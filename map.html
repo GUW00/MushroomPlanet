@@ -2394,10 +2394,10 @@ function renderWalletModal(){
   const addr=wallet.Address||'';
   const addrEl=document.getElementById('wl-addr2');
   if(addrEl) addrEl.textContent=addr?`${addr.slice(0,6)}...${addr.slice(-4)}`:'Not registered';
-  // On-chain balances from cached Firebase data
   const setOC=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v!=null?fmt(v):'Not synced'; };
-  setOC('wl-oc-shroom', wallet.onchain_shroom??wallet.shroom_onchain??null);
-  setOC('wl-oc-spore',  wallet.onchain_spore??wallet.spore_onchain??null);
+  const onchain=wallet.Onchain||{};
+  setOC('wl-oc-shroom', onchain.shroom_balance??null);
+  setOC('wl-oc-spore',  onchain.spore_balance??null);
 
   // NFT tab - show every individual NFT entry with its own image
   const nftWallet=wallet.NFT||{};
