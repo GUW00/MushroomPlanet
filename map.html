@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <title>World Map | Mushroom Planet</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen&display=swap"/>
 <link rel="stylesheet" href="styles.css"/>
 <script type="module" src="config.js"></script>
 <style>
@@ -15,10 +15,39 @@
   --border:#2a2a2a;--panel:rgba(10,10,10,0.96);
   --nav-h:58px;--hdr-h:46px;
 }
+/* Scale up all Press Start 2P text globally */
+[style*="Press Start 2P"],[class*="nav-btn"],[class*="action-tile"],
+#popup-title,#popup-cmd,#popup-discord-btn,
+.hub-title,.hub-card h3,.lb-rank,
+.wtab,.wsection h4,.nft-card .nft-name,.nft-card .nft-count,
+.pcard h4,.p-nm,.pbadge,.hdr-logo,#hdr-username,
+#back-btn,#map-title-badge,.reg-badge{
+  letter-spacing:0;
+}
+.wtab{ font-size:0.55rem !important; }
+.wsection h4{ font-size:0.5rem !important; }
+.wrow{ font-size:1.15rem !important; }
+.nft-card .nft-name{ font-size:0.38rem !important; }
+.nft-card .nft-count{ font-size:0.42rem !important; }
+.pstat{ font-size:1.1rem !important; }
+.prow{ font-size:1.05rem !important; }
+.nav-btn{ font-size:0.38rem !important; }
+.action-tile{ font-size:0.38rem !important; }
+.at-label{ font-size:0.34rem !important; }
+#popup-title{ font-size:0.65rem !important; }
+#popup-desc{ font-size:1.1rem !important; }
+#popup-cmd{ font-size:0.48rem !important; }
+#popup-discord-btn{ font-size:0.48rem !important; }
+.hub-card h3{ font-size:0.48rem !important; }
+.lb-row{ font-size:1.05rem !important; }
+
+/* Global font scale fix for Press Start 2P */
+html{ font-size:18px; }
+@media(max-width:400px){ html{ font-size:14px; } }
 html,body{
   width:100%;height:100%;overflow:hidden;
   background:#0a0f0a;color:var(--cr);
-  font-family:'VT323',monospace;
+  font-family:'Silkscreen',monospace;font-size:16px;
   touch-action:none;-webkit-tap-highlight-color:transparent;
   user-select:none;
 }
@@ -251,7 +280,7 @@ html,body{
 .link-intro strong{color:var(--y);}
 .pin-input{
   width:100%;background:#1a1a1a;border:2px solid #444;
-  color:var(--cr);font-family:'VT323',monospace;font-size:1.2rem;
+  color:var(--cr);font-family:'Silkscreen',monospace;font-size:1.2rem;
   padding:10px 12px;border-radius:4px;margin-bottom:10px;
   outline:none;transition:border-color .2s;
 }
@@ -321,6 +350,79 @@ html,body{
   border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== WALLET MODAL ===== */
+#wallet-modal{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.9);display:none;
+  align-items:flex-end;justify-content:center;
+  padding-bottom:var(--nav-h);
+}
+#wallet-modal.open{display:flex;}
+#wallet-box{
+  background:#0d0d0d;border:2px solid var(--y);border-radius:10px 10px 0 0;
+  width:100%;max-width:560px;max-height:82vh;
+  display:flex;flex-direction:column;
+  animation:slide-up .28s ease;
+}
+#wallet-mhdr{
+  background:var(--y);color:#000;padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+  border-radius:8px 8px 0 0;
+}
+#wallet-mtitle{font-family:'Press Start 2P',monospace;font-size:0.46rem;}
+#wallet-mclose{font-family:'Press Start 2P',monospace;font-size:0.46rem;background:none;border:none;color:#000;cursor:pointer;}
+#wallet-body{overflow-y:auto;flex:1;padding:16px;}
+#wallet-body::-webkit-scrollbar{width:3px;}
+#wallet-body::-webkit-scrollbar-thumb{background:var(--y);}
+.wtabs{display:flex;gap:4px;margin-bottom:12px;}
+.wtab{
+  flex:1;padding:8px;border-radius:4px;border:2px solid #333;
+  background:#111;color:#555;cursor:pointer;text-align:center;
+  font-family:'Press Start 2P',monospace;font-size:0.34rem;transition:all .15s;
+}
+.wtab.active{border-color:var(--y);color:var(--y);background:rgba(254,206,0,.06);}
+.wpanel{display:none;}.wpanel.active{display:block;}
+.wsection{
+  background:#1a1a1a;border:1px solid var(--border);
+  border-radius:6px;padding:10px 12px;margin-bottom:10px;
+}
+.wsection h4{
+  font-family:'Press Start 2P',monospace;font-size:0.26rem;
+  color:var(--y);margin-bottom:7px;padding-bottom:5px;
+  border-bottom:1px solid var(--border);
+}
+.wrow{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:5px 0;border-bottom:1px solid #141414;font-size:1.1rem;
+}
+.wrow:last-child{border:none;}
+.wl{color:#555;}.wv{color:var(--cr);}
+.wv.y{color:var(--y);}.wv.g{color:var(--g);}.wv.b{color:var(--b);}
+.nft-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;align-items:start;}
+.nft-card{
+  background:#111;border:1px solid #2a2a2a;border-radius:6px;
+  overflow:hidden;text-align:center;
+  display:flex;flex-direction:column;
+  height:auto;min-height:0;
+}
+.nft-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;border-radius:5px 5px 0 0;}
+.nft-card .nft-img-placeholder{
+  width:100%;aspect-ratio:1;background:#1a1a1a;display:flex;
+  align-items:center;justify-content:center;font-size:1.8rem;
+}
+.nft-card .nft-name{
+  font-family:'Press Start 2P',monospace;font-size:0.22rem;
+  color:#aaa;padding:5px 4px 4px;line-height:1.8;
+  word-break:break-word;white-space:normal;
+}
+.nft-card .nft-count{
+  font-family:'Press Start 2P',monospace;font-size:0.28rem;
+  color:var(--y);padding:3px 5px;
+}
+.wallet-no-link{
+  text-align:center;padding:24px 0;color:#444;font-size:.9rem;line-height:1.8;
+}
 
 /* ===== SETTINGS MODAL ===== */
 #settings-modal{
@@ -514,6 +616,9 @@ html,body{
   <button class="nav-btn" data-map="hub" id="nav-hub">
     <span class="nav-icon">🏆</span>HUB
   </button>
+  <button class="nav-btn" id="nav-wallet">
+    <span class="nav-icon">💰</span>WALLET
+  </button>
   <button class="nav-btn" id="nav-profile">
     <span class="nav-icon">👤</span>PROFILE
   </button>
@@ -599,6 +704,159 @@ html,body{
           <div class="prow"><span class="pl">Rarity</span><span class="pv y" id="pl-bot-rar">-</span></div>
         </div>
         <button class="unlink-btn" id="unlink-btn">UNLINK ACCOUNT</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WALLET MODAL -->
+<div id="wallet-modal">
+  <div id="wallet-box">
+    <div id="wallet-mhdr">
+      <span id="wallet-mtitle">WALLET</span>
+      <button id="wallet-mclose">X</button>
+    </div>
+    <div id="wallet-body">
+      <div class="wtabs">
+        <div class="wtab active" data-wtab="balances">BALANCES</div>
+        <div class="wtab" data-wtab="nfts">NFTs</div>
+        <div class="wtab" data-wtab="onchain">ON-CHAIN</div>
+      </div>
+      <div class="wpanel active" id="wpanel-balances">
+        <div class="wsection">
+          <h4>FARM</h4>
+          <div class="wrow"><span class="wl">Planted (SHROOM)</span><span class="wv y" id="wl-planted">-</span></div>
+          <div class="wrow"><span class="wl">Generated (SPORE)</span><span class="wv b" id="wl-spore-farm">-</span></div>
+        </div>
+        <div class="wsection">
+          <h4>DISCORD WALLET</h4>
+          <div class="wrow"><span class="wl">SHROOM</span><span class="wv y" id="wl-shroom">-</span></div>
+          <div class="wrow"><span class="wl">SPORE</span><span class="wv b" id="wl-spore">-</span></div>
+          <div class="wrow"><span class="wl">Staked SPORE</span><span class="wv g" id="wl-staked">-</span></div>
+        </div>
+        <div class="wsection">
+          <h4>STAKING</h4>
+          <div class="wrow"><span class="wl">Staked</span><span class="wv b" id="wl-staked2">-</span></div>
+          <div class="wrow"><span class="wl">Pending Rewards</span><span class="wv g" id="wl-pending">-</span></div>
+          <div class="wrow"><span class="wl">Nodes</span><span class="wv y" id="wl-nodes">-</span></div>
+        </div>
+      </div>
+      <div class="wpanel" id="wpanel-nfts">
+        <div id="wl-nft-content"><div class="wallet-no-link">No NFTs found.</div></div>
+      </div>
+      <div class="wpanel" id="wpanel-onchain">
+        <div class="wsection">
+          <h4>WALLET ADDRESS</h4>
+          <div class="wrow"><span class="wl">Address</span><span class="wv" id="wl-addr2" style="font-size:.7rem">-</span></div>
+        </div>
+        <div class="wsection">
+          <h4>ON-CHAIN BALANCES</h4>
+          <div class="wrow"><span class="wl">SHROOM</span><span class="wv y" id="wl-oc-shroom">-</span></div>
+          <div class="wrow"><span class="wl">SPORE</span><span class="wv b" id="wl-oc-spore">-</span></div>
+        </div>
+        <div id="wl-holding-status" style="margin-top:6px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WALLET MODAL -->
+<div id="wallet-modal">
+  <div id="wallet-box">
+    <div id="wallet-mhdr">
+      <span id="wallet-mtitle">WALLET</span>
+      <button id="wallet-mclose">X</button>
+    </div>
+    <div id="wallet-body">
+      <div class="wtabs">
+        <div class="wtab active" data-wtab="balances">BALANCES</div>
+        <div class="wtab" data-wtab="nfts">NFTs</div>
+        <div class="wtab" data-wtab="onchain">ON-CHAIN</div>
+      </div>
+      <div class="wpanel active" id="wpanel-balances">
+        <div class="wsection">
+          <h4>FARM</h4>
+          <div class="wrow"><span class="wl">Planted (SHROOM)</span><span class="wv y" id="wl-planted">-</span></div>
+          <div class="wrow"><span class="wl">Generated (SPORE)</span><span class="wv b" id="wl-spore-farm">-</span></div>
+        </div>
+        <div class="wsection">
+          <h4>DISCORD WALLET</h4>
+          <div class="wrow"><span class="wl">SHROOM</span><span class="wv y" id="wl-shroom">-</span></div>
+          <div class="wrow"><span class="wl">SPORE</span><span class="wv b" id="wl-spore">-</span></div>
+          <div class="wrow"><span class="wl">Staked SPORE</span><span class="wv g" id="wl-staked">-</span></div>
+        </div>
+        <div class="wsection">
+          <h4>STAKING</h4>
+          <div class="wrow"><span class="wl">Staked</span><span class="wv b" id="wl-staked2">-</span></div>
+          <div class="wrow"><span class="wl">Pending Rewards</span><span class="wv g" id="wl-pending">-</span></div>
+          <div class="wrow"><span class="wl">Nodes</span><span class="wv y" id="wl-nodes">-</span></div>
+        </div>
+      </div>
+      <div class="wpanel" id="wpanel-nfts">
+        <div id="wl-nft-content"><div class="wallet-no-link">No NFTs found.</div></div>
+      </div>
+      <div class="wpanel" id="wpanel-onchain">
+        <div class="wsection">
+          <h4>WALLET ADDRESS</h4>
+          <div class="wrow"><span class="wl">Address</span><span class="wv" id="wl-addr2" style="font-size:.7rem">-</span></div>
+        </div>
+        <div class="wsection">
+          <h4>ON-CHAIN BALANCES</h4>
+          <div class="wrow"><span class="wl">SHROOM</span><span class="wv y" id="wl-oc-shroom">-</span></div>
+          <div class="wrow"><span class="wl">SPORE</span><span class="wv b" id="wl-oc-spore">-</span></div>
+        </div>
+        <div id="wl-holding-status" style="margin-top:6px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WALLET MODAL -->
+<div id="wallet-modal">
+  <div id="wallet-box">
+    <div id="wallet-mhdr">
+      <span id="wallet-mtitle">WALLET</span>
+      <button id="wallet-mclose">X</button>
+    </div>
+    <div id="wallet-body">
+      <div class="wtabs">
+        <div class="wtab active" data-wtab="balances">BALANCES</div>
+        <div class="wtab" data-wtab="nfts">NFTs</div>
+        <div class="wtab" data-wtab="onchain">ON-CHAIN</div>
+      </div>
+      <div class="wpanel active" id="wpanel-balances">
+        <div class="wsection">
+          <h4>FARM</h4>
+          <div class="wrow"><span class="wl">Planted (SHROOM)</span><span class="wv y" id="wl-planted">-</span></div>
+          <div class="wrow"><span class="wl">Generated (SPORE)</span><span class="wv b" id="wl-spore-farm">-</span></div>
+        </div>
+        <div class="wsection">
+          <h4>DISCORD WALLET</h4>
+          <div class="wrow"><span class="wl">SHROOM</span><span class="wv y" id="wl-shroom">-</span></div>
+          <div class="wrow"><span class="wl">SPORE</span><span class="wv b" id="wl-spore">-</span></div>
+          <div class="wrow"><span class="wl">Staked SPORE</span><span class="wv g" id="wl-staked">-</span></div>
+        </div>
+        <div class="wsection">
+          <h4>STAKING</h4>
+          <div class="wrow"><span class="wl">Staked</span><span class="wv b" id="wl-staked2">-</span></div>
+          <div class="wrow"><span class="wl">Pending Rewards</span><span class="wv g" id="wl-pending">-</span></div>
+          <div class="wrow"><span class="wl">Nodes</span><span class="wv y" id="wl-nodes">-</span></div>
+        </div>
+      </div>
+      <div class="wpanel" id="wpanel-nfts">
+        <div id="wl-nft-content"><div class="wallet-no-link">No NFTs found.</div></div>
+      </div>
+      <div class="wpanel" id="wpanel-onchain">
+        <div class="wsection">
+          <h4>WALLET ADDRESS</h4>
+          <div class="wrow"><span class="wl">Address</span><span class="wv" id="wl-addr2" style="font-size:.7rem">-</span></div>
+        </div>
+        <div class="wsection">
+          <h4>ON-CHAIN BALANCES</h4>
+          <div class="wrow"><span class="wl">SHROOM</span><span class="wv y" id="wl-oc-shroom">-</span></div>
+          <div class="wrow"><span class="wl">SPORE</span><span class="wv b" id="wl-oc-spore">-</span></div>
+        </div>
+        <div id="wl-holding-status" style="margin-top:6px;"></div>
       </div>
     </div>
   </div>
@@ -2074,6 +2332,128 @@ document.getElementById('link-verify-btn').addEventListener('click',async()=>{
     btn.disabled=false;btn.textContent='VERIFY';
   }
 });
+
+// ================================================================
+// WALLET MODAL
+// ================================================================
+document.getElementById('nav-wallet').addEventListener('click',()=>{
+  if(!isVerified()||!getLinkedId()){
+    document.getElementById('prof-modal').classList.add('open');
+    return;
+  }
+  openWalletModal();
+});
+document.getElementById('wallet-mclose').addEventListener('click',()=>document.getElementById('wallet-modal').classList.remove('open'));
+document.getElementById('wallet-modal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('wallet-modal'))
+    document.getElementById('wallet-modal').classList.remove('open');
+});
+// Wallet tabs
+document.querySelectorAll('.wtab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.wtab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.wpanel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(`wpanel-${tab.dataset.wtab}`).classList.add('active');
+  });
+});
+
+function openWalletModal(){
+  renderWalletModal();
+  document.getElementById('wallet-modal').classList.add('open');
+}
+
+function fixIpfs(url){
+  if(!url) return null;
+  // Swap slow ipfs.io for faster cloudflare gateway
+  return url.replace('https://ipfs.io/ipfs/','https://cloudflare-ipfs.com/ipfs/')
+            .replace('ipfs://','https://cloudflare-ipfs.com/ipfs/');
+}
+function renderWalletModal(){
+  if(!profileData){ document.getElementById('wallet-modal').classList.remove('open'); return; }
+  const s=profileData.sporebot||{};
+  const p=profileData.pixie||{};
+  const bal=s.Balance||{};
+  const wallet=p.Wallet||{};
+  const staking=s.Staking||{};
+
+  // Balances tab
+  const setW=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=fmt(v); };
+  setW('wl-planted',   bal.shroom_farm);
+  setW('wl-spore-farm',bal.spore_farm);
+  setW('wl-shroom',    wallet.shroom_wallet);
+  setW('wl-spore',     wallet.spore_wallet);
+  const staked=staking.staked_spores||0;
+  setW('wl-staked',  staked>0?staked:null);
+  setW('wl-staked2', staked);
+  setW('wl-pending', staking.pending_rewards);
+  const nodes=staked>0?Math.floor(staked/100_000_000):0;
+  const nodesEl=document.getElementById('wl-nodes'); if(nodesEl) nodesEl.textContent=nodes;
+
+  // On-chain tab
+  const addr=wallet.Address||'';
+  const addrEl=document.getElementById('wl-addr2');
+  if(addrEl) addrEl.textContent=addr?`${addr.slice(0,6)}...${addr.slice(-4)}`:'Not registered';
+  // On-chain balances from cached Firebase data
+  const setOC=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v!=null?fmt(v):'Not synced'; };
+  setOC('wl-oc-shroom', wallet.onchain_shroom??wallet.shroom_onchain??null);
+  setOC('wl-oc-spore',  wallet.onchain_spore??wallet.spore_onchain??null);
+
+  // NFT tab - show every individual NFT entry with its own image
+  const nftWallet=wallet.NFT||{};
+  const nftKeys=Object.keys(nftWallet).filter(k=>k!=='total_nft');
+  const nftEl=document.getElementById('wl-nft-content');
+  if(!nftKeys.length){
+    nftEl.innerHTML='<div class="wallet-no-link">No NFTs found.<br>Run !nft in Discord to sync.</div>';
+  } else {
+    // Group each individual entry by collection, keep token-level detail
+    const groups={};
+    const colOrder=['Sporebots','Mooshie Collection','Farm Boost','Other'];
+    nftKeys.forEach(k=>{
+      const entry=nftWallet[k];
+      const displayName=k.replace(/ ID\d+$/,'');
+      const tokenIdMatch=k.match(/ ID(\d+)$/);
+      const tokenId=tokenIdMatch?tokenIdMatch[1]:null;
+      const col=displayName.includes('SporeBots')||displayName.includes('Sporebot')?'Sporebots':
+                displayName.includes('Farm Boost')?'Farm Boost':
+                displayName.includes('Mooshie')||displayName.includes('Kid Shroom')||displayName.includes('House')?'Mooshie Collection':
+                'Other';
+      if(!groups[col]) groups[col]=[];
+      const count=parseInt(entry.count||1);
+      const label=tokenId?`${displayName.replace('SporeBots','Sporebot')} #${tokenId}`
+                         :displayName.replace('Farm Boost (Gen 1)','Farm Boost');
+      groups[col].push({label, count, image:entry.image||null});
+    });
+    // Sort Sporebots by token number
+    if(groups['Sporebots']){
+      groups['Sporebots'].sort((a,b)=>{
+        const na=parseInt(a.label.match(/#(\d+)/)?.[1]||0);
+        const nb=parseInt(b.label.match(/#(\d+)/)?.[1]||0);
+        return na-nb;
+      });
+    }
+    let html='';
+    colOrder.forEach(col=>{
+      if(!groups[col]||!groups[col].length) return;
+      html+=`<div class="wsection"><h4>${col.toUpperCase()}</h4><div class="nft-grid">`;
+      groups[col].forEach(item=>{
+        html+=`<div class="nft-card">`;
+        if(item.image){
+          html+=`<img src="${fixIpfs(item.image)}" alt="${item.label}" loading="lazy"
+                  onerror="this.src='https://ipfs.io/ipfs/'+this.src.split('/ipfs/')[1];this.onerror=function(){this.style.display='none';this.nextSibling.style.display='flex'}">
+                 <div class="nft-img-placeholder" style="display:none">🍄</div>`;
+        } else {
+          html+=`<div class="nft-img-placeholder">🍄</div>`;
+        }
+        html+=`<div class="nft-name">${item.label}</div>`;
+        if(item.count>1) html+=`<div class="nft-count">x${item.count}</div>`;
+        html+=`</div>`;
+      });
+      html+=`</div></div>`;
+    });
+    nftEl.innerHTML=html;
+  }
+}
 
 // Unlink
 document.getElementById('unlink-btn').addEventListener('click',()=>{
