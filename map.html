@@ -1325,6 +1325,10 @@ function drawFarmMap(t, dt){
   // Farm well
   drawWell(wellX,wellY);
 
+  // Potion station
+  const {potionX,potionY}=farmLayout;
+  if(potionX) drawPotionStation(potionX,potionY);
+
   // Plot grid (7 cols x 6 rows = 42)
   drawFarmPlots(plotsX,plotsY,plotsW,t);
 
@@ -2033,7 +2037,8 @@ function handleTap(mx,my){
       }
     }
   } else if(currentMap==='farm'){
-    const {plotsX,plotsY,plotsW,wellX,wellY}=farmLayout;
+    const {plotsX,plotsY,plotsW,wellX,wellY,potionX,potionY,houseX,houseY,houseW,houseH}=farmLayout;
+
     // Tap on plot area
     if(mx>=plotsX-15&&mx<=plotsX+plotsW+15&&my>=plotsY-15&&my<=plotsY+150){
       showFarmPlotsPopup();return;
@@ -2042,13 +2047,9 @@ function handleTap(mx,my){
     if(Math.abs(mx-(wellX))<35&&Math.abs(my-(wellY+25))<35){
       showWellPopup();return;
     }
-    // Tap on potion station
-    const {potionX,potionY}=farmLayout;
     if(potionX&&Math.abs(mx-potionX)<40&&Math.abs(my-(potionY+15))<40){
       showPotionStationPopup();return;
     }
-    // Tap on farmhouse
-    const {houseX,houseY,houseW,houseH}=farmLayout;
     if(mx>=houseX-10&&mx<=houseX+houseW+10&&my>=houseY-20&&my<=houseY+houseH+10){
       showFarmhousePopup();return;
     }
@@ -2077,35 +2078,124 @@ document.getElementById('popup-close-btn').addEventListener('click',closePopup);
 function showFarmPlotsPopup(){
   const farm=profileData?.sporebot?.Farm||{};
   const bal=profileData?.sporebot?.Balance||{};
+  const misc=profileData?.sporebot?.Misc||{};
   const stage=farm.current_stage||'Inactive';
   const planted=bal.shroom_farm||0;
+  const sporeFarm=bal.spore_farm||0;
   const filled=Math.min(42,Math.round(planted/1_000_000));
-  const pLimit=profileData?.sporebot?.Stats?.Plant_Limit||2000000;
+  const streak=farm.streak||0;
+  const maxStreak=farm.streak_record||0;
+  const sgr=farm.spore_generation_rate||0;
+  const farmRank=farm.farm_rank||'BRONZE';
+  const lifetimeSpores=farm.lifetime_spores||0;
+  const vacationDays=farm.vacation_days||0;
+  const apy=farm.APY||0;
+  const apyPct=Math.round(apy*100);
+
+  const nftWallet=profileData?.pixie?.Wallet?.NFT||{};
+  let farmBoostShroom=0;
+  for(const[k,v] of Object.entries(nftWallet)){
+    if(k.includes('Farm Boost')&&v&&typeof v==='object') farmBoostShroom+=parseInt(v.count||1)*1000000;
+  }
+  const totalPlanted=planted+farmBoostShroom;
+
+  // Stage progress
+  const stageIdx=STAGE_ORDER.indexOf(stage);
+  const stagePctVal=stageIdx<0?0:Math.round((stageIdx+1)/STAGE_ORDER.length*100);
+
+  // Next stage time
+  const sporDate=farm.Sporulation_Date||farm.Golden_Sporulation_Date||null;
+  let nextStageStr='Unknown';
+  if(sporDate){
+    const end=new Date(sporDate.replace(' ','T')+'Z');
+    const now=new Date();
+    const diff=end-now;
+    if(diff>0){
+      const d=Math.floor(diff/86400000);
+      const h=Math.floor((diff%86400000)/3600000);
+      nextStageStr=`${d}d ${h}h`;
+    } else {
+      nextStageStr='Ready to harvest!';
+    }
+  }
+
+  const customName=misc.custom_name||'Your Farm';
 
   setEl('popup-icon','🍄');
-  setEl('popup-title','YOUR PLOTS');
+  setEl('popup-title',customName.toUpperCase());
   document.getElementById('popup-desc').innerHTML='';
   document.getElementById('popup-cmd-wrap').style.display='none';
   document.getElementById('popup-btn-row').style.display='flex';
   document.getElementById('popup-discord-btn').style.display='none';
 
-  const nftWallet=profileData?.pixie?.Wallet?.NFT||{};
-  let farmBoostCount=0;
-  for(const[k,v] of Object.entries(nftWallet)){
-    if(k.includes('Farm Boost')&&v&&typeof v==='object') farmBoostCount+=parseInt(v.count||1);
-  }
-
   document.getElementById('popup-extra').innerHTML=`
-    <div class="popup-stats">
-      <div class="pstat"><span class="pstat-l">Planted</span><span class="pstat-v y">${fmt(planted)} SHROOMS</span></div>
-      <div class="pstat"><span class="pstat-l">Plots Filled</span><span class="pstat-v">${filled} / 42</span></div>
-      <div class="pstat"><span class="pstat-l">Plant Limit</span><span class="pstat-v b">${fmt(pLimit)}</span></div>
-      <div class="pstat"><span class="pstat-l">Stage</span><span class="pstat-v g">${stage}</span></div>
-      <div class="pstat"><span class="pstat-l">Spores/Day</span><span class="pstat-v y">${fmt(farm.spore_generation_rate)}</span></div>
-      <div class="pstat"><span class="pstat-l">Farm Boost NFTs</span><span class="pstat-v y">${farmBoostCount>0?farmBoostCount+' owned':'None'}</span></div>
+    <div class="sbar-wrap" style="margin-bottom:10px">
+      <div class="sbar-lbl"><span>${farmRank} FARMER</span><span>${stage}</span></div>
+      <div class="sbar"><div class="sbar-fill" style="width:${stagePctVal}%"></div></div>
     </div>
-    <a class="popup-discord-btn" href="${DISCORD_INVITE}" target="_blank" rel="noopener noreferrer" style="margin-top:10px;display:block">USE !PLANT IN DISCORD</a>
+    <div class="popup-stats">
+      <div class="pstat"><span class="pstat-l">Stage</span><span class="pstat-v g">${stage}</span></div>
+      <div class="pstat"><span class="pstat-l">Sporulation In</span><span class="pstat-v">${nextStageStr}</span></div>
+      <div class="pstat"><span class="pstat-l">Planted SHROOM</span><span class="pstat-v y">${fmt(planted)}</span></div>
+      <div class="pstat"><span class="pstat-l">NFT Boost</span><span class="pstat-v y">+${fmt(farmBoostShroom)}</span></div>
+      <div class="pstat"><span class="pstat-l">Total Planted</span><span class="pstat-v y">${fmt(totalPlanted)}</span></div>
+      <div class="pstat"><span class="pstat-l">Plots Filled</span><span class="pstat-v">${filled} / 42</span></div>
+      <div class="pstat"><span class="pstat-l">Spores/Day</span><span class="pstat-v b">${fmt(sgr)}</span></div>
+      <div class="pstat"><span class="pstat-l">Total APY</span><span class="pstat-v b">${apyPct}%</span></div>
+      <div class="pstat"><span class="pstat-l">Spores Generated</span><span class="pstat-v b">${fmt(sporeFarm)}</span></div>
+      <div class="pstat"><span class="pstat-l">Lifetime SPORES</span><span class="pstat-v b">${fmt(lifetimeSpores)}</span></div>
+      <div class="pstat"><span class="pstat-l">Current Streak</span><span class="pstat-v">${streak} days</span></div>
+      <div class="pstat"><span class="pstat-l">Max Streak</span><span class="pstat-v">${maxStreak} days</span></div>
+      <div class="pstat"><span class="pstat-l">Vacation Days</span><span class="pstat-v">${vacationDays}</span></div>
+    </div>
+    <button onclick="showSGRPopup()" style="width:100%;margin-top:8px;background:#1a1a1a;border:2px solid #60a5fa;color:#60a5fa;font-family:'Press Start 2P',monospace;font-size:0.3rem;padding:10px;border-radius:4px;cursor:pointer;">
+      VIEW SGR BREAKDOWN
+    </button>
+    <a class="popup-discord-btn" href="${DISCORD_INVITE}" target="_blank" rel="noopener noreferrer" style="margin-top:8px;display:block">USE !FARM IN DISCORD</a>
   `;
+  openPopup();
+}
+
+function showSGRPopup(){
+  const farm=profileData?.sporebot?.Farm||{};
+  const apy=farm.APY||0;
+  const apyPct=Math.round(apy*100);
+  const sgr=farm.spore_generation_rate||0;
+  const bal=profileData?.sporebot?.Balance||{};
+  const planted=bal.shroom_farm||0;
+  const ab=farm.APY_Breakdown||{};
+
+  const lines=[];
+  lines.push('<div class="popup-stats">');
+
+  lines.push('<div class="pstat" style="border-bottom:1px solid #333;margin-bottom:4px"><span class="pstat-l" style="color:#aaa">IN-GAME BONUSES</span><span class="pstat-v"></span></div>');
+  if(ab.stage_bonus>0) lines.push(`<div class="pstat"><span class="pstat-l">Stage</span><span class="pstat-v y">${ab.stage_bonus?.toFixed(0)||0}%</span></div>`);
+  if(ab.rank_bonus>0) lines.push(`<div class="pstat"><span class="pstat-l">Farm Rank</span><span class="pstat-v y">${ab.rank_bonus?.toFixed(0)||0}%</span></div>`);
+  if(ab.potion_bonus>0) lines.push(`<div class="pstat"><span class="pstat-l">Active Potion</span><span class="pstat-v g">${ab.potion_bonus}%</span></div>`);
+  if(ab.collector_bonus>0) lines.push(`<div class="pstat"><span class="pstat-l">Gemstones</span><span class="pstat-v g">${ab.collector_bonus}%</span></div>`);
+  if(ab.rootsong_bonus>0) lines.push(`<div class="pstat"><span class="pstat-l">Rootsong</span><span class="pstat-v g">${ab.rootsong_bonus?.toFixed(0)||0}%</span></div>`);
+  if(ab.sunspore_bonus>0) lines.push(`<div class="pstat"><span class="pstat-l">Sunspore</span><span class="pstat-v g">${ab.sunspore_bonus?.toFixed(0)||0}%</span></div>`);
+  if(ab.brewing_bonus>0) lines.push(`<div class="pstat"><span class="pstat-l">Spirit Gem</span><span class="pstat-v g">${ab.brewing_bonus?.toFixed(0)||0}%</span></div>`);
+  if(ab.ingame_sporebot_bonus>0) lines.push(`<div class="pstat"><span class="pstat-l">In-Game Bot</span><span class="pstat-v g">${ab.ingame_sporebot_bonus?.toFixed(2)||0}%</span></div>`);
+
+  lines.push('<div class="pstat" style="border-bottom:1px solid #333;margin:6px 0 4px"><span class="pstat-l" style="color:#aaa">ON-CHAIN BONUSES</span><span class="pstat-v"></span></div>');
+  if(ab.sporebot_bonus>0) lines.push(`<div class="pstat"><span class="pstat-l">Sporebot NFT</span><span class="pstat-v b">${ab.sporebot_bonus}%</span></div>`);
+  if(ab.lp_bonus>0) lines.push(`<div class="pstat"><span class="pstat-l">LP Provider</span><span class="pstat-v b">${Math.round(ab.lp_bonus)}%</span></div>`);
+  if(ab.mooshie_bonus>0) lines.push(`<div class="pstat"><span class="pstat-l">Mooshie NFTs</span><span class="pstat-v b">${Math.round(ab.mooshie_bonus)}%</span></div>`);
+  if(ab.guwoo_bonus>0) lines.push(`<div class="pstat"><span class="pstat-l">Guwoo</span><span class="pstat-v b">${Math.round(ab.guwoo_bonus)}%</span></div>`);
+
+  lines.push('<div class="pstat" style="border-top:2px solid #333;margin-top:6px;padding-top:6px"><span class="pstat-l">TOTAL APY</span><span class="pstat-v y" style="font-size:1.1rem">${apyPct}%</span></div>');
+  lines.push(`<div class="pstat"><span class="pstat-l">Daily SPORES</span><span class="pstat-v b" style="font-size:1.1rem">${fmt(sgr)}</span></div>`);
+  lines.push(`<div class="pstat"><span class="pstat-l">Planted</span><span class="pstat-v">${fmt(planted)} SHROOM</span></div>`);
+  lines.push('</div>');
+  lines.push(`<button onclick="showFarmPlotsPopup()" style="width:100%;margin-top:8px;background:#1a1a1a;border:1px solid #444;color:#666;font-family:'Press Start 2P',monospace;font-size:0.28rem;padding:8px;border-radius:4px;cursor:pointer;">BACK TO FARM</button>`);
+
+  setEl('popup-icon','📈');
+  setEl('popup-title','SGR BREAKDOWN');
+  document.getElementById('popup-desc').innerHTML='';
+  document.getElementById('popup-cmd-wrap').style.display='none';
+  document.getElementById('popup-btn-row').style.display='none';
+  document.getElementById('popup-extra').innerHTML=lines.join('').replace('${apyPct}',apyPct);
   openPopup();
 }
 
@@ -2177,23 +2267,81 @@ function showPotionStationPopup(){
 }
 function showFarmhousePopup(){
   const farm=profileData?.sporebot?.Farm||{};
+  const misc=profileData?.sporebot?.Misc||{};
+  const inv=profileData?.sporebot?.Inventory||{};
+  const items=inv.Items||{};
+  const daily=dailyData||profileData?.sporebot?.Daily_Check||{};
+
+  function cdRemaining(lastKey, cdHours){
+    const lastStr=farm[lastKey]||misc[lastKey]||null;
+    if(!lastStr) return 'Now';
+    const last=new Date(lastStr.replace(' ','T')+'Z');
+    const next=new Date(last.getTime()+cdHours*3600000);
+    const diff=next-Date.now();
+    if(diff<=0) return 'Now';
+    const d=Math.floor(diff/86400000);
+    const h=Math.floor((diff%86400000)/3600000);
+    const m=Math.floor((diff%3600000)/60000);
+    if(d>0) return `${d}d ${h}h`;
+    if(h>0) return `${h}h ${m}m`;
+    return `${m}m`;
+  }
+
+  const cdRows=[
+    {label:'!forage', key:'last_forage',  cd:24,  doneKey:'daily_forage'},
+    {label:'!mist',   key:'last_mist',    cd:24,  doneKey:'daily_mist'},
+    {label:'!fan',    key:'last_fan',     cd:24,  doneKey:'daily_fan'},
+    {label:'!explore',key:'last_explore', cd:6,   doneKey:'daily_explore'},
+    {label:'!toss',   key:'last_toss',    cd:24,  doneKey:null},
+    {label:'!gather', key:'last_gather',  cd:1,   doneKey:'daily_herb'},
+    {label:'!cave',   key:'last_cave',    cd:24,  doneKey:'daily_cave'},
+  ];
+
+  if(items.Golden_Shovel) cdRows.push({label:'!dig',key:'last_dig',cd:24,doneKey:'daily_dig'});
+
+  const rows=cdRows.map(r=>{
+    const cd=cdRemaining(r.key,r.cd);
+    const done=r.doneKey?daily[r.doneKey]===true:false;
+    const color=cd==='Now'?(done?'g':'y'):'';
+    return `<div class="pstat"><span class="pstat-l">${r.label}</span><span class="pstat-v ${color}">${cd==='Now'?(done?'✓ DONE':'READY'):cd}</span></div>`;
+  }).join('');
+
+  // Pixie stats
+  const pixie=profileData?.pixie?.Pixie||{};
+  const msgXp=profileData?.pixie?.Message_XP||{};
+  const wallet=profileData?.pixie?.Wallet||{};
+  const flair=profileData?.pixie?.Flair||{};
+
+  const customName=misc.custom_name||'Your Farm';
+  const farmRank=farm.farm_rank||'BRONZE';
+  const stage=farm.current_stage||'Inactive';
+  const streak=farm.streak||0;
+  const vacDays=farm.vacation_days||0;
+  const msgStreak=msgXp.current_streak||0;
+
   setEl('popup-icon','🏠');
-  setEl('popup-title','FARMHOUSE');
-  setEl('popup-desc','Your mushroom farm home. Check your farm status with !farm and manage your daily routine from here.');
+  setEl('popup-title',customName.toUpperCase());
+  document.getElementById('popup-desc').innerHTML='';
   document.getElementById('popup-cmd-wrap').style.display='none';
-  document.getElementById('popup-btn-row').style.display='none';
+  document.getElementById('popup-btn-row').style.display='flex';
+  document.getElementById('popup-discord-btn').style.display='none';
+
   document.getElementById('popup-extra').innerHTML=`
-    <div class="popup-stats">
-      <div class="pstat"><span class="pstat-l">Farm Rank</span><span class="pstat-v y">${safe(farm.farm_rank,'BRONZE')}</span></div>
-      <div class="pstat"><span class="pstat-l">Stage</span><span class="pstat-v g">${safe(farm.current_stage,'Inactive')}</span></div>
-      <div class="pstat"><span class="pstat-l">Streak</span><span class="pstat-v">${farm.streak!=null?farm.streak+' days':'-'}</span></div>
-      <div class="pstat"><span class="pstat-l">Lifetime SPORES</span><span class="pstat-v b">${fmt(farm.lifetime_spores)}</span></div>
+    <div class="sbar-wrap" style="margin-bottom:10px">
+      <div class="sbar-lbl"><span>${farmRank} FARMER</span><span>${stage}</span></div>
+      <div class="sbar"><div class="sbar-fill" style="width:${stagePct(stage)}%"></div></div>
     </div>
-    <div class="sbar-wrap" style="margin-top:8px">
-      <div class="sbar-lbl"><span>${safe(farm.current_stage,'Inactive')}</span><span>${stagePct(farm.current_stage)}%</span></div>
-      <div class="sbar"><div class="sbar-fill" style="width:${stagePct(farm.current_stage)}%"></div></div>
+    <div class="popup-stats" style="margin-bottom:10px">
+      <div class="pstat"><span class="pstat-l">Farm Rank</span><span class="pstat-v y">${farmRank}</span></div>
+      <div class="pstat"><span class="pstat-l">Forage Streak</span><span class="pstat-v">${streak} days</span></div>
+      <div class="pstat"><span class="pstat-l">Vacation Days</span><span class="pstat-v">${vacDays}</span></div>
+      <div class="pstat"><span class="pstat-l">Pixie Level</span><span class="pstat-v g">${pixie.LvL||1}</span></div>
+      <div class="pstat"><span class="pstat-l">Flair Rank</span><span class="pstat-v p">${safe(flair.Flair,'SPROUT')}</span></div>
+      <div class="pstat"><span class="pstat-l">Msg Streak</span><span class="pstat-v">${msgStreak} days</span></div>
     </div>
-    <a class="popup-discord-btn" href="${DISCORD_INVITE}" target="_blank" rel="noopener noreferrer" style="margin-top:10px;display:block">USE !FARM IN DISCORD</a>
+    <div style="font-family:'Press Start 2P',monospace;font-size:0.26rem;color:#fece00;margin-bottom:5px;">COOLDOWNS</div>
+    <div class="popup-stats">${rows}</div>
+    <a class="popup-discord-btn" href="${DISCORD_INVITE}" target="_blank" rel="noopener noreferrer" style="margin-top:10px;display:block">USE !HOME IN DISCORD</a>
   `;
   openPopup();
 }
