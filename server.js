@@ -21,7 +21,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type'],
   credentials: true,
 }));
-app.options('*', cors());
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -215,9 +214,11 @@ app.get('/api/treasury-txs', async (req, res) => {
   const contract = token === 'shroom'
     ? '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1'
     : '0x089582AC20ea563c69408a79E1061de594b61bED';
+  const TREASURY = '0x5873002348cd4DF2aBD2624a6FC30E90573019F5';
 
   try {
-    const url = `https://api.polygonscan.com/api?module=account&action=tokentx&contractaddress=${contract}&page=1&offset=20&sort=desc&apikey=${process.env.POLYGONSCAN_API_KEY}`;
+    const limit = Math.min(parseInt(req.query.limit) || 1000, 1000);
+    const url = `https://api.etherscan.io/v2/api?chainid=137&module=account&action=tokentx&contractaddress=${contract}&address=${TREASURY}&page=1&offset=${limit}&sort=desc&apikey=${process.env.ETHERSCAN_API_KEY}`;
     const response = await fetch(url);
     const data = await response.json();
     res.json(data);

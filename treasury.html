@@ -583,7 +583,7 @@
         <div class="donut-wrap">
           <canvas id="shroomDonut" width="220" height="220"></canvas>
           <div class="donut-center">
-            <div class="pct" style="color:var(--red)">~50%</div>
+            <div class="pct" style="color:var(--red)">~44%</div>
             <div class="lbl">Treasury<br>Remaining</div>
           </div>
         </div>
@@ -604,8 +604,8 @@
         </div>
         <div class="stat-row">
           <div class="stat-key">Current Treasury (Est.)</div>
-          <div class="stat-val shroom">~50%</div>
-          <div class="stat-sub">~3,437,000,000 $HROOM remaining</div>
+          <div class="stat-val shroom">~44%</div>
+          <div class="stat-sub">~3,000,000,000 $HROOM remaining</div>
         </div>
         <div class="stat-row">
           <div class="stat-key">Liquidity Pool</div>
@@ -709,6 +709,9 @@
         <div class="tx-tabs">
           <button class="tx-tab active" onclick="switchToken('shroom', this)">$HROOM</button>
           <button class="tx-tab" onclick="switchToken('spore', this)">SPORE</button>
+          <button class="tx-tab dir-tab active" onclick="switchDir('all', this)">ALL</button>
+          <button class="tx-tab dir-tab" onclick="switchDir('out', this)">OUT</button>
+          <button class="tx-tab dir-tab" onclick="switchDir('in', this)">IN</button>
         </div>
       </div>
       <div class="tx-list" id="tx-list">
@@ -862,10 +865,10 @@
 
     // ---- Data ----
     const shroomSegments = [
-      { label: 'Treasury',       pct: 50, color: '#fd464f' },
+      { label: 'Treasury',       pct: 44, color: '#fd464f' },
       { label: 'Airdrop (used)', pct: 38, color: '#c43038' },
       { label: 'Liquidity Pool', pct: 5,  color: '#ff7b82' },
-      { label: 'Distributed',   pct: 7,  color: '#4a1215' },
+      { label: 'Distributed',   pct: 13, color: '#4a1215' },
     ];
     const sporeSegments = [
       { label: 'Treasury Holdings',           pct: 50, color: '#4fa8fd' },
@@ -897,39 +900,48 @@
 
     // Known treasury-related addresses (lowercase)
     const KNOWN_ADDRS = {
-      '0x7f9a8f3e9f2e7c5d1a4b0c8e6f2d9a3b5c7e1f0a': 'Treasury',
       '0x28def03d8dc0d186fabae9c46043e8ef9bffcc28': 'LP Pool (SHROOM/WETH)',
       '0xc373382eec590374278534494109a0cdae1fbbc8': 'LP Pool (SPORE/WETH)',
       '0x0000000000000000000000000000000000000000': 'Burn / Mint',
     };
 
-    function classifyTx(tx, contractAddr) {
+    const AIRDROP_SENDER = '0x5873002348cd4df2abd2624a6fc30e90573019f5';
+
+    function classifyTx(tx, contractAddr, count) {
       const from = (tx.from || '').toLowerCase();
       const to   = (tx.to   || '').toLowerCase();
-      const contract = contractAddr.toLowerCase();
+      const isShroom = contractAddr.toLowerCase() === SHROOM_CONTRACT.toLowerCase();
 
-      if (from === contract || to === contract) return 'farm';
-      if (KNOWN_ADDRS[from] || KNOWN_ADDRS[to]) {
-        const label = KNOWN_ADDRS[from] || KNOWN_ADDRS[to];
-        if (label.includes('LP')) return 'lp';
-        if (label.includes('Treasury')) return 'transfer';
-        if (label.includes('Burn')) return 'airdrop';
+      if (KNOWN_ADDRS[to]?.includes('LP Pool')) return 'lp';
+      if (KNOWN_ADDRS[from]?.includes('LP Pool')) return 'lp';
+
+      if (from === AIRDROP_SENDER) {
+        const val = parseFloat(tx.value || 0) / 1e18;
+        if (count >= 5) {
+          if (isShroom) return 'lp_shroom';
+          return val >= 3000000 ? 'lp_spore' : 'onchain_airdrop';
+        }
+        if (isShroom) return val >= 18000 ? 'kid_shroom' : 'gold_mooshie';
+        return val >= 1800000 ? 'kid_shroom' : 'gold_mooshie';
       }
-      // Heuristic: large round amounts likely airdrops/rewards
+
       const val = parseFloat(tx.value || 0) / 1e18;
       if (val === 0) return 'unknown';
-      if (val >= 1000000) return 'airdrop';
-      if (val >= 10000)   return 'reward';
       return 'transfer';
     }
 
     const CAT_LABELS = {
-      lp:       { label: 'LP',       cls: 'tx-cat-lp'      },
-      farm:     { label: 'Farm',     cls: 'tx-cat-farm'    },
-      airdrop:  { label: 'Airdrop',  cls: 'tx-cat-airdrop' },
-      reward:   { label: 'Reward',   cls: 'tx-cat-reward'  },
-      transfer: { label: 'Transfer', cls: 'tx-cat-transfer' },
-      unknown:  { label: 'Unknown',  cls: 'tx-cat-unknown' },
+      lp_shroom:     { label: 'LP Rewards',       cls: 'tx-cat-lp'       },
+      lp_spore:      { label: 'LP Rewards',        cls: 'tx-cat-lp'       },
+      lp:            { label: 'LP',                cls: 'tx-cat-lp'       },
+      onchain_airdrop:{ label: 'Onchain Airdrop', cls: 'tx-cat-airdrop'  },
+      kid_shroom:    { label: 'Kid Shroom',        cls: 'tx-cat-airdrop'  },
+      gold_mooshie:  { label: 'Gold Mooshie',      cls: 'tx-cat-airdrop'  },
+      farm:          { label: 'Farm',              cls: 'tx-cat-farm'     },
+      airdrop:       { label: 'Airdrop',           cls: 'tx-cat-airdrop'  },
+      reward:        { label: 'Reward',            cls: 'tx-cat-reward'   },
+      transfer:      { label: 'Transfer',          cls: 'tx-cat-transfer' },
+      unknown:       { label: 'Unknown',           cls: 'tx-cat-unknown'  },
     };
 
     function timeAgo(ts) {
@@ -949,6 +961,8 @@
     }
 
     let currentToken = 'shroom';
+    let currentDir = 'all';
+    const TREASURY_ADDR = '0x5873002348cd4df2abd2624a6fc30e90573019f5';
 
     async function loadTxFeed(token) {
       const list = document.getElementById('tx-list');
@@ -958,7 +972,7 @@
       const symbol   = token === 'shroom' ? '$HROOM' : 'SPORE';
 
       try {
-        const url = `https://api.mushroomplanet.earth/api/treasury-txs?token=${token}`;
+        const url = `https://api.mushroomplanet.earth/api/treasury-txs?token=${token}&limit=1000`;
         const res  = await fetch(url);
         const data = await res.json();
 
@@ -969,19 +983,46 @@
         }
 
         list.innerHTML = '';
-        data.result.slice(0, 15).forEach(tx => {
-          const cat   = classifyTx(tx, contract);
+        // Filter by direction first
+        const filtered = data.result.filter(tx => {
+          if (currentDir === 'out') return tx.from.toLowerCase() === TREASURY_ADDR;
+          if (currentDir === 'in')  return tx.to.toLowerCase() === TREASURY_ADDR;
+          return true;
+        });
+        // Group consecutive txs with same from+value (airdrop batches)
+        const grouped = [];
+        filtered.forEach(tx => {
+          const key = tx.from.toLowerCase() + '_' + tx.value;
+          const last = grouped[grouped.length - 1];
+          if (last && last._key === key) {
+            last._count++;
+            last._totalValue += BigInt(tx.value);
+          } else if (grouped.length < 100) {
+            grouped.push({ ...tx, _key: key, _count: 1, _totalValue: BigInt(tx.value) });
+          }
+        });
+
+        grouped.forEach(tx => {
+          const cat     = classifyTx(tx, contract, tx._count);
           const catInfo = CAT_LABELS[cat] || CAT_LABELS.unknown;
-          const amt   = formatAmt(tx.value, tx.tokenDecimal);
-          const hash  = tx.hash;
-          const short = hash.slice(0,8) + '...' + hash.slice(-6);
+          const rawVal  = tx._count > 1 ? tx._totalValue.toString() : tx.value;
+          const amt     = formatAmt(rawVal, tx.tokenDecimal);
+          const hash    = tx.hash;
+          const short   = hash.slice(0,8) + '...' + hash.slice(-6);
+          const countBadge = tx._count > 1
+            ? ` <span style="font-size:0.65rem;opacity:0.5;font-family:'Syne Mono',monospace;">x${tx._count}</span>`
+            : '';
 
           const row = document.createElement('div');
           row.className = 'tx-row';
+          const isOut = tx.from.toLowerCase() === TREASURY_ADDR;
+          const dirArrow = isOut
+            ? '<span style="color:#fd464f;font-size:0.7rem;font-weight:700;">OUT</span>'
+            : '<span style="color:#7de87d;font-size:0.7rem;font-weight:700;">IN</span>';
           row.innerHTML = `
-            <span class="tx-cat ${catInfo.cls}">${catInfo.label}</span>
+            <span class="tx-cat ${catInfo.cls}">${catInfo.label}${countBadge}</span>
             <span class="tx-hash"><a href="https://polygonscan.com/tx/${hash}" target="_blank">${short}</a></span>
-            <span class="tx-amount ${amtClass}">${amt} ${symbol}</span>
+            <span class="tx-amount ${amtClass}">${dirArrow} ${amt} ${symbol}</span>
             <span class="tx-time">${timeAgo(tx.timeStamp)}</span>
           `;
           list.appendChild(row);
@@ -1027,9 +1068,16 @@
 
     function switchToken(token, btn) {
       currentToken = token;
-      document.querySelectorAll('.tx-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tx-tab:not(.dir-tab)').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
-      loadTxFeed(token);
+      loadTxFeed(currentToken);
+    }
+
+    function switchDir(dir, btn) {
+      currentDir = dir;
+      document.querySelectorAll('.dir-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      loadTxFeed(currentToken);
     }
 
     // ---- Scroll reveal ----
