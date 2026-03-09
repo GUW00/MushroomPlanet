@@ -208,6 +208,25 @@ app.get('/api/leaderboard', async (req, res) => {
 });
 
 // ----------------------------------------------------------------
+// GET /api/treasury-txs?token=shroom|spore
+// ----------------------------------------------------------------
+app.get('/api/treasury-txs', async (req, res) => {
+  const token = req.query.token === 'spore' ? 'spore' : 'shroom';
+  const contract = token === 'shroom'
+    ? '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1'
+    : '0x089582AC20ea563c69408a79E1061de594b61bED';
+
+  try {
+    const url = `https://api.polygonscan.com/api?module=account&action=tokentx&contractaddress=${contract}&page=1&offset=20&sort=desc&apikey=${process.env.POLYGONSCAN_API_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error('[TREASURY-TXS] Error:', err);
+    res.status(500).json({ error: 'Failed to fetch transactions' });
+  }
+});
+// ----------------------------------------------------------------
 // Start server
 // ----------------------------------------------------------------
 const PORT = process.env.PORT || 3001;
