@@ -18,8 +18,6 @@
       --dark: #0f0f0f;
       --dark2: #1a1a1a;
       --dark3: #242424;
-      --shroom-color: #fd464f;
-      --spore-color: #4fa8fd;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,19 +32,13 @@
 
     /* ---- STARFIELD ---- */
     #starfield {
-      position: fixed;
-      top: 0; left: 0;
+      position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
+      pointer-events: none; z-index: 0; overflow: hidden;
     }
     .star {
-      position: absolute;
-      border-radius: 50%;
-      background: var(--cream);
-      opacity: 0;
-      animation: twinkle var(--dur) var(--delay) infinite;
+      position: absolute; border-radius: 50%; background: var(--cream);
+      opacity: 0; animation: twinkle var(--dur) var(--delay) infinite;
     }
     @keyframes twinkle {
       0%, 100% { opacity: 0; transform: scale(0.5); }
@@ -55,481 +47,240 @@
 
     /* ---- HERO ---- */
     .treasury-hero {
-      position: relative;
-      z-index: 1;
-      text-align: center;
+      position: relative; z-index: 1; text-align: center;
       padding: 5rem 1rem 3rem;
       background: radial-gradient(ellipse at 50% 0%, rgba(253,70,79,0.12) 0%, transparent 70%);
     }
     .treasury-hero .eyebrow {
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.3em;
-      color: var(--red);
-      text-transform: uppercase;
-      margin-bottom: 1rem;
-      opacity: 0;
-      animation: fadeUp 0.6s 0.2s forwards;
+      font-family: 'Syne Mono', monospace; font-size: 0.75rem;
+      letter-spacing: 0.3em; color: var(--red); text-transform: uppercase;
+      margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.2s forwards;
     }
     .treasury-hero h1 {
-      font-size: clamp(2.2rem, 6vw, 4rem);
-      font-weight: 700;
-      line-height: 1.1;
-      margin-bottom: 1rem;
-      opacity: 0;
-      animation: fadeUp 0.6s 0.4s forwards;
+      font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 700; line-height: 1.1;
+      margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.4s forwards;
     }
     .treasury-hero h1 span { color: var(--yellow); }
     .treasury-hero p {
-      font-size: 1.1rem;
-      max-width: 600px;
-      margin: 0 auto 2.5rem;
-      color: rgba(255,255,225,0.7);
-      opacity: 0;
-      animation: fadeUp 0.6s 0.6s forwards;
+      font-size: 1.1rem; max-width: 600px; margin: 0 auto 2.5rem;
+      color: rgba(255,255,225,0.7); opacity: 0; animation: fadeUp 0.6s 0.6s forwards;
     }
 
-    /* ---- LIVE PRICE STRIP ---- */
+    /* ---- PRICE STRIP ---- */
     .price-strip {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      flex-wrap: wrap;
-      padding: 0 1rem 3rem;
-      opacity: 0;
-      animation: fadeUp 0.6s 0.8s forwards;
+      position: relative; z-index: 1; display: flex; justify-content: center;
+      gap: 2rem; flex-wrap: wrap; padding: 0 1rem 3rem;
+      opacity: 0; animation: fadeUp 0.6s 0.8s forwards;
     }
     .price-pill {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      background: var(--dark3);
-      border: 1px solid rgba(254,206,0,0.2);
-      border-radius: 999px;
-      padding: 0.6rem 1.4rem;
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.85rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      background: var(--dark3); border: 1px solid rgba(254,206,0,0.2);
+      border-radius: 999px; padding: 0.6rem 1.4rem;
+      font-family: 'Syne Mono', monospace; font-size: 0.85rem;
     }
-    .price-pill .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
+    .price-pill .dot { width: 8px; height: 8px; border-radius: 50%; animation: pulse 2s infinite; }
     .dot-shroom { background: var(--red);  box-shadow: 0 0 8px var(--red); }
     .dot-spore  { background: var(--blue); box-shadow: 0 0 8px var(--blue); }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     .price-pill strong { color: var(--red); }
     .price-pill.spore-pill strong { color: var(--blue); }
     .price-val { color: var(--cream); }
 
-    /* ---- SECTION WRAPPER ---- */
+    /* ---- LAYOUT ---- */
     .treasury-section {
-      position: relative;
-      z-index: 1;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1.5rem 5rem;
+      position: relative; z-index: 1; max-width: 1200px;
+      margin: 0 auto; padding: 0 1.5rem 5rem;
     }
-
     .section-label {
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--red);
-      margin-bottom: 0.5rem;
+      font-family: 'Syne Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--red); margin-bottom: 0.5rem;
     }
     .section-title {
-      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
-      font-weight: 700;
-      margin-bottom: 2.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700;
+      margin-bottom: 2.5rem; display: flex; align-items: center; gap: 0.6rem;
     }
-    .section-title img {
-      height: 1.2em;
-      width: 1.2em;
-      vertical-align: middle;
-    }
-
-    /* ---- TOKEN CARD LAYOUT ---- */
+    .section-title img { height: 1.2em; width: 1.2em; vertical-align: middle; }
     .token-block {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin-bottom: 4rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 4rem;
     }
-    @media (max-width: 768px) {
-      .token-block { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 768px) { .token-block { grid-template-columns: 1fr; } }
 
-    /* ---- DONUT CHART CARD ---- */
+    /* ---- DONUT ---- */
     .chart-card {
-      background: var(--dark2);
-      border: 1px solid rgba(255,255,225,0.07);
-      border-radius: 1.5rem;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-      transition: border-color 0.3s;
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1.5rem; padding: 2rem; display: flex;
+      flex-direction: column; align-items: center; gap: 1.5rem; transition: border-color 0.3s;
     }
     .chart-card:hover { border-color: rgba(254,206,0,0.25); }
-
-    .donut-wrap {
-      position: relative;
-      width: 220px;
-      height: 220px;
-      flex-shrink: 0;
-    }
+    .donut-wrap { position: relative; width: 220px; height: 220px; flex-shrink: 0; }
     .donut-wrap canvas { position: absolute; top: 0; left: 0; }
     .donut-center {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      pointer-events: none;
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%); text-align: center; pointer-events: none;
     }
-    .donut-center .pct {
-      font-size: 2rem;
-      font-weight: 700;
-      line-height: 1;
-    }
+    .donut-center .pct { font-size: 2rem; font-weight: 700; line-height: 1; }
     .donut-center .lbl {
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      opacity: 0.5;
-      text-transform: uppercase;
+      font-family: 'Syne Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.15em; opacity: 0.5; text-transform: uppercase;
     }
-
-    /* ---- LEGEND ---- */
-    .legend {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-    }
-    .legend-row {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.85rem;
-    }
-    .legend-swatch {
-      width: 12px; height: 12px;
-      border-radius: 3px;
-      flex-shrink: 0;
-    }
+    .legend { width: 100%; display: flex; flex-direction: column; gap: 0.6rem; }
+    .legend-row { display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; }
+    .legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
     .legend-row .leg-label { flex: 1; color: rgba(255,255,225,0.8); }
-    .legend-row .leg-pct {
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.8rem;
-      color: var(--cream);
-    }
+    .legend-row .leg-pct { font-family: 'Syne Mono', monospace; font-size: 0.8rem; color: var(--cream); }
 
     /* ---- STATS PANEL ---- */
     .stats-panel {
-      background: var(--dark2);
-      border: 1px solid rgba(255,255,225,0.07);
-      border-radius: 1.5rem;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-      justify-content: center;
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1.5rem; padding: 2rem; display: flex;
+      flex-direction: column; gap: 1.2rem; justify-content: center;
     }
     .stat-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      padding-bottom: 1.2rem;
-      border-bottom: 1px solid rgba(255,255,225,0.06);
+      display: flex; flex-direction: column; gap: 0.3rem;
+      padding-bottom: 1.2rem; border-bottom: 1px solid rgba(255,255,225,0.06);
     }
     .stat-row:last-child { border-bottom: none; padding-bottom: 0; }
     .stat-key {
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(255,255,225,0.4);
+      font-family: 'Syne Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,225,0.4);
     }
-    .stat-val {
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
+    .stat-val { font-size: 1.5rem; font-weight: 700; }
     .stat-val.shroom { color: var(--red); }
     .stat-val.spore  { color: var(--blue); }
-    .stat-sub {
-      font-size: 0.8rem;
-      color: rgba(255,255,225,0.5);
-    }
+    .stat-sub { font-size: 0.8rem; color: rgba(255,255,225,0.5); }
 
-    /* ---- BAR CHART SECTION ---- */
+    /* ---- BAR CHART ---- */
     .bar-section {
-      background: var(--dark2);
-      border: 1px solid rgba(255,255,225,0.07);
-      border-radius: 1.5rem;
-      padding: 2rem;
-      margin-bottom: 4rem;
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1.5rem; padding: 2rem; margin-bottom: 4rem;
     }
-    .bar-chart-title {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .bar-group {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
+    .bar-chart-title { font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .bar-group { display: flex; flex-direction: column; gap: 1rem; }
     .bar-item { display: flex; flex-direction: column; gap: 0.35rem; }
-    .bar-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.78rem;
-    }
+    .bar-meta { display: flex; justify-content: space-between; font-size: 0.78rem; }
     .bar-meta .bm-label { color: rgba(255,255,225,0.75); }
-    .bar-meta .bm-pct {
-      font-family: 'Syne Mono', monospace;
-      color: var(--cream);
-    }
-    .bar-track {
-      width: 100%;
-      height: 8px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      width: 0%;
-      transition: width 1.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+    .bar-meta .bm-pct { font-family: 'Syne Mono', monospace; color: var(--cream); }
+    .bar-track { width: 100%; height: 8px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 999px; width: 0%; transition: width 1.4s cubic-bezier(0.16,1,0.3,1); }
 
-    /* ---- COMPARISON GRID ---- */
-    .compare-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin-bottom: 4rem;
-    }
-    @media (max-width: 600px) {
-      .compare-grid { grid-template-columns: 1fr; }
-    }
+    /* ---- COMPARE ---- */
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 4rem; }
+    @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
     .compare-card {
-      background: var(--dark2);
-      border: 1px solid rgba(255,255,225,0.07);
-      border-radius: 1.5rem;
-      padding: 1.75rem;
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1.5rem; padding: 1.75rem;
     }
-    .compare-card h4 {
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .badge {
-      display: inline-block;
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.1em;
-      padding: 0.2em 0.6em;
-      border-radius: 999px;
-      vertical-align: middle;
-    }
+    .compare-card h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.4rem; }
+    .badge { display: inline-block; font-family: 'Syne Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; padding: 0.2em 0.6em; border-radius: 999px; vertical-align: middle; }
     .badge-shroom { background: rgba(253,70,79,0.15); color: var(--red); }
     .badge-spore  { background: rgba(79,168,253,0.15); color: var(--blue); }
-
-    .ratio-row {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.88rem;
-      margin-bottom: 0.6rem;
-      color: rgba(255,255,225,0.75);
-    }
+    .ratio-row { display: flex; align-items: center; gap: 0.75rem; font-size: 0.88rem; margin-bottom: 0.6rem; color: rgba(255,255,225,0.75); }
     .ratio-icon { font-size: 1.1rem; }
     .ratio-val { margin-left: auto; font-family: 'Syne Mono', monospace; font-size: 0.8rem; color: var(--cream); }
 
-    /* ---- GLOW DIVIDER ---- */
+    /* ---- MISC ---- */
     .glow-divider {
-      width: 100%;
-      height: 1px;
+      width: 100%; height: 1px;
       background: linear-gradient(90deg, transparent, var(--yellow), transparent);
-      margin: 3rem 0;
-      opacity: 0.25;
+      margin: 3rem 0; opacity: 0.25;
     }
-
-    /* ---- ANIMATIONS ---- */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .reveal {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: none;
-    }
-
-    /* ---- FOOTER ---- */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
     .treas-footer {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 2rem 1rem;
-      font-size: 0.8rem;
-      color: rgba(255,255,225,0.3);
-      border-top: 1px solid rgba(255,255,225,0.06);
+      position: relative; z-index: 1; text-align: center; padding: 2rem 1rem;
+      font-size: 0.8rem; color: rgba(255,255,225,0.3); border-top: 1px solid rgba(255,255,225,0.06);
     }
 
     /* ---- TX FEED ---- */
     .tx-section {
-      background: var(--dark2);
-      border: 1px solid rgba(255,255,225,0.07);
-      border-radius: 1.5rem;
-      padding: 2rem;
-      margin-bottom: 4rem;
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1.5rem; padding: 2rem; margin-bottom: 4rem;
     }
     .tx-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-      gap: 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
     }
-    .tx-header h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+    .tx-header h3 { font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
     .live-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      background: rgba(253,70,79,0.15);
-      color: var(--red);
-      border: 1px solid rgba(253,70,79,0.3);
-      border-radius: 999px;
-      padding: 0.2em 0.7em;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: 'Syne Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em;
+      background: rgba(253,70,79,0.15); color: var(--red);
+      border: 1px solid rgba(253,70,79,0.3); border-radius: 999px; padding: 0.2em 0.7em;
     }
-    .live-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--red);
-      animation: pulse 1.5s infinite;
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: pulse 1.5s infinite; }
+    .tx-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tx-tab {
+      font-family: 'Syne Mono', monospace; font-size: 0.7rem; padding: 0.3em 0.8em;
+      border-radius: 999px; border: 1px solid rgba(255,255,225,0.15);
+      background: transparent; color: rgba(255,255,225,0.5); cursor: pointer; transition: all 0.2s;
     }
-    .tx-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+    .tx-tab.active { border-color: var(--red); color: var(--red); background: rgba(253,70,79,0.1); }
+    .tx-tab:hover  { border-color: rgba(255,255,225,0.35); color: var(--cream); }
+    .tx-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .tx-loading {
+      text-align: center; padding: 2rem; color: rgba(255,255,225,0.3);
+      font-family: 'Syne Mono', monospace; font-size: 0.8rem;
     }
+
+    /* Collapsed batch row */
     .tx-row {
-      display: grid;
-      grid-template-columns: auto 1fr auto auto;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1rem;
-      background: rgba(255,255,255,0.03);
-      border-radius: 0.75rem;
-      border: 1px solid rgba(255,255,225,0.04);
-      font-size: 0.8rem;
+      display: grid; grid-template-columns: auto 1fr auto;
+      align-items: center; gap: 0.75rem; padding: 0.75rem 1rem;
+      background: rgba(255,255,255,0.03); border-radius: 0.75rem;
+      border: 1px solid rgba(255,255,225,0.04); font-size: 0.8rem;
+      cursor: pointer; user-select: none;
       animation: fadeUp 0.4s ease forwards;
     }
     .tx-row:hover { background: rgba(255,255,255,0.06); }
-    .tx-cat {
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.65rem;
-      padding: 0.2em 0.6em;
-      border-radius: 999px;
-      white-space: nowrap;
-      font-weight: 600;
-    }
-    .tx-cat-lp     { background: rgba(79,168,253,0.15); color: var(--blue); border: 1px solid rgba(79,168,253,0.25); }
-    .tx-cat-farm   { background: rgba(253,70,79,0.15); color: var(--red); border: 1px solid rgba(253,70,79,0.25); }
-    .tx-cat-airdrop{ background: rgba(254,206,0,0.15); color: #fece00; border: 1px solid rgba(254,206,0,0.25); }
-    .tx-cat-reward { background: rgba(100,200,100,0.15); color: #7de87d; border: 1px solid rgba(100,200,100,0.25); }
-    .tx-cat-transfer{ background: rgba(200,150,255,0.15); color: #d4a8ff; border: 1px solid rgba(200,150,255,0.25); }
-    .tx-cat-unknown{ background: rgba(255,255,225,0.06); color: rgba(255,255,225,0.4); border: 1px solid rgba(255,255,225,0.1); }
-    .tx-hash {
-      font-family: 'Syne Mono', monospace;
-      color: rgba(255,255,225,0.5);
-      font-size: 0.72rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .tx-hash a { color: rgba(255,255,225,0.5); text-decoration: none; }
-    .tx-hash a:hover { color: var(--red); }
-    .tx-amount {
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.78rem;
-      white-space: nowrap;
-      text-align: right;
-    }
-    .tx-amount.shroom { color: var(--red); }
-    .tx-amount.spore  { color: var(--blue); }
-    .tx-time {
-      color: rgba(255,255,225,0.3);
-      font-size: 0.7rem;
-      white-space: nowrap;
-      text-align: right;
-    }
-    .tx-loading {
-      text-align: center;
-      padding: 2rem;
-      color: rgba(255,255,225,0.3);
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.8rem;
-    }
-    .tx-tabs {
-      display: flex;
-      gap: 0.5rem;
-    }
-    .tx-tab {
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.7rem;
-      padding: 0.3em 0.8em;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,225,0.15);
-      background: transparent;
-      color: rgba(255,255,225,0.5);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .tx-tab.active { border-color: var(--red); color: var(--red); background: rgba(253,70,79,0.1); }
-    .tx-tab:hover { border-color: rgba(255,255,225,0.35); color: var(--cream); }
+    .tx-row.open  { border-radius: 0.75rem 0.75rem 0 0; border-bottom-color: transparent; }
 
-    /* ---- NAV: inherit fixed position from styles.css ---- */
+    .tx-cat {
+      font-family: 'Syne Mono', monospace; font-size: 0.65rem;
+      padding: 0.25em 0.7em; border-radius: 999px; white-space: nowrap; font-weight: 600;
+    }
+    .tx-cat-lp      { background: rgba(79,168,253,0.15);  color: var(--blue); border: 1px solid rgba(79,168,253,0.25); }
+    .tx-cat-airdrop { background: rgba(254,206,0,0.15);   color: #fece00;     border: 1px solid rgba(254,206,0,0.25); }
+    .tx-cat-transfer{ background: rgba(200,150,255,0.15); color: #d4a8ff;     border: 1px solid rgba(200,150,255,0.25); }
+    .tx-cat-unknown { background: rgba(255,255,225,0.06); color: rgba(255,255,225,0.4); border: 1px solid rgba(255,255,225,0.1); }
+
+    /* Expand panel */
+    .tx-expand {
+      display: none;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,225,0.04);
+      border-top: none;
+      border-radius: 0 0 0.75rem 0.75rem;
+      padding: 0.75rem 1rem 1rem;
+      margin-bottom: 0; /* gap handled by parent flex gap */
+    }
+    .tx-expand.open { display: block; }
+    .expand-token-header {
+      font-family: 'Syne Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.12em; text-transform: uppercase; margin: 0.6rem 0 0.3rem;
+    }
+    .expand-grid {
+      display: flex; flex-direction: column; gap: 0;
+      max-height: 200px; overflow-y: auto;
+      border-radius: 0.4rem; border: 1px solid rgba(255,255,225,0.05);
+    }
+    .expand-row {
+      display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem;
+      align-items: center; padding: 0.3rem 0.6rem; font-size: 0.72rem;
+    }
+    .expand-row:nth-child(even) { background: rgba(255,255,255,0.015); }
+    .expand-addr { font-family: 'Syne Mono', monospace; color: rgba(255,255,225,0.35); }
+    .expand-amt  { font-family: 'Syne Mono', monospace; text-align: right; }
+    .expand-hash a {
+      font-family: 'Syne Mono', monospace; font-size: 0.68rem;
+      color: rgba(255,255,225,0.2); text-decoration: none;
+    }
+    .expand-hash a:hover { color: var(--red); }
   </style>
 </head>
 <body>
 
-  <!-- Starfield -->
   <div id="starfield"></div>
 
   <header>
@@ -545,14 +296,12 @@
 
   <div id="global-menu"></div>
 
-  <!-- Hero -->
   <div class="treasury-hero">
     <div class="eyebrow">Live Treasury Data</div>
     <h1>Mushroom Planet<br /><span>Treasury</span></h1>
     <p>Real-time allocation breakdown for the SHROOM and SPORE ecosystems powering Mushroom Planet.</p>
   </div>
 
-  <!-- Live price pills -->
   <div class="price-strip">
     <div class="price-pill">
       <span class="dot dot-shroom"></span>
@@ -566,9 +315,9 @@
     </div>
   </div>
 
-  <!-- ============ SHROOM SECTION ============ -->
   <div class="treasury-section">
 
+    <!-- SHROOM -->
     <div class="reveal">
       <div class="section-label">Token 01</div>
       <div class="section-title">
@@ -576,9 +325,7 @@
         SHROOM ($HROOM) Treasury
       </div>
     </div>
-
     <div class="token-block reveal">
-      <!-- Donut chart -->
       <div class="chart-card">
         <div class="donut-wrap">
           <canvas id="shroomDonut" width="220" height="220"></canvas>
@@ -589,8 +336,6 @@
         </div>
         <div class="legend" id="shroom-legend"></div>
       </div>
-
-      <!-- Stats -->
       <div class="stats-panel">
         <div class="stat-row">
           <div class="stat-key">Total Supply</div>
@@ -620,28 +365,22 @@
         </div>
       </div>
     </div>
-
-    <!-- Shroom bar chart -->
     <div class="bar-section reveal">
-      <div class="bar-chart-title">
-        <span style="color:var(--red)">$HROOM</span> — Allocation Breakdown
-      </div>
+      <div class="bar-chart-title"><span style="color:var(--red)">$HROOM</span> — Allocation Breakdown</div>
       <div class="bar-group" id="shroom-bars"></div>
     </div>
 
     <div class="glow-divider"></div>
 
-    <!-- ============ SPORE SECTION ============ -->
+    <!-- SPORE -->
     <div class="reveal">
       <div class="section-label">Token 02</div>
       <div class="section-title">
-        <img src="/images/spore.png" alt="SPORE" style="border-radius:50%; border:2px solid var(--red); padding:2px;" />
+        <img src="/images/spore.png" alt="SPORE" style="border-radius:50%;border:2px solid var(--red);padding:2px;" />
         SPORE (SPR) Treasury
       </div>
     </div>
-
     <div class="token-block reveal">
-      <!-- Donut chart -->
       <div class="chart-card">
         <div class="donut-wrap">
           <canvas id="sporeDonut" width="220" height="220"></canvas>
@@ -652,8 +391,6 @@
         </div>
         <div class="legend" id="spore-legend"></div>
       </div>
-
-      <!-- Stats -->
       <div class="stats-panel">
         <div class="stat-row">
           <div class="stat-key">Total Supply</div>
@@ -683,23 +420,18 @@
         </div>
       </div>
     </div>
-
-    <!-- Spore bar chart -->
     <div class="bar-section reveal">
-      <div class="bar-chart-title">
-        <span style="color:var(--blue)">SPORE</span> — Allocation Breakdown
-      </div>
+      <div class="bar-chart-title"><span style="color:var(--blue)">SPORE</span> — Allocation Breakdown</div>
       <div class="bar-group" id="spore-bars"></div>
     </div>
 
     <div class="glow-divider"></div>
 
-    <!-- ============ TX AUDIT FEED ============ -->
+    <!-- TX AUDIT FEED -->
     <div class="reveal">
       <div class="section-label">Live On-Chain</div>
       <div class="section-title">Treasury Transaction Audit</div>
     </div>
-
     <div class="tx-section reveal">
       <div class="tx-header">
         <h3>
@@ -707,29 +439,26 @@
           <span class="live-badge"><span class="live-dot"></span>LIVE</span>
         </h3>
         <div class="tx-tabs">
-          <button class="tx-tab active" onclick="switchToken('shroom', this)">$HROOM</button>
-          <button class="tx-tab" onclick="switchToken('spore', this)">SPORE</button>
-          <button class="tx-tab dir-tab active" onclick="switchDir('all', this)">ALL</button>
-          <button class="tx-tab dir-tab" onclick="switchDir('out', this)">OUT</button>
-          <button class="tx-tab dir-tab" onclick="switchDir('in', this)">IN</button>
+          <button class="tx-tab dir-tab active" onclick="switchDir('all',this)">ALL</button>
+          <button class="tx-tab dir-tab" onclick="switchDir('out',this)">OUT</button>
+          <button class="tx-tab dir-tab" onclick="switchDir('in',this)">IN</button>
         </div>
       </div>
       <div class="tx-list" id="tx-list">
         <div class="tx-loading">Fetching transactions...</div>
       </div>
-      <div style="margin-top:1rem; font-size:0.72rem; color:rgba(255,255,225,0.25); font-family:'Syne Mono',monospace; text-align:center;">
-        Data via Polygonscan. Categories auto-classified from known treasury, LP, and airdrop addresses.
+      <div style="margin-top:1rem;font-size:0.72rem;color:rgba(255,255,225,0.25);font-family:'Syne Mono',monospace;text-align:center;">
+        Data via Polygonscan · Batches auto-detected by block · Click any row to expand
       </div>
     </div>
 
     <div class="glow-divider"></div>
 
-    <!-- ============ COMPARE ============ -->
+    <!-- TOKEN COMPARISON -->
     <div class="reveal">
       <div class="section-label">Ecosystem Overview</div>
       <div class="section-title">Token Relationship</div>
     </div>
-
     <div class="compare-grid reveal">
       <div class="compare-card">
         <h4><span class="badge badge-shroom">$HROOM</span> Token Role</h4>
@@ -749,385 +478,428 @@
       </div>
     </div>
 
-  </div><!-- /treasury-section -->
+  </div>
 
   <div class="treas-footer">
     Data is approximate. Token allocations reflect launch parameters. Live prices via GeckoTerminal. &copy; 2025 Mushroom Planet.
   </div>
 
-  <!-- Scripts -->
+  <!-- ============================================================
+       SCRIPTS
+       ============================================================ -->
   <script type="module">
     import config from './config.js';
     window.addEventListener('DOMContentLoaded', () => {
-      const menuTarget = document.getElementById('global-menu');
-      if (menuTarget) menuTarget.innerHTML = config.menu.html;
+      const t = document.getElementById('global-menu');
+      if (t) t.innerHTML = config.menu.html;
     });
   </script>
 
   <script>
-    // ---- Starfield ----
-    (function() {
-      const sf = document.getElementById('starfield');
-      for (let i = 0; i < 80; i++) {
-        const s = document.createElement('div');
-        s.className = 'star';
-        const sz = Math.random() * 2.5 + 0.5;
-        s.style.cssText = [
-          'width:' + sz + 'px',
-          'height:' + sz + 'px',
-          'top:' + (Math.random() * 100) + '%',
-          'left:' + (Math.random() * 100) + '%',
-          '--dur:' + (3 + Math.random() * 5) + 's',
-          '--delay:' + (Math.random() * 6) + 's',
-          '--op:' + (0.2 + Math.random() * 0.5)
-        ].join(';');
-        sf.appendChild(s);
-      }
-    })();
-
-    // ---- Donut chart ----
-    function drawDonut(canvasId, segments, accentColor) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const cx = 110, cy = 110, r = 90, innerR = 62;
-      const total = segments.reduce((a, s) => a + s.pct, 0);
-      let startAngle = -Math.PI / 2;
-      const gap = 0.025;
-
-      // Animate
-      let progress = 0;
-      const duration = 1200;
-      const startTime = performance.now();
-
-      function draw(now) {
-        progress = Math.min((now - startTime) / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3);
-        ctx.clearRect(0, 0, 220, 220);
-
-        let angle = startAngle;
-        segments.forEach((seg, i) => {
-          const sweep = (seg.pct / total) * Math.PI * 2 * ease;
-          ctx.beginPath();
-          ctx.moveTo(cx + innerR * Math.cos(angle + gap), cy + innerR * Math.sin(angle + gap));
-          ctx.arc(cx, cy, r, angle + gap, angle + sweep - gap);
-          ctx.arc(cx, cy, innerR, angle + sweep - gap, angle + gap, true);
-          ctx.closePath();
-          ctx.fillStyle = seg.color;
-          ctx.fill();
-          angle += sweep;
-        });
-
-        // Track ring
-        ctx.beginPath();
-        ctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
-        ctx.arc(cx, cy, r + 8, Math.PI * 2, 0, true);
-        ctx.fillStyle = 'rgba(255,255,225,0.03)';
-        ctx.fill();
-
-        if (progress < 1) requestAnimationFrame(draw);
-      }
-      requestAnimationFrame(draw);
+  // ─────────────────────────────────────────────────────────────────
+  // STARFIELD
+  // ─────────────────────────────────────────────────────────────────
+  (function() {
+    const sf = document.getElementById('starfield');
+    for (let i = 0; i < 80; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      const sz = Math.random() * 2.5 + 0.5;
+      s.style.cssText = [
+        'width:' + sz + 'px', 'height:' + sz + 'px',
+        'top:'  + (Math.random()*100) + '%',
+        'left:' + (Math.random()*100) + '%',
+        '--dur:'   + (3 + Math.random()*5) + 's',
+        '--delay:' + (Math.random()*6) + 's',
+        '--op:'    + (0.2 + Math.random()*0.5),
+      ].join(';');
+      sf.appendChild(s);
     }
+  })();
 
-    // ---- Bar chart rows ----
-    function buildBars(containerId, items, color) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      items.forEach(item => {
-        const el = document.createElement('div');
-        el.className = 'bar-item';
-        el.innerHTML = `
+  // ─────────────────────────────────────────────────────────────────
+  // DONUT CHART
+  // ─────────────────────────────────────────────────────────────────
+  function drawDonut(canvasId, segments) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const cx = 110, cy = 110, r = 90, innerR = 62;
+    const total = segments.reduce((a, s) => a + s.pct, 0);
+    const gap = 0.025;
+    const start = performance.now();
+    const dur = 1200;
+    function draw(now) {
+      const ease = 1 - Math.pow(1 - Math.min((now - start) / dur, 1), 3);
+      ctx.clearRect(0, 0, 220, 220);
+      let angle = -Math.PI / 2;
+      segments.forEach(seg => {
+        const sweep = (seg.pct / total) * Math.PI * 2 * ease;
+        ctx.beginPath();
+        ctx.moveTo(cx + innerR * Math.cos(angle + gap), cy + innerR * Math.sin(angle + gap));
+        ctx.arc(cx, cy, r, angle + gap, angle + sweep - gap);
+        ctx.arc(cx, cy, innerR, angle + sweep - gap, angle + gap, true);
+        ctx.closePath();
+        ctx.fillStyle = seg.color;
+        ctx.fill();
+        angle += sweep;
+      });
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
+      ctx.arc(cx, cy, r + 8, Math.PI * 2, 0, true);
+      ctx.fillStyle = 'rgba(255,255,225,0.03)';
+      ctx.fill();
+      if (ease < 1) requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // BAR CHARTS + LEGEND
+  // ─────────────────────────────────────────────────────────────────
+  function buildBars(id, items, color) {
+    const c = document.getElementById(id);
+    if (!c) return;
+    items.forEach(item => {
+      c.insertAdjacentHTML('beforeend', `
+        <div class="bar-item">
           <div class="bar-meta">
             <span class="bm-label">${item.emoji} ${item.label}</span>
             <span class="bm-pct">${item.pct}%</span>
           </div>
           <div class="bar-track">
             <div class="bar-fill" data-pct="${item.pct}" style="background:${color};"></div>
-          </div>`;
-        container.appendChild(el);
-      });
-    }
-
-    function buildLegend(containerId, segments) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      segments.forEach(seg => {
-        const row = document.createElement('div');
-        row.className = 'legend-row';
-        row.innerHTML = `
+          </div>
+        </div>`);
+    });
+  }
+  function buildLegend(id, segments) {
+    const c = document.getElementById(id);
+    if (!c) return;
+    segments.forEach(seg => {
+      c.insertAdjacentHTML('beforeend', `
+        <div class="legend-row">
           <div class="legend-swatch" style="background:${seg.color}"></div>
           <span class="leg-label">${seg.label}</span>
-          <span class="leg-pct">${seg.pct}%</span>`;
-        container.appendChild(row);
-      });
-    }
-
-    // ---- Data ----
-    const shroomSegments = [
-      { label: 'Treasury',       pct: 44, color: '#fd464f' },
-      { label: 'Airdrop (used)', pct: 38, color: '#c43038' },
-      { label: 'Liquidity Pool', pct: 5,  color: '#ff7b82' },
-      { label: 'Distributed',   pct: 13, color: '#4a1215' },
-    ];
-    const sporeSegments = [
-      { label: 'Treasury Holdings',           pct: 50, color: '#4fa8fd' },
-      { label: 'LP Rewards & Funding',        pct: 18, color: '#2d7dd4' },
-      { label: 'Sporebot / Reddit',           pct: 10, color: '#82c6ff' },
-      { label: 'Events / Collabs / Buybacks', pct: 10, color: '#a8d8ff' },
-      { label: 'NFT Avatar Rewards',          pct: 8,  color: '#1a4f80' },
-      { label: 'Contingency',                 pct: 4,  color: '#0d2d4a' },
-    ];
-
-    const shroomBars = [
-      { emoji: '🏦', label: 'Treasury (Initial)',    pct: 57 },
-      { emoji: '🎁', label: 'Airdrop',               pct: 38 },
-      { emoji: '💧', label: 'Liquidity Pool',        pct: 5  },
-      { emoji: '📊', label: 'Current Treasury Est.', pct: 50 },
-    ];
-    const sporeBars = [
-      { emoji: '🧊', label: 'Treasury Holdings',         pct: 50 },
-      { emoji: '🔁', label: 'LP Rewards & Funding',      pct: 18 },
-      { emoji: '🌱', label: 'Sporebot / Reddit Rewards', pct: 10 },
-      { emoji: '🤝', label: 'Events, Collabs, Buybacks', pct: 10 },
-      { emoji: '🎨', label: 'NFT Avatar Rewards',        pct: 8  },
-      { emoji: '🛡', label: 'Contingency',               pct: 4  },
-    ];
-
-    // ---- TX Audit Feed ----
-    const SHROOM_CONTRACT = '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1';
-    const SPORE_CONTRACT  = '0x089582AC20ea563c69408a79E1061de594b61bED';
-
-    // Known treasury-related addresses (lowercase)
-    const KNOWN_ADDRS = {
-      '0x28def03d8dc0d186fabae9c46043e8ef9bffcc28': 'LP Pool (SHROOM/WETH)',
-      '0xc373382eec590374278534494109a0cdae1fbbc8': 'LP Pool (SPORE/WETH)',
-      '0x0000000000000000000000000000000000000000': 'Burn / Mint',
-    };
-
-    const AIRDROP_SENDER = '0x5873002348cd4df2abd2624a6fc30e90573019f5';
-
-    function classifyTx(tx, contractAddr, count) {
-      const from = (tx.from || '').toLowerCase();
-      const to   = (tx.to   || '').toLowerCase();
-      const isShroom = contractAddr.toLowerCase() === SHROOM_CONTRACT.toLowerCase();
-
-      if (KNOWN_ADDRS[to]?.includes('LP Pool')) return 'lp';
-      if (KNOWN_ADDRS[from]?.includes('LP Pool')) return 'lp';
-
-      if (from === AIRDROP_SENDER) {
-        const val = parseFloat(tx.value || 0) / 1e18;
-        if (count >= 5) {
-          if (isShroom) return 'lp_shroom';
-          return val >= 3000000 ? 'lp_spore' : 'onchain_airdrop';
-        }
-        if (isShroom) return val >= 18000 ? 'kid_shroom' : 'gold_mooshie';
-        return val >= 1800000 ? 'kid_shroom' : 'gold_mooshie';
-      }
-
-      const val = parseFloat(tx.value || 0) / 1e18;
-      if (val === 0) return 'unknown';
-      return 'transfer';
-    }
-
-    const CAT_LABELS = {
-      lp_shroom:     { label: 'LP Rewards',       cls: 'tx-cat-lp'       },
-      lp_spore:      { label: 'LP Rewards',        cls: 'tx-cat-lp'       },
-      lp:            { label: 'LP',                cls: 'tx-cat-lp'       },
-      onchain_airdrop:{ label: 'Onchain Airdrop', cls: 'tx-cat-airdrop'  },
-      kid_shroom:    { label: 'Kid Shroom',        cls: 'tx-cat-airdrop'  },
-      gold_mooshie:  { label: 'Gold Mooshie',      cls: 'tx-cat-airdrop'  },
-      farm:          { label: 'Farm',              cls: 'tx-cat-farm'     },
-      airdrop:       { label: 'Airdrop',           cls: 'tx-cat-airdrop'  },
-      reward:        { label: 'Reward',            cls: 'tx-cat-reward'   },
-      transfer:      { label: 'Transfer',          cls: 'tx-cat-transfer' },
-      unknown:       { label: 'Unknown',           cls: 'tx-cat-unknown'  },
-    };
-
-    function timeAgo(ts) {
-      const diff = Math.floor(Date.now() / 1000) - parseInt(ts);
-      if (diff < 60)   return diff + 's ago';
-      if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-      if (diff < 86400)return Math.floor(diff/3600) + 'h ago';
-      return Math.floor(diff/86400) + 'd ago';
-    }
-
-    function formatAmt(raw, decimals) {
-      const val = parseFloat(raw) / Math.pow(10, parseInt(decimals) || 18);
-      if (val >= 1e9) return (val/1e9).toFixed(2) + 'B';
-      if (val >= 1e6) return (val/1e6).toFixed(2) + 'M';
-      if (val >= 1e3) return (val/1e3).toFixed(2) + 'K';
-      return val.toFixed(2);
-    }
-
-    let currentToken = 'shroom';
-    let currentDir = 'all';
-    const TREASURY_ADDR = '0x5873002348cd4df2abd2624a6fc30e90573019f5';
-
-    async function loadTxFeed(token) {
-      const list = document.getElementById('tx-list');
-      list.innerHTML = '<div class="tx-loading">Fetching transactions...</div>';
-      const contract = token === 'shroom' ? SHROOM_CONTRACT : SPORE_CONTRACT;
-      const amtClass = token === 'shroom' ? 'shroom' : 'spore';
-      const symbol   = token === 'shroom' ? '$HROOM' : 'SPORE';
-
-      try {
-        const url = `https://api.mushroomplanet.earth/api/treasury-txs?token=${token}&limit=1000`;
-        const res  = await fetch(url);
-        const data = await res.json();
-
-        if (!data.result || !Array.isArray(data.result) || data.result.length === 0) {
-          list.innerHTML = '<div class="tx-loading">No transactions found (API key required for live data).</div>';
-          renderMockTxFeed(token);
-          return;
-        }
-
-        list.innerHTML = '';
-        // Filter by direction first
-        const filtered = data.result.filter(tx => {
-          if (currentDir === 'out') return tx.from.toLowerCase() === TREASURY_ADDR;
-          if (currentDir === 'in')  return tx.to.toLowerCase() === TREASURY_ADDR;
-          return true;
-        });
-        // Group consecutive txs with same from+value (airdrop batches)
-        const grouped = [];
-        filtered.forEach(tx => {
-          const key = tx.from.toLowerCase() + '_' + tx.value;
-          const last = grouped[grouped.length - 1];
-          if (last && last._key === key) {
-            last._count++;
-            last._totalValue += BigInt(tx.value);
-          } else if (grouped.length < 100) {
-            grouped.push({ ...tx, _key: key, _count: 1, _totalValue: BigInt(tx.value) });
-          }
-        });
-
-        grouped.forEach(tx => {
-          const cat     = classifyTx(tx, contract, tx._count);
-          const catInfo = CAT_LABELS[cat] || CAT_LABELS.unknown;
-          const rawVal  = tx._count > 1 ? tx._totalValue.toString() : tx.value;
-          const amt     = formatAmt(rawVal, tx.tokenDecimal);
-          const hash    = tx.hash;
-          const short   = hash.slice(0,8) + '...' + hash.slice(-6);
-          const countBadge = tx._count > 1
-            ? ` <span style="font-size:0.65rem;opacity:0.5;font-family:'Syne Mono',monospace;">x${tx._count}</span>`
-            : '';
-
-          const row = document.createElement('div');
-          row.className = 'tx-row';
-          const isOut = tx.from.toLowerCase() === TREASURY_ADDR;
-          const dirArrow = isOut
-            ? '<span style="color:#fd464f;font-size:0.7rem;font-weight:700;">OUT</span>'
-            : '<span style="color:#7de87d;font-size:0.7rem;font-weight:700;">IN</span>';
-          row.innerHTML = `
-            <span class="tx-cat ${catInfo.cls}">${catInfo.label}${countBadge}</span>
-            <span class="tx-hash"><a href="https://polygonscan.com/tx/${hash}" target="_blank">${short}</a></span>
-            <span class="tx-amount ${amtClass}">${dirArrow} ${amt} ${symbol}</span>
-            <span class="tx-time">${timeAgo(tx.timeStamp)}</span>
-          `;
-          list.appendChild(row);
-        });
-      } catch(e) {
-        renderMockTxFeed(token);
-      }
-    }
-
-    // Fallback mock data if no API key / CORS blocked
-    function renderMockTxFeed(token) {
-      const list = document.getElementById('tx-list');
-      const amtClass = token === 'shroom' ? 'shroom' : 'spore';
-      const symbol   = token === 'shroom' ? '$HROOM' : 'SPORE';
-      const mocks = [
-        { cat:'reward',   amt:'12,500',  ago:'2m ago',  hash:'0x4f2a...c831' },
-        { cat:'transfer', amt:'500,000', ago:'18m ago', hash:'0x9e1b...44fa' },
-        { cat:'lp',       amt:'2.1M',   ago:'1h ago',  hash:'0x2c5d...99e0' },
-        { cat:'reward',   amt:'8,200',  ago:'3h ago',  hash:'0x71af...d301' },
-        { cat:'airdrop',  amt:'3.5M',   ago:'1d ago',  hash:'0xb8c2...0ff1' },
-        { cat:'transfer', amt:'75,000', ago:'2d ago',  hash:'0xa3e9...55c2' },
-        { cat:'farm',     amt:'420',    ago:'3d ago',  hash:'0x5510...b7e4' },
-        { cat:'lp',       amt:'1.8M',   ago:'5d ago',  hash:'0xdd3f...20c9' },
-      ];
-      list.innerHTML = '';
-      const note = document.createElement('div');
-      note.style.cssText = 'font-size:0.7rem;color:rgba(255,255,225,0.25);font-family:Syne Mono,monospace;margin-bottom:0.75rem;';
-      note.textContent = 'Sample data shown. Add a Polygonscan API key for live transactions.';
-      list.appendChild(note);
-      mocks.forEach(m => {
-        const catInfo = CAT_LABELS[m.cat];
-        const row = document.createElement('div');
-        row.className = 'tx-row';
-        row.innerHTML = `
-          <span class="tx-cat ${catInfo.cls}">${catInfo.label}</span>
-          <span class="tx-hash"><a href="https://polygonscan.com/token/${token === 'shroom' ? SHROOM_CONTRACT : SPORE_CONTRACT}" target="_blank">${m.hash}</a></span>
-          <span class="tx-amount ${amtClass}">${m.amt} ${symbol}</span>
-          <span class="tx-time">${m.ago}</span>
-        `;
-        list.appendChild(row);
-      });
-    }
-
-    function switchToken(token, btn) {
-      currentToken = token;
-      document.querySelectorAll('.tx-tab:not(.dir-tab)').forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
-      loadTxFeed(currentToken);
-    }
-
-    function switchDir(dir, btn) {
-      currentDir = dir;
-      document.querySelectorAll('.dir-tab').forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
-      loadTxFeed(currentToken);
-    }
-
-    // ---- Scroll reveal ----
-    const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          // trigger bar animations when visible
-          e.target.querySelectorAll('.bar-fill').forEach(bar => {
-            bar.style.width = bar.dataset.pct + '%';
-          });
-          observer.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.15 });
-    reveals.forEach(r => observer.observe(r));
-
-    // ---- Init ----
-    window.addEventListener('DOMContentLoaded', () => {
-      buildLegend('shroom-legend', shroomSegments);
-      buildLegend('spore-legend', sporeSegments);
-      buildBars('shroom-bars', shroomBars, 'var(--red)');
-      buildBars('spore-bars', sporeBars, 'var(--blue)');
-      drawDonut('shroomDonut', shroomSegments, '#fd464f');
-      drawDonut('sporeDonut', sporeSegments, '#4fa8fd');
-      loadTxFeed('shroom');
+          <span class="leg-pct">${seg.pct}%</span>
+        </div>`);
     });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // CHART DATA
+  // ─────────────────────────────────────────────────────────────────
+  const shroomSegments = [
+    { label: 'Treasury',       pct: 44, color: '#fd464f' },
+    { label: 'Airdrop (used)', pct: 38, color: '#c43038' },
+    { label: 'Liquidity Pool', pct: 5,  color: '#ff7b82' },
+    { label: 'Distributed',   pct: 13, color: '#4a1215' },
+  ];
+  const sporeSegments = [
+    { label: 'Treasury Holdings',           pct: 50, color: '#4fa8fd' },
+    { label: 'LP Rewards & Funding',        pct: 18, color: '#2d7dd4' },
+    { label: 'Sporebot / Reddit',           pct: 10, color: '#82c6ff' },
+    { label: 'Events / Collabs / Buybacks', pct: 10, color: '#a8d8ff' },
+    { label: 'NFT Avatar Rewards',          pct: 8,  color: '#1a4f80' },
+    { label: 'Contingency',                 pct: 4,  color: '#0d2d4a' },
+  ];
+  const shroomBars = [
+    { emoji: '🏦', label: 'Treasury (Initial)',    pct: 57 },
+    { emoji: '🎁', label: 'Airdrop',               pct: 38 },
+    { emoji: '💧', label: 'Liquidity Pool',        pct: 5  },
+    { emoji: '📊', label: 'Current Treasury Est.', pct: 50 },
+  ];
+  const sporeBars = [
+    { emoji: '🧊', label: 'Treasury Holdings',         pct: 50 },
+    { emoji: '🔁', label: 'LP Rewards & Funding',      pct: 18 },
+    { emoji: '🌱', label: 'Sporebot / Reddit Rewards', pct: 10 },
+    { emoji: '🤝', label: 'Events, Collabs, Buybacks', pct: 10 },
+    { emoji: '🎨', label: 'NFT Avatar Rewards',        pct: 8  },
+    { emoji: '🛡',  label: 'Contingency',              pct: 4  },
+  ];
+
+  // ─────────────────────────────────────────────────────────────────
+  // TX FEED — BATCH DETECTION + RENDER
+  // ─────────────────────────────────────────────────────────────────
+  const TREASURY_ADDR = '0x5873002348cd4df2abd2624a6fc30e90573019f5';
+  const PAGE_SIZE     = 10;
+
+  // Map colorClass strings → CSS class names
+  const CAT_CSS = {
+    lp:       'tx-cat-lp',
+    airdrop:  'tx-cat-airdrop',
+    transfer: 'tx-cat-transfer',
+    unknown:  'tx-cat-unknown',
+  };
+
+  function timeAgo(ts) {
+    const d = Math.floor(Date.now() / 1000) - ts;
+    if (d < 60)    return d + 's ago';
+    if (d < 3600)  return Math.floor(d / 60) + 'm ago';
+    if (d < 86400) return Math.floor(d / 3600) + 'h ago';
+    return Math.floor(d / 86400) + 'd ago';
+  }
+  function fmtAmt(val) {
+    if (val >= 1e9) return (val/1e9).toFixed(2) + 'B';
+    if (val >= 1e6) return (val/1e6).toFixed(2) + 'M';
+    if (val >= 1e3) return (val/1e3).toFixed(2) + 'K';
+    return val.toFixed(2);
+  }
+  const TOKEN_COLOR  = { shroom: 'var(--red)', spore: 'var(--blue)' };
+  const TOKEN_SYMBOL = { shroom: '$HROOM',     spore: 'SPORE' };
+
+  // ── State
+  let _raw        = [];   // unfiltered batches from API
+  let _filtered   = [];   // after direction filter
+  let _dir        = 'all';
+  let _page       = 1;
+  let _displayPg  = 1;
+
+  // ── Fetch
+  async function loadFeed() {
+    document.getElementById('tx-list').innerHTML = '<div class="tx-loading">Fetching transactions…</div>';
+    try {
+      const res  = await fetch('https://api.mushroomplanet.earth/api/treasury-txs');
+      const data = await res.json();
+      if (!data.ok || !data.batches?.length) { renderMock(); return; }
+      _raw = data.batches;
+      applyAndRender();
+    } catch { renderMock(); }
+  }
+
+  function applyAndRender() {
+    _filtered  = _dir === 'all' ? _raw : _raw.filter(b => {
+      const isOut = (b.transfers[0]?.from || '').toLowerCase() === TREASURY_ADDR;
+      return _dir === 'out' ? isOut : !isOut;
+    });
+    _page = 1; _displayPg = 1;
+    renderPage();
+  }
+
+  // ── Render
+  function renderPage() {
+    const list  = document.getElementById('tx-list');
+    list.innerHTML = '';
+    const start = (_page - 1) * PAGE_SIZE;
+    const slice = _filtered.slice(start, start + PAGE_SIZE);
+
+    if (!slice.length) {
+      list.innerHTML = '<div class="tx-loading">No transactions match this filter.</div>';
+    } else {
+      slice.forEach(b => {
+        const pair = buildBatchPair(b);
+        list.appendChild(pair.row);
+        list.appendChild(pair.panel);
+      });
+    }
+    renderPagination();
+  }
+
+  // ── Build row + expand panel as a pair (both appended to list separately,
+  //    with the gap handled by .tx-list's flex gap — panel has margin-top:-0.5rem
+  //    when open so it visually merges with the row above it)
+  function buildBatchPair(batch) {
+    const isOut  = (batch.transfers[0]?.from || '').toLowerCase() === TREASURY_ADDR;
+    const catCls = CAT_CSS[batch.colorClass] || 'tx-cat-unknown';
+
+    const dirTag = isOut
+      ? `<span style="color:#fd464f;font-size:0.62rem;font-weight:700;font-family:'Syne Mono',monospace;">OUT</span>`
+      : `<span style="color:#7de87d;font-size:0.62rem;font-weight:700;font-family:'Syne Mono',monospace;">IN</span>`;
+
+    const legPills = batch.legs.map(leg => {
+      const c = TOKEN_COLOR[leg.token]  || 'var(--cream)';
+      const s = TOKEN_SYMBOL[leg.token] || leg.token;
+      return `<span style="color:${c};font-family:'Syne Mono',monospace;font-size:0.78rem;white-space:nowrap;">${fmtAmt(leg.total)} ${s}</span>`;
+    }).join('<span style="color:rgba(255,255,225,0.2);margin:0 0.2rem">+</span>');
+
+    const totalTxs  = batch.legs.reduce((s, l) => s + l.txCount, 0);
+    const maxRecips = Math.max(...batch.legs.map(l => l.recipientCount));
+    const shortHash = batch.sampleHash
+      ? batch.sampleHash.slice(0,8) + '…' + batch.sampleHash.slice(-6)
+      : '—';
+
+    // ── Collapsed row ──────────────────────────────────────────────
+    const row = document.createElement('div');
+    row.className = 'tx-row';
+    row.innerHTML = `
+      <span class="tx-cat ${catCls}">${batch.label}</span>
+      <span style="display:flex;flex-direction:column;gap:0.12rem;overflow:hidden;min-width:0;">
+        <span style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+          ${dirTag} ${legPills}
+        </span>
+        <span style="font-family:'Syne Mono',monospace;font-size:0.62rem;color:rgba(255,255,225,0.25);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+          <a href="https://polygonscan.com/tx/${batch.sampleHash}" target="_blank"
+             style="color:rgba(255,255,225,0.25);text-decoration:none;"
+             onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='rgba(255,255,225,0.25)'"
+             onclick="event.stopPropagation()">${shortHash}</a>
+          &nbsp;·&nbsp;${batch.emoji} ${maxRecips} recipients · ${totalTxs} txs
+        </span>
+      </span>
+      <span style="display:flex;flex-direction:column;align-items:flex-end;gap:0.2rem;flex-shrink:0;">
+        <span style="color:rgba(255,255,225,0.3);font-size:0.7rem;white-space:nowrap;">${timeAgo(batch.timestamp)}</span>
+        <span class="caret" style="font-family:'Syne Mono',monospace;font-size:0.58rem;color:rgba(255,255,225,0.2);">▼ details</span>
+      </span>
+    `;
+
+    // ── Expand panel ───────────────────────────────────────────────
+    const panel = document.createElement('div');
+    panel.className = 'tx-expand';
+
+    // Group transfers by token
+    const byToken = {};
+    for (const t of batch.transfers) {
+      if (!byToken[t.token]) byToken[t.token] = [];
+      byToken[t.token].push(t);
+    }
+    for (const [token, txs] of Object.entries(byToken)) {
+      const c = TOKEN_COLOR[token]  || 'var(--cream)';
+      const s = TOKEN_SYMBOL[token] || token;
+      panel.insertAdjacentHTML('beforeend',
+        `<div class="expand-token-header" style="color:${c}">${s} — ${txs.length} transfers</div>`);
+      const grid = document.createElement('div');
+      grid.className = 'expand-grid';
+      txs.forEach((t, i) => {
+        const shortTo = t.to.slice(0,6) + '…' + t.to.slice(-4);
+        const shortTx = t.hash.slice(0,8) + '…' + t.hash.slice(-6);
+        grid.insertAdjacentHTML('beforeend', `
+          <div class="expand-row">
+            <span class="expand-addr">${shortTo}</span>
+            <span class="expand-amt" style="color:${c};">${fmtAmt(t.amount)} ${s}</span>
+            <span class="expand-hash">
+              <a href="https://polygonscan.com/tx/${t.hash}" target="_blank"
+                 onmouseover="this.style.color='${c}'" onmouseout="this.style.color='rgba(255,255,225,0.2)'">${shortTx}</a>
+            </span>
+          </div>`);
+      });
+      panel.appendChild(grid);
+    }
+
+    // ── Toggle ─────────────────────────────────────────────────────
+    let open = false;
+    row.addEventListener('click', () => {
+      open = !open;
+      row.classList.toggle('open', open);
+      panel.classList.toggle('open', open);
+      if (open) panel.style.marginTop = '-0.5rem'; // close gap between row and panel
+      else       panel.style.marginTop = '';
+      const caret = row.querySelector('.caret');
+      if (caret) caret.textContent = open ? '▲ collapse' : '▼ details';
+    });
+
+    return { row, panel };
+  }
+
+  // ── Pagination ─────────────────────────────────────────────────
+  function renderPagination() {
+    let pg = document.getElementById('tx-pagination');
+    if (!pg) {
+      pg = document.createElement('div');
+      pg.id = 'tx-pagination';
+      pg.style.cssText = 'display:flex;justify-content:center;gap:0.75rem;margin-top:1rem;';
+      document.getElementById('tx-list').after(pg);
+    }
+    pg.innerHTML = '';
+    if (_displayPg > 1) {
+      const b = document.createElement('button');
+      b.className = 'tx-tab'; b.textContent = '← Prev';
+      b.onclick = () => { _displayPg--; _page--; renderPage(); };
+      pg.appendChild(b);
+    }
+    const info = document.createElement('span');
+    info.style.cssText = 'font-family:Syne Mono,monospace;font-size:0.7rem;color:rgba(255,255,225,0.3);align-self:center;';
+    info.textContent = 'Page ' + _displayPg;
+    pg.appendChild(info);
+    if (_page * PAGE_SIZE < _filtered.length) {
+      const b = document.createElement('button');
+      b.className = 'tx-tab'; b.textContent = 'Next →';
+      b.onclick = () => { _displayPg++; _page++; renderPage(); };
+      pg.appendChild(b);
+    }
+  }
+
+  // ── Direction tab (called from HTML onclick)
+  window.switchDir = function(dir, btn) {
+    _dir = dir;
+    document.querySelectorAll('.dir-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    applyAndRender();
+  };
+
+  // ── Mock fallback
+  function renderMock() {
+    const now = Math.floor(Date.now() / 1000);
+    _raw = [
+      { type:'lp_rewards',     label:'Weekly LP Rewards',    emoji:'💧', colorClass:'lp',
+        timestamp: now-300,    sampleHash:'0x4f2a1b3cdeadbeef',
+        legs:[{token:'shroom',txCount:35,total:3500000,recipientCount:35},
+              {token:'spore', txCount:35,total:500000000,recipientCount:35}],
+        transfers:[{hash:'0x4f2a1b3cdeadbeef',from:TREASURY_ADDR,to:'0xabc1',token:'shroom',amount:100000,timestamp:now-300}] },
+      { type:'kid_shroom',     label:'Kid Shroom Airdrop',   emoji:'🍄', colorClass:'airdrop',
+        timestamp: now-21600,  sampleHash:'0x9e1b2c3d44fabcde',
+        legs:[{token:'shroom',txCount:340,total:1700000,recipientCount:340},
+              {token:'spore', txCount:340,total:170000000,recipientCount:340}],
+        transfers:[{hash:'0x9e1b2c3d44fabcde',from:TREASURY_ADDR,to:'0xdef1',token:'spore',amount:500000,timestamp:now-21600}] },
+      { type:'onchain_airdrop',label:'Onchain Airdrop',      emoji:'🎁', colorClass:'airdrop',
+        timestamp: now-86400,  sampleHash:'0x2c5d3e4f99e0abcd',
+        legs:[{token:'spore',txCount:200,total:200000000,recipientCount:200}],
+        transfers:[{hash:'0x2c5d3e4f99e0abcd',from:TREASURY_ADDR,to:'0xghi1',token:'spore',amount:1000000,timestamp:now-86400}] },
+      { type:'gold_mooshie',   label:'Gold Mooshie Airdrop', emoji:'🌟', colorClass:'airdrop',
+        timestamp: now-345600, sampleHash:'0x71af4d5ed301efab',
+        legs:[{token:'shroom',txCount:164,total:820000,recipientCount:164},
+              {token:'spore', txCount:164,total:82000000,recipientCount:164}],
+        transfers:[{hash:'0x71af4d5ed301efab',from:TREASURY_ADDR,to:'0xjkl1',token:'shroom',amount:5000,timestamp:now-345600}] },
+    ];
+    const note = document.createElement('div');
+    note.style.cssText = 'font-size:0.7rem;color:rgba(255,255,225,0.25);font-family:Syne Mono,monospace;text-align:center;padding:0.5rem 0 0.75rem;';
+    note.textContent = '⚠ Sample data — update your server route to enable live data';
+    document.getElementById('tx-list').appendChild(note);
+    applyAndRender();
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SCROLL REVEAL
+  // ─────────────────────────────────────────────────────────────────
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('visible');
+      e.target.querySelectorAll('.bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
+      observer.unobserve(e.target);
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(r => observer.observe(r));
+
+  // ─────────────────────────────────────────────────────────────────
+  // INIT
+  // ─────────────────────────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    buildLegend('shroom-legend', shroomSegments);
+    buildLegend('spore-legend',  sporeSegments);
+    buildBars('shroom-bars', shroomBars, 'var(--red)');
+    buildBars('spore-bars',  sporeBars,  'var(--blue)');
+    drawDonut('shroomDonut', shroomSegments);
+    drawDonut('sporeDonut',  sporeSegments);
+    loadFeed();
+  });
   </script>
 
   <!-- Live prices -->
   <script>
-    async function fetchPrices() {
-      try {
-        const [sporeRes, shroomRes] = await Promise.all([
-          fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8'),
-          fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28')
-        ]);
-        const sporeData  = await sporeRes.json();
-        const shroomData = await shroomRes.json();
-        const sporePrice  = parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(9);
-        const shroomPrice = parseFloat(shroomData.data.attributes.base_token_price_usd).toFixed(7);
-        document.getElementById('spore-price').textContent  = '$' + sporePrice;
-        document.getElementById('shroom-price').textContent = '$' + shroomPrice;
-      } catch(e) {
-        document.getElementById('spore-price').textContent  = 'N/A';
-        document.getElementById('shroom-price').textContent = 'N/A';
-      }
+  async function fetchPrices() {
+    try {
+      const [sr, sp] = await Promise.all([
+        fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28'),
+        fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8'),
+      ]);
+      const sd = await sr.json(), pd = await sp.json();
+      document.getElementById('shroom-price').textContent = '$' + parseFloat(sd.data.attributes.base_token_price_usd).toFixed(7);
+      document.getElementById('spore-price').textContent  = '$' + parseFloat(pd.data.attributes.base_token_price_usd).toFixed(9);
+    } catch {
+      document.getElementById('shroom-price').textContent = 'N/A';
+      document.getElementById('spore-price').textContent  = 'N/A';
     }
-    fetchPrices();
+  }
+  fetchPrices();
   </script>
 
 </body>
