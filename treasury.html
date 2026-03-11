@@ -319,6 +319,15 @@
 
   <div class="treasury-section">
 
+    <!-- TREASURY HOLDINGS -->
+    <div class="reveal" style="margin-bottom:3rem;">
+      <div class="section-label">Live Balances</div>
+      <div class="section-title">Treasury Holdings</div>
+      <div id="holdings-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
+        <div class="tx-loading" style="grid-column:1/-1;">Loading balances...</div>
+      </div>
+    </div>
+
     <!-- SHROOM -->
     <div class="reveal">
       <div class="section-label">Token 01</div>
@@ -569,6 +578,7 @@
             <span class="bm-label">${item.emoji} ${item.label}</span>
             <span class="bm-pct">${item.pct}%</span>
           </div>
+          ${item.sub ? `<div style="font-size:0.7rem;color:rgba(255,255,225,0.35);margin-bottom:0.25rem;font-family:'Syne Mono',monospace;">${item.sub}</div>` : ''}
           <div class="bar-track">
             <div class="bar-fill" data-pct="${item.pct}" style="background:${color};"></div>
           </div>
@@ -606,18 +616,18 @@
     { label: 'Contingency',                 pct: 4,  color: '#0d2d4a' },
   ];
   const shroomBars = [
-    { emoji: '🏦', label: 'Treasury (Initial)',    pct: 57 },
-    { emoji: '🎁', label: 'Airdrop',               pct: 38 },
-    { emoji: '💧', label: 'Liquidity Pool',        pct: 5  },
-    { emoji: '📊', label: 'Current Treasury Est.', pct: 50 },
+    { emoji: '🏦', label: 'Treasury — Initial Allocation (57%)',  pct: 57, sub: '3,918,180,000 $HROOM' },
+    { emoji: '📊', label: 'Treasury — Est. Remaining (~44%)',     pct: 44, sub: '~3,000,000,000 $HROOM remaining' },
+    { emoji: '🎁', label: 'Airdrop (38%)',                        pct: 38, sub: 'Distributed to NFT holders' },
+    { emoji: '💧', label: 'Liquidity Pool (5%)',                  pct: 5,  sub: '343,700,000 $HROOM seeded' },
   ];
   const sporeBars = [
-    { emoji: '🧊', label: 'Treasury Holdings',         pct: 50 },
-    { emoji: '🔁', label: 'LP Rewards & Funding',      pct: 18 },
-    { emoji: '🌱', label: 'Sporebot / Reddit Rewards', pct: 10 },
-    { emoji: '🤝', label: 'Events, Collabs, Buybacks', pct: 10 },
-    { emoji: '🎨', label: 'NFT Avatar Rewards',        pct: 8  },
-    { emoji: '🛡',  label: 'Contingency',              pct: 4  },
+    { emoji: '🧊', label: 'Treasury Holdings — Initial (50%)',    pct: 50, sub: '343,700,000,000 SPORE held' },
+    { emoji: '🔁', label: 'LP Rewards & Funding (18%)',           pct: 18, sub: 'Ongoing LP rewards' },
+    { emoji: '🌱', label: 'Sporebot / Reddit Rewards (10%)',      pct: 10, sub: 'In-game farming & Reddit rewards' },
+    { emoji: '🤝', label: 'Events, Collabs, Buybacks (10%)',      pct: 10, sub: 'Community events & buybacks' },
+    { emoji: '🎨', label: 'NFT Avatar Rewards (8%)',              pct: 8,  sub: 'Mooshie holder rewards' },
+    { emoji: '🛡',  label: 'Contingency (4%)',                    pct: 4,  sub: 'Reserve buffer' },
   ];
 
   // ─────────────────────────────────────────────────────────────────
@@ -755,6 +765,55 @@
       if (!byToken[t.token]) byToken[t.token] = [];
       byToken[t.token].push(t);
     }
+    // For swaps, show a summary line: e.g. "Received 15.37M $HROOM for ~0.10 WETH"
+    if (batch.colorClass === 'swap') {
+      const inLegs  = batch.transfers.filter(t => t.to.toLowerCase()   === TREASURY_ADDR.toLowerCase());
+      const outLegs = batch.transfers.filter(t => t.from.toLowerCase() === TREASURY_ADDR.toLowerCase());
+      const fmt = (t) => {
+        const c = TOKEN_COLOR[t.token]  || 'var(--cream)';
+        const s = TOKEN_SYMBOL[t.token] || t.token.toUpperCase();
+        return `<span style="color:${c};font-family:'Syne Mono',monospace;font-weight:700;">${fmtAmt(t.amount)} ${s}</span>`;
+      };
+      const inTotal  = {};
+      const outTotal = {};
+      for (const t of inLegs)  inTotal[t.token]  = (inTotal[t.token]  || 0) + t.amount;
+      for (const t of outLegs) outTotal[t.token] = (outTotal[t.token] || 0) + t.amount;
+
+      const inSummary  = Object.entries(inTotal).map(([tok, amt]) => {
+        const c = TOKEN_COLOR[tok]  || 'var(--cream)';
+        const s = TOKEN_SYMBOL[tok] || tok.toUpperCase();
+        return `<span style="color:${c};font-family:'Syne Mono',monospace;font-weight:700;">${fmtAmt(amt)} ${s}</span>`;
+      });
+      const outSummary = Object.entries(outTotal).map(([tok, amt]) => {
+        const c = TOKEN_COLOR[tok]  || 'var(--cream)';
+        const s = TOKEN_SYMBOL[tok] || tok.toUpperCase();
+        return `<span style="color:${c};font-family:'Syne Mono',monospace;font-weight:700;">${fmtAmt(amt)} ${s}</span>`;
+      });
+
+      // Build a "X for Y" swap summary line
+      const swapLine = [
+        outSummary.length ? `<span style="color:rgba(255,255,225,0.4);font-size:0.72rem;">SPENT</span> ${outSummary.join(' + ')}` : '',
+        inSummary.length  ? `<span style="color:rgba(255,255,225,0.4);font-size:0.72rem;">RECEIVED</span> ${inSummary.join(' + ')}` : '',
+      ].filter(Boolean).join(`<span style="color:rgba(255,255,225,0.5);margin:0 0.6rem;font-size:0.85rem;font-family:'Syne Mono',monospace;">for</span>`);
+
+      panel.insertAdjacentHTML('beforeend',
+        `<div style="font-size:0.85rem;padding:0.6rem 0.5rem 0.75rem;display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,225,0.06);margin-bottom:0.5rem;">
+           ${swapLine}
+         </div>`);
+
+      // Hash link
+      if (batch.sampleHash) {
+        panel.insertAdjacentHTML('beforeend',
+          `<div style="font-family:'Syne Mono',monospace;font-size:0.65rem;color:rgba(255,255,225,0.2);padding:0 0.25rem 0.25rem;">
+             <a href="https://polygonscan.com/tx/${batch.sampleHash}" target="_blank"
+                style="color:rgba(255,255,225,0.2);text-decoration:none;"
+                onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='rgba(255,255,225,0.2)'">
+               View on Polygonscan: ${batch.sampleHash.slice(0,10)}...${batch.sampleHash.slice(-8)}
+             </a>
+           </div>`);
+      }
+      // skip the generic per-token grid for swaps - summary is enough
+    } else {
     for (const [token, txs] of Object.entries(byToken)) {
       const c = TOKEN_COLOR[token]  || 'var(--cream)';
       const s = TOKEN_SYMBOL[token] || token;
@@ -763,8 +822,8 @@
       const grid = document.createElement('div');
       grid.className = 'expand-grid';
       txs.forEach((t, i) => {
-        const shortTo = t.to.slice(0,6) + '…' + t.to.slice(-4);
-        const shortTx = t.hash.slice(0,8) + '…' + t.hash.slice(-6);
+        const shortTo = t.to.slice(0,6) + '...' + t.to.slice(-4);
+        const shortTx = t.hash.slice(0,8) + '...' + t.hash.slice(-6);
         grid.insertAdjacentHTML('beforeend', `
           <div class="expand-row">
             <span class="expand-addr">${shortTo}</span>
@@ -777,6 +836,7 @@
       });
       panel.appendChild(grid);
     }
+    } // end non-swap else
 
     // ── Toggle ─────────────────────────────────────────────────────
     let open = false;
@@ -904,6 +964,64 @@
     }
   }
   fetchPrices();
+
+  </script>
+
+<!-- Treasury Holdings -->
+  <script>
+  const HOLDINGS_TOKENS = [
+    { symbol: '$HROOM', contract: '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1', color: 'var(--red)',  decimals: 18 },
+    { symbol: 'SPORE',  contract: '0x089582AC20ea563c69408a79E1061de594b61bED', color: 'var(--blue)', decimals: 18 },
+    { symbol: 'WETH',   contract: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', color: '#9b8cff',     decimals: 18 },
+    { symbol: 'POL',    contract: null,                                           color: '#8247e5',     decimals: 18 },
+    { symbol: 'WBTC',   contract: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6', color: '#f7931a',     decimals: 8  },
+  ];
+  const TREAS = '0x5873002348cd4df2abd2624a6fc30e90573019f5';
+  const POLY_RPC = 'https://rpc.ankr.com/polygon';
+
+  async function fetchTokenBalance(contract, decimals) {
+    const data = '0x70a08231' + TREAS.slice(2).padStart(64, '0');
+    const body = JSON.stringify({ jsonrpc:'2.0', method:'eth_call', params:[{ to: contract, data }, 'latest'], id: 1 });
+    const r = await fetch(POLY_RPC, { method:'POST', headers:{'Content-Type':'application/json'}, body });
+    const j = await r.json();
+    return parseInt(j.result, 16) / Math.pow(10, decimals);
+  }
+  async function fetchPolBalance() {
+    const body = JSON.stringify({ jsonrpc:'2.0', method:'eth_getBalance', params:[TREAS, 'latest'], id: 1 });
+    const r = await fetch(POLY_RPC, { method:'POST', headers:{'Content-Type':'application/json'}, body });
+    const j = await r.json();
+    return parseInt(j.result, 16) / 1e18;
+  }
+  function fmtBal(val, sym) {
+    if (sym === 'WBTC') return val.toFixed(4) + ' ' + sym;
+    if (val >= 1e9) return (val/1e9).toFixed(2) + 'B ' + sym;
+    if (val >= 1e6) return (val/1e6).toFixed(2) + 'M ' + sym;
+    if (val >= 1e3) return (val/1e3).toFixed(2) + 'K ' + sym;
+    return val.toFixed(2) + ' ' + sym;
+  }
+  const HOLDINGS_COLORS = { '$HROOM': 'var(--red)', 'SPORE': 'var(--blue)', 'WETH': '#9b8cff', 'WBTC': '#f7931a', 'POL': '#8247e5' };
+
+  async function loadHoldings() {
+    const grid = document.getElementById('holdings-grid');
+    try {
+      const res  = await fetch('https://api.mushroomplanet.earth/api/treasury-holdings');
+      const data = await res.json();
+      if (!data.ok) throw new Error('bad response');
+      grid.innerHTML = '';
+      data.balances.forEach(t => {
+        const color   = HOLDINGS_COLORS[t.symbol] || 'var(--cream)';
+        const display = fmtBal(t.balance, t.symbol);
+        grid.insertAdjacentHTML('beforeend', `
+          <div class="stats-panel" style="padding:1.25rem;min-width:0;">
+            <div class="stat-key">${t.symbol}</div>
+            <div class="stat-val" style="color:${color};font-size:1.1rem;">${display}</div>
+          </div>`);
+      });
+    } catch {
+      grid.innerHTML = '<div class="tx-loading">Failed to load balances.</div>';
+    }
+  }
+  loadHoldings();
   </script>
 
 </body>

@@ -207,22 +207,55 @@ app.get('/api/leaderboard', async (req, res) => {
 });
 
 // ----------------------------------------------------------------
+// GET /api/treasury-holdings
+// ----------------------------------------------------------------
+const TREASURY_HOLDINGS_ADDR = '0x5873002348cd4DF2aBD2624a6FC30E90573019F5';
+const HOLDINGS_TOKENS_LIST = [
+  { symbol: '$HROOM', contract: '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1', decimals: 18 },
+  { symbol: 'SPORE',  contract: '0x089582AC20ea563c69408a79E1061de594b61bED', decimals: 18 },
+  { symbol: 'WETH',   contract: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', decimals: 18 },
+  { symbol: 'WBTC',   contract: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6', decimals: 8  },
+];
+
+app.get('/api/treasury-holdings', async (req, res) => {
+  try {
+    const rpcUrl = process.env.ALCHEMY_POLYGON_URL;
+    const balanceData = '0x70a08231' + TREASURY_HOLDINGS_ADDR.slice(2).padStart(64, '0');
+
+    const tokenResults = await Promise.all(HOLDINGS_TOKENS_LIST.map(async t => {
+      const body = JSON.stringify({
+        jsonrpc: '2.0', method: 'eth_call',
+        params: [{ to: t.contract, data: balanceData }, 'latest'], id: 1,
+      });
+      const r = await fetch(rpcUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+      const j = await r.json();
+      const raw = parseInt(j.result, 16);
+      return { symbol: t.symbol, balance: raw / Math.pow(10, t.decimals) };
+    }));
+
+    // Native POL balance
+    const polBody = JSON.stringify({
+      jsonrpc: '2.0', method: 'eth_getBalance',
+      params: [TREASURY_HOLDINGS_ADDR, 'latest'], id: 1,
+    });
+    const polR = await fetch(rpcUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: polBody });
+    const polJ = await polR.json();
+    const polBal = parseInt(polJ.result, 16) / 1e18;
+
+    res.json({ ok: true, balances: [...tokenResults, { symbol: 'POL', balance: polBal }] });
+  } catch (err) {
+    console.error('[TREASURY-HOLDINGS] Error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to fetch holdings' });
+  }
+});
+
+// ----------------------------------------------------------------
 // GET /api/treasury-txs
 // ----------------------------------------------------------------
-// Strategy:
-//   1. Group each token's rows by block into single-token blocks
-//   2. For airdrop-sized blocks (50+ txs), pair SHROOM + SPORE blocks
-//      using recipient overlap (>=50%) and timestamp within 30 min,
-//      because Gnosis Safe sometimes sends each token in a separate block
-//   3. Classify by per-recipient amounts:
-//        Kid Shroom:   ~20,000 SHROOM + ~1,500,000 SPORE per NFT
-//        Gold Mooshie: ~15,000 SHROOM + ~2,000,000 SPORE per NFT
-//        Weekly LP:    ~3.5M SHROOM total + ~500M SPORE total, ~35 recipients
-//        Onchain Airdrop: SPORE only, ~200M total
-//   4. Incoming txs (treasury is the recipient) => Swap
 
 const SHROOM_CONTRACT = '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1';
 const SPORE_CONTRACT  = '0x089582AC20ea563c69408a79E1061de594b61bED';
+const WETH_CONTRACT   = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619';
 const TREASURY_ADDR   = '0x5873002348cd4DF2aBD2624a6FC30E90573019F5';
 
 function inRange(value, target, tolerance) {
@@ -263,16 +296,34 @@ function classifyEvent(legs, isIncoming) {
   if (s && p) {
     const shroomPer = s.total / s.recipientCount;
     const sporePer  = p.total / p.recipientCount;
-    // Kid Shroom: ~20k SHROOM + ~1.5M SPORE per NFT
+    // Kid Shroom: ~29k SHROOM + ~4.5M SPORE per NFT
+    if (inRange(shroomPer, 29_000, 0.45) && inRange(sporePer, 4_500_000, 0.45)) {
+      return { type: 'kid_shroom', label: 'Kid Shroom Airdrop', emoji: '🍄', colorClass: 'airdrop' };
+    }
     if (inRange(shroomPer, 20_000, 0.40) && inRange(sporePer, 1_500_000, 0.40)) {
       return { type: 'kid_shroom', label: 'Kid Shroom Airdrop', emoji: '🍄', colorClass: 'airdrop' };
     }
-    // Gold Mooshie: ~15k SHROOM + ~2M SPORE per NFT
+    // Gold Mooshie: ~28k SHROOM + ~3.8M SPORE per NFT (4.65M/163 + 620M/163)
+    if (inRange(shroomPer, 28_000, 0.40) && inRange(sporePer, 3_800_000, 0.40)) {
+      return { type: 'gold_mooshie', label: 'Gold Mooshie Airdrop', emoji: '🌟', colorClass: 'airdrop' };
+    }
+    // Gold Mooshie fallback: ~15k SHROOM + ~2M SPORE
     if (inRange(shroomPer, 15_000, 0.40) && inRange(sporePer, 2_000_000, 0.40)) {
       return { type: 'gold_mooshie', label: 'Gold Mooshie Airdrop', emoji: '🌟', colorClass: 'airdrop' };
     }
-    if (s.txCount >= 50 || p.txCount >= 50) {
-      return { type: 'airdrop', label: 'Airdrop', emoji: '🎁', colorClass: 'airdrop' };
+  }
+
+  // Single-token Gold Mooshie half (only SHROOM or only SPORE leg)
+  if (s && !p) {
+    const shroomPer = s.total / s.recipientCount;
+    if (inRange(shroomPer, 28_000, 0.45) || inRange(shroomPer, 15_000, 0.45)) {
+      return { type: 'gold_mooshie', label: 'Gold Mooshie Airdrop', emoji: '🌟', colorClass: 'airdrop' };
+    }
+  }
+  if (p && !s) {
+    const sporePer = p.total / p.recipientCount;
+    if (inRange(sporePer, 3_800_000, 0.45) || inRange(sporePer, 2_000_000, 0.45)) {
+      return { type: 'gold_mooshie', label: 'Gold Mooshie Airdrop', emoji: '🌟', colorClass: 'airdrop' };
     }
   }
 
@@ -297,9 +348,10 @@ async function fetchTokenTxs(contractAddress) {
   return data.result;
 }
 
-function groupIntoBatches(shroomRows, sporeRows) {
+function groupIntoBatches(shroomRows, sporeRows, wethRows = []) {
   const shroomByBlock = {};
   const sporeByBlock  = {};
+  const wethByBlock   = {};
 
   for (const r of shroomRows) {
     if (!shroomByBlock[r.blockNumber]) shroomByBlock[r.blockNumber] = [];
@@ -308,6 +360,10 @@ function groupIntoBatches(shroomRows, sporeRows) {
   for (const r of sporeRows) {
     if (!sporeByBlock[r.blockNumber]) sporeByBlock[r.blockNumber] = [];
     sporeByBlock[r.blockNumber].push(r);
+  }
+  for (const r of wethRows) {
+    if (!wethByBlock[r.blockNumber]) wethByBlock[r.blockNumber] = [];
+    wethByBlock[r.blockNumber].push(r);
   }
 
   function summariseBlock(rows, token) {
@@ -373,9 +429,82 @@ function groupIntoBatches(shroomRows, sporeRows) {
   }
 
   // Remaining unpaired blocks become individual events
+  // Second pass: pair large single-token OUT blocks by recipient overlap + time
+  // (catches Gold Mooshie where SHROOM and SPORE land in different blocks)
+  const shroomSingles = shroomBlocks.filter(b => !usedShroomBlocks.has(b.blockNumber) && b.isOut && b.txCount >= 20);
+  const sporeSingles  = sporeBlocks.filter(b  => !usedSporeBlocks.has(b.blockNumber)  && b.isOut && b.txCount >= 20);
+  for (const sb of shroomSingles) {
+    let bestMatch = null, bestOverlap = 0;
+    for (const pb of sporeSingles) {
+      if (usedSporeBlocks.has(pb.blockNumber)) continue;
+      if (Math.abs(sb.timestamp - pb.timestamp) > 6 * 60 * 60) continue; // 6h window for cross-block
+      const overlap = recipientOverlap(sb.recipients, pb.recipients);
+      if (overlap >= 0.30 && overlap > bestOverlap) { // lower threshold for separate blocks
+        bestOverlap = overlap;
+        bestMatch   = pb;
+      }
+    }
+    if (bestMatch) {
+      usedShroomBlocks.add(sb.blockNumber);
+      usedSporeBlocks.add(bestMatch.blockNumber);
+      const legs = [
+        { token: 'shroom', txCount: sb.txCount,        total: sb.total,        recipientCount: sb.recipientCount },
+        { token: 'spore',  txCount: bestMatch.txCount, total: bestMatch.total, recipientCount: bestMatch.recipientCount },
+      ];
+      const cls = classifyEvent(legs, false);
+      events.push({
+        ...cls,
+        timestamp:  Math.max(sb.timestamp, bestMatch.timestamp),
+        sampleHash: sb.sampleHash,
+        legs,
+        transfers: [
+          ...sb.rows.map(r => ({ hash: r.hash, from: r.from, to: r.to, token: 'shroom', amount: parseFloat(r.value)/1e18, timestamp: parseInt(r.timeStamp) })),
+          ...bestMatch.rows.map(r => ({ hash: r.hash, from: r.from, to: r.to, token: 'spore', amount: parseFloat(r.value)/1e18, timestamp: parseInt(r.timeStamp) })),
+        ],
+      });
+    }
+  }
+
+  // Detect swaps by grouping all rows by tx hash — same hash + 2 tokens = swap
+  const allRows = [
+    ...shroomRows.map(r => ({ ...r, token: 'shroom' })),
+    ...sporeRows.map(r  => ({ ...r, token: 'spore'  })),
+    ...wethRows.map(r   => ({ ...r, token: 'weth'   })),
+  ];
+  const byHash = {};
+  for (const r of allRows) {
+    if (!byHash[r.hash]) byHash[r.hash] = [];
+    byHash[r.hash].push(r);
+  }
+  const swapUsedBlocks = new Set();
+  for (const [hash, rows] of Object.entries(byHash)) {
+    const tokens = new Set(rows.map(r => r.token));
+    if (tokens.size < 2) continue;
+    const transfers = rows.map(r => ({
+      hash: r.hash, from: r.from, to: r.to, token: r.token,
+      amount: parseFloat(r.value) / 1e18, timestamp: parseInt(r.timeStamp),
+    }));
+    const legMap = {};
+    for (const r of rows) {
+      if (!legMap[r.token]) legMap[r.token] = { token: r.token, txCount: 0, total: 0, recipients: new Set() };
+      legMap[r.token].txCount++;
+      legMap[r.token].total += parseFloat(r.value) / 1e18;
+      legMap[r.token].recipients.add(r.to.toLowerCase());
+    }
+    const legs = Object.values(legMap).map(l => ({ token: l.token, txCount: l.txCount, total: l.total, recipientCount: l.recipients.size }));
+    events.push({
+      type: 'swap', label: 'Swap', emoji: '🔄', colorClass: 'swap',
+      timestamp: Math.max(...rows.map(r => parseInt(r.timeStamp))),
+      sampleHash: hash, legs, transfers,
+    });
+    for (const r of rows) swapUsedBlocks.add(r.blockNumber);
+  }
+  const wethBlocks = Object.entries(wethByBlock).map(([, rows]) => summariseBlock(rows, 'weth'));
+
   const remaining = [
-    ...shroomBlocks.filter(b => !usedShroomBlocks.has(b.blockNumber)),
-    ...sporeBlocks.filter(b  => !usedSporeBlocks.has(b.blockNumber)),
+    ...shroomBlocks.filter(b => !usedShroomBlocks.has(b.blockNumber) && !swapUsedBlocks.has(b.blockNumber)),
+    ...sporeBlocks.filter(b  => !usedSporeBlocks.has(b.blockNumber)  && !swapUsedBlocks.has(b.blockNumber)),
+    ...wethBlocks.filter(b   => !swapUsedBlocks.has(b.blockNumber)),
   ];
 
   for (const blk of remaining) {
@@ -403,11 +532,12 @@ function groupIntoBatches(shroomRows, sporeRows) {
 
 app.get('/api/treasury-txs', async (req, res) => {
   try {
-    const [shroomRows, sporeRows] = await Promise.all([
+    const [shroomRows, sporeRows, wethRows] = await Promise.all([
       fetchTokenTxs(SHROOM_CONTRACT),
       fetchTokenTxs(SPORE_CONTRACT),
+      fetchTokenTxs(WETH_CONTRACT),
     ]);
-    const batches = groupIntoBatches(shroomRows, sporeRows);
+    const batches = groupIntoBatches(shroomRows, sporeRows, wethRows);
     res.json({ ok: true, batches });
   } catch (err) {
     console.error('[TREASURY-TXS] Error:', err);
