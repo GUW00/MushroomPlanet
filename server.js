@@ -210,6 +210,9 @@ app.get('/api/leaderboard', async (req, res) => {
 // GET /api/treasury-holdings
 // ----------------------------------------------------------------
 const TREASURY_HOLDINGS_ADDR = '0x5873002348cd4DF2aBD2624a6FC30E90573019F5';
+const SPOREBOT_WALLET_ADDR   = '0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A';
+const LP_POOL_WETH_SHROOM    = '0x28def03d8dc0d186fabae9c46043e8ef9bffcc28';
+const LP_POOL_SPR_SHROOM     = '0xc373382eec590374278534494109a0cdae1fbbc8';
 const HOLDINGS_TOKENS_LIST = [
   { symbol: '$HROOM', contract: '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1', decimals: 18 },
   { symbol: 'SPORE',  contract: '0x089582AC20ea563c69408a79E1061de594b61bED', decimals: 18 },
@@ -219,7 +222,7 @@ const HOLDINGS_TOKENS_LIST = [
 
 app.get('/api/treasury-holdings', async (req, res) => {
   try {
-    const rpcUrl = process.env.ALCHEMY_POLYGON_URL;
+    const rpcUrl = 'https://rpc.ankr.com/polygon';
     const balanceData = '0x70a08231' + TREASURY_HOLDINGS_ADDR.slice(2).padStart(64, '0');
 
     const tokenResults = await Promise.all(HOLDINGS_TOKENS_LIST.map(async t => {
@@ -246,6 +249,93 @@ app.get('/api/treasury-holdings', async (req, res) => {
   } catch (err) {
     console.error('[TREASURY-HOLDINGS] Error:', err);
     res.status(500).json({ ok: false, error: 'Failed to fetch holdings' });
+  }
+});
+
+// ----------------------------------------------------------------
+// GET /api/lp-holdings
+// ----------------------------------------------------------------
+const LP_ERC20_ABI_FRAG = [
+  { name: 'getReserves', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ name: 'reserve0', type: 'uint112' }, { name: 'reserve1', type: 'uint112' }, { name: 'blockTimestampLast', type: 'uint32' }] },
+  { name: 'token0', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'address' }] },
+  { name: 'token1', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'address' }] },
+  { name: 'totalSupply', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'uint256' }] },
+  { name: 'balanceOf', type: 'function', stateMutability: 'view', inputs: [{ name: 'owner', type: 'address' }], outputs: [{ name: '', type: 'uint256' }] },
+];
+
+const LP_TOKEN_DECIMALS = {
+  '0x924b16dfb993eedecc91c6d08b831e94135deae1': { symbol: 'SHROOM', decimals: 18 },
+  '0x089582ac20ea563c69408a79e1061de594b61bed': { symbol: 'SPORE',  decimals: 18 },
+  '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619': { symbol: 'WETH',   decimals: 18 },
+};
+
+async function getRpcCall(rpcUrl, method, params) {
+  const r = await fetch(rpcUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jsonrpc: '2.0', method, params, id: 1 }),
+  });
+  const j = await r.json();
+  return j.result;
+}
+
+async function getLPInfo(rpcUrl, poolAddr, holderAddr) {
+  const encode32 = (addr) => addr.replace('0x', '').toLowerCase().padStart(64, '0');
+
+  // token0, token1, totalSupply, reserves, holder balance — parallel
+  const [t0res, t1res, tsRes, rvRes, balRes] = await Promise.all([
+    getRpcCall(rpcUrl, 'eth_call', [{ to: poolAddr, data: '0x0dfe1681' }, 'latest']), // token0
+    getRpcCall(rpcUrl, 'eth_call', [{ to: poolAddr, data: '0xd21220a7' }, 'latest']), // token1
+    getRpcCall(rpcUrl, 'eth_call', [{ to: poolAddr, data: '0x18160ddd' }, 'latest']), // totalSupply
+    getRpcCall(rpcUrl, 'eth_call', [{ to: poolAddr, data: '0x0902f1ac' }, 'latest']), // getReserves
+    getRpcCall(rpcUrl, 'eth_call', [{ to: poolAddr, data: '0x70a08231' + encode32(holderAddr) }, 'latest']), // balanceOf
+  ]);
+
+  const token0 = '0x' + t0res.slice(26).toLowerCase();
+  const token1 = '0x' + t1res.slice(26).toLowerCase();
+  const totalSupply = BigInt(tsRes);
+  const holderBal   = BigInt(balRes);
+
+  // getReserves returns packed: reserve0 (112bit), reserve1 (112bit), timestamp (32bit)
+  const reserveHex = rvRes.slice(2);
+  const reserve0 = BigInt('0x' + reserveHex.slice(0, 64));
+  const reserve1 = BigInt('0x' + reserveHex.slice(64, 128));
+
+  if (totalSupply === 0n) return null;
+  const share = Number(holderBal) / Number(totalSupply);
+
+  const meta0 = LP_TOKEN_DECIMALS[token0] || { symbol: token0.slice(0,8), decimals: 18 };
+  const meta1 = LP_TOKEN_DECIMALS[token1] || { symbol: token1.slice(0,8), decimals: 18 };
+
+  return {
+    pool: poolAddr,
+    share: share,
+    lpBalance: Number(holderBal) / 1e18,
+    token0: { symbol: meta0.symbol, balance: Number(reserve0) / Math.pow(10, meta0.decimals) * share },
+    token1: { symbol: meta1.symbol, balance: Number(reserve1) / Math.pow(10, meta1.decimals) * share },
+  };
+}
+
+app.get('/api/lp-holdings', async (req, res) => {
+  const rpcUrl = 'https://rpc.ankr.com/polygon';
+  try {
+    const [wethShroom, sprShroom, sporebotBal] = await Promise.all([
+      getLPInfo(rpcUrl, LP_POOL_WETH_SHROOM, TREASURY_HOLDINGS_ADDR),
+      getLPInfo(rpcUrl, LP_POOL_SPR_SHROOM,  TREASURY_HOLDINGS_ADDR),
+      getRpcCall(rpcUrl, 'eth_call', [{
+        to: '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1',
+        data: '0x70a08231' + SPOREBOT_WALLET_ADDR.replace('0x','').toLowerCase().padStart(64,'0'),
+      }, 'latest']),
+    ]);
+    res.json({
+      ok: true,
+      lp_weth_shroom: wethShroom,
+      lp_spr_shroom: sprShroom,
+      sporebot_shroom: parseInt(sporebotBal, 16) / 1e18,
+    });
+  } catch (err) {
+    console.error('[LP-HOLDINGS] Error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to fetch LP holdings' });
   }
 });
 
@@ -277,18 +367,15 @@ function classifyEvent(legs, isIncoming) {
   const s = legs.find(l => l.token === 'shroom');
   const p = legs.find(l => l.token === 'spore');
 
-  // Weekly LP Rewards: both tokens, ~35 txs each, ~3.5M SHROOM + ~500M SPORE
+  // Weekly LP Rewards: always exactly 3,500,000 SHROOM + 500,000,000 SPORE
   if (s && p &&
-      s.txCount >= 20 && s.txCount <= 60 &&
-      p.txCount >= 20 && p.txCount <= 60 &&
-      inRange(s.total, 3_500_000,   0.35) &&
-      inRange(p.total, 500_000_000, 0.35)) {
+      inRange(s.total, 3_500_000,   0.01) &&
+      inRange(p.total, 500_000_000, 0.01)) {
     return { type: 'lp_rewards', label: 'Weekly LP Rewards', emoji: '💧', colorClass: 'lp' };
   }
 
-  // Onchain Airdrop: SPORE only, 100-350 txs, ~200M total
-  if (p && !s && p.txCount >= 100 && p.txCount <= 350 &&
-      inRange(p.total, 200_000_000, 0.60)) {
+  // Onchain Airdrop: SPORE only, ~200M total (relaxed tx count)
+  if (p && !s && inRange(p.total, 200_000_000, 0.01)) {
     return { type: 'onchain_airdrop', label: 'Onchain Airdrop', emoji: '🎁', colorClass: 'airdrop' };
   }
 
@@ -296,20 +383,17 @@ function classifyEvent(legs, isIncoming) {
   if (s && p) {
     const shroomPer = s.total / s.recipientCount;
     const sporePer  = p.total / p.recipientCount;
-    // Kid Shroom: ~29k SHROOM + ~4.5M SPORE per NFT
-    if (inRange(shroomPer, 29_000, 0.45) && inRange(sporePer, 4_500_000, 0.45)) {
+    // Gold Mooshie: ~28,500 SHROOM + ~3,800,000 SPORE per NFT (163 holders)
+    if (inRange(shroomPer, 28_500, 0.30) && inRange(sporePer, 3_800_000, 0.30)) {
+      return { type: 'gold_mooshie', label: 'Gold Mooshie Airdrop', emoji: '🌟', colorClass: 'airdrop' };
+    }
+    // Kid Shroom: ~29,300 SHROOM + ~2,200,000 SPORE per NFT (337 holders)
+    if (inRange(shroomPer, 29_300, 0.30) && inRange(sporePer, 2_200_000, 0.30)) {
       return { type: 'kid_shroom', label: 'Kid Shroom Airdrop', emoji: '🍄', colorClass: 'airdrop' };
     }
+    // Kid Shroom legacy: ~20k SHROOM + ~1.5M SPORE
     if (inRange(shroomPer, 20_000, 0.40) && inRange(sporePer, 1_500_000, 0.40)) {
       return { type: 'kid_shroom', label: 'Kid Shroom Airdrop', emoji: '🍄', colorClass: 'airdrop' };
-    }
-    // Gold Mooshie: ~28k SHROOM + ~3.8M SPORE per NFT (4.65M/163 + 620M/163)
-    if (inRange(shroomPer, 28_000, 0.40) && inRange(sporePer, 3_800_000, 0.40)) {
-      return { type: 'gold_mooshie', label: 'Gold Mooshie Airdrop', emoji: '🌟', colorClass: 'airdrop' };
-    }
-    // Gold Mooshie fallback: ~15k SHROOM + ~2M SPORE
-    if (inRange(shroomPer, 15_000, 0.40) && inRange(sporePer, 2_000_000, 0.40)) {
-      return { type: 'gold_mooshie', label: 'Gold Mooshie Airdrop', emoji: '🌟', colorClass: 'airdrop' };
     }
   }
 
@@ -437,7 +521,7 @@ function groupIntoBatches(shroomRows, sporeRows, wethRows = []) {
     let bestMatch = null, bestOverlap = 0;
     for (const pb of sporeSingles) {
       if (usedSporeBlocks.has(pb.blockNumber)) continue;
-      if (Math.abs(sb.timestamp - pb.timestamp) > 6 * 60 * 60) continue; // 6h window for cross-block
+      if (Math.abs(sb.timestamp - pb.timestamp) > 24 * 60 * 60) continue; // 24h window for cross-block
       const overlap = recipientOverlap(sb.recipients, pb.recipients);
       if (overlap >= 0.30 && overlap > bestOverlap) { // lower threshold for separate blocks
         bestOverlap = overlap;
@@ -480,6 +564,11 @@ function groupIntoBatches(shroomRows, sporeRows, wethRows = []) {
   for (const [hash, rows] of Object.entries(byHash)) {
     const tokens = new Set(rows.map(r => r.token));
     if (tokens.size < 2) continue;
+    // Skip if any row belongs to an already-classified airdrop block
+    const alreadyUsed = rows.some(r =>
+      usedShroomBlocks.has(r.blockNumber) || usedSporeBlocks.has(r.blockNumber)
+    );
+    if (alreadyUsed) continue;
     const transfers = rows.map(r => ({
       hash: r.hash, from: r.from, to: r.to, token: r.token,
       amount: parseFloat(r.value) / 1e18, timestamp: parseInt(r.timeStamp),

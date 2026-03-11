@@ -319,121 +319,132 @@
 
   <div class="treasury-section">
 
-    <!-- TREASURY HOLDINGS -->
+    <!-- CURRENT TREASURY LIVE -->
     <div class="reveal" style="margin-bottom:3rem;">
-      <div class="section-label">Live Balances</div>
-      <div class="section-title">Treasury Holdings</div>
-      <div id="holdings-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
-        <div class="tx-loading" style="grid-column:1/-1;">Loading balances...</div>
+      <div class="section-label">Current Treasury (LIVE)</div>
+      <div class="section-title">Live Treasury Balances</div>
+
+      <div style="margin-bottom:1rem;">
+        <div style="font-family:'Syne Mono',monospace;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.5rem;">Shroom Treasury Wallet</div>
+        <div id="holdings-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
+          <div class="tx-loading" style="grid-column:1/-1;">Loading balances...</div>
+        </div>
+      </div>
+
+      <div style="margin-top:2rem;margin-bottom:1rem;">
+        <div style="font-family:'Syne Mono',monospace;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.5rem;">Liquidity Pools (Treasury Share)</div>
+        <div id="lp-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;">
+          <div class="tx-loading" style="grid-column:1/-1;">Loading LP data...</div>
+        </div>
+      </div>
+
+      <div style="margin-top:2rem;">
+        <div style="font-family:'Syne Mono',monospace;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.5rem;">Sporebot Wallet</div>
+        <div id="sporebot-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
+          <div class="tx-loading" style="grid-column:1/-1;">Loading...</div>
+        </div>
       </div>
     </div>
 
-    <!-- SHROOM -->
+    <!-- SHROOM + SPORE COMBINED -->
     <div class="reveal">
-      <div class="section-label">Token 01</div>
-      <div class="section-title">
-        <img src="/images/shroom.png" alt="SHROOM" />
-        SHROOM ($HROOM) Treasury
-      </div>
+      <div class="section-label">Token Allocation</div>
+      <div class="section-title">Treasury Overview</div>
     </div>
-    <div class="token-block reveal">
-      <div class="chart-card">
-        <div class="donut-wrap">
-          <canvas id="shroomDonut" width="220" height="220"></canvas>
-          <div class="donut-center">
-            <div class="pct" style="color:var(--red)">~44%</div>
-            <div class="lbl">Treasury<br>Remaining</div>
-          </div>
-        </div>
-        <div class="legend" id="shroom-legend"></div>
-      </div>
+
+    <!-- Two-column token stats -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;" class="reveal">
+
+      <!-- SHROOM left -->
       <div class="stats-panel">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem;">
+          <img src="/images/shroom.png" alt="SHROOM" style="height:1.4rem;width:1.4rem;" />
+          <span style="font-weight:700;font-size:1rem;">$HROOM</span>
+          <a href="https://polygonscan.com/address/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" style="font-family:'Syne Mono',monospace;font-size:0.62rem;color:rgba(255,255,225,0.25);text-decoration:none;margin-left:auto;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='rgba(255,255,225,0.25)'">Polygonscan</a>
+        </div>
         <div class="stat-row">
           <div class="stat-key">Total Supply</div>
-          <div class="stat-val shroom">6,874,000,000</div>
+          <div class="stat-val shroom" style="font-size:1.2rem;">6,874,000,000</div>
           <div class="stat-sub">$HROOM on Polygon</div>
         </div>
         <div class="stat-row">
-          <div class="stat-key">Initial Treasury Allocation</div>
-          <div class="stat-val shroom">57%</div>
-          <div class="stat-sub">3,918,180,000 $HROOM</div>
+          <div class="stat-key">Initial Treasury (57%)</div>
+          <div class="stat-val shroom" style="font-size:1.1rem;">3,918,180,000</div>
+          <div class="stat-sub">Held at launch</div>
         </div>
         <div class="stat-row">
-          <div class="stat-key">Current Treasury (Est.)</div>
-          <div class="stat-val shroom">~44%</div>
-          <div class="stat-sub">~3,000,000,000 $HROOM remaining</div>
+          <div class="stat-key">Initial Airdrop (38%)</div>
+          <div class="stat-val shroom" style="font-size:1.1rem;">2,612,120,000</div>
+          <div class="stat-sub">T1: 1,436,666,000 · T2: 261,212,000 · T3: 914,242,000</div>
         </div>
         <div class="stat-row">
-          <div class="stat-key">Liquidity Pool</div>
-          <div class="stat-val shroom">5%</div>
-          <div class="stat-sub">343,700,000 $HROOM seeded to WETH pool</div>
+          <div class="stat-key">Initial LP (5%)</div>
+          <div class="stat-val shroom" style="font-size:1.1rem;">343,700,000</div>
+          <div class="stat-sub">Seeded to WETH/$HROOM pool</div>
         </div>
         <div class="stat-row">
-          <div class="stat-key">Contract</div>
-          <div class="stat-val" style="font-size:0.8rem;">
-            <a href="https://polygonscan.com/address/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" style="color:var(--red)">View on Polygonscan</a>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="bar-section reveal">
-      <div class="bar-chart-title"><span style="color:var(--red)">$HROOM</span> — Allocation Breakdown</div>
-      <div class="bar-group" id="shroom-bars"></div>
-    </div>
-
-    <div class="glow-divider"></div>
-
-    <!-- SPORE -->
-    <div class="reveal">
-      <div class="section-label">Token 02</div>
-      <div class="section-title">
-        <img src="/images/spore.png" alt="SPORE" style="border-radius:50%;border:2px solid var(--red);padding:2px;" />
-        SPORE (SPR) Treasury
-      </div>
-    </div>
-    <div class="token-block reveal">
-      <div class="chart-card">
-        <div class="donut-wrap">
-          <canvas id="sporeDonut" width="220" height="220"></canvas>
-          <div class="donut-center">
-            <div class="pct" style="color:var(--blue)">50%</div>
-            <div class="lbl">Treasury<br>Holdings</div>
-          </div>
-        </div>
-        <div class="legend" id="spore-legend"></div>
-      </div>
-      <div class="stats-panel">
-        <div class="stat-row">
-          <div class="stat-key">Total Supply</div>
-          <div class="stat-val spore">687,400,000,000</div>
-          <div class="stat-sub">SPORE (SPR) on Polygon</div>
-        </div>
-        <div class="stat-row">
-          <div class="stat-key">Treasury Holdings</div>
-          <div class="stat-val spore">50%</div>
-          <div class="stat-sub">343,700,000,000 SPORE held</div>
-        </div>
-        <div class="stat-row">
-          <div class="stat-key">Farming Planted</div>
-          <div class="stat-val spore">470M+</div>
-          <div class="stat-sub">Active farms across ~100 users</div>
+          <div class="stat-key">Current Treasury (allocated)</div>
+          <div class="stat-val shroom" id="live-shroom-treasury" style="font-size:1.1rem;">3,061,991,043</div>
+          <div class="stat-sub">100% planned across 9 categories</div>
         </div>
         <div class="stat-row">
           <div class="stat-key">Launched</div>
-          <div class="stat-val" style="font-size:1.1rem;">Jan 12, 2025</div>
-          <div class="stat-sub">Governance token for Mushroom Planet</div>
+          <div class="stat-val" style="font-size:1rem;">May 7th, 2024</div>
+          <div class="stat-sub">Governance token · 18 decimals · Polygon</div>
+        </div>
+      </div>
+
+      <!-- SPORE right -->
+      <div class="stats-panel">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem;">
+          <img src="/images/spore.png" alt="SPORE" style="height:1.4rem;width:1.4rem;border-radius:50%;border:2px solid var(--blue);padding:1px;" />
+          <span style="font-weight:700;font-size:1rem;color:var(--blue);">SPORE</span>
+          <a href="https://polygonscan.com/address/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" style="font-family:'Syne Mono',monospace;font-size:0.62rem;color:rgba(255,255,225,0.25);text-decoration:none;margin-left:auto;" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='rgba(255,255,225,0.25)'">Polygonscan</a>
         </div>
         <div class="stat-row">
-          <div class="stat-key">Contract</div>
-          <div class="stat-val" style="font-size:0.8rem;">
-            <a href="https://polygonscan.com/address/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" style="color:var(--blue)">View on Polygonscan</a>
-          </div>
+          <div class="stat-key">Total Supply</div>
+          <div class="stat-val spore" style="font-size:1.2rem;">687,400,000,000</div>
+          <div class="stat-sub">SPORE (SPR) on Polygon</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Treasury Holdings (95%)</div>
+          <div class="stat-val spore" style="font-size:1.1rem;">653,030,000</div>
+          <div class="stat-sub">Held at launch</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Discretionary Half</div>
+          <div class="stat-val spore" style="font-size:1.1rem;">272,954,033,092</div>
+          <div class="stat-sub">Flexible — funds any category as needed</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Total Allocated</div>
+          <div class="stat-val spore" style="font-size:1.1rem;">579,153,137,392</div>
+          <div class="stat-sub">Aligned + Discretionary across 9 categories</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Aligned Half (1:100 peg)</div>
+          <div class="stat-val spore" style="font-size:1.1rem;">306,199,104,300</div>
+          <div class="stat-sub">Mirrors SHROOM treasury 1:100</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Launched</div>
+          <div class="stat-val" style="font-size:1rem;">Jan 12, 2025</div>
+          <div class="stat-sub">Governance token · 18 decimals · Polygon</div>
         </div>
       </div>
     </div>
+
+    <!-- Combined allocation bars -->
     <div class="bar-section reveal">
-      <div class="bar-chart-title"><span style="color:var(--blue)">SPORE</span> — Allocation Breakdown</div>
-      <div class="bar-group" id="spore-bars"></div>
+      <div class="bar-chart-title">
+        Treasury Allocation Plan
+        <span style="font-size:0.72rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;font-weight:400;margin-left:0.5rem;">3,061,991,043 SHROOM · 579,153,137,392 SPORE</span>
+      </div>
+      <div style="display:flex;gap:1rem;margin-bottom:1rem;font-family:'Syne Mono',monospace;font-size:0.65rem;color:rgba(255,255,225,0.4);">
+        <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block;"></span>SHROOM</span>
+        <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:var(--blue);display:inline-block;"></span>SPORE</span>
+      </div>
+      <div class="bar-group" id="combined-bars"></div>
     </div>
 
     <div class="glow-divider"></div>
@@ -568,23 +579,6 @@
   // ─────────────────────────────────────────────────────────────────
   // BAR CHARTS + LEGEND
   // ─────────────────────────────────────────────────────────────────
-  function buildBars(id, items, color) {
-    const c = document.getElementById(id);
-    if (!c) return;
-    items.forEach(item => {
-      c.insertAdjacentHTML('beforeend', `
-        <div class="bar-item">
-          <div class="bar-meta">
-            <span class="bm-label">${item.emoji} ${item.label}</span>
-            <span class="bm-pct">${item.pct}%</span>
-          </div>
-          ${item.sub ? `<div style="font-size:0.7rem;color:rgba(255,255,225,0.35);margin-bottom:0.25rem;font-family:'Syne Mono',monospace;">${item.sub}</div>` : ''}
-          <div class="bar-track">
-            <div class="bar-fill" data-pct="${item.pct}" style="background:${color};"></div>
-          </div>
-        </div>`);
-    });
-  }
   function buildLegend(id, segments) {
     const c = document.getElementById(id);
     if (!c) return;
@@ -601,34 +595,39 @@
   // ─────────────────────────────────────────────────────────────────
   // CHART DATA
   // ─────────────────────────────────────────────────────────────────
-  const shroomSegments = [
-    { label: 'Treasury',       pct: 44, color: '#fd464f' },
-    { label: 'Airdrop (used)', pct: 38, color: '#c43038' },
-    { label: 'Liquidity Pool', pct: 5,  color: '#ff7b82' },
-    { label: 'Distributed',   pct: 13, color: '#4a1215' },
+
+  const combinedBars = [
+    { emoji: '💧', label: 'LP Rewards',             pct: 20, shroom: '612,398,209',  spore: '61,239,820,900' },
+    { emoji: '🍄', label: 'NFT Rewards',            pct: 20, shroom: '612,398,209',  spore: '61,239,820,900' },
+    { emoji: '🤖', label: 'Sporebot Rewards',       pct: 20, shroom: '612,398,209',  spore: '61,239,820,900' },
+    { emoji: '🤝', label: 'Partnerships / Collabs', pct: 10, shroom: '306,199,104',  spore: '30,619,910,400' },
+    { emoji: '🧪', label: 'Innovation / Misc',      pct: 10, shroom: '306,199,104',  spore: '30,619,910,400' },
+    { emoji: '🗳',  label: 'Governance',             pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200' },
+    { emoji: '🛡',  label: 'Strategic Reserve',      pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200' },
+    { emoji: '🔁', label: 'Swap Function',          pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200' },
+    { emoji: '🚨', label: 'Emergency Fund',         pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200' },
   ];
-  const sporeSegments = [
-    { label: 'Treasury Holdings',           pct: 50, color: '#4fa8fd' },
-    { label: 'LP Rewards & Funding',        pct: 18, color: '#2d7dd4' },
-    { label: 'Sporebot / Reddit',           pct: 10, color: '#82c6ff' },
-    { label: 'Events / Collabs / Buybacks', pct: 10, color: '#a8d8ff' },
-    { label: 'NFT Avatar Rewards',          pct: 8,  color: '#1a4f80' },
-    { label: 'Contingency',                 pct: 4,  color: '#0d2d4a' },
-  ];
-  const shroomBars = [
-    { emoji: '🏦', label: 'Treasury — Initial Allocation (57%)',  pct: 57, sub: '3,918,180,000 $HROOM' },
-    { emoji: '📊', label: 'Treasury — Est. Remaining (~44%)',     pct: 44, sub: '~3,000,000,000 $HROOM remaining' },
-    { emoji: '🎁', label: 'Airdrop (38%)',                        pct: 38, sub: 'Distributed to NFT holders' },
-    { emoji: '💧', label: 'Liquidity Pool (5%)',                  pct: 5,  sub: '343,700,000 $HROOM seeded' },
-  ];
-  const sporeBars = [
-    { emoji: '🧊', label: 'Treasury Holdings — Initial (50%)',    pct: 50, sub: '343,700,000,000 SPORE held' },
-    { emoji: '🔁', label: 'LP Rewards & Funding (18%)',           pct: 18, sub: 'Ongoing LP rewards' },
-    { emoji: '🌱', label: 'Sporebot / Reddit Rewards (10%)',      pct: 10, sub: 'In-game farming & Reddit rewards' },
-    { emoji: '🤝', label: 'Events, Collabs, Buybacks (10%)',      pct: 10, sub: 'Community events & buybacks' },
-    { emoji: '🎨', label: 'NFT Avatar Rewards (8%)',              pct: 8,  sub: 'Mooshie holder rewards' },
-    { emoji: '🛡',  label: 'Contingency (4%)',                    pct: 4,  sub: 'Reserve buffer' },
-  ];
+
+  function buildCombinedBars(id, items) {
+    const c = document.getElementById(id);
+    if (!c) return;
+    items.forEach(item => {
+      c.insertAdjacentHTML('beforeend', `
+        <div class="bar-item">
+          <div class="bar-meta">
+            <span class="bm-label">${item.emoji} ${item.label}</span>
+            <span class="bm-pct">${item.pct}%</span>
+          </div>
+          <div style="font-size:0.68rem;color:rgba(255,255,225,0.3);margin-bottom:0.3rem;font-family:'Syne Mono',monospace;display:flex;gap:1.5rem;">
+            <span style="color:rgba(253,70,79,0.7);">${item.shroom} SHROOM</span>
+            <span style="color:rgba(79,168,253,0.7);">${item.spore} SPORE</span>
+          </div>
+          <div class="bar-track" style="height:10px;">
+            <div style="height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--red) 50%,var(--blue) 50%);transition:width 1.4s cubic-bezier(0.16,1,0.3,1);" data-pct="100"></div>
+          </div>
+        </div>`);
+    });
+  }
 
   // ─────────────────────────────────────────────────────────────────
   // TX FEED — BATCH DETECTION + RENDER
@@ -927,7 +926,7 @@
     entries.forEach(e => {
       if (!e.isIntersecting) return;
       e.target.classList.add('visible');
-      e.target.querySelectorAll('.bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
+      e.target.querySelectorAll('[data-pct]').forEach(b => { b.style.width = b.dataset.pct + '%'; });
       observer.unobserve(e.target);
     });
   }, { threshold: 0.15 });
@@ -937,12 +936,7 @@
   // INIT
   // ─────────────────────────────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', () => {
-    buildLegend('shroom-legend', shroomSegments);
-    buildLegend('spore-legend',  sporeSegments);
-    buildBars('shroom-bars', shroomBars, 'var(--red)');
-    buildBars('spore-bars',  sporeBars,  'var(--blue)');
-    drawDonut('shroomDonut', shroomSegments);
-    drawDonut('sporeDonut',  sporeSegments);
+    buildCombinedBars('combined-bars', combinedBars);
     loadFeed();
   });
   </script>
@@ -1011,6 +1005,11 @@
       data.balances.forEach(t => {
         const color   = HOLDINGS_COLORS[t.symbol] || 'var(--cream)';
         const display = fmtBal(t.balance, t.symbol);
+        // Update live SHROOM treasury stat if present
+        if (t.symbol === '$HROOM') {
+          const el = document.getElementById('live-shroom-treasury');
+          if (el) el.textContent = fmtBal(t.balance, '');
+        }
         grid.insertAdjacentHTML('beforeend', `
           <div class="stats-panel" style="padding:1.25rem;min-width:0;">
             <div class="stat-key">${t.symbol}</div>
@@ -1021,7 +1020,51 @@
       grid.innerHTML = '<div class="tx-loading">Failed to load balances.</div>';
     }
   }
+
+  async function loadLPHoldings() {
+    const lpGrid    = document.getElementById('lp-grid');
+    const sbGrid    = document.getElementById('sporebot-grid');
+    try {
+      const res  = await fetch('https://api.mushroomplanet.earth/api/lp-holdings');
+      const data = await res.json();
+      if (!data.ok) throw new Error('bad response');
+      lpGrid.innerHTML = '';
+
+      const pools = [
+        { key: 'lp_weth_shroom', label: 'WETH / $HROOM Pool' },
+        { key: 'lp_spr_shroom',  label: 'SPR / $HROOM Pool'  },
+      ];
+      pools.forEach(p => {
+        const lp = data[p.key];
+        if (!lp) return;
+        const t0c = HOLDINGS_COLORS[lp.token0.symbol] || 'var(--cream)';
+        const t1c = HOLDINGS_COLORS[lp.token1.symbol] || 'var(--cream)';
+        const pct = (lp.share * 100).toFixed(2);
+        lpGrid.insertAdjacentHTML('beforeend', `
+          <div class="stats-panel" style="padding:1.25rem;min-width:0;">
+            <div class="stat-key">${p.label} <span style="opacity:0.4;">(${pct}% share)</span></div>
+            <div class="stat-val" style="color:${t0c};font-size:1rem;">${fmtBal(lp.token0.balance, lp.token0.symbol)}</div>
+            <div class="stat-val" style="color:${t1c};font-size:1rem;">${fmtBal(lp.token1.balance, lp.token1.symbol)}</div>
+          </div>`);
+      });
+
+      // Sporebot wallet
+      sbGrid.innerHTML = '';
+      const sbc = HOLDINGS_COLORS['$HROOM'] || 'var(--red)';
+      sbGrid.insertAdjacentHTML('beforeend', `
+        <div class="stats-panel" style="padding:1.25rem;min-width:0;">
+          <div class="stat-key">$HROOM</div>
+          <div class="stat-val" style="color:${sbc};font-size:1.1rem;">${fmtBal(data.sporebot_shroom, '$HROOM')}</div>
+          <div class="stat-sub" style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;margin-top:0.3rem;">0xa00C...863A</div>
+        </div>`);
+    } catch {
+      lpGrid.innerHTML    = '<div class="tx-loading">Failed to load LP data.</div>';
+      sbGrid.innerHTML    = '<div class="tx-loading">Failed to load.</div>';
+    }
+  }
+
   loadHoldings();
+  loadLPHoldings();
   </script>
 
 </body>
