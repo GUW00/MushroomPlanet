@@ -243,7 +243,9 @@
     .tx-cat-lp      { background: rgba(79,168,253,0.15);  color: var(--blue); border: 1px solid rgba(79,168,253,0.25); }
     .tx-cat-airdrop { background: rgba(254,206,0,0.15);   color: #fece00;     border: 1px solid rgba(254,206,0,0.25); }
     .tx-cat-transfer{ background: rgba(200,150,255,0.15); color: #d4a8ff;     border: 1px solid rgba(200,150,255,0.25); }
+    .tx-cat-swap    { background: rgba(100,220,150,0.15); color: #64dc96;     border: 1px solid rgba(100,220,150,0.25); }
     .tx-cat-unknown { background: rgba(255,255,225,0.06); color: rgba(255,255,225,0.4); border: 1px solid rgba(255,255,225,0.1); }
+    .tx-cat-swap    { background: rgba(0,255,150,0.10);   color: #00e89a;     border: 1px solid rgba(0,255,150,0.25); }
 
     /* Expand panel */
     .tx-expand {
@@ -629,7 +631,9 @@
     lp:       'tx-cat-lp',
     airdrop:  'tx-cat-airdrop',
     transfer: 'tx-cat-transfer',
+    swap:     'tx-cat-swap',
     unknown:  'tx-cat-unknown',
+    swap:     'tx-cat-swap',
   };
 
   function timeAgo(ts) {
@@ -645,8 +649,8 @@
     if (val >= 1e3) return (val/1e3).toFixed(2) + 'K';
     return val.toFixed(2);
   }
-  const TOKEN_COLOR  = { shroom: 'var(--red)', spore: 'var(--blue)' };
-  const TOKEN_SYMBOL = { shroom: '$HROOM',     spore: 'SPORE' };
+  const TOKEN_COLOR  = { shroom: 'var(--red)', spore: 'var(--blue)', weth: '#9b8cff', wbtc: '#f7931a', pol: '#8247e5' };
+  const TOKEN_SYMBOL = { shroom: '$HROOM', spore: 'SPORE', weth: 'WETH', wbtc: 'WBTC', pol: 'POL' };
 
   // ── State
   let _raw        = [];   // unfiltered batches from API

@@ -209,9 +209,17 @@ app.get('/api/leaderboard', async (req, res) => {
 // ----------------------------------------------------------------
 // GET /api/treasury-txs
 // ----------------------------------------------------------------
-// Fetches both tokens, groups by blockNumber (Gnosis Safe executes
-// all legs of a multisig batch atomically in one block), detects
-// which batch type it is, and returns clean events instead of raw rows.
+// Strategy:
+//   1. Group each token's rows by block into single-token blocks
+//   2. For airdrop-sized blocks (50+ txs), pair SHROOM + SPORE blocks
+//      using recipient overlap (>=50%) and timestamp within 30 min,
+//      because Gnosis Safe sometimes sends each token in a separate block
+//   3. Classify by per-recipient amounts:
+//        Kid Shroom:   ~20,000 SHROOM + ~1,500,000 SPORE per NFT
+//        Gold Mooshie: ~15,000 SHROOM + ~2,000,000 SPORE per NFT
+//        Weekly LP:    ~3.5M SHROOM total + ~500M SPORE total, ~35 recipients
+//        Onchain Airdrop: SPORE only, ~200M total
+//   4. Incoming txs (treasury is the recipient) => Swap
 
 const SHROOM_CONTRACT = '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1';
 const SPORE_CONTRACT  = '0x089582AC20ea563c69408a79E1061de594b61bED';
@@ -221,58 +229,60 @@ function inRange(value, target, tolerance) {
   return value >= target * (1 - tolerance) && value <= target * (1 + tolerance);
 }
 
-const BATCH_RULES = [
-  {
-    type: 'lp_rewards', label: 'Weekly LP Rewards', emoji: '💧', colorClass: 'lp',
-    // Both tokens, ~35 txs each, SHROOM total ~3.5M, SPORE total ~500M (±30%)
-    match(legs) {
-      const s = legs.find(l => l.token === 'shroom');
-      const p = legs.find(l => l.token === 'spore');
-      if (!s || !p) return false;
-      return s.txCount >= 20 && s.txCount <= 60
-          && p.txCount >= 20 && p.txCount <= 60
-          && inRange(s.total, 3_500_000,   0.30)
-          && inRange(p.total, 500_000_000, 0.30);
-    },
-  },
-  {
-    type: 'kid_shroom', label: 'Kid Shroom Airdrop', emoji: '🍄', colorClass: 'airdrop',
-    // Both tokens, ~340 txs each
-    match(legs) {
-      const s = legs.find(l => l.token === 'shroom');
-      const p = legs.find(l => l.token === 'spore');
-      if (!s || !p) return false;
-      return s.txCount >= 200 && s.txCount <= 500
-          && p.txCount >= 200 && p.txCount <= 500;
-    },
-  },
-  {
-    type: 'gold_mooshie', label: 'Gold Mooshie Airdrop', emoji: '🌟', colorClass: 'airdrop',
-    // Both tokens, ~164 txs each
-    match(legs) {
-      const s = legs.find(l => l.token === 'shroom');
-      const p = legs.find(l => l.token === 'spore');
-      if (!s || !p) return false;
-      return s.txCount >= 100 && s.txCount <= 200
-          && p.txCount >= 100 && p.txCount <= 200;
-    },
-  },
-  {
-    type: 'onchain_airdrop', label: 'Onchain Airdrop', emoji: '🎁', colorClass: 'airdrop',
-    // SPORE only, ~200 txs, ~200M total (±50%)
-    match(legs) {
-      const p = legs.find(l => l.token === 'spore');
-      const s = legs.find(l => l.token === 'shroom');
-      if (!p || s) return false;
-      return p.txCount >= 100 && p.txCount <= 350
-          && inRange(p.total, 200_000_000, 0.50);
-    },
-  },
-  {
-    type: 'transfer', label: 'Transfer', emoji: '➡️', colorClass: 'transfer',
-    match: () => true, // catch-all
-  },
-];
+function recipientOverlap(setA, setB) {
+  if (!setA.size || !setB.size) return 0;
+  let shared = 0;
+  for (const addr of setA) if (setB.has(addr)) shared++;
+  return shared / Math.min(setA.size, setB.size);
+}
+
+function classifyEvent(legs, isIncoming) {
+  if (isIncoming) {
+    return { type: 'swap', label: 'Swap', emoji: '🔄', colorClass: 'swap' };
+  }
+
+  const s = legs.find(l => l.token === 'shroom');
+  const p = legs.find(l => l.token === 'spore');
+
+  // Weekly LP Rewards: both tokens, ~35 txs each, ~3.5M SHROOM + ~500M SPORE
+  if (s && p &&
+      s.txCount >= 20 && s.txCount <= 60 &&
+      p.txCount >= 20 && p.txCount <= 60 &&
+      inRange(s.total, 3_500_000,   0.35) &&
+      inRange(p.total, 500_000_000, 0.35)) {
+    return { type: 'lp_rewards', label: 'Weekly LP Rewards', emoji: '💧', colorClass: 'lp' };
+  }
+
+  // Onchain Airdrop: SPORE only, 100-350 txs, ~200M total
+  if (p && !s && p.txCount >= 100 && p.txCount <= 350 &&
+      inRange(p.total, 200_000_000, 0.60)) {
+    return { type: 'onchain_airdrop', label: 'Onchain Airdrop', emoji: '🎁', colorClass: 'airdrop' };
+  }
+
+  // Kid Shroom vs Gold Mooshie by per-recipient amounts
+  if (s && p) {
+    const shroomPer = s.total / s.recipientCount;
+    const sporePer  = p.total / p.recipientCount;
+    // Kid Shroom: ~20k SHROOM + ~1.5M SPORE per NFT
+    if (inRange(shroomPer, 20_000, 0.40) && inRange(sporePer, 1_500_000, 0.40)) {
+      return { type: 'kid_shroom', label: 'Kid Shroom Airdrop', emoji: '🍄', colorClass: 'airdrop' };
+    }
+    // Gold Mooshie: ~15k SHROOM + ~2M SPORE per NFT
+    if (inRange(shroomPer, 15_000, 0.40) && inRange(sporePer, 2_000_000, 0.40)) {
+      return { type: 'gold_mooshie', label: 'Gold Mooshie Airdrop', emoji: '🌟', colorClass: 'airdrop' };
+    }
+    if (s.txCount >= 50 || p.txCount >= 50) {
+      return { type: 'airdrop', label: 'Airdrop', emoji: '🎁', colorClass: 'airdrop' };
+    }
+  }
+
+  const anyLeg = s || p;
+  if (anyLeg && anyLeg.txCount >= 50) {
+    return { type: 'airdrop', label: 'Airdrop', emoji: '🎁', colorClass: 'airdrop' };
+  }
+
+  return { type: 'transfer', label: 'Transfer', emoji: '➡️', colorClass: 'transfer' };
+}
 
 async function fetchTokenTxs(contractAddress) {
   const url = `https://api.etherscan.io/v2/api?chainid=137`
@@ -288,51 +298,107 @@ async function fetchTokenTxs(contractAddress) {
 }
 
 function groupIntoBatches(shroomRows, sporeRows) {
-  const all = [
-    ...shroomRows.map(r => ({ ...r, _token: 'shroom' })),
-    ...sporeRows.map(r  => ({ ...r, _token: 'spore'  })),
-  ];
+  const shroomByBlock = {};
+  const sporeByBlock  = {};
 
-  const byBlock = {};
-  for (const tx of all) {
-    if (!byBlock[tx.blockNumber]) byBlock[tx.blockNumber] = [];
-    byBlock[tx.blockNumber].push(tx);
+  for (const r of shroomRows) {
+    if (!shroomByBlock[r.blockNumber]) shroomByBlock[r.blockNumber] = [];
+    shroomByBlock[r.blockNumber].push(r);
+  }
+  for (const r of sporeRows) {
+    if (!sporeByBlock[r.blockNumber]) sporeByBlock[r.blockNumber] = [];
+    sporeByBlock[r.blockNumber].push(r);
   }
 
-  const batches = [];
-  for (const rows of Object.values(byBlock)) {
-    const legMap = {};
-    for (const row of rows) {
-      const t = row._token;
-      if (!legMap[t]) legMap[t] = { token: t, txCount: 0, total: 0, recipients: new Set() };
-      legMap[t].txCount++;
-      legMap[t].total += parseFloat(row.value) / 1e18;
-      legMap[t].recipients.add(row.to.toLowerCase());
-    }
-    const legs = Object.values(legMap).map(l => ({
-      token: l.token, txCount: l.txCount, total: l.total,
-      recipientCount: l.recipients.size,
-    }));
-    const rule = BATCH_RULES.find(r => r.match(legs));
-    batches.push({
-      type:       rule.type,
-      label:      rule.label,
-      emoji:      rule.emoji,
-      colorClass: rule.colorClass,
-      timestamp:  Math.max(...rows.map(r => parseInt(r.timeStamp))),
+  function summariseBlock(rows, token) {
+    const recipients = new Set(rows.map(r => r.to.toLowerCase()));
+    const total      = rows.reduce((s, r) => s + parseFloat(r.value) / 1e18, 0);
+    const timestamp  = Math.max(...rows.map(r => parseInt(r.timeStamp)));
+    const isOut      = rows[0].from.toLowerCase() === TREASURY_ADDR.toLowerCase();
+    return {
+      token, rows, recipients, total,
+      txCount: rows.length, recipientCount: recipients.size,
+      timestamp, isOut,
+      blockNumber: rows[0].blockNumber,
       sampleHash: rows[0].hash,
+    };
+  }
+
+  const shroomBlocks = Object.entries(shroomByBlock).map(([, rows]) => summariseBlock(rows, 'shroom'));
+  const sporeBlocks  = Object.entries(sporeByBlock).map(([, rows])  => summariseBlock(rows, 'spore'));
+
+  const AIRDROP_MIN    = 50;
+  const TIME_WINDOW    = 30 * 60;
+  const OVERLAP_THRESH = 0.50;
+
+  const usedShroomBlocks = new Set();
+  const usedSporeBlocks  = new Set();
+  const events           = [];
+
+  // Pair large SHROOM blocks with matching SPORE blocks
+  for (const sb of shroomBlocks) {
+    if (!sb.isOut || sb.txCount < AIRDROP_MIN) continue;
+
+    let bestMatch = null, bestOverlap = 0;
+    for (const pb of sporeBlocks) {
+      if (usedSporeBlocks.has(pb.blockNumber)) continue;
+      if (!pb.isOut) continue;
+      if (Math.abs(sb.timestamp - pb.timestamp) > TIME_WINDOW) continue;
+      const overlap = recipientOverlap(sb.recipients, pb.recipients);
+      if (overlap >= OVERLAP_THRESH && overlap > bestOverlap) {
+        bestOverlap = overlap;
+        bestMatch   = pb;
+      }
+    }
+
+    if (bestMatch) {
+      usedShroomBlocks.add(sb.blockNumber);
+      usedSporeBlocks.add(bestMatch.blockNumber);
+      const legs = [
+        { token: 'shroom', txCount: sb.txCount,        total: sb.total,        recipientCount: sb.recipientCount },
+        { token: 'spore',  txCount: bestMatch.txCount, total: bestMatch.total, recipientCount: bestMatch.recipientCount },
+      ];
+      const cls = classifyEvent(legs, false);
+      events.push({
+        ...cls,
+        timestamp:  Math.max(sb.timestamp, bestMatch.timestamp),
+        sampleHash: sb.sampleHash,
+        legs,
+        transfers: [
+          ...sb.rows.map(r => ({ hash: r.hash, from: r.from, to: r.to, token: 'shroom', amount: parseFloat(r.value)/1e18, timestamp: parseInt(r.timeStamp) })),
+          ...bestMatch.rows.map(r => ({ hash: r.hash, from: r.from, to: r.to, token: 'spore', amount: parseFloat(r.value)/1e18, timestamp: parseInt(r.timeStamp) })),
+        ],
+      });
+    }
+  }
+
+  // Remaining unpaired blocks become individual events
+  const remaining = [
+    ...shroomBlocks.filter(b => !usedShroomBlocks.has(b.blockNumber)),
+    ...sporeBlocks.filter(b  => !usedSporeBlocks.has(b.blockNumber)),
+  ];
+
+  for (const blk of remaining) {
+    const legs = [{
+      token: blk.token, txCount: blk.txCount,
+      total: blk.total, recipientCount: blk.recipientCount,
+    }];
+    const cls = classifyEvent(legs, !blk.isOut);
+    events.push({
+      ...cls,
+      timestamp:  blk.timestamp,
+      sampleHash: blk.sampleHash,
       legs,
-      transfers: rows.map(r => ({
-        hash:      r.hash,
-        from:      r.from,
-        to:        r.to,
-        token:     r._token,
-        amount:    parseFloat(r.value) / 1e18,
+      transfers: blk.rows.map(r => ({
+        hash: r.hash, from: r.from, to: r.to,
+        token: blk.token,
+        amount: parseFloat(r.value) / 1e18,
         timestamp: parseInt(r.timeStamp),
       })),
     });
   }
-  return batches.sort((a, b) => b.timestamp - a.timestamp);
+
+  return events.sort((a, b) => b.timestamp - a.timestamp);
 }
 
 app.get('/api/treasury-txs', async (req, res) => {
