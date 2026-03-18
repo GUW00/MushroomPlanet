@@ -652,6 +652,10 @@
   </script>
 
   <script>
+
+  window.USE_LOCAL = true;
+  window.API_BASE  = window.USE_LOCAL ? 'http://localhost:3001' : 'https://api.mushroomplanet.earth';
+
   // ─────────────────────────────────────────────────────────────────
   // STARFIELD
   // ─────────────────────────────────────────────────────────────────
@@ -856,7 +860,7 @@
   async function loadFeed() {
     document.getElementById('tx-list').innerHTML = '<div class="tx-loading">Fetching transactions…</div>';
     try {
-      const res  = await fetch('http://localhost:3001/api/treasury-txs');
+      const res  = await fetch(`${window.API_BASE}/api/treasury-txs`);
       const data = await res.json();
       if (!data.ok || !data.batches?.length) { renderMock(); return; }
       _raw = data.batches;
@@ -1249,7 +1253,7 @@
   async function loadHoldings() {
     const grid = document.getElementById('holdings-grid');
     try {
-      const res  = await fetch('http://localhost:3001/api/treasury-holdings');
+      const res  = await fetch(`${window.API_BASE}/api/treasury-holdings`);
       const data = await res.json();
       if (!data.ok) throw new Error('bad response');
       grid.innerHTML = '';
@@ -1276,7 +1280,7 @@
     const lpGrid    = document.getElementById('lp-grid');
     const sbGrid    = document.getElementById('sporebot-grid');
     try {
-      const res  = await fetch('http://localhost:3001/api/lp-holdings');
+      const res  = await fetch(`${window.API_BASE}/api/lp-holdings`);
       const data = await res.json();
       if (!data.ok) throw new Error('bad response');
       lpGrid.innerHTML = '';
