@@ -279,6 +279,26 @@
       color: rgba(255,255,225,0.2); text-decoration: none;
     }
     .expand-hash a:hover { color: var(--red); }
+    .btn-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'syne mono', monospace; font-size: 0.68rem;
+      text-decoration: none; padding: 0.45em 0.6em; border-radius: 0.4rem;
+      border: 1px solid; text-align: center; transition: all 0.2s ease;
+      cursor: pointer; white-space: nowrap;
+    }
+    .btn-link:hover { transform: translatey(-1px); filter: brightness(1.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .btn-link:active { transform: translatey(0); filter: brightness(0.9); }
+    .btn-red  { color: var(--red);  background: rgba(253,70,79,0.08);  border-color: rgba(253,70,79,0.25); }
+    .btn-blue { color: var(--blue); background: rgba(79,168,253,0.08); border-color: rgba(79,168,253,0.25); }
+    .btn-gold { color: #fece00;     background: rgba(254,206,0,0.08);  border-color: rgba(254,206,0,0.25); }
+    .btn-purple { color: #c084fc;   background: rgba(192,132,252,0.08);border-color: rgba(192,132,252,0.25); }
+    .btn-ghost { color: rgba(255,255,225,0.4); background: rgba(255,255,255,0.03); border-color: rgba(255,255,225,0.1); }
+    .btn-red:hover    { background: rgba(253,70,79,0.15);  border-color: rgba(253,70,79,0.5); }
+    .btn-blue:hover   { background: rgba(79,168,253,0.15); border-color: rgba(79,168,253,0.5); }
+    .btn-gold:hover   { background: rgba(254,206,0,0.15);  border-color: rgba(254,206,0,0.5); }
+    .btn-purple:hover { background: rgba(192,132,252,0.15);border-color: rgba(192,132,252,0.5); }
+    .btn-ghost:hover  { color: var(--cream); background: rgba(255,255,255,0.07); border-color: rgba(255,255,225,0.3); }
+
     @media (max-width: 480px) {
       .treasury-section { padding: 0 1rem 3rem; }
       .compare-card { padding: 1.25rem; }
@@ -534,8 +554,8 @@
           Year 2 Starts October 1st, 2026
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-          <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1#balances" target="_blank" style="color:var(--red);font-size:0.68rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.4em 0.5em;background:rgba(253,70,79,0.08);border:1px solid rgba(253,70,79,0.15);border-radius:0.4rem;text-align:center;">SHROOM Holders →</a>
-          <a href="https://polygonscan.com/token/0x089582ac20ea563c69408a79e1061de594b61bed#balances" target="_blank" style="color:var(--blue);font-size:0.68rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.4em 0.5em;background:rgba(79,168,253,0.08);border:1px solid rgba(79,168,253,0.15);border-radius:0.4rem;text-align:center;">SPORE Holders →</a>
+          <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1#balances" target="_blank" class="btn-link btn-red">SHROOM Holders →</a>
+          <a href="https://polygonscan.com/token/0x089582ac20ea563c69408a79e1061de594b61bed#balances" target="_blank" class="btn-link btn-blue">SPORE Holders →</a>
         </div>
       </div>
 
@@ -588,12 +608,12 @@
           Once the monthly airdrop program ends, Kid Shroom and Gold Mooshie holders will be added to the daily Sporebot rewards!
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;">
-          <a href="https://opensea.io/collection/mooshies-house" target="_blank" style="color:var(--red);font-size:0.62rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.35em 0.3em;background:rgba(253,70,79,0.08);border:1px solid rgba(253,70,79,0.2);border-radius:0.4rem;text-align:center;">House Mooshie</a>
-          <a href="https://opensea.io/collection/king-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" style="color:var(--red);font-size:0.62rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.35em 0.3em;background:rgba(253,70,79,0.08);border:1px solid rgba(253,70,79,0.2);border-radius:0.4rem;text-align:center;">King Mooshie</a>
-          <a href="https://opensea.io/collection/queen-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" style="color:#c084fc;font-size:0.62rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.35em 0.3em;background:rgba(192,132,252,0.08);border:1px solid rgba(192,132,252,0.2);border-radius:0.4rem;text-align:center;">Queen Mooshie</a>
-          <a href="https://opensea.io/collection/kid-shroom-by-zuko-x-reddit-collectible-avatars" target="_blank" style="color:var(--red);font-size:0.62rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.35em 0.3em;background:rgba(253,70,79,0.08);border:1px solid rgba(253,70,79,0.2);border-radius:0.4rem;text-align:center;">Kid Shroom</a>
-          <a href="https://opensea.io/collection/gold-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" style="color:#fece00;font-size:0.62rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.35em 0.3em;background:rgba(254,206,0,0.08);border:1px solid rgba(254,206,0,0.2);border-radius:0.4rem;text-align:center;">Gold Mooshie</a>
-          <span style="color:rgba(255,255,225,0.2);font-size:0.62rem;font-family:'Syne Mono',monospace;padding:0.35em 0.3em;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.4rem;text-align:center;">Coming Soon</span>
+          <a href="https://opensea.io/collection/mooshies-house" target="_blank" class="btn-link btn-red">House Mooshie</a>
+          <a href="https://opensea.io/collection/king-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" class="btn-link btn-red">King Mooshie</a>
+          <a href="https://opensea.io/collection/queen-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" class="btn-link btn-purple">Queen Mooshie</a>
+          <a href="https://opensea.io/collection/kid-shroom-by-zuko-x-reddit-collectible-avatars" target="_blank" class="btn-link btn-red">Kid Shroom</a>
+          <a href="https://opensea.io/collection/gold-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" class="btn-link btn-gold">Gold Mooshie</a>
+          <span class="btn-link btn-ghost" style="opacity:0.5;cursor:default;">Coming Soon</span>
         </div>
       </div>
 
@@ -606,7 +626,7 @@
         <div style="font-size:0.78rem;color:rgba(255,255,225,0.6);line-height:1.6;margin-bottom:0.25rem;">
           <span style="color:var(--red);font-weight:600;">Snapshot:</span> Every Sunday · Airdrop sent Monday<br>
           <span style="color:var(--red);font-weight:600;">Earn:</span> Based on your % share of the pool<br>
-          <span style="color:var(--red);font-weight:600;">Tapers:</span> Annually on May 7th each year
+          <span style="color:var(--red);font-weight:600;">Tapers:</span> Annually on May 7th each year<br>
         </div>
         <div style="font-family:'Syne Mono',monospace;font-size:0.68rem;border:1px solid rgba(255,255,225,0.06);border-radius:0.75rem;overflow:hidden;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.4rem 0.75rem;background:rgba(255,255,255,0.05);color:rgba(255,255,225,0.35);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;">
@@ -623,13 +643,20 @@
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;"><span style="color:rgba(255,255,225,0.4);">Y9</span><span style="color:var(--red);text-align:center;">0.75M</span><span style="color:var(--blue);text-align:right;">75M</span></div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);"><span style="color:rgba(255,255,225,0.4);">Y10</span><span style="color:var(--red);text-align:center;">0.5M</span><span style="color:var(--blue);text-align:right;">50M</span></div>
         </div>
-        <div style="font-size:0.7rem;color:rgba(255,255,225,0.35);font-family:'Syne Mono',monospace;padding:0.5rem 0.6rem;background:rgba(255,255,255,0.02);border-radius:0.5rem;border:1px solid rgba(255,255,225,0.05);">
-          Year 3 Starts May 7th, 2026<br>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+          <div style="font-size:0.68rem;font-family:'Syne Mono',monospace;padding:0.5rem 0.6rem;background:rgba(253,70,79,0.08);border-radius:0.5rem;border:1px solid rgba(253,70,79,0.2);line-height:1.5;">
+            <span style="color:var(--red);font-weight:600;">SHROOM</span><br>
+            <span style="color:rgba(255,255,225,0.4);">Now in Year 2</span>
+          </div>
+          <div style="font-size:0.68rem;font-family:'Syne Mono',monospace;padding:0.5rem 0.6rem;background:rgba(79,168,253,0.08);border-radius:0.5rem;border:1px solid rgba(79,168,253,0.2);line-height:1.5;">
+            <span style="color:var(--blue);font-weight:600;">SPORE</span><br>
+            <span style="color:rgba(255,255,225,0.4);">Now in Year 1</span>
+          </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;">
-          <a href="https://polygonscan.com/token/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28#balances" target="_blank" style="color:var(--red);font-size:0.68rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.4em 0.5em;background:rgba(253,70,79,0.08);border:1px solid rgba(253,70,79,0.15);border-radius:0.4rem;text-align:center;">SHROOM/WETH LP</a>
-          <a href="https://polygonscan.com/token/0x2a91571238303c6700a9336342c754e159243168#balances" target="_blank" style="color:var(--blue);font-size:0.68rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.4em 0.5em;background:rgba(79,168,253,0.08);border:1px solid rgba(79,168,253,0.15);border-radius:0.4rem;text-align:center;">SPORE/WETH LP</a>
-          <a href="https://www.reddit.com/r/MushroomPlanet/comments/1mu9dx0/quickswap_guide_trading_providing_liquidity/" target="_blank" style="color:rgba(255,255,225,0.4);font-size:0.68rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.4em 0.5em;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,225,0.08);border-radius:0.4rem;text-align:center;">LP Guide</a>
+          <a href="https://polygonscan.com/token/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28#balances" target="_blank" class="btn-link btn-red">SHROOM/WETH LP</a>
+          <a href="https://polygonscan.com/token/0x2a91571238303c6700a9336342c754e159243168#balances" target="_blank" class="btn-link btn-blue">SPORE/WETH LP</a>
+          <a href="https://www.reddit.com/r/MushroomPlanet/comments/1mu9dx0/quickswap_guide_trading_providing_liquidity/" target="_blank" class="btn-link btn-ghost">LP Guide</a>
         </div>
       </div>
     </div>
