@@ -16,7 +16,7 @@ const TESTING = process.env.TESTING === 'true';
 const db = admin.database();
 const app = express();
 app.use(cors({
-  origin: ['https://mushroomplanet.earth', 'http://localhost:8080'],
+  origin: ['https://mushroomplanet.earth', 'http://localhost:8080', 'http://localhost:5500'],
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
   credentials: true,
@@ -213,6 +213,7 @@ const TREASURY_HOLDINGS_ADDR = '0x5873002348cd4DF2aBD2624a6FC30E90573019F5';
 const SPOREBOT_WALLET_ADDR   = '0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A';
 const LP_POOL_WETH_SHROOM    = '0x28def03d8dc0d186fabae9c46043e8ef9bffcc28';
 const LP_POOL_SPR_SHROOM     = '0xc373382eec590374278534494109a0cdae1fbbc8';
+const LP_POOL_SPR_WETH       = '0x2a91571238303c6700a9336342c754e159243168';
 const HOLDINGS_TOKENS_LIST = [
   { symbol: '$HROOM', contract: '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1', decimals: 18 },
   { symbol: 'SPORE',  contract: '0x089582AC20ea563c69408a79E1061de594b61bED', decimals: 18 },
@@ -222,7 +223,7 @@ const HOLDINGS_TOKENS_LIST = [
 
 app.get('/api/treasury-holdings', async (req, res) => {
   try {
-    const rpcUrl = 'https://rpc.ankr.com/polygon';
+    const rpcUrl = process.env.ALCHEMY_POLYGON_URL;
     const balanceData = '0x70a08231' + TREASURY_HOLDINGS_ADDR.slice(2).padStart(64, '0');
 
     const tokenResults = await Promise.all(HOLDINGS_TOKENS_LIST.map(async t => {
@@ -276,6 +277,9 @@ async function getRpcCall(rpcUrl, method, params) {
     body: JSON.stringify({ jsonrpc: '2.0', method, params, id: 1 }),
   });
   const j = await r.json();
+  if (j.result === undefined) {
+    console.error('[RPC] undefined result:', JSON.stringify(j), 'params:', JSON.stringify(params));
+  }
   return j.result;
 }
 
@@ -317,21 +321,28 @@ async function getLPInfo(rpcUrl, poolAddr, holderAddr) {
 }
 
 app.get('/api/lp-holdings', async (req, res) => {
-  const rpcUrl = 'https://rpc.ankr.com/polygon';
+  const rpcUrl = process.env.ALCHEMY_POLYGON_URL;
   try {
-    const [wethShroom, sprShroom, sporebotBal] = await Promise.all([
+    const [wethShroom, sprShroom, sprWeth, sporebotBal, sporebotSpore] = await Promise.all([
       getLPInfo(rpcUrl, LP_POOL_WETH_SHROOM, TREASURY_HOLDINGS_ADDR),
       getLPInfo(rpcUrl, LP_POOL_SPR_SHROOM,  TREASURY_HOLDINGS_ADDR),
+      getLPInfo(rpcUrl, LP_POOL_SPR_WETH,    TREASURY_HOLDINGS_ADDR),
       getRpcCall(rpcUrl, 'eth_call', [{
         to: '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1',
-        data: '0x70a08231' + SPOREBOT_WALLET_ADDR.replace('0x','').toLowerCase().padStart(64,'0'),
+        data: '0x70a08231' + SPOREBOT_WALLET_ADDR.replace('0x', '').toLowerCase().padStart(64,'0'),
+      }, 'latest']),
+      getRpcCall(rpcUrl, 'eth_call', [{
+        to: '0x089582AC20ea563c69408a79E1061de594b61bED',
+        data: '0x70a08231' + SPOREBOT_WALLET_ADDR.replace('0x', '').toLowerCase().padStart(64,'0'),
       }, 'latest']),
     ]);
     res.json({
       ok: true,
       lp_weth_shroom: wethShroom,
       lp_spr_shroom: sprShroom,
+      lp_spr_weth: sprWeth,
       sporebot_shroom: parseInt(sporebotBal, 16) / 1e18,
+      sporebot_spore: parseInt(sporebotSpore, 16) / 1e18,
     });
   } catch (err) {
     console.error('[LP-HOLDINGS] Error:', err);
@@ -475,9 +486,43 @@ function groupIntoBatches(shroomRows, sporeRows, wethRows = []) {
   const usedSporeBlocks  = new Set();
   const events           = [];
 
-  // Pair large SHROOM blocks with matching SPORE blocks
+  // Pre-pass: pair LP Rewards by amount match (3.5M SHROOM + 500M SPORE) regardless of tx count
+  for (const sb of shroomBlocks) {
+    if (!sb.isOut || !inRange(sb.total, 3_500_000, 0.01) || sb.recipientCount > 50) continue;
+    let bestMatch = null, bestDelta = Infinity;
+    for (const pb of sporeBlocks) {
+      if (usedSporeBlocks.has(pb.blockNumber)) continue;
+      if (!pb.isOut) continue;
+      if (!inRange(pb.total, 500_000_000, 0.01)) continue;
+      // LP Rewards go to <=50 recipients (small set), reject large airdrop blocks
+      if (pb.recipientCount > 50) continue;
+      const delta = Math.abs(sb.timestamp - pb.timestamp);
+      if (delta < TIME_WINDOW && delta < bestDelta) { bestDelta = delta; bestMatch = pb; }
+    }
+    if (bestMatch) {
+      usedShroomBlocks.add(sb.blockNumber);
+      usedSporeBlocks.add(bestMatch.blockNumber);
+      const legs = [
+        { token: 'shroom', txCount: sb.txCount,        total: sb.total,        recipientCount: sb.recipientCount },
+        { token: 'spore',  txCount: bestMatch.txCount, total: bestMatch.total, recipientCount: bestMatch.recipientCount },
+      ];
+      events.push({
+        type: 'lp_rewards', label: 'Weekly LP Rewards', emoji: '💧', colorClass: 'lp',
+        timestamp:  Math.max(sb.timestamp, bestMatch.timestamp),
+        sampleHash: sb.sampleHash,
+        legs,
+        transfers: [
+          ...sb.rows.map(r => ({ hash: r.hash, from: r.from, to: r.to, token: 'shroom', amount: parseFloat(r.value)/1e18, timestamp: parseInt(r.timeStamp) })),
+          ...bestMatch.rows.map(r => ({ hash: r.hash, from: r.from, to: r.to, token: 'spore', amount: parseFloat(r.value)/1e18, timestamp: parseInt(r.timeStamp) })),
+        ],
+      });
+    }
+  }
+
+  // Pair large SHROOM blocks with matching SPORE blocks (airdrop overlap pass)
   for (const sb of shroomBlocks) {
     if (!sb.isOut || sb.txCount < AIRDROP_MIN) continue;
+    if (usedShroomBlocks.has(sb.blockNumber)) continue;
 
     let bestMatch = null, bestOverlap = 0;
     for (const pb of sporeBlocks) {

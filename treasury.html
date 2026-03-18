@@ -268,7 +268,7 @@
       border-radius: 0.4rem; border: 1px solid rgba(255,255,225,0.05);
     }
     .expand-row {
-      display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem;
+      display: grid; grid-template-columns: 1fr auto auto; gap: 0.5rem;
       align-items: center; padding: 0.3rem 0.6rem; font-size: 0.72rem;
     }
     .expand-row:nth-child(even) { background: rgba(255,255,255,0.015); }
@@ -279,6 +279,14 @@
       color: rgba(255,255,225,0.2); text-decoration: none;
     }
     .expand-hash a:hover { color: var(--red); }
+    @media (max-width: 480px) {
+      .treasury-section { padding: 0 1rem 3rem; }
+      .compare-card { padding: 1.25rem; }
+      .bar-section { padding: 1.25rem; }
+      .tx-section { padding: 1.25rem; }
+      .stats-panel { padding: 1.25rem; }
+      .price-strip { gap: 0.75rem; padding: 0 0.75rem 2rem; }
+    }
   </style>
 </head>
 <body>
@@ -302,6 +310,18 @@
     <div class="eyebrow">Live Treasury Data</div>
     <h1>Mushroom Planet<br /><span>Treasury</span></h1>
     <p>Real-time allocation breakdown for the SHROOM and SPORE ecosystems powering Mushroom Planet.</p>
+    <div style="display:flex;justify-content:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.5rem;padding:0 1rem;">
+      <div style="display:flex;align-items:center;gap:0.5rem;background:var(--dark3);border:1px solid rgba(253,70,79,0.2);border-radius:999px;padding:0.45rem 0.9rem;font-family:'Syne Mono',monospace;font-size:0.72rem;">
+        <span style="color:rgba(255,255,225,0.4);">Offchain Rate</span>
+        <span style="color:var(--cream);font-weight:600;">100 SPORE = 1 SHROOM</span>
+        <span style="font-size:0.65rem;color:rgba(255,255,225,0.3);">fixed</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.6rem;background:var(--dark3);border:1px solid rgba(79,168,253,0.2);border-radius:999px;padding:0.5rem 1.2rem;font-family:'Syne Mono',monospace;font-size:0.8rem;">
+        <span style="color:rgba(255,255,225,0.4);">Onchain Rate</span>
+        <span id="onchain-rate" style="color:var(--blue);font-weight:600;">Loading...</span>
+        <span style="font-size:0.65rem;color:rgba(255,255,225,0.3);">live</span>
+      </div>
+    </div>
   </div>
 
   <div class="price-strip">
@@ -476,31 +496,145 @@
 
     <div class="glow-divider"></div>
 
-    <!-- TOKEN COMPARISON -->
+<!-- CURRENT REWARDS -->
     <div class="reveal">
-      <div class="section-label">Ecosystem Overview</div>
-      <div class="section-title">Token Relationship</div>
+      <div class="section-label">Current Rewards</div>
+      <div class="section-title">How Rewards Work</div>
     </div>
-    <div class="compare-grid reveal">
-      <div class="compare-card">
-        <h4><span class="badge badge-shroom">$HROOM</span> Token Role</h4>
-        <div class="ratio-row"><span class="ratio-icon">🌐</span> Network <span class="ratio-val">Polygon</span></div>
-        <div class="ratio-row"><span class="ratio-icon">🔥</span> Type <span class="ratio-val">Reward / Utility</span></div>
-        <div class="ratio-row"><span class="ratio-icon">💧</span> LP Pool <span class="ratio-val">WETH / $HROOM</span></div>
-        <div class="ratio-row"><span class="ratio-icon">📋</span> Audit <span class="ratio-val"><a href="https://0xmacro.com/library/audits/shroom-1" target="_blank" style="color:var(--red)">0xMacro</a></span></div>
-        <div class="ratio-row"><span class="ratio-icon">🔁</span> 1:100 ratio <span class="ratio-val">1 SHROOM = 100 SPORE</span></div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:4rem;" class="reveal">
+
+      <!-- ONCHAIN REWARDS -->
+      <div class="compare-card" style="display:flex;flex-direction:column;gap:1rem;">
+        <h4 style="font-size:1rem;display:flex;align-items:center;gap:0.5rem;">
+          <img src="/images/blockchain.png" style="height:1.2rem;width:1.2rem;vertical-align:middle;">
+          Onchain Rewards
+        </h4>
+        <div style="font-size:0.78rem;color:rgba(255,255,225,0.6);line-height:1.6;margin-bottom:0.5rem;">
+          <span style="color:var(--blue);font-weight:600;">Eligibility:</span> Any wallet holding 1M+ SHROOM<br>
+          <span style="color:var(--blue);font-weight:600;">Total Pool:</span> 68.74B SPORE over 10 years<br>
+          <span style="color:var(--blue);font-weight:600;">Snapshot:</span> Weekly · Treasury & LP wallets excluded
+        </div>
+        <div style="font-family:'Syne Mono',monospace;font-size:0.68rem;border:1px solid rgba(255,255,225,0.06);border-radius:0.75rem;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.4rem 0.75rem;background:rgba(255,255,255,0.05);color:rgba(255,255,225,0.35);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;">
+            <span>Year</span><span style="text-align:center;">Weekly</span><span style="text-align:right;">Yearly</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;"><span style="color:rgba(255,255,225,0.4);">Y1</span><span style="color:var(--blue);text-align:center;">200M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">10.40B</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);"><span style="color:rgba(255,255,225,0.4);">Y2</span><span style="color:var(--blue);text-align:center;">185M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">9.62B</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;"><span style="color:rgba(255,255,225,0.4);">Y3</span><span style="color:var(--blue);text-align:center;">170M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">8.84B</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);"><span style="color:rgba(255,255,225,0.4);">Y4</span><span style="color:var(--blue);text-align:center;">155M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">8.06B</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;"><span style="color:rgba(255,255,225,0.4);">Y5</span><span style="color:var(--blue);text-align:center;">140M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">7.28B</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);"><span style="color:rgba(255,255,225,0.4);">Y6</span><span style="color:var(--blue);text-align:center;">125M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">6.50B</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;"><span style="color:rgba(255,255,225,0.4);">Y7</span><span style="color:var(--blue);text-align:center;">110M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">5.72B</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);"><span style="color:rgba(255,255,225,0.4);">Y8</span><span style="color:var(--blue);text-align:center;">95M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">4.94B</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;"><span style="color:rgba(255,255,225,0.4);">Y9</span><span style="color:var(--blue);text-align:center;">80M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">4.16B</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);"><span style="color:rgba(255,255,225,0.4);">Y10</span><span style="color:var(--blue);text-align:center;">62M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">3.22B</span></div>
+        </div>
+        <div style="font-size:0.7rem;color:rgba(255,255,225,0.35);font-family:'Syne Mono',monospace;padding:0.5rem 0.6rem;background:rgba(255,255,255,0.02);border-radius:0.5rem;border:1px solid rgba(255,255,225,0.05);">
+          Year 2 Starts October 1st, 2026
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+          <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1#balances" target="_blank" style="color:var(--red);font-size:0.68rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.4em 0.5em;background:rgba(253,70,79,0.08);border:1px solid rgba(253,70,79,0.15);border-radius:0.4rem;text-align:center;">SHROOM Holders →</a>
+          <a href="https://polygonscan.com/token/0x089582ac20ea563c69408a79e1061de594b61bed#balances" target="_blank" style="color:var(--blue);font-size:0.68rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.4em 0.5em;background:rgba(79,168,253,0.08);border:1px solid rgba(79,168,253,0.15);border-radius:0.4rem;text-align:center;">SPORE Holders →</a>
+        </div>
       </div>
-      <div class="compare-card">
-        <h4><span class="badge badge-spore">SPORE</span> Token Role</h4>
-        <div class="ratio-row"><span class="ratio-icon">🌐</span> Network <span class="ratio-val">Polygon</span></div>
-        <div class="ratio-row"><span class="ratio-icon">🗳️</span> Type <span class="ratio-val">Governance</span></div>
-        <div class="ratio-row"><span class="ratio-icon">💧</span> LP Pool <span class="ratio-val">WETH / SPR</span></div>
-        <div class="ratio-row"><span class="ratio-icon">🌱</span> Farm Active <span class="ratio-val">470M+ planted</span></div>
-        <div class="ratio-row"><span class="ratio-icon">⚡</span> Decimals <span class="ratio-val">18</span></div>
+
+      <!-- NFT REWARDS (CENTER) -->
+      <div class="compare-card" style="display:flex;flex-direction:column;gap:1rem;">
+        <h4 style="font-size:1rem;display:flex;align-items:center;gap:0.5rem;">
+          <img src="/images/nft.png" style="height:1.2rem;width:1.2rem;vertical-align:middle;border-radius:3px;">
+          NFT Rewards
+        </h4>
+        <div style="font-size:0.78rem;color:rgba(255,255,225,0.6);line-height:1.6;margin-bottom:0.25rem;">
+          <span style="color:var(--yellow);font-weight:600;">Zuko's Mooshies:</span> House / King / Queen / Kid / Gold<br>
+          <span style="color:var(--yellow);font-weight:600;">Offchain Daily:</span> House, King & Queen Mooshie<br>
+          <span style="color:var(--yellow);font-weight:600;">Onchain Monthly:</span> Kid Shroom + Gold Mooshie
+        </div>
+        <div style="font-family:'Syne Mono',monospace;font-size:0.68rem;border:1px solid rgba(255,255,225,0.06);border-radius:0.75rem;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.4rem 0.75rem;background:rgba(255,255,255,0.05);color:rgba(255,255,225,0.35);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;">
+            <span>NFT</span><span style="text-align:center;">Reward</span><span style="text-align:right;">Type</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;align-items:center;">
+            <span style="color:var(--red);">House Mooshie</span>
+            <span style="color:rgba(255,255,225,0.6);text-align:center;">200K SPORE</span>
+            <span style="color:rgba(255,255,225,0.4);text-align:right;">Daily</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);align-items:center;">
+            <span style="color:var(--red);">King Mooshie</span>
+            <span style="color:rgba(255,255,225,0.6);text-align:center;">200K SPORE</span>
+            <span style="color:rgba(255,255,225,0.4);text-align:right;">Daily</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;align-items:center;">
+            <span style="color:#c084fc;">Queen Mooshie</span>
+            <span style="color:rgba(255,255,225,0.6);text-align:center;">200K SPORE</span>
+            <span style="color:rgba(255,255,225,0.4);text-align:right;">Daily</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);align-items:center;">
+            <span style="color:var(--red);">Kid Shroom</span>
+            <span style="color:rgba(255,255,225,0.6);text-align:center;">20K SHROOM + 1.5M SPORE</span>
+            <span style="color:rgba(255,255,225,0.4);text-align:right;">Monthly</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;align-items:center;">
+            <span style="color:#fece00;">Gold Mooshie</span>
+            <span style="color:rgba(255,255,225,0.6);text-align:center;">15K SHROOM + 2M SPORE</span>
+            <span style="color:rgba(255,255,225,0.4);text-align:right;">Monthly</span>
+          </div>
+        </div>
+        <div style="font-size:0.7rem;color:rgba(255,255,225,0.35);font-family:'Syne Mono',monospace;padding:0.5rem 0.6rem;background:rgba(255,255,255,0.02);border-radius:0.5rem;border:1px solid rgba(255,255,225,0.05);">
+          Kid Shroom: Feb 2025 – Jul 2026 (18 months)<br>
+          Gold Mooshie: Nov 2025 – Oct 2028 (36 months)
+        </div>
+        <div style="font-size:0.72rem;color:rgba(255,255,225,0.5);padding:0.5rem 0.6rem;background:rgba(79,168,253,0.05);border-radius:0.5rem;border:1px solid rgba(79,168,253,0.12);line-height:1.6;">
+          Once the monthly airdrop program ends, Kid Shroom and Gold Mooshie holders will be added to the daily Sporebot rewards!
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;">
+          <a href="https://opensea.io/collection/mooshies-house" target="_blank" style="color:var(--red);font-size:0.62rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.35em 0.3em;background:rgba(253,70,79,0.08);border:1px solid rgba(253,70,79,0.2);border-radius:0.4rem;text-align:center;">House Mooshie</a>
+          <a href="https://opensea.io/collection/king-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" style="color:var(--red);font-size:0.62rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.35em 0.3em;background:rgba(253,70,79,0.08);border:1px solid rgba(253,70,79,0.2);border-radius:0.4rem;text-align:center;">King Mooshie</a>
+          <a href="https://opensea.io/collection/queen-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" style="color:#c084fc;font-size:0.62rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.35em 0.3em;background:rgba(192,132,252,0.08);border:1px solid rgba(192,132,252,0.2);border-radius:0.4rem;text-align:center;">Queen Mooshie</a>
+          <a href="https://opensea.io/collection/kid-shroom-by-zuko-x-reddit-collectible-avatars" target="_blank" style="color:var(--red);font-size:0.62rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.35em 0.3em;background:rgba(253,70,79,0.08);border:1px solid rgba(253,70,79,0.2);border-radius:0.4rem;text-align:center;">Kid Shroom</a>
+          <a href="https://opensea.io/collection/gold-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" style="color:#fece00;font-size:0.62rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.35em 0.3em;background:rgba(254,206,0,0.08);border:1px solid rgba(254,206,0,0.2);border-radius:0.4rem;text-align:center;">Gold Mooshie</a>
+          <span style="color:rgba(255,255,225,0.2);font-size:0.62rem;font-family:'Syne Mono',monospace;padding:0.35em 0.3em;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.4rem;text-align:center;">Coming Soon</span>
+        </div>
+      </div>
+
+            <!-- LP REWARDS -->
+      <div class="compare-card" style="display:flex;flex-direction:column;gap:1rem;">
+        <h4 style="font-size:1rem;display:flex;align-items:center;gap:0.5rem;">
+          <img src="/images/sporulation1.webp" style="height:1.2rem;width:1.2rem;vertical-align:middle;border-radius:3px;">
+          LP Rewards
+        </h4>
+        <div style="font-size:0.78rem;color:rgba(255,255,225,0.6);line-height:1.6;margin-bottom:0.25rem;">
+          <span style="color:var(--red);font-weight:600;">Snapshot:</span> Every Sunday · Airdrop sent Monday<br>
+          <span style="color:var(--red);font-weight:600;">Earn:</span> Based on your % share of the pool<br>
+          <span style="color:var(--red);font-weight:600;">Tapers:</span> Annually on May 7th each year
+        </div>
+        <div style="font-family:'Syne Mono',monospace;font-size:0.68rem;border:1px solid rgba(255,255,225,0.06);border-radius:0.75rem;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.4rem 0.75rem;background:rgba(255,255,255,0.05);color:rgba(255,255,225,0.35);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;">
+            <span>Year</span><span style="text-align:center;">SHROOM/wk</span><span style="text-align:right;">SPORE/wk</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;"><span style="color:rgba(255,255,225,0.4);">Y1</span><span style="color:var(--red);text-align:center;">5M</span><span style="color:var(--blue);text-align:right;">500M</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);"><span style="color:rgba(255,255,225,0.4);">Y2</span><span style="color:var(--red);text-align:center;">3.5M</span><span style="color:var(--blue);text-align:right;">350M</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;"><span style="color:rgba(255,255,225,0.4);">Y3</span><span style="color:var(--red);text-align:center;">2.5M</span><span style="color:var(--blue);text-align:right;">250M</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);"><span style="color:rgba(255,255,225,0.4);">Y4</span><span style="color:var(--red);text-align:center;">2M</span><span style="color:var(--blue);text-align:right;">200M</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;"><span style="color:rgba(255,255,225,0.4);">Y5</span><span style="color:var(--red);text-align:center;">1.75M</span><span style="color:var(--blue);text-align:right;">175M</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);"><span style="color:rgba(255,255,225,0.4);">Y6</span><span style="color:var(--red);text-align:center;">1.5M</span><span style="color:var(--blue);text-align:right;">150M</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;"><span style="color:rgba(255,255,225,0.4);">Y7</span><span style="color:var(--red);text-align:center;">1.25M</span><span style="color:var(--blue);text-align:right;">125M</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);"><span style="color:rgba(255,255,225,0.4);">Y8</span><span style="color:var(--red);text-align:center;">1M</span><span style="color:var(--blue);text-align:right;">100M</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;"><span style="color:rgba(255,255,225,0.4);">Y9</span><span style="color:var(--red);text-align:center;">0.75M</span><span style="color:var(--blue);text-align:right;">75M</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:0.35rem 0.75rem;background:rgba(255,255,255,0.02);"><span style="color:rgba(255,255,225,0.4);">Y10</span><span style="color:var(--red);text-align:center;">0.5M</span><span style="color:var(--blue);text-align:right;">50M</span></div>
+        </div>
+        <div style="font-size:0.7rem;color:rgba(255,255,225,0.35);font-family:'Syne Mono',monospace;padding:0.5rem 0.6rem;background:rgba(255,255,255,0.02);border-radius:0.5rem;border:1px solid rgba(255,255,225,0.05);">
+          Year 3 Starts May 7th, 2026<br>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;">
+          <a href="https://polygonscan.com/token/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28#balances" target="_blank" style="color:var(--red);font-size:0.68rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.4em 0.5em;background:rgba(253,70,79,0.08);border:1px solid rgba(253,70,79,0.15);border-radius:0.4rem;text-align:center;">SHROOM/WETH LP</a>
+          <a href="https://polygonscan.com/token/0x2a91571238303c6700a9336342c754e159243168#balances" target="_blank" style="color:var(--blue);font-size:0.68rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.4em 0.5em;background:rgba(79,168,253,0.08);border:1px solid rgba(79,168,253,0.15);border-radius:0.4rem;text-align:center;">SPORE/WETH LP</a>
+          <a href="https://www.reddit.com/r/MushroomPlanet/comments/1mu9dx0/quickswap_guide_trading_providing_liquidity/" target="_blank" style="color:rgba(255,255,225,0.4);font-size:0.68rem;font-family:'Syne Mono',monospace;text-decoration:none;padding:0.4em 0.5em;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,225,0.08);border-radius:0.4rem;text-align:center;">LP Guide</a>
+        </div>
       </div>
     </div>
 
-  </div>
+    </div>
 
   <div class="treas-footer">
     Data is approximate. Token allocations reflect launch parameters. Live prices via GeckoTerminal. &copy; 2025 Mushroom Planet.
@@ -596,34 +730,84 @@
   // CHART DATA
   // ─────────────────────────────────────────────────────────────────
 
+  const BASELINE_TS = 1773100800; // March 10 2026 00:00 UTC
+
+  const CATEGORY_MAP = {
+    lp_rewards:       'lp',
+    kid_shroom:       'nft',
+    gold_mooshie:     'nft',
+    onchain_airdrop:  'spore_rewards',
+  };
+
   const combinedBars = [
-    { emoji: '💧', label: 'LP Rewards',             pct: 20, shroom: '612,398,209',  spore: '61,239,820,900' },
-    { emoji: '🍄', label: 'NFT Rewards',            pct: 20, shroom: '612,398,209',  spore: '61,239,820,900' },
-    { emoji: '🤖', label: 'Sporebot Rewards',       pct: 20, shroom: '612,398,209',  spore: '61,239,820,900' },
-    { emoji: '🤝', label: 'Partnerships / Collabs', pct: 10, shroom: '306,199,104',  spore: '30,619,910,400' },
-    { emoji: '🧪', label: 'Innovation / Misc',      pct: 10, shroom: '306,199,104',  spore: '30,619,910,400' },
-    { emoji: '🗳',  label: 'Governance',             pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200' },
-    { emoji: '🛡',  label: 'Strategic Reserve',      pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200' },
-    { emoji: '🔁', label: 'Swap Function',          pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200' },
-    { emoji: '🚨', label: 'Emergency Fund',         pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200' },
+    { img: '/images/sporulation1.webp', label: 'LP Rewards',             key: 'lp',            pct: 20, shroom: '609,500,000',  spore: '80,200,000,000',  baseShroom: 609_500_000,  baseSpore: 80_200_000_000  },
+    { img: '/images/nft.png',           label: 'NFT Rewards',            key: 'nft',           pct: 20, shroom: '612,398,209',  spore: '61,239,820,900',  baseShroom: 612_398_209,  baseSpore: 61_239_820_900  },
+    { img: '/images/sporebot.png',      label: 'Sporebot Rewards',       key: 'sporebot',      pct: 20, shroom: '612,398,209',  spore: '61,239,820,900',  baseShroom: 612_398_209,  baseSpore: 61_239_820_900  },
+    { emoji: '🤝',                      label: 'Partnerships / Collabs', key: null,            pct: 10, shroom: '306,199,104',  spore: '30,619,910,400',  baseShroom: 306_199_104,  baseSpore: 30_619_910_400  },
+    { img: '/images/innovations.png',    label: 'Innovation / Misc',      key: null,            pct: 10, shroom: '306,199,104',  spore: '30,619,910,400',  baseShroom: 306_199_104,  baseSpore: 30_619_910_400  },
+    { img: '/images/vote.png',          label: 'Governance',             key: null,            pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200',  baseShroom: 153_099_552,  baseSpore: 15_309_955_200  },
+    { img: '/images/reserves.png',      label: 'Strategic Reserve',      key: null,            pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200',  baseShroom: 153_099_552,  baseSpore: 15_309_955_200  },
+    { img: '/images/swaps.png',         label: 'Swap Function',          key: null,            pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200',  baseShroom: 153_099_552,  baseSpore: 15_309_955_200  },
+    { img: '/images/emergency-funds.png', label: 'Emergency Fund',       key: null,            pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200',  baseShroom: 153_099_552,  baseSpore: 15_309_955_200  },
+    { img: '/images/blockchain.png',    label: 'Onchain Rewards',        key: 'spore_rewards', pct: 0,  shroom: '0',            spore: '68,740,000,000',  baseShroom: 0,            baseSpore: 68_740_000_000, sporeOnly: true },
   ];
 
-  function buildCombinedBars(id, items) {
+  function buildCombinedBars(id, items, spent) {
     const c = document.getElementById(id);
     if (!c) return;
+    c.innerHTML = '';
     items.forEach(item => {
+      const s = spent[item.key] || { shroom: 0, spore: 0 };
+
+      const remShroom = Math.max(0, item.baseShroom + (s.shroomAdded || 0) - s.shroom);
+      const remSpore  = Math.max(0, item.baseSpore  + (s.sporeAdded  || 0) - s.spore);
+      const spentShroom = item.baseShroom - remShroom;
+      const spentSpore  = item.baseSpore  - remSpore;
+
+      const totalShroom = item.baseShroom + (s.shroomAdded || 0);
+      const totalSpore  = item.baseSpore  + (s.sporeAdded  || 0);
+
+      // Bar widths — spent gray replaces from right
+      const shroomSpentPct = totalShroom > 0 ? (spentShroom / totalShroom) * 50 : 0;
+      const shroomRemPct   = totalShroom > 0 ? (remShroom   / totalShroom) * 50 : 0;
+      const sporeSpentPct  = totalSpore  > 0 ? (spentSpore  / totalSpore)  * 50 : 0;
+      const sporeRemPct    = totalSpore  > 0 ? (remSpore    / totalSpore)  * 50 : 0;
+
+      const fmtNum = v => v >= 1e9 ? (v/1e9).toFixed(2)+'B' : v >= 1e6 ? (v/1e6).toFixed(2)+'M' : v >= 1e3 ? (v/1e3).toFixed(2)+'K' : v.toFixed(0);
+
+      const shroomLine = item.sporeOnly ? '' :
+        `<span style="color:rgba(253,70,79,0.7);">${fmtNum(remShroom)} SHROOM</span>
+         ${spentShroom > 0 ? `<span style="color:rgba(255,255,255,0.2);">(-${fmtNum(spentShroom)} spent)</span>` : ''}`;
+
+      const sporeLine =
+        `<span style="color:rgba(79,168,253,0.7);">${fmtNum(remSpore)} SPORE</span>
+         ${spentSpore > 0 ? `<span style="color:rgba(255,255,255,0.2);">(-${fmtNum(spentSpore)} spent)</span>` : ''}`;
+
+      // Build gradient: red-rem | red-spent-gray | blue-rem | blue-spent-gray
+      let gradient, totalPct;
+      if (item.sporeOnly) {
+        const rp = sporeRemPct * 2;
+        const sp = sporeSpentPct * 2;
+        gradient = `linear-gradient(90deg, var(--blue) ${rp}%, rgba(255,255,255,0.12) ${rp}%, rgba(255,255,255,0.12) ${rp+sp}%, transparent ${rp+sp}%)`;
+        totalPct = rp + sp;
+      } else {
+        const a = shroomRemPct, b = shroomRemPct + shroomSpentPct;
+        const d = b + sporeRemPct, e = d + sporeSpentPct;
+        gradient = `linear-gradient(90deg, var(--red) ${a}%, rgba(255,255,255,0.12) ${a}%, rgba(255,255,255,0.12) ${b}%, var(--blue) ${b}%, var(--blue) ${d}%, rgba(255,255,255,0.12) ${d}%, rgba(255,255,255,0.12) ${e}%, transparent ${e}%)`;
+        totalPct = e;
+      }
+
       c.insertAdjacentHTML('beforeend', `
         <div class="bar-item">
           <div class="bar-meta">
-            <span class="bm-label">${item.emoji} ${item.label}</span>
-            <span class="bm-pct">${item.pct}%</span>
+            <span class="bm-label">${item.img ? `<img src="${item.img}" style="height:1em;width:1em;vertical-align:middle;border-radius:3px;margin-right:0.3rem;">` : (item.emoji || '') + ' '}${item.label}</span>
+            <span class="bm-pct">${item.pct > 0 ? item.pct+'%' : ''}</span>
           </div>
-          <div style="font-size:0.68rem;color:rgba(255,255,225,0.3);margin-bottom:0.3rem;font-family:'Syne Mono',monospace;display:flex;gap:1.5rem;">
-            <span style="color:rgba(253,70,79,0.7);">${item.shroom} SHROOM</span>
-            <span style="color:rgba(79,168,253,0.7);">${item.spore} SPORE</span>
+          <div style="font-size:0.68rem;color:rgba(255,255,225,0.3);margin-bottom:0.3rem;font-family:'Syne Mono',monospace;display:flex;gap:1.5rem;flex-wrap:wrap;">
+            ${shroomLine} ${sporeLine}
           </div>
           <div class="bar-track" style="height:10px;">
-            <div style="height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--red) 50%,var(--blue) 50%);transition:width 1.4s cubic-bezier(0.16,1,0.3,1);" data-pct="100"></div>
+            <div style="height:100%;width:0%;border-radius:999px;background:${gradient};transition:width 1.4s cubic-bezier(0.16,1,0.3,1);" data-pct="${Math.min(100, totalPct)}"></div>
           </div>
         </div>`);
     });
@@ -672,21 +856,12 @@
   async function loadFeed() {
     document.getElementById('tx-list').innerHTML = '<div class="tx-loading">Fetching transactions…</div>';
     try {
-      const res  = await fetch('https://api.mushroomplanet.earth/api/treasury-txs');
+      const res  = await fetch('http://localhost:3001/api/treasury-txs');
       const data = await res.json();
       if (!data.ok || !data.batches?.length) { renderMock(); return; }
       _raw = data.batches;
       applyAndRender();
     } catch { renderMock(); }
-  }
-
-  function applyAndRender() {
-    _filtered  = _dir === 'all' ? _raw : _raw.filter(b => {
-      const isOut = (b.transfers[0]?.from || '').toLowerCase() === TREASURY_ADDR;
-      return _dir === 'out' ? isOut : !isOut;
-    });
-    _page = 1; _displayPg = 1;
-    renderPage();
   }
 
   // ── Render
@@ -935,10 +1110,79 @@
   // ─────────────────────────────────────────────────────────────────
   // INIT
   // ─────────────────────────────────────────────────────────────────
+  const SPOREBOT_ADDR = '0xa00c9a4c1f40cdb30105e1402dd4c0ac7048863a';
+
+  function calcSpent(batches) {
+    const spent = {
+      lp:           { shroom: 0, spore: 0 },
+      nft:          { shroom: 0, spore: 0 },
+      sporebot:     { shroom: 0, spore: 0, shroomAdded: 0, sporeAdded: 0 },
+      spore_rewards:{ shroom: 0, spore: 4_200_000_000 }, // 21 weeks x 200M pre-baseline
+    };
+
+    for (const b of batches) {
+      if (b.timestamp <= BASELINE_TS) continue;
+
+      const cat = CATEGORY_MAP[b.type];
+
+      // Sporebot transfers: OUT tx to sporebot addr, only if it's a small transfer (not a mass airdrop)
+      const sporebotTransfers = b.transfers.filter(t =>
+        t.to.toLowerCase() === SPOREBOT_ADDR && t.from.toLowerCase() === TREASURY_ADDR
+      );
+      const isToSporebot = sporebotTransfers.length > 0 && b.transfers.length <= 5;
+      if (isToSporebot) {
+        for (const leg of b.legs) {
+          if (leg.token === 'shroom') spent.sporebot.shroom += leg.total;
+          if (leg.token === 'spore')  spent.sporebot.spore  += leg.total;
+        }
+        continue;
+      }
+
+      // Swaps IN — add to sporebot pool
+      if (b.type === 'swap') {
+        for (const t of b.transfers) {
+          if (t.to.toLowerCase() === TREASURY_ADDR) {
+            if (t.token === 'shroom') spent.sporebot.shroomAdded = (spent.sporebot.shroomAdded || 0) + t.amount;
+            if (t.token === 'spore')  spent.sporebot.sporeAdded  = (spent.sporebot.sporeAdded  || 0) + t.amount;
+          }
+        }
+        continue;
+      }
+
+      if (!cat) continue;
+
+      console.log(`[CAT] ${b.type} -> ${cat} | ts:${b.timestamp} | ${b.legs.map(l => l.total + ' ' + l.token).join(' + ')}`);
+
+      for (const leg of b.legs) {
+        if (leg.token === 'shroom') spent[cat].shroom += leg.total;
+        if (leg.token === 'spore')  spent[cat].spore  += leg.total;
+      }
+    }
+    return spent;
+  }
+
   window.addEventListener('DOMContentLoaded', () => {
-    buildCombinedBars('combined-bars', combinedBars);
+    buildCombinedBars('combined-bars', combinedBars, {});
     loadFeed();
   });
+
+  function applyAndRender() {
+    _filtered  = _dir === 'all' ? _raw : _raw.filter(b => {
+      const isOut = (b.transfers[0]?.from || '').toLowerCase() === TREASURY_ADDR;
+      return _dir === 'out' ? isOut : !isOut;
+    });
+    _page = 1; _displayPg = 1;
+    renderPage();
+    if (_raw.length) {
+      const spent = calcSpent(_raw);
+      console.log('[SPENT]', JSON.stringify(spent));
+      buildCombinedBars('combined-bars', combinedBars, spent);
+      // Re-apply widths immediately since reveal already fired
+      document.querySelectorAll('#combined-bars [data-pct]').forEach(b => {
+        b.style.width = b.dataset.pct + '%';
+      });
+    }
+  }
   </script>
 
   <!-- Live prices -->
@@ -950,9 +1194,16 @@
         fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8'),
       ]);
       const sd = await sr.json(), pd = await sp.json();
-      document.getElementById('shroom-price').textContent = '$' + parseFloat(sd.data.attributes.base_token_price_usd).toFixed(7);
-      document.getElementById('spore-price').textContent  = '$' + parseFloat(pd.data.attributes.base_token_price_usd).toFixed(9);
-    } catch {
+      const shroomUsd = parseFloat(sd.data.attributes.base_token_price_usd);
+      const sporeUsd  = parseFloat(pd.data.attributes.base_token_price_usd);
+      document.getElementById('shroom-price').textContent = '$' + shroomUsd.toFixed(7);
+      document.getElementById('spore-price').textContent  = '$' + sporeUsd.toFixed(9);
+      const rateEl = document.getElementById('onchain-rate');
+      if (rateEl && shroomUsd > 0 && sporeUsd > 0) {
+        rateEl.textContent = Math.round(shroomUsd / sporeUsd).toLocaleString() + ' SPORE = 1 SHROOM';
+      }
+    } catch(e) {
+      console.error('[PRICES]', e);
       document.getElementById('shroom-price').textContent = 'N/A';
       document.getElementById('spore-price').textContent  = 'N/A';
     }
@@ -998,7 +1249,7 @@
   async function loadHoldings() {
     const grid = document.getElementById('holdings-grid');
     try {
-      const res  = await fetch('https://api.mushroomplanet.earth/api/treasury-holdings');
+      const res  = await fetch('http://localhost:3001/api/treasury-holdings');
       const data = await res.json();
       if (!data.ok) throw new Error('bad response');
       grid.innerHTML = '';
@@ -1025,14 +1276,15 @@
     const lpGrid    = document.getElementById('lp-grid');
     const sbGrid    = document.getElementById('sporebot-grid');
     try {
-      const res  = await fetch('https://api.mushroomplanet.earth/api/lp-holdings');
+      const res  = await fetch('http://localhost:3001/api/lp-holdings');
       const data = await res.json();
       if (!data.ok) throw new Error('bad response');
       lpGrid.innerHTML = '';
 
       const pools = [
-        { key: 'lp_weth_shroom', label: 'WETH / $HROOM Pool' },
         { key: 'lp_spr_shroom',  label: 'SPR / $HROOM Pool'  },
+        { key: 'lp_weth_shroom', label: 'WETH / $HROOM Pool' },
+        { key: 'lp_spr_weth',    label: 'SPR / WETH Pool'    },
       ];
       pools.forEach(p => {
         const lp = data[p.key];
@@ -1055,6 +1307,11 @@
         <div class="stats-panel" style="padding:1.25rem;min-width:0;">
           <div class="stat-key">$HROOM</div>
           <div class="stat-val" style="color:${sbc};font-size:1.1rem;">${fmtBal(data.sporebot_shroom, '$HROOM')}</div>
+          <div class="stat-sub" style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;margin-top:0.3rem;">0xa00C...863A</div>
+        </div>
+        <div class="stats-panel" style="padding:1.25rem;min-width:0;">
+          <div class="stat-key">SPORE</div>
+          <div class="stat-val" style="color:var(--blue);font-size:1.1rem;">${fmtBal(data.sporebot_spore, 'SPORE')}</div>
           <div class="stat-sub" style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;margin-top:0.3rem;">0xa00C...863A</div>
         </div>`);
     } catch {
