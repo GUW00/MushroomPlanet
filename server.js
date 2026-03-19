@@ -372,7 +372,7 @@ function recipientOverlap(setA, setB) {
 
 function classifyEvent(legs, isIncoming) {
   if (isIncoming) {
-    return { type: 'swap', label: 'Swap', emoji: '🔄', colorClass: 'swap' };
+    return { type: 'transfer', label: 'Deposit', emoji: '⬇️', colorClass: 'transfer' };
   }
 
   const s = legs.find(l => l.token === 'shroom');
@@ -635,6 +635,8 @@ function groupIntoBatches(shroomRows, sporeRows, wethRows = []) {
   }
   const wethBlocks = Object.entries(wethByBlock).map(([, rows]) => summariseBlock(rows, 'weth'));
 
+  shroomBlocks.forEach(b => {
+  });
   const remaining = [
     ...shroomBlocks.filter(b => !usedShroomBlocks.has(b.blockNumber) && !swapUsedBlocks.has(b.blockNumber)),
     ...sporeBlocks.filter(b  => !usedSporeBlocks.has(b.blockNumber)  && !swapUsedBlocks.has(b.blockNumber)),
