@@ -686,6 +686,17 @@ app.get('/api/treasury-txs', async (req, res) => {
 // ----------------------------------------------------------------
 const PORT = process.env.PORT || 3001;
 console.log(`[CONFIG] TESTING=${TESTING}`);
+app.get('/api/sporebot-totals', async (req, res) => {
+  try {
+    const snap = await db.ref('Sporebot/Admin/Total_Balance').get();
+    if (!snap.exists()) return res.json({ ok: false });
+    res.json({ ok: true, totals: snap.val() });
+  } catch (err) {
+    console.error('[SPOREBOT-TOTALS]', err);
+    res.status(500).json({ ok: false });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

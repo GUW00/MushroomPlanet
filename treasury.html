@@ -7,42 +7,54 @@
   <meta name="description" content="Live SHROOM and SPORE treasury allocation and ecosystem stats." />
   <link id="font-link" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne+Mono&display=swap" />
   <link rel="stylesheet" href="styles.css" />
-  <script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-  const app = initializeApp({ databaseURL: 'https://sporebot-testing-default-rtdb.firebaseio.com' });
-  const fbDb = getDatabase(app);
-
-  async function loadSporebotTotals() {
+  <script>
+async function loadSporebotTotals() {
     try {
-      const snap = await get(ref(fbDb, 'Sporebot/Admin/Total_Balance'));
-      if (!snap.exists()) return;
-      const t = snap.val();
+      const res  = await fetch(`${window.API_BASE}/api/sporebot-totals`);
+      const data = await res.json();
+      if (!data.ok) return;
+      const t = data.totals;
       window._sporebotTotals = t;
       if (window._latestSpent) {
         buildCombinedBars('combined-bars', combinedBars, window._latestSpent);
         document.querySelectorAll('#combined-bars [data-pct]').forEach(b => { b.style.width = b.dataset.pct + '%'; });
       }
-      const existing = document.getElementById('sporebot-grid');
-      if (!existing) return;
-      const infoDiv = document.createElement('div');
-      infoDiv.style.cssText = 'grid-column:1/-1;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:1rem;padding:1rem 1.25rem;font-family:"Syne Mono",monospace;font-size:0.72rem;color:rgba(255,255,225,0.4);display:flex;flex-wrap:wrap;gap:1rem;margin-top:0.5rem;';
+      const shroomEl = document.getElementById('inbot-shroom');
+      const sporeEl  = document.getElementById('inbot-spore');
+      if (shroomEl) shroomEl.textContent = fmt(t.grand_total_shrooms) + ' $HROOM';
+      if (sporeEl)  sporeEl.textContent  = fmt(t.grand_total_spores)  + ' SPORE';
+      const grid = document.getElementById('sporebot-grid');
+      if (!grid) return;
       const fmt = v => v >= 1e9 ? (v/1e9).toFixed(2)+'B' : v >= 1e6 ? (v/1e6).toFixed(2)+'M' : v >= 1e3 ? (v/1e3).toFixed(2)+'K' : v.toLocaleString();
-      infoDiv.innerHTML = `
-        <span style="color:rgba(255,255,225,0.25);width:100%;font-size:0.62rem;letter-spacing:0.1em;">DISTRIBUTED BUT NOT YET WITHDRAWN (IN-BOT BALANCES)</span>
-        <span><span style="color:var(--red);">${fmt(t.grand_total_shrooms)} SHROOM</span> &nbsp;·&nbsp; <span style="color:var(--blue);">${fmt(t.grand_total_spores)} SPORE</span> &nbsp; total held by users</span>
-        <span style="color:rgba(255,255,225,0.25);">|</span>
-        <span>Farm: <span style="color:var(--red);">${fmt(t.farm_shrooms)}</span> &nbsp;·&nbsp; <span style="color:var(--blue);">${fmt(t.farm_spores)}</span></span>
-        <span style="color:rgba(255,255,225,0.25);">|</span>
-        <span>Discord: <span style="color:var(--red);">${fmt(t.discord_shroom_wallet)}</span> &nbsp;·&nbsp; <span style="color:var(--blue);">${fmt(t.discord_spore_wallet)}</span></span>
-        <span style="color:rgba(255,255,225,0.25);">|</span>
-        <span>Staked: <span style="color:var(--blue);">${fmt(t.staked_spores)}</span></span>
-      `;
-      existing.appendChild(infoDiv);
+      const card = document.createElement('div');
+      card.style.cssText = 'grid-column:1/-1;background:var(--dark2);border:1px solid rgba(255,255,225,0.07);border-radius:1.5rem;padding:1.25rem;margin-top:0.5rem;';
+      card.innerHTML = `
+        <div style="font-family:'Syne Mono',monospace;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,225,0.4);margin-bottom:0.75rem;">In-Bot Balances (Distributed, Not Yet Withdrawn)</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
+          <div>
+            <div style="font-family:'Syne Mono',monospace;font-size:0.62rem;color:rgba(255,255,225,0.3);margin-bottom:0.25rem;">TOTAL HELD BY USERS</div>
+            <div style="font-size:1.1rem;font-weight:700;color:var(--red);">${fmt(t.grand_total_shrooms)} SHROOM</div>
+            <div style="font-size:1.1rem;font-weight:700;color:var(--blue);">${fmt(t.grand_total_spores)} SPORE</div>
+          </div>
+          <div>
+            <div style="font-family:'Syne Mono',monospace;font-size:0.62rem;color:rgba(255,255,225,0.3);margin-bottom:0.25rem;">FARM BALANCES</div>
+            <div style="color:var(--red);font-weight:600;">${fmt(t.farm_shrooms)} SHROOM</div>
+            <div style="color:var(--blue);font-weight:600;">${fmt(t.farm_spores)} SPORE</div>
+          </div>
+          <div>
+            <div style="font-family:'Syne Mono',monospace;font-size:0.62rem;color:rgba(255,255,225,0.3);margin-bottom:0.25rem;">DISCORD WALLETS</div>
+            <div style="color:var(--red);font-weight:600;">${fmt(t.discord_shroom_wallet)} SHROOM</div>
+            <div style="color:var(--blue);font-weight:600;">${fmt(t.discord_spore_wallet)} SPORE</div>
+          </div>
+          <div>
+            <div style="font-family:'Syne Mono',monospace;font-size:0.62rem;color:rgba(255,255,225,0.3);margin-bottom:0.25rem;">STAKED</div>
+            <div style="color:var(--blue);font-weight:600;">${fmt(t.staked_spores)} SPORE</div>
+          </div>
+        </div>`;
+      grid.appendChild(card);
     } catch(e) { console.error('[SPOREBOT-TOTALS]', e); }
   }
-  window.loadSporebotTotals = loadSporebotTotals;
-</script>
+  </script>
   <script type="module" src="config.js"></script>
 
   <style>
@@ -1460,13 +1472,34 @@
             <div class="stat-sub" style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;margin-top:0.3rem;">0xa00C...863A</div>
           </div>
         </a>`);
+
+      // In-bot balances — added after wallet cards, filled by loadSporebotTotals
+      sbGrid.insertAdjacentHTML('beforeend', `
+        <a href="https://polygonscan.com/address/0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A" target="_blank" style="text-decoration:none;">
+          <div class="stats-panel" style="padding:1.25rem;min-width:0;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.07)'">
+            <div class="stat-key">In-Bot SHROOM</div>
+            <div class="stat-val" id="inbot-shroom" style="color:var(--red);font-size:1.1rem;">Loading...</div>
+            <div class="stat-sub" style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;margin-top:0.3rem;">Held by users</div>
+          </div>
+        </a>
+        <a href="https://polygonscan.com/address/0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A" target="_blank" style="text-decoration:none;">
+          <div class="stats-panel" style="padding:1.25rem;min-width:0;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.07)'">
+            <div class="stat-key">In-Bot SPORE</div>
+            <div class="stat-val" id="inbot-spore" style="color:var(--blue);font-size:1.1rem;">Loading...</div>
+            <div class="stat-sub" style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;margin-top:0.3rem;">Held by users</div>
+          </div>
+        </a>`);
+
     } catch {
       lpGrid.innerHTML    = '<div class="tx-loading">Failed to load LP data.</div>';
       sbGrid.innerHTML    = '<div class="tx-loading">Failed to load.</div>';
     }
   }
 
-  loadLPHoldings().then(() => loadSporebotTotals());
+  loadLPHoldings().then(() => {
+    if (window.loadSporebotTotals) loadSporebotTotals();
+    else window.addEventListener('load', loadSporebotTotals);
+  });
   loadFeed().then(() => loadHoldings());
   </script>
 
