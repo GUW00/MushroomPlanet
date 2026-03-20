@@ -12,7 +12,7 @@ admin.initializeApp({
   databaseURL: 'https://drbots---live-default-rtdb.firebaseio.com',
 });
 
-const TESTING = process.env.TESTING === 'false';
+const TESTING = process.env.TESTING === 'true';
 const db = admin.database();
 const app = express();
 app.use(cors({
