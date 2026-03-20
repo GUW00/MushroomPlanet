@@ -19,13 +19,13 @@ async function loadSporebotTotals() {
         buildCombinedBars('combined-bars', combinedBars, window._latestSpent);
         document.querySelectorAll('#combined-bars [data-pct]').forEach(b => { b.style.width = b.dataset.pct + '%'; });
       }
+      const fmt = v => v >= 1e9 ? (v/1e9).toFixed(2)+'B' : v >= 1e6 ? (v/1e6).toFixed(2)+'M' : v >= 1e3 ? (v/1e3).toFixed(2)+'K' : v.toLocaleString();
       const shroomEl = document.getElementById('inbot-shroom');
       const sporeEl  = document.getElementById('inbot-spore');
       if (shroomEl) shroomEl.textContent = fmt(t.grand_total_shrooms) + ' $HROOM';
       if (sporeEl)  sporeEl.textContent  = fmt(t.grand_total_spores)  + ' SPORE';
       const grid = document.getElementById('sporebot-grid');
       if (!grid) return;
-      const fmt = v => v >= 1e9 ? (v/1e9).toFixed(2)+'B' : v >= 1e6 ? (v/1e6).toFixed(2)+'M' : v >= 1e3 ? (v/1e3).toFixed(2)+'K' : v.toLocaleString();
       const card = document.createElement('div');
       card.style.cssText = 'grid-column:1/-1;background:var(--dark2);border:1px solid rgba(255,255,225,0.07);border-radius:1.5rem;padding:1.25rem;margin-top:0.5rem;';
       card.innerHTML = `
