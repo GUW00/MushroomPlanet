@@ -538,6 +538,7 @@ async function loadSporebotTotals() {
       <div style="display:flex;gap:1rem;margin-bottom:1rem;font-family:'Syne Mono',monospace;font-size:0.65rem;color:rgba(255,255,225,0.4);">
         <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block;"></span>SHROOM</span>
         <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:var(--blue);display:inline-block;"></span>SPORE</span>
+        <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:#22c55e;display:inline-block;"></span>OFF-CHAIN SPOREBOT</span>
       </div>
       <div class="bar-group" id="combined-bars"></div>
     </div>
@@ -736,7 +737,7 @@ async function loadSporebotTotals() {
 
   <script>
 
-  window.USE_LOCAL = false;
+  window.USE_LOCAL = true;
   window.API_BASE  = window.USE_LOCAL ? 'http://localhost:3001' : 'https://api.mushroomplanet.earth';
 
   // ─────────────────────────────────────────────────────────────────
@@ -827,15 +828,15 @@ async function loadSporebotTotals() {
   };
 
   const combinedBars = [
-    { img: '/images/sporulation1.webp', label: 'LP Rewards',             key: 'lp',            pct: 20, shroom: '609,500,000',  spore: '80,200,000,000',  baseShroom: 609_500_000,  baseSpore: 80_200_000_000  },
-    { img: '/images/nft.png',           label: 'NFT Rewards',            key: 'nft',           pct: 20, shroom: '612,398,209',  spore: '61,239,820,900',  baseShroom: 612_398_209,  baseSpore: 61_239_820_900  },
-    { img: '/images/sporebot.png',      label: 'Sporebot Rewards',       key: 'sporebot',      pct: 20, shroom: '612,398,209',  spore: '61,239,820,900',  baseShroom: 612_398_209,  baseSpore: 61_239_820_900  },
-    { emoji: '🤝',                      label: 'Partnerships / Collabs', key: null,            pct: 10, shroom: '306,199,104',  spore: '30,619,910,400',  baseShroom: 306_199_104,  baseSpore: 30_619_910_400  },
-    { img: '/images/innovations.png',    label: 'Innovation / Misc',      key: null,            pct: 10, shroom: '306,199,104',  spore: '30,619,910,400',  baseShroom: 306_199_104,  baseSpore: 30_619_910_400  },
-    { img: '/images/vote.png',          label: 'Governance',             key: null,            pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200',  baseShroom: 153_099_552,  baseSpore: 15_309_955_200  },
-    { img: '/images/reserves.png',      label: 'Strategic Reserve',      key: null,            pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200',  baseShroom: 153_099_552,  baseSpore: 15_309_955_200  },
-    { img: '/images/swaps.png',         label: 'Swap Function',          key: null,            pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200',  baseShroom: 153_099_552,  baseSpore: 15_309_955_200  },
-    { img: '/images/emergency-funds.png', label: 'Emergency Fund',       key: null,            pct: 5,  shroom: '153,099,552',  spore: '15,309,955,200',  baseShroom: 153_099_552,  baseSpore: 15_309_955_200  },
+    { img: '/images/sporulation1.webp', label: 'LP Rewards',             key: 'lp',            pct: 20, shroom: '613,000,000',  spore: '80,700,000,000',  baseShroom: 613_000_000,  baseSpore: 80_700_000_000  },
+    { img: '/images/nft.png',           label: 'NFT Rewards',            key: 'nft',           pct: 20, shroom: '600,000,000',  spore: '60,000,000,000',  baseShroom: 600_000_000,  baseSpore: 60_000_000_000  },
+    { img: '/images/sporebot.png',      label: 'Sporebot Rewards',       key: 'sporebot',      pct: 20, shroom: '725,000,000',  spore: '60,000,000,000',  baseShroom: 725_000_000,  baseSpore: 60_000_000_000  },
+    { emoji: '🤝',                      label: 'Partnerships / Collabs', key: null,            pct: 10, shroom: '250,000,000',  spore: '25,000,000,000',  baseShroom: 250_000_000,  baseSpore: 25_000_000_000  },
+    { img: '/images/innovations.png',    label: 'Innovation / Misc',      key: null,           pct: 10, shroom: '250,000,000',  spore: '25,000,000,000',  baseShroom: 250_000_000,  baseSpore: 25_000_000_000  },
+    { img: '/images/vote.png',          label: 'Governance',             key: null,            pct: 5,  shroom: '150,000,000',  spore: '15,000,000,000',  baseShroom: 150_000_000,  baseSpore: 15_000_000_000  },
+    { img: '/images/reserves.png',      label: 'Strategic Reserve',      key: null,            pct: 5,  shroom: '150,000,000',  spore: '15,000,000,000',  baseShroom: 150_000_000,  baseSpore: 15_000_000_000  },
+    { img: '/images/swaps.png',         label: 'Swap Function',          key: null,            pct: 5,  shroom: '150,000,000',  spore: '15,000,000,000',  baseShroom: 150_000_000,  baseSpore: 15_000_000_000  },
+    { img: '/images/emergency-funds.png', label: 'Emergency Fund',       key: null,            pct: 5,  shroom: '150,000,000',  spore: '15,000,000,000',  baseShroom: 150_000_000,  baseSpore: 15_000_000_000  },
     { img: '/images/blockchain.png',    label: 'Onchain Rewards',        key: 'spore_rewards', pct: 0,  shroom: '0',            spore: '68,740,000,000',  baseShroom: 0,            baseSpore: 68_740_000_000, sporeOnly: true },
   ];
 
@@ -892,15 +893,13 @@ async function loadSporebotTotals() {
         const e = c + sporeRemPct;
         const f = e + sporeSpentPct;
         gradient = item.key === 'sporebot'
-          ? `linear-gradient(90deg, var(--red) ${a}%, #8b1a1a ${a}%, #8b1a1a ${b}%, rgba(255,255,255,0.12) ${b}%, rgba(255,255,255,0.12) ${c}%, var(--blue) ${c}%, var(--blue) ${d}%, #0a3060 ${d}%, #0a3060 ${e}%, rgba(255,255,255,0.12) ${e}%, rgba(255,255,255,0.12) ${f}%, transparent ${f}%)`
+          ? `linear-gradient(90deg, var(--red) ${a}%, #22c55e ${a}%, #22c55e ${b}%, rgba(255,255,255,0.12) ${b}%, rgba(255,255,255,0.12) ${c}%, var(--blue) ${c}%, var(--blue) ${d}%, #22c55e ${d}%, #22c55e ${e}%, rgba(255,255,255,0.12) ${e}%, rgba(255,255,255,0.12) ${f}%, transparent ${f}%)`
           : `linear-gradient(90deg, var(--red) ${a}%, rgba(255,255,255,0.12) ${b}%, rgba(255,255,255,0.12) ${c}%, var(--blue) ${c}%, var(--blue) ${e}%, rgba(255,255,255,0.12) ${e}%, rgba(255,255,255,0.12) ${f}%, transparent ${f}%)`;
         totalPct = f;
       }
 
-      const shroomRemPctOfAlloc = totalShroom > 0 ? ((remShroom / totalShroom) * item.pct).toFixed(1) : item.pct.toFixed(1);
-      const sporeRemPctOfAlloc  = item.sporeOnly
-        ? (totalSpore > 0 ? ((remSpore / totalSpore) * 100).toFixed(1) : '100.0')
-        : (totalSpore > 0 ? ((remSpore / totalSpore) * item.pct).toFixed(1) : item.pct.toFixed(1));
+      const shroomRemPctOfAlloc = totalShroom > 0 ? ((remShroom / totalShroom) * 100).toFixed(1) : '100.0';
+      const sporeRemPctOfAlloc  = totalSpore  > 0 ? ((remSpore  / totalSpore)  * 100).toFixed(1) : '100.0';
 
       const hoverHtml = item.sporeOnly
         ? `<span style="color:var(--blue);">SPORE: ${sporeRemPctOfAlloc}%</span>`
@@ -910,17 +909,19 @@ async function loadSporebotTotals() {
         <div class="bar-item" style="position:relative;">
           <div class="bar-meta">
             <span class="bm-label">${item.img ? `<img src="${item.img}" style="height:1em;width:1em;vertical-align:middle;border-radius:3px;margin-right:0.3rem;">` : (item.emoji || '') + ' '}${item.label}</span>
-            <span class="bm-pct" style="display:flex;align-items:center;gap:0.5rem;">
-              <span class="bar-hover-tip" style="display:none;font-size:0.65rem;font-family:'Syne Mono',monospace;font-weight:400;">${hoverHtml}</span>
-              <span class="bar-static-pct">${item.pct > 0 ? item.pct+'%' : ''}</span>
+            <span class="bm-pct" style="display:flex;align-items:center;gap:0.75rem;">
+              ${item.sporeOnly
+                ? `<span style="color:var(--blue);font-family:'Syne Mono',monospace;font-size:0.65rem;">${sporeRemPctOfAlloc}%</span>`
+                : `<span style="color:var(--red);font-family:'Syne Mono',monospace;font-size:0.65rem;">${shroomRemPctOfAlloc}%</span>
+                   <span style="color:rgba(255,255,225,0.2);font-size:0.6rem;">|</span>
+                   <span style="color:var(--blue);font-family:'Syne Mono',monospace;font-size:0.65rem;">${sporeRemPctOfAlloc}%</span>`
+              }
             </span>
           </div>
           <div style="font-size:0.68rem;color:rgba(255,255,225,0.3);margin-bottom:0.3rem;font-family:'Syne Mono',monospace;display:flex;gap:1.5rem;flex-wrap:wrap;">
             ${shroomLine} ${sporeLine}
           </div>
-          <div class="bar-track" style="height:10px;cursor:pointer;"
-               onmouseenter="this.closest('.bar-item').querySelector('.bar-hover-tip').style.display='inline';this.closest('.bar-item').querySelector('.bar-static-pct').style.display='none';"
-               onmouseleave="this.closest('.bar-item').querySelector('.bar-hover-tip').style.display='none';this.closest('.bar-item').querySelector('.bar-static-pct').style.display='';">
+          <div class="bar-track" style="height:10px;">
             <div style="height:100%;width:0%;border-radius:999px;background:${gradient};transition:width 1.4s cubic-bezier(0.16,1,0.3,1);" data-pct="${Math.min(100, totalPct)}"></div>
           </div>
         </div>`);
@@ -1353,7 +1354,7 @@ async function loadSporebotTotals() {
   }
   function fmtBal(val, sym) {
     if (sym === 'WBTC') return val.toFixed(4) + ' ' + sym;
-    if (val >= 1e9) return (val/1e9).toFixed(2) + 'B ' + sym;
+    if (val >= 1e9) return (val/1e9).toFixed(3) + 'B ' + sym;
     if (val >= 1e6) return (val/1e6).toFixed(2) + 'M ' + sym;
     if (val >= 1e3) return (val/1e3).toFixed(2) + 'K ' + sym;
     return val.toFixed(2) + ' ' + sym;
@@ -1374,11 +1375,14 @@ async function loadSporebotTotals() {
         if (t.symbol === '$HROOM') {
           const el  = document.getElementById('live-shroom-treasury');
           const sub = document.getElementById('live-shroom-treasury-sub');
-          const SHROOM_ALLOCATED = 3_061_991_043;
-          const disc = Math.max(0, t.balance - SHROOM_ALLOCATED);
+          const SHROOM_ALLOC_BASE = 3_038_000_000;
+          const sp                = window._latestSpent || {};
+          const categorySpent     = (sp.lp?.shroom || 0) + (sp.nft?.shroom || 0) + (sp.sporebot?.shroom || 0);
+          const allocRem          = Math.max(0, SHROOM_ALLOC_BASE - categorySpent);
+          const disc              = Math.max(0, t.balance - allocRem);
           if (el) el.textContent = fmtBal(t.balance, '');
           if (sub) sub.innerHTML =
-            `<span style="color:rgba(253,70,79,0.6);">Allocated: ${fmtBal(SHROOM_ALLOCATED, '$HROOM')}</span>` +
+            `<span style="color:rgba(253,70,79,0.6);">Allocated: ${fmtBal(allocRem, '$HROOM')}</span>` +
             ` &nbsp;·&nbsp; ` +
             `<span style="color:rgba(253,70,79,0.6);">Disc: ${fmtBal(disc, '$HROOM')}</span>`;
         }
@@ -1386,14 +1390,17 @@ async function loadSporebotTotals() {
           const el  = document.getElementById('live-spore-treasury');
           const sub = document.getElementById('live-spore-treasury-sub');
           const shroomBal    = data.balances.find(b => b.symbol === '$HROOM')?.balance || 0;
-          const SPORE_ONCHAIN = 68_740_000_000;
-          const onchainSpent = window._latestSpent?.spore_rewards?.spore || 0;
-          const onchainRem   = Math.max(0, SPORE_ONCHAIN - onchainSpent);
-          const mirror       = shroomBal * 100;
-          const disc         = Math.max(0, t.balance - mirror - onchainRem);
+          const SPORE_MIRROR_BASE = 310_700_000_000;
+          const SPORE_ONCHAIN     = 68_740_000_000;
+          const onchainSpent      = window._latestSpent?.spore_rewards?.spore || 0;
+          const onchainRem        = Math.max(0, SPORE_ONCHAIN - onchainSpent);
+          const sp                = window._latestSpent || {};
+          const categorySpent     = (sp.lp?.spore || 0) + (sp.nft?.spore || 0) + (sp.sporebot?.spore || 0);
+          const mirrorRem         = Math.max(0, SPORE_MIRROR_BASE - categorySpent);
+          const disc              = Math.max(0, t.balance - mirrorRem - onchainRem);
           if (el)  el.textContent = fmtBal(t.balance, 'SPORE');
           if (sub) sub.innerHTML =
-            `<span style="color:rgba(79,168,253,0.6);">Mirror: ${fmtBal(mirror, 'SPORE')}</span>` +
+            `<span style="color:rgba(79,168,253,0.6);">Mirror: ${fmtBal(mirrorRem, 'SPORE')}</span>` +
             ` &nbsp;·&nbsp; ` +
             `<span style="color:rgba(79,168,253,0.6);">Allocated: ${fmtBal(onchainRem, 'SPORE')}</span>` +
             ` &nbsp;·&nbsp; ` +
