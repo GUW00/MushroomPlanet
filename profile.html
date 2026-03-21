@@ -1682,5 +1682,28 @@ function renderReddit(s, p) {
   }
 })();
 </script>
+<button id="pwa-install-btn" style="display:none;position:fixed;bottom:80px;right:1rem;
+  background:#fe0000;color:#fff;border:none;border-radius:0.75rem;
+  padding:0.6rem 1.2rem;font-family:Syne Mono,monospace;font-size:0.7rem;
+  cursor:pointer;z-index:998;box-shadow:0 4px 12px rgba(0,0,0,0.4);">
+  + Install App
+</button>
+
+<script>
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('pwa-install-btn').style.display = 'block';
+});
+document.getElementById('pwa-install-btn').addEventListener('click', () => {
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    document.getElementById('pwa-install-btn').style.display = 'none';
+    deferredPrompt = null;
+  });
+});
+</script>
+
 </body>
 </html>
