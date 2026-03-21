@@ -1024,15 +1024,35 @@ function renderFarm(s) {
     { key: 'daily_explore', label: 'Explore', cmd: '!explore' },
     { key: 'daily_dig',     label: 'Dig',     cmd: '!dig' },
   ];
-  const grid = document.getElementById('daily-actions-grid');
-  grid.innerHTML = DAILY_ACTIONS.map(a => {
-    const done = daily[a.key] === true;
-    const color = done ? 'rgba(34,197,94,0.1)' : a.required ? 'rgba(253,70,79,0.1)' : 'rgba(255,255,255,0.03)';
-    const border = done ? 'rgba(34,197,94,0.3)' : a.required ? 'rgba(253,70,79,0.3)' : 'rgba(255,255,225,0.08)';
-    const textCol = done ? '#22c55e' : a.required ? '#fd464f' : 'rgba(255,255,225,0.5)';
-    return '<div style="padding:0.5rem 0.9rem;border-radius:999px;border:1px solid ' + border + ';background:' + color + ';font-family:Syne Mono,monospace;font-size:0.65rem;color:' + textCol + ';">'
-      + (done ? '✓ ' : '') + a.label + '</div>';
-  }).join('');
+  const doneCount = DAILY_ACTIONS.filter(a => daily[a.key] === true).length;
+  const totalCount = DAILY_ACTIONS.length;
+  const barPct = Math.round((doneCount / totalCount) * 100);
+
+  grid.innerHTML = '<div style="margin-bottom:1rem;">'
+    + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;">'
+    + '<span>Daily Progress</span><span>' + doneCount + ' / ' + totalCount + ' complete</span></div>'
+    + '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
+    + '<div style="height:100%;width:' + barPct + '%;background:linear-gradient(90deg,var(--green),#4ade80);border-radius:999px;transition:width 1s ease;"></div>'
+    + '</div></div>'
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.5rem;">'
+    + DAILY_ACTIONS.map(a => {
+      const done = daily[a.key] === true;
+      const bg     = done ? 'rgba(34,197,94,0.08)'  : a.required ? 'rgba(253,70,79,0.06)'  : 'rgba(255,255,255,0.02)';
+      const border = done ? 'rgba(34,197,94,0.3)'   : a.required ? 'rgba(253,70,79,0.25)'  : 'rgba(255,255,225,0.07)';
+      const icon   = done ? '✓' : a.required ? '!' : '○';
+      const iconCol= done ? '#22c55e' : a.required ? '#fd464f' : 'rgba(255,255,225,0.25)';
+      const labelCol = done ? '#22c55e' : a.required ? 'var(--cream)' : 'rgba(255,255,225,0.45)';
+      const cmdCol = done ? 'rgba(34,197,94,0.5)' : 'rgba(255,255,225,0.2)';
+      return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.875rem;border-radius:0.75rem;border:1px solid ' + border + ';background:' + bg + ';">'
+        + '<span style="font-size:0.9rem;color:' + iconCol + ';font-weight:700;width:14px;text-align:center;flex-shrink:0;">' + icon + '</span>'
+        + '<div style="display:flex;flex-direction:column;gap:0.1rem;min-width:0;">'
+        + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.8rem;font-weight:600;color:' + labelCol + ';">' + a.label + '</span>'
+        + '<span style="font-family:Syne Mono,monospace;font-size:0.58rem;color:' + cmdCol + ';">' + a.cmd + '</span>'
+        + '</div>'
+        + (done ? '' : (a.required ? '<span style="margin-left:auto;font-family:Syne Mono,monospace;font-size:0.55rem;color:var(--red);flex-shrink:0;">DO THIS</span>' : ''))
+        + '</div>';
+    }).join('')
+    + '</div>';
 }
 
 function renderWallet(s, p) {
@@ -1118,7 +1138,12 @@ function renderNFTs(p) {
               : 'Other';
     const label = tokenId ? displayName.replace('SporeBots','Sporebot') + ' #' + tokenId
                           : displayName.replace('Farm Boost (Gen 1)','Farm Boost');
-    groups[col].push({ label, count: parseInt(entry.count || 1), image: entry.image || null });
+    // For Sporebots, build image from token ID if not cached
+    let image = entry.image || null;
+    if (!image && tokenId && col === 'Sporebots') {
+      image = 'https://alchemy.mypinata.cloud/ipfs/QmYh9hwJZNTDy192auvCq1jnpvhmLhAFW4qRRcXSraNntL/' + tokenId + '.png';
+    }
+    groups[col].push({ label, count: parseInt(entry.count || 1), image });
   });
 
   if (groups['Sporebots']) {
