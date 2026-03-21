@@ -3,835 +3,1380 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Farm Profile | Mushroom Planet</title>
-  <meta name="description" content="View your Mushroom Planet farm stats, NFTs, wallet, companions, staking, and more." />
-  <meta name="theme-color" content="#1a1a1a" />
-
-  <link id="font-link" rel="stylesheet" href="" />
+  <title>Profile | Mushroom Planet</title>
+  <meta name="description" content="Your Mushroom Planet profile - farm stats, wallet, NFTs, and activity across Discord and Reddit." />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne+Mono&display=swap" />
   <link rel="stylesheet" href="styles.css" />
   <script type="module" src="config.js"></script>
 
   <style>
-    /* ===== PROFILE PAGE STYLES ===== */
-    .profile-search-section {
-      padding: 3rem 1rem 2rem;
-      text-align: center;
-      background: var(--clr-dark, #111);
+    /* ---- HEADER OVERRIDE (match convert/vote pages) ---- */
+    header {
+      background-color: #fe0000 !important;
+      border-bottom: none !important;
     }
-    .profile-search-section h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-    }
-    .profile-search-section p {
-      color: #aaa;
-      margin-bottom: 1.5rem;
-    }
-    .search-bar {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    .search-bar input {
-      padding: 0.65rem 1rem;
-      border-radius: 0.5rem;
-      border: 1px solid #444;
-      background: #222;
-      color: #fff;
-      font-size: 1rem;
-      width: 280px;
-    }
-    .search-bar input::placeholder { color: #666; }
-    .search-bar button {
-      padding: 0.65rem 1.4rem;
-      border-radius: 0.5rem;
-      background: #facc15;
-      color: #000;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-    .search-bar button:hover { background: #eab308; }
-
-    #status-msg {
-      margin-top: 1rem;
-      font-size: 0.95rem;
-      color: #aaa;
-      min-height: 1.4rem;
+    .hero { background-image: none !important; }
+    .hero::before { display: none !important; }
+    body { padding-top: 120px !important; }
+    :root {
+      --cream: #ffffe1;
+      --yellow: #fece00;
+      --red: #fd464f;
+      --blue: #4fa8fd;
+      --green: #22c55e;
+      --purple: #c084fc;
+      --dark: #0f0f0f;
+      --dark2: #1a1a1a;
+      --dark3: #242424;
     }
 
-    /* ===== DASHBOARD ===== */
-    #dashboard {
-      display: none;
-      padding: 2rem 1rem 4rem;
-      max-width: 1200px;
-      margin: 0 auto;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--dark);
+      color: var(--cream);
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden;
+      padding-top: 100px;
     }
 
-    .profile-header {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 1rem;
-      padding: 1.5rem 2rem;
+    /* ---- STARFIELD ---- */
+    #starfield {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .star {
+      position: absolute; border-radius: 50%; background: var(--cream);
+      opacity: 0; animation: twinkle var(--dur) var(--delay) infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: var(--op); transform: scale(1); }
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+    .reveal { opacity:0; transform:translateY(30px); transition:opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    /* ---- HERO ---- */
+    .hero {
+      position: relative; z-index: 1; text-align: center;
+      padding: 4rem 1rem 2.5rem;
+      background: radial-gradient(ellipse at 50% 0%, rgba(253,70,79,0.1) 0%, transparent 70%);
+    }
+    .hero .eyebrow {
+      font-family: 'Syne Mono', monospace; font-size: 0.75rem;
+      letter-spacing: 0.3em; color: var(--blue); text-transform: uppercase;
+      margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.2s forwards;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; line-height: 1.1;
+      margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.4s forwards;
+    }
+    .hero p {
+      font-size: 1rem; max-width: 520px; margin: 0 auto;
+      color: rgba(255,255,225,0.6); opacity: 0; animation: fadeUp 0.6s 0.6s forwards;
+    }
+
+    /* ---- PAGE LAYOUT ---- */
+    .page-section {
+      position: relative; z-index: 1; max-width: 980px;
+      margin: 0 auto; padding: 0 1.5rem 5rem;
+    }
+
+    /* ---- AUTH GATE ---- */
+    .auth-gate {
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1.5rem; padding: 3rem 2rem; text-align: center;
       margin-bottom: 2rem;
-      flex-wrap: wrap;
     }
+    .auth-gate-icon { font-size: 3rem; margin-bottom: 1.25rem; }
+    .auth-gate h3 {
+      font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem;
+    }
+    .auth-gate p {
+      font-size: 0.85rem; color: rgba(255,255,225,0.5); margin-bottom: 1.75rem;
+      max-width: 400px; margin-left: auto; margin-right: auto;
+    }
+    .btn-discord {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: #5865f2; color: #fff; border: none; border-radius: 0.75rem;
+      padding: 0.85rem 1.75rem; font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer; text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-discord:hover { background: #4752c4; transform: translateY(-2px); }
+    .btn-sm {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: 'Syne Mono', monospace; font-size: 0.65rem;
+      padding: 0.35em 0.9em; border-radius: 999px;
+      border: 1px solid rgba(255,255,225,0.15); background: transparent;
+      color: rgba(255,255,225,0.4); cursor: pointer; transition: all 0.2s;
+    }
+    .btn-sm:hover { border-color: var(--red); color: var(--red); }
+
+    /* ---- PROFILE HEADER CARD ---- */
+    .profile-header {
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1.5rem; padding: 2rem; margin-bottom: 1.25rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1.25rem;
+    }
+    .profile-identity { display: flex; align-items: center; gap: 1.25rem; }
     .profile-avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      background: #333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
+      width: 64px; height: 64px; border-radius: 50%;
+      border: 2px solid var(--yellow); flex-shrink: 0;
+    }
+    .profile-avatar-placeholder {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--dark3); border: 2px solid rgba(255,255,225,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; flex-shrink: 0;
+    }
+    .profile-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .profile-sub {
+      font-family: 'Syne Mono', monospace; font-size: 0.65rem;
+      color: rgba(255,255,225,0.35); display: flex; gap: 0.75rem; flex-wrap: wrap;
+    }
+    .profile-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-family: 'Syne Mono', monospace; font-size: 0.6rem; letter-spacing: 0.06em;
+      padding: 0.2em 0.65em; border-radius: 999px;
+    }
+    .badge-yellow { background: rgba(254,206,0,0.1); color: var(--yellow); border: 1px solid rgba(254,206,0,0.25); }
+    .badge-green  { background: rgba(34,197,94,0.1);  color: var(--green);  border: 1px solid rgba(34,197,94,0.25); }
+    .badge-purple { background: rgba(192,132,252,0.1);color: var(--purple); border: 1px solid rgba(192,132,252,0.25); }
+    .badge-blue   { background: rgba(79,168,253,0.1); color: var(--blue);   border: 1px solid rgba(79,168,253,0.25); }
+    .badge-red    { background: rgba(253,70,79,0.1);  color: var(--red);    border: 1px solid rgba(253,70,79,0.25); }
+    .mvp-block {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem;
+    }
+    .mvp-score {
+      font-family: 'Syne Mono', monospace; font-size: 2rem; font-weight: 700;
+      color: var(--yellow); line-height: 1;
+    }
+    .mvp-label {
+      font-family: 'Syne Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,225,0.35);
+    }
+
+    /* ---- STAT STRIP ---- */
+    .stat-strip {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem; margin-bottom: 1.25rem;
+    }
+    .stat-pill {
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1rem; padding: 1rem 1.25rem;
+      display: flex; flex-direction: column; gap: 0.2rem;
+    }
+    .stat-pill .sp-label {
+      font-family: 'Syne Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,225,0.3);
+    }
+    .stat-pill .sp-val {
+      font-family: 'Syne Mono', monospace; font-size: 1.05rem; font-weight: 700;
+    }
+    .sp-val.yellow { color: var(--yellow); }
+    .sp-val.blue   { color: var(--blue); }
+    .sp-val.green  { color: var(--green); }
+    .sp-val.red    { color: var(--red); }
+    .sp-val.purple { color: var(--purple); }
+
+    /* ---- TABS ---- */
+    .tab-bar {
+      display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+    }
+    .tab {
+      font-family: 'Syne Mono', monospace; font-size: 0.7rem;
+      padding: 0.45em 1.1em; border-radius: 999px;
+      border: 1px solid rgba(255,255,225,0.12);
+      background: transparent; color: rgba(255,255,225,0.4);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .tab.active { border-color: var(--yellow); color: var(--yellow); background: rgba(254,206,0,0.08); }
+    .tab:hover:not(.active) { border-color: rgba(255,255,225,0.3); color: var(--cream); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ---- SECTION CARDS ---- */
+    .info-card {
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1.25rem; padding: 1.5rem; margin-bottom: 1rem;
+      transition: border-color 0.3s;
+    }
+    .info-card:hover { border-color: rgba(255,255,225,0.12); }
+    .card-title {
+      font-family: 'Syne Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,225,0.35); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .card-title-accent { color: var(--yellow); }
+
+    /* ---- DATA ROWS ---- */
+    .data-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.5rem;
+    }
+    .data-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,225,0.05);
+      font-size: 0.82rem;
+    }
+    .data-row:last-child { border-bottom: none; }
+    .dr-label { color: rgba(255,255,225,0.4); }
+    .dr-val   { color: var(--cream); font-family: 'Syne Mono', monospace; font-size: 0.78rem; text-align: right; max-width: 55%; word-break: break-all; }
+    .dr-val.y { color: var(--yellow); }
+    .dr-val.b { color: var(--blue); }
+    .dr-val.g { color: var(--green); }
+    .dr-val.p { color: var(--purple); }
+    .dr-val.r { color: var(--red); }
+
+    /* ---- STAGE BAR ---- */
+    .stage-bar-wrap { margin: 1rem 0 0.5rem; }
+    .stage-bar-labels {
+      display: flex; justify-content: space-between;
+      font-family: 'Syne Mono', monospace; font-size: 0.62rem;
+      color: rgba(255,255,225,0.35); margin-bottom: 0.35rem;
+    }
+    .stage-bar-track {
+      height: 6px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden;
+    }
+    .stage-bar-fill {
+      height: 100%; border-radius: 999px;
+      background: linear-gradient(90deg, var(--yellow), #f97316);
+      transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    /* ---- NFT GRID ---- */
+    .nft-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 0.75rem; margin-top: 0.75rem;
+    }
+    .nft-card {
+      background: var(--dark3); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 0.875rem; overflow: hidden; text-align: center;
+      transition: all 0.2s;
+    }
+    .nft-card:hover { border-color: rgba(255,255,225,0.2); transform: translateY(-2px); }
+    .nft-card img {
+      width: 100%; height: auto; display: block;
+    }
+    .nft-card-placeholder {
+      width: 100%; aspect-ratio: 1; background: rgba(255,255,255,0.03);
+      display: flex; align-items: center; justify-content: center; font-size: 2rem;
+    }
+    .nft-card-name {
+      font-family: 'Syne Mono', monospace; font-size: 0.55rem;
+      color: rgba(255,255,225,0.6); padding: 0.5rem 0.4rem 0.3rem;
+      word-break: break-word; line-height: 1.5;
+    }
+    .nft-card-count {
+      font-family: 'Syne Mono', monospace; font-size: 0.62rem;
+      color: var(--yellow); padding-bottom: 0.5rem;
+    }
+
+    /* ---- GEM CHIPS ---- */
+    .gem-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+    .gem-chip {
+      padding: 0.35em 0.8em; border-radius: 999px; font-size: 0.75rem;
+      font-family: 'Syne Mono', monospace;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,225,0.1);
+      color: rgba(255,255,225,0.3); transition: all 0.2s;
+    }
+    .gem-chip.owned {
+      background: rgba(254,206,0,0.08); border-color: rgba(254,206,0,0.3); color: var(--yellow);
+    }
+
+    /* ---- COMPANION CARD ---- */
+    .companion-card {
+      display: flex; align-items: center; gap: 1rem;
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 0.875rem; padding: 1rem 1.25rem;
+    }
+    .companion-emoji { font-size: 2.5rem; flex-shrink: 0; }
+    .companion-bond-bar {
+      flex: 1; height: 4px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; margin-top: 0.4rem;
+    }
+    .companion-bond-fill {
+      height: 100%; background: var(--purple); border-radius: 999px;
+      transition: width 1s ease;
+    }
+
+    /* ---- SPOREBOT NPC CARD ---- */
+    .bot-card {
+      display: flex; gap: 1.25rem; align-items: flex-start;
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 0.875rem; padding: 1.25rem;
+    }
+    .bot-card img {
+      width: 80px; height: 80px; border-radius: 0.625rem;
+      border: 1px solid rgba(255,255,225,0.1); object-fit: cover; flex-shrink: 0;
+    }
+    .bot-card-placeholder {
+      width: 80px; height: 80px; border-radius: 0.625rem;
+      background: var(--dark3); border: 1px solid rgba(255,255,225,0.07);
+      display: flex; align-items: center; justify-content: center; font-size: 2rem;
       flex-shrink: 0;
     }
-    .profile-identity h2 {
-      margin: 0 0 0.25rem;
-      font-size: 1.5rem;
-    }
-    .profile-identity p {
-      margin: 0;
-      color: #888;
-      font-size: 0.9rem;
-    }
-    .profile-badges {
-      margin-left: auto;
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    .badge {
-      padding: 0.3rem 0.75rem;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: bold;
-      background: #2a2a2a;
-      border: 1px solid #444;
-    }
-    .badge.verified { border-color: #22c55e; color: #22c55e; }
-    .badge.rank { border-color: #facc15; color: #facc15; }
-    .badge.flair { border-color: #a855f7; color: #a855f7; }
 
-    /* ===== SECTION GRID ===== */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 1.25rem;
+    /* ---- PLATFORM TABS ---- */
+    .platform-strip {
+      display: flex; gap: 0.5rem; margin-bottom: 1.25rem;
     }
-    .dash-card {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
-      border-radius: 0.875rem;
-      padding: 1.25rem 1.5rem;
-      transition: border-color 0.2s;
+    .platform-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.55rem 1.1rem; border-radius: 0.75rem;
+      border: 1px solid rgba(255,255,225,0.1); background: transparent;
+      color: rgba(255,255,225,0.4); cursor: pointer; font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem; font-weight: 600; transition: all 0.2s;
     }
-    .dash-card:hover { border-color: #444; }
-    .dash-card.full-width {
-      grid-column: 1 / -1;
+    .platform-btn.active {
+      background: rgba(254,206,0,0.08); border-color: rgba(254,206,0,0.3); color: var(--yellow);
     }
-    .dash-card h3 {
-      margin: 0 0 1rem;
-      font-size: 1rem;
-      color: #facc15;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      border-bottom: 1px solid #2a2a2a;
-      padding-bottom: 0.6rem;
-    }
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.3rem 0;
-      border-bottom: 1px solid #1f1f1f;
-      font-size: 0.9rem;
-    }
-    .stat-row:last-child { border-bottom: none; }
-    .stat-label { color: #888; }
-    .stat-value { color: #fff; font-weight: 500; text-align: right; max-width: 60%; word-break: break-all; }
-    .stat-value.green { color: #22c55e; }
-    .stat-value.yellow { color: #facc15; }
-    .stat-value.red { color: #ef4444; }
-    .stat-value.blue { color: #60a5fa; }
-    .stat-value.purple { color: #a855f7; }
+    .platform-btn:hover:not(.active) { border-color: rgba(255,255,225,0.25); color: var(--cream); }
 
-    /* ===== FARM STAGE BAR ===== */
-    .stage-bar-wrap {
-      margin: 0.75rem 0;
+    /* ---- REDDIT SECTION ---- */
+    .reddit-stat-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;
     }
-    .stage-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: #888;
-      margin-bottom: 0.3rem;
+    .reddit-stat {
+      background: rgba(255,69,0,0.06); border: 1px solid rgba(255,69,0,0.15);
+      border-radius: 0.875rem; padding: 0.875rem 1rem;
     }
-    .stage-bar {
-      height: 8px;
-      background: #2a2a2a;
-      border-radius: 999px;
-      overflow: hidden;
+    .reddit-stat .rs-label {
+      font-family: 'Syne Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,225,0.3); margin-bottom: 0.2rem;
     }
-    .stage-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #facc15, #f97316);
-      border-radius: 999px;
-      transition: width 0.6s ease;
+    .reddit-stat .rs-val {
+      font-family: 'Syne Mono', monospace; font-size: 1rem; font-weight: 700;
+      color: #ff6314;
     }
 
-    /* ===== NFT GRID ===== */
-    .nft-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    .nft-tag {
-      background: #222;
-      border: 1px solid #333;
-      border-radius: 0.5rem;
-      padding: 0.3rem 0.65rem;
-      font-size: 0.8rem;
-      color: #ccc;
-    }
-    .nft-tag.sporebot { border-color: #a855f7; color: #a855f7; }
-    .nft-tag.active-bot { border-color: #22c55e; color: #22c55e; }
-
-    /* ===== COMPANION ===== */
-    .companion-display {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      background: #222;
-      border-radius: 0.75rem;
-      padding: 0.75rem 1rem;
-      margin-bottom: 0.75rem;
-    }
-    .companion-icon { font-size: 2rem; }
-    .companion-info h4 { margin: 0 0 0.2rem; font-size: 0.95rem; }
-    .companion-info p { margin: 0; font-size: 0.8rem; color: #888; }
-
-    /* ===== DAILY CHECKLIST ===== */
-    .daily-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 0.5rem;
-      margin-top: 0.25rem;
-    }
-    .daily-item {
-      background: #222;
-      border-radius: 0.5rem;
-      padding: 0.4rem 0.6rem;
-      font-size: 0.8rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .daily-item.done { color: #22c55e; }
-    .daily-item.pending { color: #555; }
-
-    /* ===== INVENTORY TAGS ===== */
-    .inv-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-top: 0.4rem;
-    }
-    .inv-tag {
-      background: #222;
-      border: 1px solid #333;
-      border-radius: 0.4rem;
-      padding: 0.2rem 0.55rem;
-      font-size: 0.78rem;
-      color: #bbb;
-    }
-    .inv-tag.found { border-color: #facc15; color: #facc15; }
-
-    /* ===== STAKING ===== */
-    .staking-highlight {
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
-      border: 1px solid #3b4f6e;
-      border-radius: 0.75rem;
-      padding: 1rem;
-      text-align: center;
-      margin-bottom: 0.75rem;
-    }
-    .staking-highlight .big-num {
-      font-size: 1.6rem;
-      font-weight: bold;
-      color: #60a5fa;
-    }
-    .staking-highlight .big-label {
-      font-size: 0.8rem;
-      color: #888;
+    /* ---- FOOTER ---- */
+    .treas-footer {
+      position: relative; z-index: 1; text-align: center; padding: 2rem 1rem;
+      font-size: 0.8rem; color: rgba(255,255,225,0.3);
+      border-top: 1px solid rgba(255,255,225,0.06);
     }
 
-    /* ===== LOADING ===== */
-    .loader {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      border: 2px solid #333;
-      border-top-color: #facc15;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-      margin-left: 0.4rem;
+    .glow-divider {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+      margin: 2rem 0; opacity: 0.15;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 600px) {
+    .empty-hint {
+      text-align: center; padding: 2rem;
+      font-family: 'Syne Mono', monospace; font-size: 0.75rem;
+      color: rgba(255,255,225,0.2);
+    }
+
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite; flex-shrink: 0;
+    }
+
+    @media(max-width: 600px) {
       .profile-header { flex-direction: column; align-items: flex-start; }
-      .profile-badges { margin-left: 0; }
+      .mvp-block { align-items: flex-start; }
+      .page-section { padding: 0 1rem 3rem; }
     }
   </style>
 </head>
-
 <body>
-  <header>
-    <nav class="container">
-      <a href="/" class="logo"></a>
-      <ul class="nav-links">
-        <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
-        <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
-        <li><a href="/profile.html">PROFILE</a></li>
-      </ul>
-    </nav>
-  </header>
 
-  <div id="global-menu"></div>
+<div id="starfield"></div>
 
-  <!-- Price Bar -->
-  <div id="price-bar">
-    <div class="price-content">
-      <div class="price-group">
-        <img src="/images/shroom_small.png" alt="$HROOM" />
-        <span>
-          <a href="https://www.geckoterminal.com/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
-            SHROOM PRICE: <strong id="shroom-price"></strong>
-          </a>
-        </span>
-      </div>
-      <div class="price-group">
-        <img src="/images/spore_small.png" alt="SPORE" />
-        <span>
-          <a href="https://www.geckoterminal.com/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
-            SPORE PRICE: <strong id="spore-price"></strong>
-          </a>
-        </span>
-      </div>
-    </div>
+<header>
+  <nav class="container">
+    <a href="index.html" class="logo">Mushroom Planet</a>
+    <ul class="nav-links">
+      <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
+      <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
+      <li><a href="/profile.html">PROFILE</a></li>
+    </ul>
+  </nav>
+</header>
+
+<div id="global-menu"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">My Account</div>
+  <h1>Farm <span style="color:var(--red);">Profile</span></h1>
+  <p>Your stats, wallet, NFTs, and activity across Discord and Reddit — all in one place.</p>
+</div>
+
+<div class="page-section">
+
+  <!-- AUTH GATE (shown when logged out) -->
+  <div id="auth-gate" class="auth-gate reveal" style="display:none;">
+    <div class="auth-gate-icon">🍄</div>
+    <h3>Connect Your Discord</h3>
+    <p>Sign in with Discord to view your full Mushroom Planet profile, farm stats, wallet balances, NFTs, and more.</p>
+    <a href="#" class="btn-discord" id="btn-login" onclick="startDiscordOAuth(event)">
+      <svg width="18" height="14" viewBox="0 0 24 18" fill="currentColor"><path d="M20.317 1.492a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 4.677 1.492a.07.07 0 0 0-.032.027C.533 6.168-.32 10.702.099 15.179c.002.022.015.043.031.053a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      Connect Discord
+    </a>
   </div>
 
-  <!-- Search Section -->
-  <section class="profile-search-section">
-    <h1>🍄 Farm Profile</h1>
-    <p>Enter your Discord User ID to view your full Mushroom Planet dashboard.</p>
-    <div class="search-bar">
-      <input type="text" id="discord-id" placeholder="Discord ID or Username" />
-      <button id="connect-btn">Load Profile</button>
-    </div>
-    <div id="status-msg"></div>
-  </section>
+  <!-- LOADING STATE -->
+  <div id="loading-state" class="auth-gate reveal" style="display:none;">
+    <div class="auth-gate-icon" style="font-size:2rem;opacity:0.5;">...</div>
+    <p style="color:rgba(255,255,225,0.4);margin-bottom:0;">Loading your profile...</p>
+  </div>
 
-  <!-- Dashboard -->
-  <div id="dashboard">
+  <!-- PROFILE CONTENT (shown when logged in) -->
+  <div id="profile-content" style="display:none;">
 
-    <!-- Profile Header -->
-    <div class="profile-header">
-      <div class="profile-avatar">🍄</div>
+    <!-- HEADER CARD -->
+    <div class="profile-header reveal" id="prof-header">
       <div class="profile-identity">
-        <h2 id="ph-username">-</h2>
-        <p id="ph-joined">Joined: -</p>
-        <p id="ph-id" style="font-size:0.8rem;color:#555;"></p>
+        <div id="prof-avatar-wrap"><div class="profile-avatar-placeholder">🍄</div></div>
+        <div>
+          <div class="profile-name" id="prof-username">—</div>
+          <div class="profile-sub">
+            <span id="prof-discord-tag">Discord</span>
+            <span id="prof-joined">Joined —</span>
+          </div>
+          <div class="profile-badges" id="prof-badges"></div>
+        </div>
       </div>
-      <div class="profile-badges">
-        <span class="badge rank" id="ph-rank">-</span>
-        <span class="badge flair" id="ph-flair">-</span>
-        <span class="badge verified" id="ph-verified" style="display:none;">PIXIE VERIFIED</span>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.75rem;">
+        <div class="mvp-block">
+          <div class="mvp-score" id="prof-mvp">0.0</div>
+          <div class="mvp-label">MVP Score</div>
+        </div>
+        <button class="btn-sm" id="btn-logout" onclick="logout()">Disconnect</button>
       </div>
     </div>
 
-    <div class="dashboard-grid">
+    <!-- QUICK STATS STRIP -->
+    <div class="stat-strip reveal" id="stat-strip">
+      <div class="stat-pill">
+        <span class="sp-label">Planted</span>
+        <span class="sp-val yellow" id="qs-planted">—</span>
+      </div>
+      <div class="stat-pill">
+        <span class="sp-label">SPORE/Day</span>
+        <span class="sp-val blue" id="qs-sgr">—</span>
+      </div>
+      <div class="stat-pill">
+        <span class="sp-label">Staked SPORE</span>
+        <span class="sp-val green" id="qs-staked">—</span>
+      </div>
+      <div class="stat-pill">
+        <span class="sp-label">Farm Stage</span>
+        <span class="sp-val yellow" id="qs-stage">—</span>
+      </div>
+      <div class="stat-pill">
+        <span class="sp-label">Forage Streak</span>
+        <span class="sp-val" id="qs-streak">—</span>
+      </div>
+      <div class="stat-pill">
+        <span class="sp-label">Nodes</span>
+        <span class="sp-val purple" id="qs-nodes">—</span>
+      </div>
+    </div>
 
-      <!-- WALLET -->
-      <div class="dash-card">
-        <h3>💰 Wallet</h3>
-        <div class="stat-row"><span class="stat-label">SHROOM Balance</span><span class="stat-value yellow" id="w-shroom">-</span></div>
-        <div class="stat-row"><span class="stat-label">SPORE Balance</span><span class="stat-value blue" id="w-spore">-</span></div>
-        <div class="stat-row"><span class="stat-label">SHROOM Planted</span><span class="stat-value green" id="w-planted">-</span></div>
-        <div class="stat-row"><span class="stat-label">SPORE Generated</span><span class="stat-value blue" id="w-spore-farm">-</span></div>
-        <div class="stat-row"><span class="stat-label">Polygon Address</span><span class="stat-value" id="w-address" style="font-size:0.75rem;">-</span></div>
+    <!-- PLATFORM TOGGLE -->
+    <div class="platform-strip reveal">
+      <button class="platform-btn active" id="plat-discord" onclick="setPlatform('discord')">
+        <svg width="16" height="12" viewBox="0 0 24 18" fill="currentColor"><path d="M20.317 1.492a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 4.677 1.492a.07.07 0 0 0-.032.027C.533 6.168-.32 10.702.099 15.179c.002.022.015.043.031.053a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Discord
+      </button>
+      <button class="platform-btn" id="plat-reddit" onclick="setPlatform('reddit')">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="#ff6314"><path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.793 3.383 8.797 7.906 9.742V12.58H5.63V10h2.277V8.04c0-2.252 1.34-3.496 3.394-3.496.983 0 2.012.176 2.012.176V6.93h-1.133c-1.117 0-1.465.692-1.465 1.403V10h2.492l-.398 2.578H10.71v7.164C15.617 18.797 20 14.793 20 10z"/></svg>
+        Reddit
+      </button>
+    </div>
+
+    <!-- DISCORD PANEL -->
+    <div id="panel-discord">
+      <div class="tab-bar">
+        <button class="tab active" onclick="switchTab('farm',this)">Farm</button>
+        <button class="tab" onclick="switchTab('wallet',this)">Wallet</button>
+        <button class="tab" onclick="switchTab('staking',this)">Staking</button>
+        <button class="tab" onclick="switchTab('nfts',this)">NFTs</button>
+        <button class="tab" onclick="switchTab('companion',this)">Companion</button>
+        <button class="tab" onclick="switchTab('inventory',this)">Inventory</button>
+        <button class="tab" onclick="switchTab('pixie',this)">Pixie XP</button>
       </div>
 
-      <!-- FARM -->
-      <div class="dash-card">
-        <h3>🌾 Farm Status</h3>
-        <div class="stat-row"><span class="stat-label">Current Stage</span><span class="stat-value green" id="f-stage">-</span></div>
-        <div class="stat-row"><span class="stat-label">Farm Rank</span><span class="stat-value yellow" id="f-rank">-</span></div>
-        <div class="stat-row"><span class="stat-label">Spores Per Day</span><span class="stat-value" id="f-sgr">-</span></div>
-        <div class="stat-row"><span class="stat-label">Lifetime SPORES</span><span class="stat-value blue" id="f-lifetime">-</span></div>
-        <div class="stat-row"><span class="stat-label">Forage Streak</span><span class="stat-value" id="f-streak">-</span></div>
-        <div class="stat-row"><span class="stat-label">Streak Record</span><span class="stat-value" id="f-streak-rec">-</span></div>
-        <div class="stage-bar-wrap">
-          <div class="stage-label"><span id="stage-name-label">Stage</span><span id="stage-pct-label">-</span></div>
-          <div class="stage-bar"><div class="stage-fill" id="stage-fill" style="width:0%"></div></div>
-        </div>
-      </div>
-
-      <!-- PIXIE -->
-      <div class="dash-card">
-        <h3>🪄 Pixie Stats</h3>
-        <div class="stat-row"><span class="stat-label">Level</span><span class="stat-value yellow" id="p-level">-</span></div>
-        <div class="stat-row"><span class="stat-label">Total XP</span><span class="stat-value" id="p-xp">-</span></div>
-        <div class="stat-row"><span class="stat-label">XP to Next Level</span><span class="stat-value" id="p-xp-needed">-</span></div>
-        <div class="stat-row"><span class="stat-label">Good Shrooms</span><span class="stat-value green" id="p-gs">-</span></div>
-        <div class="stat-row"><span class="stat-label">GS Given / Received</span><span class="stat-value" id="p-gs-social">-</span></div>
-        <div class="stat-row"><span class="stat-label">Message XP</span><span class="stat-value" id="p-msg-xp">-</span></div>
-        <div class="stat-row"><span class="stat-label">Message Streak</span><span class="stat-value" id="p-msg-streak">-</span></div>
-        <div class="stat-row"><span class="stat-label">Reddit Username</span><span class="stat-value" id="p-reddit">-</span></div>
-      </div>
-
-      <!-- STAKING -->
-      <div class="dash-card">
-        <h3>🏦 Staking</h3>
-        <div class="staking-highlight">
-          <div class="big-num" id="s-staked">-</div>
-          <div class="big-label">SPORES Staked</div>
-        </div>
-        <div class="stat-row"><span class="stat-label">Spores Generated</span><span class="stat-value blue" id="s-pending">-</span></div>
-        <div class="stat-row"><span class="stat-label">Mycelium Nodes</span><span class="stat-value purple" id="s-nodes">-</span></div>
-        <div class="stat-row"><span class="stat-label">APR</span><span class="stat-value green">20%</span></div>
-      </div>
-
-      <!-- COMPANION -->
-      <div class="dash-card">
-        <h3>🐾 Companion</h3>
-        <div id="companion-display">
-          <div class="companion-display">
-            <div class="companion-icon" id="c-icon">?</div>
-            <div class="companion-info">
-              <h4 id="c-name">No companion active</h4>
-              <p id="c-bonus">-</p>
+      <!-- FARM TAB -->
+      <div class="tab-panel active reveal" id="tab-farm">
+        <div class="info-card">
+          <div class="card-title"><span class="card-title-accent">🍄</span> Farm Status</div>
+          <div class="stage-bar-wrap">
+            <div class="stage-bar-labels">
+              <span id="farm-stage-label">Stage</span>
+              <span id="farm-stage-pct">0%</span>
+            </div>
+            <div class="stage-bar-track">
+              <div class="stage-bar-fill" id="farm-stage-fill" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="data-grid" style="margin-top:1rem;">
+            <div>
+              <div class="data-row"><span class="dr-label">Stage</span><span class="dr-val g" id="f-stage">—</span></div>
+              <div class="data-row"><span class="dr-label">Farm Rank</span><span class="dr-val y" id="f-rank">—</span></div>
+              <div class="data-row"><span class="dr-label">Spores / Day</span><span class="dr-val b" id="f-sgr">—</span></div>
+              <div class="data-row"><span class="dr-label">Total APY</span><span class="dr-val b" id="f-apy">—</span></div>
+              <div class="data-row"><span class="dr-label">Plots Filled</span><span class="dr-val" id="f-plots">—</span></div>
+            </div>
+            <div>
+              <div class="data-row"><span class="dr-label">Forage Streak</span><span class="dr-val" id="f-streak">—</span></div>
+              <div class="data-row"><span class="dr-label">Max Streak</span><span class="dr-val" id="f-maxstreak">—</span></div>
+              <div class="data-row"><span class="dr-label">Vacation Days</span><span class="dr-val y" id="f-vacation">—</span></div>
+              <div class="data-row"><span class="dr-label">Lifetime SPORE</span><span class="dr-val b" id="f-lifetime">—</span></div>
+              <div class="data-row"><span class="dr-label">Sporulation In</span><span class="dr-val" id="f-spor-date">—</span></div>
             </div>
           </div>
         </div>
-        <div class="stat-row"><span class="stat-label">Total Fed</span><span class="stat-value yellow" id="c-fed">-</span></div>
-        <div class="stat-row"><span class="stat-label">Bond Level</span><span class="stat-value" id="c-bond">-</span></div>
-        <div class="stat-row"><span class="stat-label">Days Active</span><span class="stat-value" id="c-days">-</span></div>
-        <div class="stat-row"><span class="stat-label">Companions Unlocked</span><span class="stat-value green" id="c-unlocked">-</span></div>
-      </div>
-
-      <!-- FARM STATS / BONUSES -->
-      <div class="dash-card">
-        <h3>📊 Farm Bonuses</h3>
-        <div class="stat-row"><span class="stat-label">Spore Yield Bonus</span><span class="stat-value green" id="st-yield">-</span></div>
-        <div class="stat-row"><span class="stat-label">Harvest Bonus</span><span class="stat-value" id="st-harvest">-</span></div>
-        <div class="stat-row"><span class="stat-label">Herb Find Rate</span><span class="stat-value" id="st-herb">-</span></div>
-        <div class="stat-row"><span class="stat-label">Rare Herb Chance</span><span class="stat-value" id="st-rare-herb">-</span></div>
-        <div class="stat-row"><span class="stat-label">Double Herb Chance</span><span class="stat-value" id="st-double-herb">-</span></div>
-        <div class="stat-row"><span class="stat-label">Scroll Find Rate</span><span class="stat-value" id="st-scroll">-</span></div>
-        <div class="stat-row"><span class="stat-label">Artifact Discovery</span><span class="stat-value" id="st-artifact">-</span></div>
-        <div class="stat-row"><span class="stat-label">King Totem Chance</span><span class="stat-value" id="st-king">-</span></div>
-        <div class="stat-row"><span class="stat-label">Kid Totem Chance</span><span class="stat-value" id="st-kid">-</span></div>
-      </div>
-
-      <!-- TIPPING -->
-      <div class="dash-card">
-        <h3>💸 Tipping</h3>
-        <div class="stat-row"><span class="stat-label">SHROOM Given</span><span class="stat-value yellow" id="t-shroom-given">-</span></div>
-        <div class="stat-row"><span class="stat-label">SHROOM Received</span><span class="stat-value green" id="t-shroom-recv">-</span></div>
-        <div class="stat-row"><span class="stat-label">SPORE Given</span><span class="stat-value blue" id="t-spore-given">-</span></div>
-        <div class="stat-row"><span class="stat-label">SPORE Received</span><span class="stat-value green" id="t-spore-recv">-</span></div>
-        <div class="stat-row"><span class="stat-label">Raffle SPORES</span><span class="stat-value purple" id="t-raffle">-</span></div>
-        <div class="stat-row"><span class="stat-label">Airdrop SPORES</span><span class="stat-value purple" id="t-airdrop">-</span></div>
-      </div>
-
-      <!-- DAILY CHECKLIST -->
-      <div class="dash-card">
-        <h3>📆 Today's Commands</h3>
-        <div class="daily-grid" id="daily-grid"></div>
-      </div>
-
-      <!-- ACTIVE SPOREBOT NFT -->
-      <div class="dash-card">
-        <h3>🤖 Active Sporebot NFT</h3>
-        <div id="active-bot-section">
-          <img id="bot-image" src="" alt="Sporebot" style="display:none;width:100%;max-width:200px;border-radius:0.75rem;margin-bottom:0.75rem;border:1px solid #333;" />
-          <div class="stat-row"><span class="stat-label">Name</span><span class="stat-value purple" id="bot-name">-</span></div>
-          <div class="stat-row"><span class="stat-label">Token ID</span><span class="stat-value" id="bot-id">-</span></div>
-          <div class="stat-row"><span class="stat-label">Rarity</span><span class="stat-value yellow" id="bot-rarity">-</span></div>
+        <div class="info-card">
+          <div class="card-title"><span class="card-title-accent">📅</span> Daily Actions</div>
+          <div id="daily-actions-grid" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
         </div>
       </div>
 
-    </div><!-- end dashboard-grid -->
-  </div><!-- end dashboard -->
+      <!-- WALLET TAB -->
+      <div class="tab-panel reveal" id="tab-wallet">
+        <div class="info-card">
+          <div class="card-title"><span class="card-title-accent">💰</span> Discord Wallet</div>
+          <div class="data-grid">
+            <div>
+              <div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val y" id="w-shroom">—</span></div>
+              <div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b" id="w-spore">—</span></div>
+              <div class="data-row"><span class="dr-label">Planted SHROOM</span><span class="dr-val y" id="w-planted">—</span></div>
+              <div class="data-row"><span class="dr-label">Farm SPORE</span><span class="dr-val b" id="w-spore-farm">—</span></div>
+            </div>
+            <div>
+              <div class="data-row"><span class="dr-label">Wallet Address</span><span class="dr-val" id="w-addr">—</span></div>
+              <div class="data-row"><span class="dr-label">Onchain SHROOM</span><span class="dr-val y" id="w-oc-shroom">—</span></div>
+              <div class="data-row"><span class="dr-label">Onchain SPORE</span><span class="dr-val b" id="w-oc-spore">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  <footer>
-    <div class="container">&copy; 2025 Mushroom Planet. All rights reserved.</div>
-  </footer>
+      <!-- STAKING TAB -->
+      <div class="tab-panel reveal" id="tab-staking">
+        <div class="info-card">
+          <div class="card-title"><span class="card-title-accent">⚡</span> Staking</div>
+          <div class="data-grid">
+            <div>
+              <div class="data-row"><span class="dr-label">Staked SPORE</span><span class="dr-val b" id="s-staked">—</span></div>
+              <div class="data-row"><span class="dr-label">Pending Rewards</span><span class="dr-val g" id="s-pending">—</span></div>
+              <div class="data-row"><span class="dr-label">Mycelium Nodes</span><span class="dr-val p" id="s-nodes">—</span></div>
+            </div>
+            <div>
+              <div class="data-row"><span class="dr-label">Staking APY</span><span class="dr-val y" id="s-apy">—</span></div>
+              <div class="data-row"><span class="dr-label">Total Staking Earned</span><span class="dr-val g" id="s-total-earned">—</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="card-title"><span class="card-title-accent">⚡</span> MVP Breakdown</div>
+          <div id="mvp-breakdown"></div>
+        </div>
+      </div>
 
-  <!-- Config + Theme Init -->
-  <script type="module">
-    import config from './config.js';
-    const root = document.documentElement;
-    const theme = config.theme;
-    document.title = "Farm Profile | " + config.site.title;
-    const fontParam = config.metadata.googleFonts.join('&family=');
-    document.getElementById('font-link').href = `https://fonts.googleapis.com/css2?family=${fontParam}&display=swap`;
-    Object.entries(theme.colors).forEach(([key, val]) => {
-      if (typeof val === 'string') {
-        root.style.setProperty(`--clr-${key}`, val);
+      <!-- NFTs TAB -->
+      <div class="tab-panel reveal" id="tab-nfts">
+        <div class="info-card">
+          <div class="card-title"><span class="live-dot"></span> Your NFTs</div>
+          <div id="nft-content"><div class="empty-hint">No NFTs found. Run !nft in Discord to sync.</div></div>
+        </div>
+      </div>
+
+      <!-- COMPANION TAB -->
+      <div class="tab-panel reveal" id="tab-companion">
+        <div class="info-card">
+          <div class="card-title"><span class="card-title-accent">🐾</span> Active Companion</div>
+          <div id="companion-content"><div class="empty-hint">No active companion.</div></div>
+        </div>
+        <div class="info-card" id="pets-roster-card">
+          <div class="card-title"><span class="card-title-accent">🐾</span> All Companions</div>
+          <div id="pets-roster"></div>
+        </div>
+      </div>
+
+      <!-- INVENTORY TAB -->
+      <div class="tab-panel reveal" id="tab-inventory">
+        <div class="info-card">
+          <div class="card-title"><span class="card-title-accent">🎒</span> Items</div>
+          <div id="items-content"><div class="empty-hint">No items yet.</div></div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent">💎</span> Gemstones</div>
+          <div class="gem-row" id="gems-content"></div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent">🧪</span> Potions</div>
+          <div id="potions-content"><div class="empty-hint">No potions brewed yet.</div></div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent">📜</span> Artifacts & Scrolls</div>
+          <div id="artifacts-content"><div class="empty-hint">None found yet. Use !explore to discover.</div></div>
+        </div>
+      </div>
+
+      <!-- PIXIE XP TAB -->
+      <div class="tab-panel reveal" id="tab-pixie">
+        <div class="info-card">
+          <div class="card-title"><span class="card-title-accent">✨</span> Pixie Stats</div>
+          <div class="data-grid">
+            <div>
+              <div class="data-row"><span class="dr-label">Level</span><span class="dr-val g" id="px-level">—</span></div>
+              <div class="data-row"><span class="dr-label">Total XP</span><span class="dr-val b" id="px-xp">—</span></div>
+              <div class="data-row"><span class="dr-label">Flair Rank</span><span class="dr-val p" id="px-flair">—</span></div>
+              <div class="data-row"><span class="dr-label">Flair Title</span><span class="dr-val" id="px-flair-title">—</span></div>
+            </div>
+            <div>
+              <div class="data-row"><span class="dr-label">Msg Streak</span><span class="dr-val" id="px-streak">—</span></div>
+              <div class="data-row"><span class="dr-label">Max Msg Streak</span><span class="dr-val" id="px-maxstreak">—</span></div>
+              <div class="data-row"><span class="dr-label">Social Butterfly</span><span class="dr-val g" id="px-social">—</span></div>
+              <div class="data-row"><span class="dr-label">Verified</span><span class="dr-val" id="px-verified">—</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent">🏆</span> Achievements</div>
+          <div id="achievements-content"><div class="empty-hint">No achievements yet.</div></div>
+        </div>
+      </div>
+    </div><!-- /panel-discord -->
+
+    <!-- REDDIT PANEL -->
+    <div id="panel-reddit" style="display:none;">
+      <div class="info-card reveal">
+        <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">🤖</span> Reddit Bot Stats</div>
+        <div class="reddit-stat-grid" id="reddit-stats">
+          <div class="empty-hint">No Reddit data found.</div>
+        </div>
+      </div>
+      <div class="info-card reveal" style="margin-top:1rem;" id="reddit-wallet-card">
+        <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">💰</span> Reddit Wallet</div>
+        <div id="reddit-wallet-content"><div class="empty-hint">No Reddit wallet linked.</div></div>
+      </div>
+      <div class="info-card reveal" style="margin-top:1rem;">
+        <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">📅</span> Reddit Daily Activity</div>
+        <div id="reddit-daily-content"><div class="empty-hint">No daily data found.</div></div>
+      </div>
+    </div>
+
+  </div><!-- /profile-content -->
+
+</div>
+
+<div class="treas-footer">
+  Profile data is synced from Firebase in real time. &copy; 2025 Mushroom Planet.
+</div>
+
+<script type="module">
+  import config from './config.js';
+  window.addEventListener('DOMContentLoaded', () => {
+    const t = document.getElementById('global-menu');
+    if (t) t.innerHTML = config.menu.html;
+  });
+</script>
+
+<script>
+// ================================================================
+// CONFIG
+// ================================================================
+window.API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:3001'
+  : 'https://api.mushroomplanet.earth';
+
+let DISCORD_CLIENT_ID = '';
+const REDIRECT_URI = encodeURIComponent(window.location.origin + '/profile.html');
+
+// ================================================================
+// STARFIELD
+// ================================================================
+(function() {
+  const sf = document.getElementById('starfield');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.5 + 0.5;
+    s.style.cssText = [
+      'width:' + sz + 'px', 'height:' + sz + 'px',
+      'top:'  + (Math.random()*100) + '%',
+      'left:' + (Math.random()*100) + '%',
+      '--dur:'   + (3 + Math.random()*5) + 's',
+      '--delay:' + (Math.random()*6) + 's',
+      '--op:'    + (0.2 + Math.random()*0.5),
+    ].join(';');
+    sf.appendChild(s);
+  }
+})();
+
+// ================================================================
+// SCROLL REVEAL
+// ================================================================
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.05 });
+document.querySelectorAll('.reveal').forEach(r => observer.observe(r));
+
+// ================================================================
+// STATE
+// ================================================================
+let currentUser = null;
+let profileData = null;
+let currentPlatform = 'discord';
+let currentTab = 'farm';
+
+// ================================================================
+// HELPERS
+// ================================================================
+const fmt = n => n == null ? '-' : Number(n).toLocaleString();
+const safe = (v, fb = '-') => (v != null && v !== '') ? v : fb;
+
+function timeRemaining(iso) {
+  if (!iso) return 'Unknown';
+  const diff = new Date(iso.replace(' ', 'T') + (iso.includes('Z') ? '' : 'Z')) - Date.now();
+  if (diff <= 0) return 'Ready!';
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  if (d > 0) return d + 'd ' + h + 'h';
+  const m = Math.floor((diff % 3600000) / 60000);
+  if (h > 0) return h + 'h ' + m + 'm';
+  return m + 'm';
+}
+
+const STAGE_ORDER = ['Spore','Germination','Mycelium','Fruiting','Sporulation','Golden_Sporulation'];
+function stagePct(name) {
+  const i = STAGE_ORDER.indexOf(name);
+  return i < 0 ? 0 : Math.round((i + 1) / STAGE_ORDER.length * 100);
+}
+
+const CEMOJIS = {turtle:'🐢',bunny:'🐰',fox:'🦊',frog:'🐸',wolf:'🐺',duck:'🦆',deer:'🦌',owl:'🦉',bear:'🐻',monkey:'🐒',songbird:'🐦',panda:'🐼'};
+const BOND_REQS = {1:0,2:7,3:15,4:25,5:42};
+const BOND_LBLS = {1:'Acquaintance',2:'Friend',3:'Trusted Ally',4:'Soul Bond',5:'Eternal Bond'};
+function bondLevel(days) {
+  let lv = 1;
+  for (const [l, r] of Object.entries(BOND_REQS)) if (days >= r) lv = parseInt(l);
+  return lv;
+}
+
+const GEMS = ['Shroomstone_Quartz','Shroomcap_Ruby','Sporelight_Sapphire','Moonglow_Amethyst','Prismcap_Diamond'];
+const GEM_LABELS = {'Shroomstone_Quartz':'Quartz','Shroomcap_Ruby':'Ruby','Sporelight_Sapphire':'Sapphire','Moonglow_Amethyst':'Amethyst','Prismcap_Diamond':'Diamond'};
+
+function fixIpfs(url) {
+  if (!url) return null;
+  return url.replace('https://ipfs.io/ipfs/', 'https://cloudflare-ipfs.com/ipfs/')
+            .replace('ipfs://', 'https://cloudflare-ipfs.com/ipfs/');
+}
+
+function setEl(id, v) { const e = document.getElementById(id); if (e) e.textContent = v; }
+
+// ================================================================
+// DISCORD OAUTH
+// ================================================================
+async function startDiscordOAuth(e) {
+  e.preventDefault();
+  if (!DISCORD_CLIENT_ID) {
+    try {
+      const cfg = await fetch(window.API_BASE + '/api/config/public').then(r => r.json());
+      DISCORD_CLIENT_ID = cfg.discord_client_id || '';
+    } catch {}
+  }
+  if (!DISCORD_CLIENT_ID) { alert('Config error. Try again.'); return; }
+  const state = Math.random().toString(36).slice(2);
+  sessionStorage.setItem('oauth_state', state);
+  sessionStorage.setItem('oauth_return', 'profile');
+  const url = 'https://discord.com/api/oauth2/authorize'
+    + '?client_id=' + DISCORD_CLIENT_ID
+    + '&redirect_uri=' + REDIRECT_URI
+    + '&response_type=code&scope=identify&state=' + state;
+  window.location.href = url;
+}
+window.startDiscordOAuth = startDiscordOAuth;
+
+async function handleOAuthCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code   = params.get('code');
+  const state  = params.get('state');
+  if (!code) return false;
+
+  window.history.replaceState({}, document.title, window.location.pathname);
+  const savedState = sessionStorage.getItem('oauth_state');
+  sessionStorage.removeItem('oauth_state');
+  if (state !== savedState) return false;
+
+  showState('loading');
+  try {
+    const res = await fetch(window.API_BASE + '/api/auth/discord/callback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, redirect_uri: window.location.origin + '/profile.html' }),
+      credentials: 'include',
+    });
+    const data = await res.json();
+    if (!data.success) { showState('gate'); return false; }
+    currentUser = data.user;
+    localStorage.setItem('mp_profile_user', JSON.stringify(currentUser));
+    return true;
+  } catch {
+    showState('gate');
+    return false;
+  }
+}
+
+async function checkExistingSession() {
+  const stored = localStorage.getItem('mp_profile_user');
+  if (!stored) return false;
+  try {
+    currentUser = JSON.parse(stored);
+    const res = await fetch(window.API_BASE + '/api/vote/user/' + currentUser.discord_id);
+    const data = await res.json();
+    if (data.ok) { currentUser.mvp = data.mvp; localStorage.setItem('mp_profile_user', JSON.stringify(currentUser)); }
+    return true;
+  } catch { return true; } // still use cached user
+}
+
+function logout() {
+  currentUser = null;
+  profileData = null;
+  localStorage.removeItem('mp_profile_user');
+  showState('gate');
+}
+window.logout = logout;
+
+// ================================================================
+// LOAD PROFILE DATA
+// ================================================================
+async function loadProfileData() {
+  if (!currentUser) return;
+  showState('loading');
+  try {
+    const res = await fetch(window.API_BASE + '/api/user/' + currentUser.discord_id);
+    const data = await res.json();
+    profileData = data;
+    renderProfile();
+    showState('profile');
+  } catch {
+    showState('gate');
+  }
+}
+
+// ================================================================
+// SHOW/HIDE STATES
+// ================================================================
+function showState(state) {
+  document.getElementById('auth-gate').style.display       = state === 'gate'    ? 'block' : 'none';
+  document.getElementById('loading-state').style.display   = state === 'loading' ? 'block' : 'none';
+  document.getElementById('profile-content').style.display = state === 'profile' ? 'block' : 'none';
+  if (state === 'gate' || state === 'profile') {
+    setTimeout(() => {
+      document.querySelectorAll('.reveal').forEach(el => {
+        if (!el.classList.contains('visible')) observer.observe(el);
+      });
+    }, 50);
+  }
+}
+
+// ================================================================
+// TABS & PLATFORM
+// ================================================================
+function switchTab(name, btn) {
+  currentTab = name;
+  document.querySelectorAll('#panel-discord .tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#panel-discord .tab-panel').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const panel = document.getElementById('tab-' + name);
+  if (panel) panel.classList.add('active');
+}
+window.switchTab = switchTab;
+
+function setPlatform(plat) {
+  currentPlatform = plat;
+  document.getElementById('plat-discord').classList.toggle('active', plat === 'discord');
+  document.getElementById('plat-reddit').classList.toggle('active', plat === 'reddit');
+  document.getElementById('panel-discord').style.display = plat === 'discord' ? 'block' : 'none';
+  document.getElementById('panel-reddit').style.display  = plat === 'reddit'  ? 'block' : 'none';
+}
+window.setPlatform = setPlatform;
+
+// ================================================================
+// RENDER PROFILE
+// ================================================================
+function renderProfile() {
+  if (!profileData) return;
+  const s = profileData.sporebot || {};
+  const p = profileData.pixie    || {};
+
+  renderHeader(s, p);
+  renderQuickStats(s, p);
+  renderFarm(s);
+  renderWallet(s, p);
+  renderStaking(s, p);
+  renderNFTs(p);
+  renderCompanion(s);
+  renderInventory(s);
+  renderPixie(p);
+  renderReddit(s, p);
+}
+
+function renderHeader(s, p) {
+  const misc    = s.Misc   || {};
+  const wallet  = p.Wallet || {};
+  const flair   = p.Flair  || {};
+  const farm    = s.Farm   || {};
+  const sec     = p.Security || {};
+  const msgXp   = p.Message_XP || {};
+  const staking = s.Staking || {};
+
+  const name = misc.username || wallet.username || currentUser?.username || 'Unknown Farmer';
+  setEl('prof-username', name);
+  setEl('prof-discord-tag', 'Discord: ' + (currentUser?.discord_id || ''));
+  setEl('prof-joined', 'Joined: ' + safe(p.Misc?.created_at || misc.created_at, 'Unknown'));
+  setEl('prof-mvp', (currentUser?.mvp || 0).toFixed(1));
+
+  // Avatar
+  const wrap = document.getElementById('prof-avatar-wrap');
+  if (currentUser?.avatar) {
+    wrap.innerHTML = '<img class="profile-avatar" src="https://cdn.discordapp.com/avatars/' + currentUser.discord_id + '/' + currentUser.avatar + '.png" alt="avatar">';
+  }
+
+  // Badges
+  const badgeEl = document.getElementById('prof-badges');
+  const badges = [];
+  if (farm.farm_rank)    badges.push('<span class="badge badge-yellow">' + farm.farm_rank + '</span>');
+  if (flair.Flair)       badges.push('<span class="badge badge-purple">' + flair.Flair + '</span>');
+  if (sec.Verified)      badges.push('<span class="badge badge-green">PIXIE VERIFIED</span>');
+  if (staking.staked_spores > 0) {
+    const nodes = Math.floor(staking.staked_spores / 100_000_000);
+    if (nodes > 0) badges.push('<span class="badge badge-blue">' + nodes + ' NODES</span>');
+  }
+  badgeEl.innerHTML = badges.join('');
+}
+
+function renderQuickStats(s, p) {
+  const bal     = s.Balance || {};
+  const farm    = s.Farm    || {};
+  const staking = s.Staking || {};
+  const planted = bal.shroom_farm || 0;
+  const staked  = staking.staked_spores || 0;
+
+  setEl('qs-planted', fmt(planted) + ' SHROOM');
+  setEl('qs-sgr',     fmt(farm.spore_generation_rate) + ' / day');
+  setEl('qs-staked',  fmt(staked));
+  setEl('qs-stage',   safe(farm.current_stage, 'Inactive'));
+  setEl('qs-streak',  safe(farm.streak, 0) + ' days');
+  setEl('qs-nodes',   staked > 0 ? Math.floor(staked / 100_000_000).toString() : '0');
+}
+
+function renderFarm(s) {
+  const farm    = s.Farm    || {};
+  const bal     = s.Balance || {};
+  const daily   = s.Daily_Check || {};
+  const planted = bal.shroom_farm || 0;
+  const stage   = farm.current_stage || 'Inactive';
+  const pct     = stagePct(stage);
+  const filled  = Math.min(42, Math.round(planted / 1_000_000));
+
+  setEl('farm-stage-label', stage);
+  setEl('farm-stage-pct', pct + '%');
+  setTimeout(() => {
+    const fill = document.getElementById('farm-stage-fill');
+    if (fill) fill.style.width = pct + '%';
+  }, 300);
+
+  setEl('f-stage',    stage);
+  setEl('f-rank',     safe(farm.farm_rank, 'BRONZE'));
+  setEl('f-sgr',      fmt(farm.spore_generation_rate) + ' / day');
+  setEl('f-apy',      farm.APY != null ? Math.round(farm.APY * 100) + '%' : '-');
+  setEl('f-plots',    filled + ' / 42');
+  setEl('f-streak',   safe(farm.streak, 0) + ' days');
+  setEl('f-maxstreak',safe(farm.streak_record, 0) + ' days');
+  setEl('f-vacation', safe(farm.vacation_days, 0));
+  setEl('f-lifetime', fmt(farm.lifetime_spores));
+
+  const sporDate = farm.Sporulation_Date || farm.Golden_Sporulation_Date || null;
+  setEl('f-spor-date', sporDate ? timeRemaining(sporDate) : '-');
+
+  // Daily actions
+  const DAILY_ACTIONS = [
+    { key: 'daily_forage',  label: 'Forage',  cmd: '!forage', required: true },
+    { key: 'daily_mist',    label: 'Mist',    cmd: '!mist' },
+    { key: 'daily_fan',     label: 'Fan',     cmd: '!fan' },
+    { key: 'daily_herb',    label: 'Gather',  cmd: '!gather' },
+    { key: 'daily_cave',    label: 'Cave',    cmd: '!cave' },
+    { key: 'daily_explore', label: 'Explore', cmd: '!explore' },
+    { key: 'daily_dig',     label: 'Dig',     cmd: '!dig' },
+  ];
+  const grid = document.getElementById('daily-actions-grid');
+  grid.innerHTML = DAILY_ACTIONS.map(a => {
+    const done = daily[a.key] === true;
+    const color = done ? 'rgba(34,197,94,0.1)' : a.required ? 'rgba(253,70,79,0.1)' : 'rgba(255,255,255,0.03)';
+    const border = done ? 'rgba(34,197,94,0.3)' : a.required ? 'rgba(253,70,79,0.3)' : 'rgba(255,255,225,0.08)';
+    const textCol = done ? '#22c55e' : a.required ? '#fd464f' : 'rgba(255,255,225,0.5)';
+    return '<div style="padding:0.5rem 0.9rem;border-radius:999px;border:1px solid ' + border + ';background:' + color + ';font-family:Syne Mono,monospace;font-size:0.65rem;color:' + textCol + ';">'
+      + (done ? '✓ ' : '') + a.label + '</div>';
+  }).join('');
+}
+
+function renderWallet(s, p) {
+  const bal    = s.Balance || {};
+  const wallet = p.Wallet  || {};
+  const onchain = wallet.Onchain || {};
+  const addr = wallet.Address || '';
+
+  setEl('w-shroom',     fmt(wallet.shroom_wallet));
+  setEl('w-spore',      fmt(wallet.spore_wallet));
+  setEl('w-planted',    fmt(bal.shroom_farm));
+  setEl('w-spore-farm', fmt(bal.spore_farm));
+  setEl('w-addr',       addr ? addr.slice(0,6) + '...' + addr.slice(-4) : 'Not registered');
+  setEl('w-oc-shroom',  onchain.shroom_balance != null ? fmt(onchain.shroom_balance) : 'Not synced');
+  setEl('w-oc-spore',   onchain.spore_balance  != null ? fmt(onchain.spore_balance)  : 'Not synced');
+}
+
+function renderStaking(s, p) {
+  const staking = s.Staking || {};
+  const staked  = staking.staked_spores || 0;
+  const nodes   = staked > 0 ? Math.floor(staked / 100_000_000) : 0;
+
+  setEl('s-staked',  fmt(staked));
+  setEl('s-pending', fmt(staking.pending_rewards));
+  setEl('s-nodes',   nodes.toString());
+  setEl('s-apy',     staking.apy != null ? staking.apy + '%' : '-');
+  setEl('s-total-earned', fmt(staking.total_earned));
+
+  // MVP breakdown
+  const mvp = p.MVP || {};
+  const breakdown = mvp.breakdown || {};
+  const mbEl = document.getElementById('mvp-breakdown');
+  if (!Object.keys(breakdown).length && !mvp.total) {
+    mbEl.innerHTML = '<div class="empty-hint">No MVP data yet. Start staking to earn MVP.</div>';
+    return;
+  }
+  const categories = [
+    { key: 'mycelium_nodes',   label: 'Mycelium Nodes',  max: 25 },
+    { key: 'staked_spore',     label: 'Staked SPORE',    max: 20 },
+    { key: 'planted_shroom',   label: 'Planted SHROOM',  max: 15 },
+    { key: 'onchain_spore',    label: 'Onchain SPORE',   max: 10 },
+    { key: 'farm_rank',        label: 'Farm Rank',       max: 10 },
+    { key: 'pixie_xp',         label: 'Pixie XP',        max: 10 },
+    { key: 'onchain_shroom',   label: 'Onchain SHROOM',  max: 5  },
+    { key: 'nfts',             label: 'NFTs',             max: 5  },
+  ];
+  mbEl.innerHTML = categories.map(cat => {
+    const val = breakdown[cat.key] || 0;
+    const pct = Math.min(100, (val / cat.max) * 100);
+    return '<div style="margin-bottom:0.875rem;">'
+      + '<div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:0.3rem;">'
+      + '<span style="color:rgba(255,255,225,0.5);">' + cat.label + '</span>'
+      + '<span style="font-family:Syne Mono,monospace;color:var(--yellow);">' + val.toFixed(1) + ' / ' + cat.max + '</span>'
+      + '</div>'
+      + '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
+      + '<div style="height:100%;background:var(--yellow);border-radius:999px;width:' + pct + '%;transition:width 1s ease;"></div>'
+      + '</div></div>';
+  }).join('');
+}
+
+function renderNFTs(p) {
+  const wallet = p.Wallet || {};
+  const nftWallet = wallet.NFT || {};
+  const keys = Object.keys(nftWallet).filter(k => k !== 'total_nft');
+  const el = document.getElementById('nft-content');
+
+  if (!keys.length) {
+    el.innerHTML = '<div class="empty-hint">No NFTs found. Run !nft in Discord to sync.</div>';
+    return;
+  }
+
+  const groups = { 'Sporebots': [], 'Mooshie Collection': [], 'Farm Boost': [], 'Other': [] };
+  const colOrder = ['Sporebots','Mooshie Collection','Farm Boost','Other'];
+
+  keys.forEach(k => {
+    const entry = nftWallet[k];
+    const displayName = k.replace(/ ID\d+$/, '');
+    const tokenMatch  = k.match(/ ID(\d+)$/);
+    const tokenId     = tokenMatch ? tokenMatch[1] : null;
+    const col = displayName.includes('SporeBots') || displayName.includes('Sporebot') ? 'Sporebots'
+              : displayName.includes('Farm Boost') ? 'Farm Boost'
+              : displayName.includes('Mooshie') || displayName.includes('Kid Shroom') || displayName.includes('House') ? 'Mooshie Collection'
+              : 'Other';
+    const label = tokenId ? displayName.replace('SporeBots','Sporebot') + ' #' + tokenId
+                          : displayName.replace('Farm Boost (Gen 1)','Farm Boost');
+    groups[col].push({ label, count: parseInt(entry.count || 1), image: entry.image || null });
+  });
+
+  if (groups['Sporebots']) {
+    groups['Sporebots'].sort((a, b) => {
+      const na = parseInt(a.label.match(/#(\d+)/)?.[1] || 0);
+      const nb = parseInt(b.label.match(/#(\d+)/)?.[1] || 0);
+      return na - nb;
+    });
+  }
+
+  let html = '';
+  colOrder.forEach(col => {
+    if (!groups[col] || !groups[col].length) return;
+    html += '<div style="margin-bottom:1.25rem;">'
+      + '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.3);margin-bottom:0.5rem;">' + col + '</div>'
+      + '<div class="nft-grid">';
+    groups[col].forEach(item => {
+      html += '<div class="nft-card">';
+      if (item.image) {
+        html += '<img src="' + fixIpfs(item.image) + '" alt="' + item.label + '" loading="lazy" onerror="this.style.display=\'none\'">';
       } else {
-        Object.entries(val).forEach(([subKey, subVal]) => {
-          root.style.setProperty(`--clr-${key}-${subKey}`, subVal);
-        });
+        html += '<div class="nft-card-placeholder">🍄</div>';
+      }
+      html += '<div class="nft-card-name">' + item.label + '</div>';
+      if (item.count > 1) html += '<div class="nft-card-count">x' + item.count + '</div>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+  el.innerHTML = html;
+}
+
+function renderCompanion(s) {
+  const comp = s.Companion || {};
+  const activeKey = comp.active;
+  const el = document.getElementById('companion-content');
+
+  if (!activeKey) {
+    el.innerHTML = '<div class="empty-hint">No active companion. Use !pet adopt in Discord.</div>';
+  } else {
+    const pets = comp.pets || {};
+    const pd = pets[activeKey] || {};
+    let days = pd.total_days || 0;
+    if (comp.adopted_at) {
+      const a = new Date(comp.adopted_at.replace(' ','T') + 'Z');
+      days += Math.floor((Date.now() - a.getTime()) / 86400000);
+    }
+    const bl = bondLevel(days);
+    const bondPct = Math.min(100, (days / 42) * 100);
+    el.innerHTML = '<div class="companion-card">'
+      + '<div class="companion-emoji">' + (CEMOJIS[activeKey] || '🐾') + '</div>'
+      + '<div style="flex:1;">'
+      + '<div style="font-weight:700;margin-bottom:0.25rem;">' + activeKey.charAt(0).toUpperCase() + activeKey.slice(1) + '</div>'
+      + '<div style="font-size:0.8rem;color:rgba(255,255,225,0.5);margin-bottom:0.5rem;">Lv.' + bl + ' - ' + (BOND_LBLS[bl] || '') + ' &nbsp; ' + days + ' days together</div>'
+      + '<div class="companion-bond-bar"><div class="companion-bond-fill" style="width:' + bondPct + '%;"></div></div>'
+      + '</div></div>';
+  }
+
+  // Roster
+  const rosterEl = document.getElementById('pets-roster');
+  const allPets = Object.keys(comp.pets || {});
+  if (!allPets.length) {
+    rosterEl.innerHTML = '<div class="empty-hint">No companions adopted yet.</div>';
+    return;
+  }
+  rosterEl.innerHTML = allPets.map(k => {
+    const pd = (comp.pets || {})[k] || {};
+    const days = pd.total_days || 0;
+    const bl = bondLevel(days);
+    const isActive = k === activeKey;
+    return '<div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid rgba(255,255,225,0.05);">'
+      + '<span style="font-size:1.5rem;">' + (CEMOJIS[k] || '🐾') + '</span>'
+      + '<span style="flex:1;font-size:0.85rem;">' + k.charAt(0).toUpperCase() + k.slice(1) + '</span>'
+      + '<span style="font-family:Syne Mono,monospace;font-size:0.65rem;color:rgba(255,255,225,0.35);">Lv.' + bl + ' &nbsp; ' + days + 'd</span>'
+      + (isActive ? '<span style="font-family:Syne Mono,monospace;font-size:0.58rem;color:var(--green);padding:0.15em 0.5em;border:1px solid rgba(34,197,94,0.3);border-radius:999px;">ACTIVE</span>' : '')
+      + '</div>';
+  }).join('');
+}
+
+function renderInventory(s) {
+  const inv  = s.Inventory || {};
+  const items = inv.Items || {};
+  const gems  = inv.Gemstones || {};
+  const potions = inv.Potions || {};
+  const artifacts = inv.Artifacts || {};
+  const scrolls   = inv.Scrolls   || {};
+
+  // Items
+  const ITEM_MAP = {
+    Golden_Shovel:'Golden Shovel', Elder_Pipe:'Elder Pipe', Feather:'Feather',
+    Wildtongue_Gemstone:'Wildtongue Gemstone', Mooshie_Gemstone:'Mooshie Gemstone',
+    King_Totem:'King Totem', Queen_Totem:'Queen Totem', Kid_Totem:'Kid Totem',
+    Gold_Totem:'Gold Totem', Miner_Helmet:'Miner Helmet', Well_Access:'Well Access',
+  };
+  const ownedItems = Object.entries(items).filter(([,v]) => v && v !== false);
+  const itemsEl = document.getElementById('items-content');
+  if (ownedItems.length) {
+    itemsEl.innerHTML = ownedItems.map(([k,v]) => {
+      const label = ITEM_MAP[k] || k.replace(/_/g,' ');
+      const qty = typeof v === 'number' && v > 1 ? ' x' + v : '';
+      return '<div class="data-row"><span class="dr-label">' + label + qty + '</span><span class="dr-val g">Owned</span></div>';
+    }).join('');
+  } else {
+    itemsEl.innerHTML = '<div class="empty-hint">No items yet.</div>';
+  }
+
+  // Gems
+  const gemsEl = document.getElementById('gems-content');
+  gemsEl.innerHTML = GEMS.map(g => {
+    const owned = gems[g] && gems[g] > 0;
+    const qty = owned ? ' x' + gems[g] : '';
+    return '<span class="gem-chip ' + (owned ? 'owned' : '') + '">' + (GEM_LABELS[g] || g) + qty + '</span>';
+  }).join('');
+
+  // Potions
+  const potionsEl = document.getElementById('potions-content');
+  const active = potions.Active_Potion;
+  const stored = Object.entries(potions).filter(([k]) => k.startsWith('Potion_'));
+
+  function cleanEmoji(str) { return str ? String(str).replace(/<:[^:]+:\d+>/g, '').trim() : ''; }
+
+  let potHtml = '';
+  if (active && typeof active === 'object') {
+    potHtml += '<div style="margin-bottom:0.75rem;padding-bottom:0.75rem;border-bottom:1px solid rgba(255,255,225,0.06);">'
+      + '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.35rem;">ACTIVE POTION</div>'
+      + '<div class="data-row"><span class="dr-label">Name</span><span class="dr-val p">' + cleanEmoji(active.name || 'Unknown') + '</span></div>';
+    Object.entries(active).filter(([k]) => !['name','emoji','Potion Score','Potion_Score'].includes(k)).forEach(([k,v]) => {
+      potHtml += '<div class="data-row"><span class="dr-label">' + k.replace(/_/g,' ') + '</span><span class="dr-val g">' + (typeof v === 'number' ? v + '%' : v) + '</span></div>';
+    });
+    potHtml += '</div>';
+  }
+  if (stored.length) {
+    potHtml += '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.35rem;">STORED (' + stored.length + ')</div>';
+    stored.forEach(([,v]) => {
+      if (typeof v === 'object') {
+        potHtml += '<div class="data-row"><span class="dr-label">' + cleanEmoji(v.name || 'Potion') + '</span>'
+          + '<span class="dr-val" style="font-size:0.7rem;">' + (v['Potion Score'] ? 'Score: ' + Number(v['Potion Score']).toFixed(1) : '') + '</span></div>';
       }
     });
-    root.style.setProperty('--font-heading', theme.fonts.heading);
-    root.style.setProperty('--font-body', theme.fonts.body);
-    window.addEventListener('DOMContentLoaded', () => {
-      const logo = document.querySelector('.logo');
-      if (logo) logo.textContent = config.site.headerTitle;
-      const menuTarget = document.getElementById('global-menu');
-      if (menuTarget) menuTarget.innerHTML = config.menu.html;
-    });
-  </script>
+  }
+  if (!potHtml) potHtml = '<div class="empty-hint">No potions brewed yet.</div>';
+  potionsEl.innerHTML = potHtml;
 
-  <!-- Token Prices -->
-  <script type="module">
-    async function updateTokenPrices() {
-      try {
-        const sporeRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8');
-        const sporeData = await sporeRes.json();
-        document.getElementById('spore-price').textContent = `$${parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(9)}`;
-        const shroomRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28');
-        const shroomData = await shroomRes.json();
-        document.getElementById('shroom-price').textContent = `$${parseFloat(shroomData.data.attributes.base_token_price_usd).toFixed(7)}`;
-      } catch (e) { console.error('Price fetch failed:', e); }
-    }
-    updateTokenPrices();
-  </script>
+  // Artifacts & Scrolls
+  const ART_LABELS = {
+    Elderwood_Bow:'Elderwood Bow',Wizard_Staff:'Wizard Staff',Reshi_Shield:'Reshi Shield',
+    Spell_Book:'Spell Book',Wizard_Hat:'Wizard Hat',Healing_Potion:'Healing Potion',
+    Mooshie_Ring:'Mooshie Ring',Magical_Mirror:'Magical Mirror',
+    Deathcap_Dagger:'Deathcap Dagger',Arcane_Amulet:'Arcane Amulet',
+  };
+  const ownedArts    = Object.entries(artifacts).filter(([,v]) => v && v !== false);
+  const ownedScrolls = Object.entries(scrolls).filter(([,v]) => v && v !== false);
+  const artEl = document.getElementById('artifacts-content');
+  let artHtml = '';
+  if (ownedArts.length) {
+    artHtml += '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.35rem;">ARTIFACTS</div>';
+    artHtml += ownedArts.map(([k]) => '<div class="data-row"><span class="dr-label">' + (ART_LABELS[k] || k.replace(/_/g,' ')) + '</span><span class="dr-val y">Found</span></div>').join('');
+  }
+  artHtml += '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin:0.75rem 0 0.35rem;">SCROLLS</div>';
+  artHtml += '<div class="data-row"><span class="dr-label">Scrolls Found</span><span class="dr-val p">' + ownedScrolls.length + ' / 10</span></div>';
+  if (!ownedArts.length && !ownedScrolls.length) artHtml = '<div class="empty-hint">None found yet. Use !explore to discover.</div>';
+  artEl.innerHTML = artHtml;
+}
 
-  <!-- Profile Logic -->
-  <script type="module">
-    // ---- Helpers ----
-    const fmt = (n) => n == null ? '-' : Number(n).toLocaleString();
-    const pct = (n) => n == null ? '-' : `${Number(n).toFixed(2)}%`;
-    const bool = (v) => v ? '✅' : '❌';
-    const safe = (v, fallback = '-') => (v != null && v !== '' && v !== undefined) ? v : fallback;
+function renderPixie(p) {
+  const pixie  = p.Pixie       || {};
+  const msgXp  = p.Message_XP  || {};
+  const flair  = p.Flair       || {};
+  const sec    = p.Security    || {};
+  const quests = p.Quests      || {};
+  const ach    = p.Achievements || {};
 
-    const COMPANION_EMOJIS = {
-      turtle: '🐢', bunny: '🐰', fox: '🦊', frog: '🐸',
-      wolf: '🐺', duck: '🦆', deer: '🦌', owl: '🦉',
-      bear: '🐻', monkey: '🐒', songbird: '🐦', panda: '🐼'
-    };
+  setEl('px-level',       safe(pixie.LvL, 1));
+  setEl('px-xp',          fmt(pixie.XP));
+  setEl('px-flair',       safe(flair.Flair, 'SPROUT'));
+  setEl('px-flair-title', safe(flair.Title, '-'));
+  setEl('px-streak',      safe(msgXp.current_streak, 0) + ' days');
+  setEl('px-maxstreak',   safe(msgXp.max_streak, 0) + ' days');
+  setEl('px-social',      quests.social_butterfly ? 'Completed' : 'In Progress');
+  setEl('px-verified',    sec.Verified ? 'Yes' : 'No');
 
-    const STAGE_ORDER = ['Spore', 'Germination', 'Mycelium', 'Pinning', 'Sporulation'];
+  // Achievements
+  const achEl = document.getElementById('achievements-content');
+  const achEntries = Object.entries(ach).filter(([,v]) => v && typeof v === 'object' && v.earned);
+  if (!achEntries.length) {
+    achEl.innerHTML = '<div class="empty-hint">No achievements yet.</div>';
+    return;
+  }
+  achEl.innerHTML = achEntries.map(([k,v]) => {
+    return '<div class="data-row"><span class="dr-label">' + k.replace(/_/g,' ') + '</span><span class="dr-val g">Earned</span></div>';
+  }).join('');
+}
 
-    function stageProgress(stageName) {
-      const idx = STAGE_ORDER.indexOf(stageName);
-      if (idx < 0) return 0;
-      return Math.round(((idx + 1) / STAGE_ORDER.length) * 100);
-    }
+function renderReddit(s, p) {
+  // Reddit data lives under Sporebot or Pixie depending on your DB structure
+  // We'll look in the sporebot data for Reddit-specific fields
+  const reddit = s.Reddit || {};
+  const redditFarm = s.Reddit_Farm || {};
+  const redditBal  = reddit.Balance || s.Reddit_Balance || {};
+  const redditDaily = reddit.Daily || {};
 
-    function set(id, val) {
-      const el = document.getElementById(id);
-      if (el) el.textContent = val;
-    }
+  const statsEl = document.getElementById('reddit-stats');
+  const stats = [
+    { label: 'SHROOM Balance', val: fmt(redditBal.shroom_wallet || reddit.shroom_wallet) },
+    { label: 'SPORE Balance',  val: fmt(redditBal.spore_wallet  || reddit.spore_wallet) },
+    { label: 'Planted SHROOM', val: fmt(redditBal.shroom_farm   || reddit.shroom_farm) },
+    { label: 'Farm SPORE',     val: fmt(redditBal.spore_farm    || reddit.spore_farm) },
+    { label: 'Farm Stage',     val: safe(redditFarm.current_stage || reddit.current_stage) },
+    { label: 'Forage Streak',  val: safe((redditFarm.streak || reddit.streak), 0) + ' days' },
+  ];
+  const hasData = stats.some(st => st.val !== '-' && st.val !== '0' && st.val !== '0 days');
+  if (!hasData) {
+    statsEl.innerHTML = '<div class="empty-hint" style="grid-column:1/-1;">No Reddit data found. Make sure you\'ve used the Reddit bot.</div>';
+  } else {
+    statsEl.innerHTML = stats.map(st => '<div class="reddit-stat"><div class="rs-label">' + st.label + '</div><div class="rs-val">' + st.val + '</div></div>').join('');
+  }
 
-    function renderTags(containerId, items, className = '') {
-      const el = document.getElementById(containerId);
-      if (!el) return;
-      if (!items || items.length === 0) {
-        el.innerHTML = `<span style="color:#444;font-size:0.8rem;">None</span>`;
-        return;
-      }
-      el.innerHTML = items.map(i => `<span class="inv-tag ${className}">${i}</span>`).join('');
-    }
+  // Reddit daily
+  const rdEl = document.getElementById('reddit-daily-content');
+  const REDDIT_DAILY = ['daily_forage','daily_mist','daily_fan','daily_herb','daily_explore'];
+  const rdHasData = REDDIT_DAILY.some(k => redditDaily[k] != null);
+  if (!rdHasData) {
+    rdEl.innerHTML = '<div class="empty-hint">No Reddit daily data found.</div>';
+  } else {
+    rdEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;">' + REDDIT_DAILY.map(k => {
+      const done = redditDaily[k] === true;
+      const label = k.replace('daily_','').charAt(0).toUpperCase() + k.replace('daily_','').slice(1);
+      const color = done ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,225,0.08)';
+      const textCol = done ? '#22c55e' : 'rgba(255,255,225,0.35)';
+      return '<div style="padding:0.4rem 0.8rem;border-radius:999px;border:1px solid ' + color + ';font-family:Syne Mono,monospace;font-size:0.65rem;color:' + textCol + ';">' + (done ? '✓ ' : '') + label + '</div>';
+    }).join('') + '</div>';
+  }
 
-    // ---- Load Profile ----
-    async function loadProfile(userId) {
-      const statusEl = document.getElementById('status-msg');
-      statusEl.innerHTML = `Looking up user... <span class="loader"></span>`;
+  // Reddit wallet
+  const rwEl = document.getElementById('reddit-wallet-content');
+  if (!hasData) {
+    rwEl.innerHTML = '<div class="empty-hint">No Reddit wallet data.</div>';
+  } else {
+    rwEl.innerHTML = '<div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val y">' + fmt(redditBal.shroom_wallet || reddit.shroom_wallet) + '</span></div>'
+      + '<div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b">' + fmt(redditBal.spore_wallet || reddit.spore_wallet) + '</span></div>';
+  }
+}
 
-      try {
-        const API_BASE = window.location.port === '8080' ? 'http://localhost:3001' : '';
-        const res = await fetch(`${API_BASE}/api/user/${userId}`);
-        if (!res.ok) {
-          statusEl.textContent = res.status === 404 ? '❌ User not found. Check your Discord ID.' : `❌ Server error (${res.status})`;
-          return;
-        }
-        const data = await res.json();
+// ================================================================
+// INIT
+// ================================================================
+(async function init() {
+  // Check for OAuth callback
+  const fromOAuth = await handleOAuthCallback();
+  if (fromOAuth) {
+    await loadProfileData();
+    return;
+  }
 
-        if (!data || (!data.sporebot && !data.pixie)) {
-          statusEl.textContent = '❌ No profile data found for that ID.';
-          return;
-        }
+  // Check existing session
+  const hasSession = await checkExistingSession();
+  if (hasSession) {
+    await loadProfileData();
+    return;
+  }
 
-        statusEl.textContent = '';
-        document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        renderProfile(data);
-      } catch (err) {
-        statusEl.textContent = '❌ Could not connect to server. Make sure the server is running.';
-        console.error(err);
-      }
-    }
-
-    function renderProfile(data) {
-      const s = data.sporebot || {};
-      const p = data.pixie || {};
-
-      const farm = s.Farm || {};
-      const balance = s.Balance || {};
-      const daily = s.Daily_Check || {};
-      const stats = s.Stats || {};
-      const inv = s.Inventory || {};
-      const staking = s.Staking || {};
-      const companion = s.Companion || {};
-      const misc = s.Misc || {};
-      const nfts = s.NFTs || {};
-
-      const wallet = p.Wallet || {};
-      const pixie = p.Pixie || {};
-      const tipping = p.Tipping || {};
-      const goodshroom = p.GoodShroom || {};
-      const security = p.Security || {};
-      const msgXP = p.Message_XP || {};
-      const flair = p.Flair || {};
-
-      // --- Profile Header ---
-      set('ph-username', safe(misc.username || wallet.username, 'Unknown Farmer'));
-      set('ph-joined', `Joined: ${safe(p.Misc?.created_at || misc.created_at, 'Unknown')}`);
-      set('ph-id', `Discord ID: ${userId}`);
-      set('ph-rank', safe(farm.farm_rank, 'BRONZE'));
-      set('ph-flair', safe(flair.Flair, '🌱 SPROUT'));
-      if (security.Verified) {
-        document.getElementById('ph-verified').style.display = 'inline-block';
-      }
-
-      // --- Wallet ---
-      set('w-shroom', fmt(wallet.shroom_wallet));
-      set('w-spore', fmt(wallet.spore_wallet));
-      set('w-planted', fmt(balance.shroom_farm));
-      set('w-spore-farm', fmt(balance.spore_farm));
-      const addr = wallet.Address || '';
-      set('w-address', addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : 'Not registered');
-
-      // --- Farm ---
-      set('f-stage', safe(farm.current_stage, 'Inactive'));
-      set('f-rank', safe(farm.farm_rank, 'BRONZE'));
-      set('f-sgr', farm.spore_generation_rate != null ? `${Number(farm.spore_generation_rate).toLocaleString()} / day` : '-');
-      set('f-lifetime', fmt(farm.lifetime_spores));
-      set('f-streak', farm.streak != null ? `${farm.streak} days` : '-');
-      set('f-streak-rec', farm.streak_record != null ? `${farm.streak_record} days` : '-');
-
-      const STAGE_DAYS = {Spore:0, Germination:7, Mycelium:21, Pinning:35, Sporulation:42};
-      const stagePct = stageProgress(farm.current_stage);
-      const stageIdx = STAGE_ORDER.indexOf(farm.current_stage);
-      const nextStage = stageIdx >= 0 && stageIdx < STAGE_ORDER.length - 1 ? STAGE_ORDER[stageIdx + 1] : null;
-      const nextDays = nextStage ? STAGE_DAYS[nextStage] : null;
-      const farmStart = farm.farm_start_date ? new Date(farm.farm_start_date) : null;
-      let daysLabel = '';
-      if (nextStage && farmStart) {
-        const daysElapsed = Math.floor((Date.now() - farmStart.getTime()) / 86400000);
-        const daysLeft = Math.max(0, nextDays - daysElapsed);
-        daysLabel = `${daysLeft}d until ${nextStage}`;
-      } else if (!nextStage) {
-        daysLabel = 'Max Stage!';
-      }
-      document.getElementById('stage-fill').style.width = `${stagePct}%`;
-      set('stage-name-label', `Farm Stage: ${safe(farm.current_stage, 'Inactive')}`);
-      set('stage-pct-label', daysLabel);
-
-      // --- Pixie ---
-      set('p-level', safe(pixie.LvL, '1'));
-      set('p-xp', fmt(pixie.Total_XP));
-      set('p-xp-needed', fmt(pixie.XP_Needed));
-      set('p-gs', safe(pixie.GS, '0'));
-      set('p-gs-social', `${safe(goodshroom.Given, 0)} given / ${safe(goodshroom.Received, 0)} received`);
-      set('p-msg-xp', fmt(msgXP.Total_Message_XP));
-      set('p-msg-streak', msgXP.current_streak != null ? `${msgXP.current_streak} days` : '-');
-      set('p-reddit', safe(security.RedditName, 'Not linked'));
-
-      // --- Staking ---
-      const stakedAmt = staking.staked_spores || 0;
-      set('s-staked', fmt(stakedAmt));
-      set('s-pending', fmt(staking.pending_rewards));
-      set('s-earned', fmt(staking.lifetime_rewards));
-      const nodes = stakedAmt > 0 ? Math.floor(stakedAmt / 100_000_000) : 0;
-      set('s-nodes', nodes.toString());
-
-      // --- Companion ---
-      const BOND_LEVELS = {1:0, 2:7, 3:15, 4:25, 5:42};
-      function getBondLevel(days) {
-        let level = 1;
-        for (const [lvl, req] of Object.entries(BOND_LEVELS)) {
-          if (days >= req) level = parseInt(lvl);
-        }
-        return level;
-      }
-      const BOND_LABELS = {1:'Acquaintance', 2:'Friend', 3:'Trusted Ally', 4:'Soul Bond', 5:'Eternal Bond'};
-
-      const activeKey = companion.active;
-      if (activeKey) {
-        const emoji = COMPANION_EMOJIS[activeKey] || '🐾';
-        set('c-icon', emoji);
-        set('c-name', activeKey.charAt(0).toUpperCase() + activeKey.slice(1));
-        const pets = companion.pets || {};
-        const petData = pets[activeKey] || {};
-        let totalDays = petData.total_days || 0;
-        if (companion.adopted_at) {
-          const adopted = new Date(companion.adopted_at.replace(' ', 'T') + 'Z');
-          const elapsed = Math.floor((Date.now() - adopted.getTime()) / 86400000);
-          totalDays += elapsed;
-        }
-        const bondLevel = getBondLevel(totalDays);
-        set('c-bond', `Level ${bondLevel} / 5 - ${BOND_LABELS[bondLevel]}`);
-        set('c-days', `${totalDays} days`);
-        set('c-bonus', `Bond Lv.${bondLevel} active`);
-      } else {
-        set('c-name', 'No companion active');
-        set('c-bonus', 'Use !pet in Discord to equip one');
-        set('c-bond', '-');
-        set('c-days', '-');
-      }
-      set('c-fed', fmt(companion.total_fed));
-      const unlockedCount = Object.keys(companion.pets || {}).length;
-      set('c-unlocked', `${unlockedCount} / 12`);
-
-      // --- Farm Stats ---
-      set('st-yield', pct(stats.Spore_Yield));
-      set('st-harvest', pct(stats.Harvest_Bonus));
-      set('st-herb', pct(stats.Herb_Find_Rate));
-      set('st-rare-herb', pct(stats.Rare_Herb_Chance));
-      set('st-double-herb', pct(stats.Double_Herb_Chance));
-      set('st-scroll', pct(stats.Scroll_Find_Rate));
-      set('st-artifact', pct(stats.Artifact_Discovery));
-      set('st-king', pct(stats.King_Totem_Chance));
-      set('st-kid', pct(stats.Kid_Totem_Chance));
-
-      // --- Tipping ---
-      const tTotal = tipping.Total || {};
-      const tGiven = tTotal.Given || {};
-      const tRecv = tTotal.Received || {};
-      set('t-shroom-given', fmt(tGiven.Total_Shrooms));
-      set('t-shroom-recv', fmt(tRecv.Total_Shrooms));
-      set('t-spore-given', fmt(tGiven.Total_Spores));
-      set('t-spore-recv', fmt(tRecv.Total_Spores));
-      set('t-raffle', fmt((tipping.Raffle || {}).Total_Spores));
-      set('t-airdrop', fmt((tipping.Airdrop || {}).Total_Spores));
-
-      // --- Daily Checklist ---
-      const dailyCommands = [
-        { key: 'daily_forage', label: '🍂 Forage' },
-        { key: 'daily_mist', label: '💧 Mist' },
-        { key: 'daily_fan', label: '🌬️ Fan' },
-        { key: 'daily_explore', label: '🔎 Explore' },
-        { key: 'daily_visit', label: '🧙 Visit' },
-        { key: 'daily_toss', label: '⛲ Toss' },
-        { key: 'daily_feed', label: '🐾 Feed' },
-        { key: 'daily_dig', label: '⛏️ Dig' },
-        { key: 'daily_herb', label: '🌿 Herb' },
-        { key: 'daily_cave', label: '⛰️ Cave' },
-      ];
-      const dailyGrid = document.getElementById('daily-grid');
-      dailyGrid.innerHTML = dailyCommands.map(cmd => {
-        const done = daily[cmd.key] === true;
-        return `<div class="daily-item ${done ? 'done' : 'pending'}">${done ? '✅' : '⬜'} ${cmd.label}</div>`;
-      }).join('');
-
-      // --- Active Sporebot NFT ---
-      const activeBot = inv.Active_Sporebot || {};
-      if (activeBot && activeBot.token_id) {
-        const botName = activeBot.title || activeBot.name || `Sporebot #${activeBot.token_id}`;
-        set('bot-name', botName);
-        set('bot-id', `#${activeBot.token_id}`);
-        set('bot-rarity', safe(activeBot.rarity_score ? `Score: ${activeBot.rarity_score}` : null, '-'));
-        const yieldBonus = activeBot.traits?.Spore_Yield || activeBot.spore_yield_bonus || null;
-        if (activeBot.image) {
-          const imgEl = document.getElementById('bot-image');
-          if (imgEl) { imgEl.src = activeBot.image; imgEl.style.display = 'block'; }
-        }
-      } else {
-        set('bot-name', 'No Sporebot active');
-        set('bot-id', '-');
-        set('bot-rarity', '-');
-      }
-
-      // --- NFTs Owned ---
-      const nftGrid = document.getElementById('nft-grid');
-      const walletNFTs = wallet.NFT || {};
-      const allNFTs = { ...walletNFTs, ...nfts };
-      const nftKeys = Object.keys(allNFTs).filter(k => k !== 'total_nft');
-      if (nftKeys.length > 0) {
-        const activeId = activeBot?.token_id?.toString();
-        nftGrid.innerHTML = nftKeys.map(k => {
-          const label = k.replace(' ID', ' #');
-          const isSporebot = k.toLowerCase().includes('sporebot');
-          const isActive = isSporebot && activeId && k.includes(activeId);
-          const cls = isActive ? 'active-bot' : (isSporebot ? 'sporebot' : '');
-          return `<span class="nft-tag ${cls}">${label}${isActive ? ' (Active)' : ''}</span>`;
-        }).join('');
-      } else {
-        nftGrid.innerHTML = `<span style="color:#555;font-size:0.85rem;">No NFTs found</span>`;
-      }
-
-      // --- Inventory ---
-      const artifacts = inv.Artifacts || {};
-      const foundArtifacts = Object.entries(artifacts).filter(([_, v]) => v).map(([k]) => k);
-      renderTags('inv-artifacts', foundArtifacts, 'found');
-
-      const scrolls = inv.Scrolls || {};
-      const foundScrolls = Object.entries(scrolls).filter(([_, v]) => v).map(([k]) => k);
-      renderTags('inv-scrolls', foundScrolls, 'found');
-
-      const items = inv.Items || {};
-      const foundItems = Object.entries(items).filter(([_, v]) => v).map(([k]) => k);
-      renderTags('inv-items', foundItems);
-
-      const ingredients = inv.Ingredients || {};
-      const ingList = Object.entries(ingredients)
-        .filter(([_, v]) => v && v > 0)
-        .map(([k, v]) => `${k} (${v})`);
-      renderTags('inv-ingredients', ingList);
-
-      const potions = inv.Potions || {};
-      const potionCount = Object.keys(potions).filter(k => k.startsWith('Potion_')).length;
-      renderTags('inv-potions', potionCount > 0 ? [`${potionCount} potion(s) stored`] : []);
-
-      const gems = inv.Gemstones || {};
-      const gemList = Object.entries(gems).filter(([_, v]) => v && v > 0).map(([k, v]) => `${k} (${v})`);
-      renderTags('inv-gems', gemList);
-    }
-
-    // ---- Button Logic ----
-    let userId = '';
-
-    document.getElementById('connect-btn').addEventListener('click', () => {
-      const input = document.getElementById('discord-id').value.trim();
-      if (!input) {
-        document.getElementById('status-msg').textContent = 'Please enter your Discord User ID.';
-        return;
-      }
-      userId = input;
-      loadProfile(userId);
-    });
-
-    document.getElementById('discord-id').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') document.getElementById('connect-btn').click();
-    });
-  </script>
-
+  // No session
+  showState('gate');
+})();
+</script>
 </body>
 </html>
