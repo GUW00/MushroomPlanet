@@ -1186,7 +1186,6 @@ function renderStaking(s, p) {
       + '<div style="height:100%;background:var(--yellow);border-radius:999px;width:' + pct + '%;transition:width 1s ease;"></div>'
       + '</div></div>';
   }).join('');
-}
 
   // Node breakdown
   const nbEl = document.getElementById('nodes-breakdown');
@@ -1222,7 +1221,8 @@ function renderStaking(s, p) {
     }
     nbEl.innerHTML = nbHtml;
   }
-  
+}
+
 function renderNFTs(p) {
   const wallet = p.Wallet || {};
   const nftWallet = wallet.NFT || {};
