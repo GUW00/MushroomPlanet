@@ -10,6 +10,16 @@
   <script type="module" src="config.js"></script>
 
   <style>
+    .price-pill {
+      display: flex; align-items: center; gap: 0.75rem;
+      background: var(--dark3); border: 1px solid rgba(254,206,0,0.2);
+      border-radius: 999px; padding: 0.6rem 1.4rem;
+      font-family: 'Syne Mono', monospace; font-size: 0.85rem;
+    }
+    .price-pill .dot { width: 8px; height: 8px; border-radius: 50%; animation: pulse 2s infinite; }
+    .price-pill strong { color: var(--red); }
+    .price-pill.spore-pill strong { color: var(--blue); }
+    .price-val { color: var(--cream); }
     :root {
       --cream: #ffffe1;
       --yellow: #fece00;
@@ -359,9 +369,11 @@
     .contract-link:hover { color: var(--blue); }
 
     @media(max-width:600px){
-      .swap-card { padding: 1.5rem; }
+      .swap-card { padding: 1.25rem; }
       .wallet-panel { padding: 1.25rem; }
-      .dir-btn { font-size: 0.8rem; padding: 0.55rem 0.6rem; }
+      .dir-btn { font-size: 0.72rem; padding: 0.5rem 0.4rem; gap: 0.25rem; }
+      .dir-toggle { padding: 0.2rem; gap: 0.2rem; }
+      .token-dot { width: 6px; height: 6px; }
     }
   </style>
 </head>
@@ -389,12 +401,36 @@
     <p>Trustless, on-chain token conversion at a fixed rate. Governed by a Polygon smart contract — permanent and transparent.</p>
   </div>
 
-  <div class="rate-strip">
-    <div class="rate-pill">
-      <span>Fixed Rate</span>
-      <strong>1 SHROOM = 100 SPORE</strong>
-      <span style="font-size:0.62rem;color:rgba(255,255,225,0.3);">immutable</span>
+  <div style="display:flex;justify-content:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.5rem;padding:0 1rem;position:relative;z-index:1;">
+    <div style="display:flex;align-items:center;gap:0.5rem;background:var(--dark3);border:1px solid rgba(253,70,79,0.2);border-radius:999px;padding:0.45rem 0.9rem;font-family:'Syne Mono',monospace;font-size:0.72rem;">
+      <span style="color:rgba(255,255,225,0.4);">Offchain Rate</span>
+      <span style="color:var(--cream);font-weight:600;">100 SPORE = 1 SHROOM</span>
+      <span style="font-size:0.65rem;color:rgba(255,255,225,0.3);">fixed</span>
     </div>
+    <a href="https://dapp.quickswap.exchange/swap/best/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" style="text-decoration:none;">
+      <div style="display:flex;align-items:center;gap:0.5rem;background:var(--dark3);border:1px solid rgba(79,168,253,0.2);border-radius:999px;padding:0.45rem 0.9rem;font-family:'Syne Mono',monospace;font-size:0.72rem;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(79,168,253,0.5)'" onmouseout="this.style.borderColor='rgba(79,168,253,0.2)'">
+        <span style="color:rgba(255,255,225,0.4);">Onchain Rate</span>
+        <span id="onchain-rate" style="color:var(--blue);font-weight:600;">Loading...</span>
+        <span style="font-size:0.65rem;color:rgba(255,255,225,0.3);">live</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="rate-strip">
+    <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" style="text-decoration:none;">
+      <div class="price-pill" style="cursor:pointer;">
+        <span class="dot dot-shroom"></span>
+        <span>$HROOM</span>
+        <strong class="price-val" id="shroom-price">Loading...</strong>
+      </div>
+    </a>
+    <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" style="text-decoration:none;">
+      <div class="price-pill spore-pill" style="cursor:pointer;">
+        <span class="dot dot-spore"></span>
+        <span>SPORE</span>
+        <strong class="price-val" id="spore-price">Loading...</strong>
+      </div>
+    </a>
     <div class="rate-pill" style="border-color:rgba(79,168,253,0.2);">
       <span>Network</span>
       <strong style="color:var(--blue);">Polygon</strong>
@@ -456,14 +492,14 @@
       <!-- Direction toggle -->
       <div class="dir-toggle">
         <button class="dir-btn active" id="btn-shroom-to-spore" onclick="setDirection('shroom_to_spore')">
-          <span class="token-dot dot-shroom"></span> SHROOM
-          <span style="color:rgba(255,255,225,0.25);font-size:0.75rem;margin:0 0.2rem;">-&gt;</span>
-          SPORE <span class="token-dot dot-spore"></span>
+          <span class="token-dot dot-shroom"></span>
+          <span class="dir-label">SHROOM <span style="opacity:0.4;">→</span> SPORE</span>
+          <span class="token-dot dot-spore"></span>
         </button>
         <button class="dir-btn" id="btn-spore-to-shroom" onclick="setDirection('spore_to_shroom')">
-          <span class="token-dot dot-spore"></span> SPORE
-          <span style="color:rgba(255,255,225,0.25);font-size:0.75rem;margin:0 0.2rem;">-&gt;</span>
-          SHROOM <span class="token-dot dot-shroom"></span>
+          <span class="token-dot dot-spore"></span>
+          <span class="dir-label">SPORE <span style="opacity:0.4;">→</span> SHROOM</span>
+          <span class="token-dot dot-shroom"></span>
         </button>
       </div>
 
@@ -736,8 +772,20 @@
   };
 
   async function connectWallet() {
+    // Mobile: if no injected provider, offer deep links
     if (!window.ethereum) {
-      setStatus('No wallet detected. Install MetaMask.', 'error');
+      const pageUrl = encodeURIComponent(window.location.href);
+      const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+      if (isMobile) {
+        const choice = confirm('Open in wallet app?\n\nOK = MetaMask\nCancel = Coinbase Wallet');
+        if (choice) {
+          window.location.href = 'https://metamask.app.link/dapp/' + window.location.host + window.location.pathname;
+        } else {
+          window.location.href = 'https://go.cb-wallet.com/dapp?url=' + pageUrl;
+        }
+        return;
+      }
+      setStatus('No wallet detected. Install MetaMask or Coinbase Wallet.', 'error');
       return;
     }
     try {
@@ -961,23 +1009,44 @@
   window.addEventListener('DOMContentLoaded', () => {
     if (CONTRACT_ADDRESS !== 'DEPLOY_CONTRACT_ADDRESS_HERE') {
       loadReserves();
-      setInterval(loadReserves, 30000); // refresh every 30s
+      setInterval(loadReserves, 30000);
     } else {
       document.getElementById('res-shroom').textContent = 'Not deployed yet';
       document.getElementById('res-spore').textContent  = 'Not deployed yet';
     }
     updateButtonState();
+    // Only hook wallet events if already injected (don't trigger permission prompt)
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', accounts => {
+        if (!accounts.length) disconnectWallet();
+        else { walletAddr = accounts[0]; loadWalletBalances(); }
+      });
+      window.ethereum.on('chainChanged', () => window.location.reload());
+    }
   });
-
-  // Handle account/chain changes
-  if (window.ethereum) {
-    window.ethereum.on('accountsChanged', accounts => {
-      if (!accounts.length) disconnectWallet();
-      else { walletAddr = accounts[0]; loadWalletBalances(); }
-    });
-    window.ethereum.on('chainChanged', () => window.location.reload());
-  }
   </script>
-
+<script>
+  async function fetchPrices() {
+    try {
+      const [sr, sp] = await Promise.all([
+        fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28'),
+        fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8'),
+      ]);
+      const sd = await sr.json(), pd = await sp.json();
+      const shroomUsd = parseFloat(sd.data.attributes.base_token_price_usd);
+      const sporeUsd  = parseFloat(pd.data.attributes.base_token_price_usd);
+      document.getElementById('shroom-price').textContent = '$' + shroomUsd.toFixed(7);
+      document.getElementById('spore-price').textContent  = '$' + sporeUsd.toFixed(9);
+      const rateEl = document.getElementById('onchain-rate');
+      if (rateEl && shroomUsd > 0 && sporeUsd > 0) {
+        rateEl.textContent = Math.round(shroomUsd / sporeUsd).toLocaleString() + ' SPORE = 1 SHROOM';
+      }
+    } catch(e) {
+      document.getElementById('shroom-price').textContent = 'N/A';
+      document.getElementById('spore-price').textContent  = 'N/A';
+    }
+  }
+  fetchPrices();
+  </script>
 </body>
 </html>
