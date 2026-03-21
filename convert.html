@@ -431,11 +431,6 @@
         <strong class="price-val" id="spore-price">Loading...</strong>
       </div>
     </a>
-    <div class="rate-pill" style="border-color:rgba(79,168,253,0.2);">
-      <span>Network</span>
-      <strong style="color:var(--blue);">Polygon</strong>
-      <span style="font-size:0.62rem;color:rgba(255,255,225,0.3);">~$0.01 gas</span>
-    </div>
   </div>
 
   <div class="page-section">
@@ -591,7 +586,9 @@
   const SHROOM_CONTRACT   = '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1';
   const SPORE_CONTRACT    = '0x089582AC20ea563c69408a79E1061de594b61bED';
   const POLYGON_CHAIN_ID  = 137;
-  const POLYGON_RPC = 'http://localhost:3001/api/rpc/polygon';
+  const POLYGON_RPC = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:3001/api/rpc/polygon'
+  : 'https://api.mushroomplanet.earth/api/rpc/polygon';
   const UINT256_MAX       = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
   // ================================================================
@@ -772,28 +769,37 @@
   };
 
   async function connectWallet() {
-    // Mobile: if no injected provider, offer deep links
+    const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+
+    // No injected provider — offer deep links on mobile, error on desktop
     if (!window.ethereum) {
-      const pageUrl = encodeURIComponent(window.location.href);
-      const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
       if (isMobile) {
+        const pageUrl = encodeURIComponent(window.location.href);
         const choice = confirm('Open in wallet app?\n\nOK = MetaMask\nCancel = Coinbase Wallet');
-        if (choice) {
-          window.location.href = 'https://metamask.app.link/dapp/' + window.location.host + window.location.pathname;
-        } else {
-          window.location.href = 'https://go.cb-wallet.com/dapp?url=' + pageUrl;
-        }
+        window.location.href = choice
+          ? 'https://metamask.app.link/dapp/' + window.location.host + window.location.pathname
+          : 'https://go.cb-wallet.com/dapp?url=' + pageUrl;
         return;
       }
       setStatus('No wallet detected. Install MetaMask or Coinbase Wallet.', 'error');
       return;
     }
+
+    // Desktop with multiple providers (e.g. Brave + MetaMask) — show picker
+    if (!isMobile && window.ethereum.providers?.length > 1) {
+      const pick = confirm('Choose wallet:\n\nOK = MetaMask\nCancel = Brave / Default');
+      const chosenProvider = pick
+        ? window.ethereum.providers.find(p => p.isMetaMask && !p.isBraveWallet)
+        : window.ethereum.providers.find(p => p.isBraveWallet) || window.ethereum.providers[0];
+      provider = new ethers.BrowserProvider(chosenProvider || window.ethereum);
+    } else {
+      provider = new ethers.BrowserProvider(window.ethereum);
+    }
+
     try {
       setStatus('Connecting...', 'info');
-      provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send('eth_requestAccounts', []);
 
-      // Switch to Polygon if needed
       const network = await provider.getNetwork();
       if (Number(network.chainId) !== POLYGON_CHAIN_ID) {
         try {
