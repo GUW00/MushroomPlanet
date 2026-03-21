@@ -27,31 +27,19 @@ async function loadSporebotTotals() {
       const grid = document.getElementById('sporebot-grid');
       if (!grid) return;
       const card = document.createElement('div');
-      card.style.cssText = 'grid-column:1/-1;background:var(--dark2);border:1px solid rgba(255,255,225,0.07);border-radius:1.5rem;padding:1.25rem;margin-top:0.5rem;';
-      card.innerHTML = `
-        <div style="font-family:'Syne Mono',monospace;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,225,0.4);margin-bottom:0.75rem;">In-Bot Balances (Distributed, Not Yet Withdrawn)</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
-          <div>
-            <div style="font-family:'Syne Mono',monospace;font-size:0.62rem;color:rgba(255,255,225,0.3);margin-bottom:0.25rem;">TOTAL HELD BY USERS</div>
-            <div style="font-size:1.1rem;font-weight:700;color:var(--red);">${fmt(t.grand_total_shrooms)} SHROOM</div>
-            <div style="font-size:1.1rem;font-weight:700;color:var(--blue);">${fmt(t.grand_total_spores)} SPORE</div>
-          </div>
-          <div>
-            <div style="font-family:'Syne Mono',monospace;font-size:0.62rem;color:rgba(255,255,225,0.3);margin-bottom:0.25rem;">FARM BALANCES</div>
-            <div style="color:var(--red);font-weight:600;">${fmt(t.farm_shrooms)} SHROOM</div>
-            <div style="color:var(--blue);font-weight:600;">${fmt(t.farm_spores)} SPORE</div>
-          </div>
-          <div>
-            <div style="font-family:'Syne Mono',monospace;font-size:0.62rem;color:rgba(255,255,225,0.3);margin-bottom:0.25rem;">DISCORD WALLETS</div>
-            <div style="color:var(--red);font-weight:600;">${fmt(t.discord_shroom_wallet)} SHROOM</div>
-            <div style="color:var(--blue);font-weight:600;">${fmt(t.discord_spore_wallet)} SPORE</div>
-          </div>
-          <div>
-            <div style="font-family:'Syne Mono',monospace;font-size:0.62rem;color:rgba(255,255,225,0.3);margin-bottom:0.25rem;">STAKED</div>
-            <div style="color:var(--blue);font-weight:600;">${fmt(t.staked_spores)} SPORE</div>
-          </div>
-        </div>`;
-      grid.appendChild(card);
+      const cards = [
+        { label: 'TOTAL IN-BOT', html: `<div style="color:var(--red);font-weight:700;font-size:1rem;">${fmt(t.grand_total_shrooms)} SHROOM</div><div style="color:var(--blue);font-weight:700;font-size:1rem;">${fmt(t.grand_total_spores)} SPORE</div>` },
+        { label: 'FARM', html: `<div style="color:var(--red);font-weight:600;">${fmt(t.farm_shrooms)} SHROOM</div><div style="color:var(--blue);font-weight:600;">${fmt(t.farm_spores)} SPORE</div>` },
+        { label: 'DISCORD WALLETS', html: `<div style="color:var(--red);font-weight:600;">${fmt(t.discord_shroom_wallet)} SHROOM</div><div style="color:var(--blue);font-weight:600;">${fmt(t.discord_spore_wallet)} SPORE</div>` },
+        { label: 'STAKED', html: `<div style="color:var(--blue);font-weight:600;">${fmt(t.staked_spores)} SPORE</div>` },
+      ];
+      cards.forEach(cd => {
+        const el = document.createElement('div');
+        el.className = 'stats-panel';
+        el.style.cssText = 'padding:1.25rem;min-width:0;';
+        el.innerHTML = `<div class="stat-key" style="margin-bottom:0.5rem;">${cd.label}</div>${cd.html}`;
+        grid.appendChild(el);
+      });
     } catch(e) { console.error('[SPOREBOT-TOTALS]', e); }
   }
   </script>
@@ -435,7 +423,7 @@ async function loadSporebotTotals() {
 
       <div style="margin-top:2rem;">
         <div style="font-family:'Syne Mono',monospace;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.5rem;">Sporebot Wallet</div>
-        <div id="sporebot-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
+        <div id="sporebot-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;">
           <div class="tx-loading" style="grid-column:1/-1;">Loading...</div>
         </div>
       </div>
@@ -737,7 +725,7 @@ async function loadSporebotTotals() {
 
   <script>
 
-  window.USE_LOCAL = false;
+  window.USE_LOCAL = true;
   window.API_BASE  = window.USE_LOCAL ? 'http://localhost:3001' : 'https://api.mushroomplanet.earth';
 
   // ─────────────────────────────────────────────────────────────────
@@ -1466,35 +1454,11 @@ async function loadSporebotTotals() {
       const sbc = HOLDINGS_COLORS['$HROOM'] || 'var(--red)';
       sbGrid.insertAdjacentHTML('beforeend', `
         <a href="https://polygonscan.com/address/0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A" target="_blank" style="text-decoration:none;">
-          <div class="stats-panel" style="padding:1.25rem;min-width:0;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.07)'">
-            <div class="stat-key">$HROOM</div>
-            <div class="stat-val" style="color:${sbc};font-size:1.1rem;">${fmtBal(data.sporebot_shroom, '$HROOM')}</div>
-            <div class="stat-sub" style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;margin-top:0.3rem;">0xa00C...863A</div>
-          </div>
-        </a>
-        <a href="https://polygonscan.com/address/0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A" target="_blank" style="text-decoration:none;">
-          <div class="stats-panel" style="padding:1.25rem;min-width:0;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.07)'">
-            <div class="stat-key">SPORE</div>
-            <div class="stat-val" style="color:var(--blue);font-size:1.1rem;">${fmtBal(data.sporebot_spore, 'SPORE')}</div>
-            <div class="stat-sub" style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;margin-top:0.3rem;">0xa00C...863A</div>
-          </div>
-        </a>`);
-
-      // In-bot balances — added after wallet cards, filled by loadSporebotTotals
-      sbGrid.insertAdjacentHTML('beforeend', `
-        <a href="https://polygonscan.com/address/0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A" target="_blank" style="text-decoration:none;">
-          <div class="stats-panel" style="padding:1.25rem;min-width:0;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.07)'">
-            <div class="stat-key">In-Bot SHROOM</div>
-            <div class="stat-val" id="inbot-shroom" style="color:var(--red);font-size:1.1rem;">Loading...</div>
-            <div class="stat-sub" style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;margin-top:0.3rem;">Held by users</div>
-          </div>
-        </a>
-        <a href="https://polygonscan.com/address/0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A" target="_blank" style="text-decoration:none;">
-          <div class="stats-panel" style="padding:1.25rem;min-width:0;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.07)'">
-            <div class="stat-key">In-Bot SPORE</div>
-            <div class="stat-val" id="inbot-spore" style="color:var(--blue);font-size:1.1rem;">Loading...</div>
-            <div class="stat-sub" style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;margin-top:0.3rem;">Held by users</div>
-          </div>
+          <div class="stats-panel" style="padding:2rem;min-width:0;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.07)'">
+            <div class="stat-key">SPOREBOT WALLET</div>
+            <div class="stat-val" style="color:${sbc};font-size:1rem;">${fmtBal(data.sporebot_shroom, '$HROOM')}</div>
+            <div class="stat-val" style="color:var(--blue);font-size:1rem;">${fmtBal(data.sporebot_spore, 'SPORE')}</div>
+            </div>
         </a>`);
 
     } catch {
