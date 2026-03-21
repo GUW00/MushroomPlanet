@@ -1170,6 +1170,19 @@ app.post('/api/proposals/:id/close', async (req, res) => {
     res.status(500).json({ ok: false });
   }
 });
+app.post('/api/rpc/polygon', async (req, res) => {
+  try {
+    const r = await fetch(process.env.ALCHEMY_POLYGON_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body),
+    });
+    const data = await r.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'RPC proxy failed' });
+  }
+});
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
