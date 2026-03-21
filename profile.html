@@ -776,8 +776,12 @@ const GEM_LABELS = {'Shroomstone_Quartz':'Quartz','Shroomcap_Ruby':'Ruby','Spore
 
 function fixIpfs(url) {
   if (!url) return null;
-  return url.replace('https://ipfs.io/ipfs/', 'https://cloudflare-ipfs.com/ipfs/')
-            .replace('ipfs://', 'https://cloudflare-ipfs.com/ipfs/');
+  // Normalize all IPFS variants to Pinata gateway (most reliable)
+  return url
+    .replace('https://ipfs.io/ipfs/', 'https://alchemy.mypinata.cloud/ipfs/')
+    .replace('https://cloudflare-ipfs.com/ipfs/', 'https://alchemy.mypinata.cloud/ipfs/')
+    .replace('https://gateway.pinata.cloud/ipfs/', 'https://alchemy.mypinata.cloud/ipfs/')
+    .replace('ipfs://', 'https://alchemy.mypinata.cloud/ipfs/');
 }
 
 function setEl(id, v) { const e = document.getElementById(id); if (e) e.textContent = v; }
