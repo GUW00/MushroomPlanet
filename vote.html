@@ -364,10 +364,10 @@
       background: var(--dark2); border: 1px solid rgba(255,255,225,0.1);
       border-radius: 0.875rem; padding: 0.875rem 1.25rem;
       font-size: 0.82rem; max-width: 320px;
-      transform: translateY(120%); transition: transform 0.3s ease;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
       display: flex; align-items: center; gap: 0.6rem;
     }
-    .toast.show { transform: translateY(0); }
+    .toast.show { opacity: 1; pointer-events: auto; }
     .toast.success { border-color: rgba(34,197,94,0.3); }
     .toast.error   { border-color: rgba(253,70,79,0.3); }
     .progress-bar {
@@ -387,10 +387,11 @@
     }
 
     @media (max-width: 600px) {
-      .stage-strip { flex-direction: column; align-items: center; gap: 0.5rem; padding: 0 1rem 2rem; }
-      .stage-pill { border-radius: 0.75rem !important; min-width: 0; width: 100%; max-width: 320px; flex-direction: row; justify-content: flex-start; gap: 1rem; padding: 0.75rem 1.25rem; }
-      .stage-num { font-size: 0.55rem; white-space: nowrap; }
+      .stage-strip { flex-direction: column; align-items: center; gap: 0.5rem; padding: 0 1.5rem 2rem; }
+      .stage-pill { border-radius: 0.75rem !important; width: 100%; min-width: 0; flex-direction: row; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; }
+      .stage-pill:first-child, .stage-pill:last-child { border-radius: 0.75rem !important; }
       .stage-arrow { display: none; }
+      .stage-sub { display: inline; }
       .vote-section { padding: 0 1rem 3rem; }
       .modal { padding: 1.5rem; }
       .auth-bar { flex-direction: column; align-items: flex-start; }
