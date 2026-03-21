@@ -657,3 +657,10 @@ body {
   vertical-align: middle;
   flex-shrink: 0;
 }
+
+/* PWA bottom nav - only visible when installed */
+nav.pwa-nav { display: none !important; }
+@media (display-mode: standalone) {
+  nav.pwa-nav { display: flex !important; }
+  body { padding-bottom: 70px !important; }
+}

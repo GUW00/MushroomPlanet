@@ -1,0 +1,14 @@
+{
+  "name": "Mushroom Planet",
+  "short_name": "MushPlanet",
+  "description": "Farm dashboard, treasury, governance and token tools",
+  "start_url": "/profile.html",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#fe0000",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/images/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

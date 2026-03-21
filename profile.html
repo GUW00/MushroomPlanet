@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#fe0000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mushroom Planet">
+  <link rel="apple-touch-icon" href="/images/icon-192.png">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Profile | Mushroom Planet</title>
@@ -10,6 +16,21 @@
   <script type="module" src="config.js"></script>
 
   <style>
+    .pwa-tab {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0.2rem;
+      text-decoration: none; color: rgba(255,255,225,0.35);
+      font-family: 'Syne Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.05em; transition: color 0.2s;
+    }
+    .pwa-tab span:first-child { font-size: 1.3rem; }
+    .pwa-tab.active { color: var(--yellow); }
+    .pwa-tab:hover { color: var(--cream); }
+    .pwa-nav { display: none; }
+    @media (display-mode: standalone) {
+      .pwa-nav { display: flex; }
+      body { padding-bottom: 70px !important; }
+    }
     /* ---- HEADER OVERRIDE (match convert/vote pages) ---- */
     header {
       background-color: #fe0000 !important;
@@ -1629,6 +1650,36 @@ function renderReddit(s, p) {
 
   // No session
   showState('gate');
+})();
+</script>
+<nav class="pwa-nav" style="
+  position:fixed; bottom:0; left:0; right:0; height:65px;
+  background:#111; border-top:1px solid rgba(255,255,225,0.08);
+  align-items:stretch; z-index:999;
+  padding-bottom:env(safe-area-inset-bottom);
+">
+  <a href="/profile.html" class="pwa-tab" data-page="profile">
+    <span>👤</span><span>Profile</span>
+  </a>
+  <a href="/treasury.html" class="pwa-tab" data-page="treasury">
+    <span>🏦</span><span>Treasury</span>
+  </a>
+  <a href="/vote.html" class="pwa-tab" data-page="vote">
+    <span>🗳️</span><span>Vote</span>
+  </a>
+  <a href="/convert.html" class="pwa-tab" data-page="convert">
+    <span>🔄</span><span>Convert</span>
+  </a>
+</nav>
+<script>
+(function() {
+  const page = window.location.pathname.split('/').pop().replace('.html','') || 'profile';
+  document.querySelectorAll('.pwa-tab').forEach(t => {
+    if (t.dataset.page === page) t.classList.add('active');
+  });
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
 })();
 </script>
 </body>
