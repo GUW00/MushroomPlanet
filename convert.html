@@ -800,15 +800,16 @@
 
 async function connectWallet() {
     const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+    // Brave on mobile injects isBraveWallet but doesn't support DApp browsing well
+    // Only treat as "wallet browser" if MetaMask, Coinbase/Base, or Trust
     const inWalletBrowser = window.ethereum && (
-      window.ethereum.isMetaMask ||
+      (window.ethereum.isMetaMask && !window.ethereum.isBraveWallet) ||
       window.ethereum.isCoinbaseWallet ||
       window.ethereum.isBaseSdk ||
-      window.ethereum.isTrust ||
-      window.ethereum.isBraveWallet
+      window.ethereum.isTrust
     );
 
-    // Mobile but NOT inside a wallet browser — show "open in wallet" screen
+    // Mobile but NOT inside a dedicated wallet browser — show "open in wallet" screen
     if (isMobile && !inWalletBrowser) {
       showMobileWalletScreen();
       return;
