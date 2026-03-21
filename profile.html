@@ -1398,20 +1398,54 @@ function renderReddit(s, p) {
     + '<div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b">' + fmt(bal.reddit_spores) + '</span></div>'
     + (r.Address ? '<div class="data-row"><span class="dr-label">Wallet</span><span class="dr-val">' + r.Address.slice(0,6) + '...' + r.Address.slice(-4) + '</span></div>' : '');
 
-  const questDone = r.Quests?.Daily_Quest === true;
-  const REDDIT_DAILY = [
-    { key: 'daily_forage', label: 'Forage' },
-    { key: 'daily_mist',   label: 'Mist' },
-    { key: 'daily_fan',    label: 'Fan' },
+  const questDone   = r.Quests?.Daily_Quest === true;
+  const forageDone  = forage.daily_forage === true;
+  const feedCooldown = feed.last_feed_time
+    ? (function() {
+        const last = new Date(feed.last_feed_time);
+        const diff = 3600000 - (Date.now() - last.getTime());
+        if (diff <= 0) return 'Ready';
+        const m = Math.floor(diff / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        return m + 'm ' + s + 's';
+      })()
+    : 'Ready';
+  const feedReady = feedCooldown === 'Ready';
+
+  const REDDIT_ACTIONS = [
+    { label: 'Forage',      cmd: '!forage',  done: forageDone,  cadence: 'Daily',  required: true },
+    { label: 'Feed',        cmd: '!feed',    done: feedReady,   cadence: 'Hourly', required: false, customState: feedReady ? 'READY' : feedCooldown },
+    { label: 'Daily Quest', cmd: '!quest',   done: questDone,   cadence: 'Daily',  required: false },
   ];
-  rdEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;">'
-    + REDDIT_DAILY.map(a => {
-      const done    = forage[a.key] === true;
-      const border  = done ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,225,0.08)';
-      const textCol = done ? '#22c55e' : 'rgba(255,255,225,0.35)';
-      return '<div style="padding:0.4rem 0.8rem;border-radius:999px;border:1px solid ' + border + ';font-family:Syne Mono,monospace;font-size:0.65rem;color:' + textCol + ';">' + (done ? '✓ ' : '') + a.label + '</div>';
+
+  const doneCount = [forageDone, feedReady, questDone].filter(Boolean).length;
+  const totalCount = REDDIT_ACTIONS.length;
+  const barPct = Math.round((doneCount / totalCount) * 100);
+
+  rdEl.innerHTML = '<div style="margin-bottom:1rem;">'
+    + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;">'
+    + '<span>Daily Progress</span><span>' + doneCount + ' / ' + totalCount + ' complete</span></div>'
+    + '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
+    + '<div style="height:100%;width:' + barPct + '%;background:linear-gradient(90deg,#ff6314,#ff9a14);border-radius:999px;transition:width 1s ease;"></div>'
+    + '</div></div>'
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem;">'
+    + REDDIT_ACTIONS.map(a => {
+      const bg     = a.done ? 'rgba(34,197,94,0.08)'  : a.required ? 'rgba(253,70,79,0.06)'  : 'rgba(255,255,255,0.02)';
+      const border = a.done ? 'rgba(34,197,94,0.3)'   : a.required ? 'rgba(253,70,79,0.25)'  : 'rgba(255,255,225,0.07)';
+      const icon   = a.done ? '✓' : a.required ? '!' : '○';
+      const iconCol  = a.done ? '#22c55e' : a.required ? '#fd464f' : 'rgba(255,255,225,0.25)';
+      const labelCol = a.done ? '#22c55e' : 'var(--cream)';
+      const stateLabel = a.customState || (a.done ? 'Done' : a.cadence);
+      const stateCol   = a.done ? 'rgba(34,197,94,0.5)' : a.required ? 'rgba(253,70,79,0.6)' : 'rgba(255,255,225,0.25)';
+      return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.875rem;border-radius:0.75rem;border:1px solid ' + border + ';background:' + bg + ';">'
+        + '<span style="font-size:0.9rem;color:' + iconCol + ';font-weight:700;width:14px;text-align:center;flex-shrink:0;">' + icon + '</span>'
+        + '<div style="display:flex;flex-direction:column;gap:0.1rem;min-width:0;">'
+        + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.8rem;font-weight:600;color:' + labelCol + ';">' + a.label + '</span>'
+        + '<span style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,100,20,0.7);">' + a.cmd + '</span>'
+        + '</div>'
+        + '<span style="margin-left:auto;font-family:Syne Mono,monospace;font-size:0.55rem;color:' + stateCol + ';flex-shrink:0;">' + stateLabel + '</span>'
+        + '</div>';
     }).join('')
-    + '<div style="padding:0.4rem 0.8rem;border-radius:999px;border:1px solid ' + (questDone ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,225,0.08)') + ';font-family:Syne Mono,monospace;font-size:0.65rem;color:' + (questDone ? '#22c55e' : 'rgba(255,255,225,0.35)') + ';">' + (questDone ? '✓ ' : '') + 'Daily Quest</div>'
     + '</div>';
 }
 
