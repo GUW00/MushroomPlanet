@@ -862,9 +862,15 @@ async function loadProfileData() {
   if (!currentUser) return;
   showState('loading');
   try {
-    const res = await fetch(window.API_BASE + '/api/user/' + currentUser.discord_id);
-    const data = await res.json();
-    profileData = data;
+    const [discordRes, redditRes] = await Promise.all([
+      fetch(window.API_BASE + '/api/user/' + currentUser.discord_id),
+      fetch(window.API_BASE + '/api/reddit-user/' + currentUser.discord_id),
+    ]);
+    const discordData = await discordRes.json();
+    const redditData  = await redditRes.json();
+    profileData = discordData;
+    profileData.reddit     = redditData.reddit || null;
+    profileData.redditName = redditData.redditName || null;
     renderProfile();
     showState('profile');
   } catch {

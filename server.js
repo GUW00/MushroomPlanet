@@ -1183,6 +1183,25 @@ app.post('/api/rpc/polygon', async (req, res) => {
     res.status(500).json({ error: 'RPC proxy failed' });
   }
 });
+// ----------------------------------------------------------------
+// GET /api/reddit-user/:username
+// Returns Reddit/Users/{username} data by discord_id lookup
+// ----------------------------------------------------------------
+app.get('/api/reddit-user/:discord_id', async (req, res) => {
+  try {
+    const discord_id = req.params.discord_id;
+    // Find Reddit username via Pixie link
+    const pixieSnap = await db.ref(`Pixie/Users/${discord_id}/Security/RedditName`).get();
+    const redditName = pixieSnap.exists() ? pixieSnap.val() : null;
+    if (!redditName) return res.json({ ok: true, reddit: null, redditName: null });
+
+    const snap = await db.ref(`Reddit/Users/${redditName}`).get();
+    res.json({ ok: true, reddit: snap.exists() ? snap.val() : null, redditName });
+  } catch (err) {
+    console.error('[REDDIT-USER] Error:', err);
+    res.status(500).json({ ok: false });
+  }
+});
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
