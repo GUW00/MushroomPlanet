@@ -800,59 +800,93 @@
 
 async function connectWallet() {
     const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+    const inWalletBrowser = window.ethereum && (
+      window.ethereum.isMetaMask ||
+      window.ethereum.isCoinbaseWallet ||
+      window.ethereum.isBaseSdk ||
+      window.ethereum.isTrust ||
+      window.ethereum.isBraveWallet
+    );
 
-    // Build provider list — check both .providers array and single injection
-    let providerList = [];
-    if (window.ethereum?.providers?.length) {
-      providerList = [...window.ethereum.providers];
-    } else if (window.ethereum) {
-      providerList = [window.ethereum];
+    // Mobile but NOT inside a wallet browser — show "open in wallet" screen
+    if (isMobile && !inWalletBrowser) {
+      showMobileWalletScreen();
+      return;
     }
-    // On mobile Brave, MetaMask may be injected separately as window.ethereum
-    // but Brave also injects itself — check both and add MetaMask if missed
-    if (isMobile && window.ethereum?.isMetaMask && !providerList.some(p => p.isMetaMask && !p.isBraveWallet)) {
-      providerList.push(window.ethereum);
-    }
-    if (isMobile && window.coinbaseWalletExtension) {
-      providerList.push(window.coinbaseWalletExtension);
-    }
-    // Deduplicate by wallet type — some browsers inject duplicates
-    const seen = new Set();
-    providerList = providerList.filter(p => {
-      const key = p.isBraveWallet ? 'brave' : p.isMetaMask ? 'metamask' : p.isCoinbaseWallet ? 'coinbase' : p.isRabby ? 'rabby' : Math.random();
-      if (seen.has(key)) return false;
-      seen.add(key); return true;
-    });
 
-    // No wallet at all — mobile deep links
-    if (providerList.length === 0) {
-      if (isMobile) {
-        showWalletModal([
-          { name: 'MetaMask',          action: () => { window.location.href = 'https://metamask.app.link/dapp/' + window.location.host + window.location.pathname; } },
-          { name: 'Base Wallet',       action: () => { window.location.href = 'https://coinbase.com/wallet/dapp?url=' + encodeURIComponent(window.location.href); } },
-        ]);
-        return;
-      }
+    // Desktop or already inside a wallet browser — connect directly
+    if (!window.ethereum) {
       setStatus('No wallet detected. Install MetaMask or Base Wallet.', 'error');
       return;
     }
 
-    // Map providers to named options
+    // Build provider list
+    let providerList = [];
+    if (window.ethereum?.providers?.length) {
+      providerList = [...window.ethereum.providers];
+    } else {
+      providerList = [window.ethereum];
+    }
+
+    // Deduplicate
+    const seen = new Set();
+    providerList = providerList.filter(p => {
+      const key = p.isBraveWallet ? 'brave' : p.isMetaMask ? 'metamask' : p.isCoinbaseWallet ? 'coinbase' : p.isRabby ? 'rabby' : p.isTrust ? 'trust' : 'unknown';
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    });
+
+    // If only one provider (inside wallet browser) — connect directly, no picker
+    if (providerList.length === 1) {
+      await doConnect(providerList[0]);
+      return;
+    }
+
+    // Desktop with multiple wallets — show picker
     const options = providerList.map(p => {
       let name = 'Browser Wallet';
-      if (p.isBraveWallet)                          name = 'Brave Wallet';
-      else if (p.isMetaMask && !p.isBraveWallet)    name = 'MetaMask';
-      else if (p.isCoinbaseWallet || p.isBaseSdk)   name = 'Base Wallet';
-      else if (p.isRabby)                           name = 'Rabby';
-      else if (p.isTrust)                           name = 'Trust Wallet';
+      if (p.isBraveWallet)                        name = 'Brave Wallet';
+      else if (p.isMetaMask && !p.isBraveWallet)  name = 'MetaMask';
+      else if (p.isCoinbaseWallet || p.isBaseSdk) name = 'Base Wallet';
+      else if (p.isRabby)                         name = 'Rabby';
+      else if (p.isTrust)                         name = 'Trust Wallet';
       return { name, provider: p };
     });
 
-    // ALWAYS show the picker — never auto-connect, even with one wallet
     showWalletModal(options.map(o => ({
       name: o.name,
       action: () => doConnect(o.provider),
     })));
+  }
+
+  function showMobileWalletScreen() {
+    document.getElementById('wallet-modal')?.remove();
+    const modal = document.createElement('div');
+    modal.id = 'wallet-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);padding:1.5rem;';
+    const pageUrl = encodeURIComponent(window.location.href);
+    modal.innerHTML = `
+      <div style="background:#1a1a1a;border:1px solid rgba(255,255,225,0.12);border-radius:1.5rem;padding:2rem;max-width:340px;width:100%;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:1rem;">📱</div>
+        <div style="font-family:'Syne Mono',monospace;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.75rem;">Mobile Wallet Required</div>
+        <div style="font-size:0.88rem;color:rgba(255,255,225,0.7);line-height:1.6;margin-bottom:1.75rem;">
+          Open this page inside your wallet app's built-in browser for the best experience.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1rem;">
+          <a href="https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}"
+             style="display:block;padding:0.85rem 1rem;background:rgba(235,130,30,0.1);border:1px solid rgba(235,130,30,0.3);border-radius:0.75rem;color:#f6851b;font-family:Space Grotesk,sans-serif;font-size:0.9rem;font-weight:600;text-decoration:none;">
+            Open in MetaMask
+          </a>
+          <a href="https://coinbase.com/wallet/dapp?url=${pageUrl}"
+             style="display:block;padding:0.85rem 1rem;background:rgba(79,168,253,0.1);border:1px solid rgba(79,168,253,0.3);border-radius:0.75rem;color:var(--blue);font-family:Space Grotesk,sans-serif;font-size:0.9rem;font-weight:600;text-decoration:none;">
+            Open in Base Wallet
+          </a>
+        </div>
+        <button onclick="document.getElementById('wallet-modal').remove()" style="width:100%;padding:0.55rem;background:transparent;border:1px solid rgba(255,255,225,0.1);border-radius:0.6rem;color:rgba(255,255,225,0.35);font-family:'Syne Mono',monospace;font-size:0.72rem;cursor:pointer;">Cancel</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
   }
 
   async function doConnect(chosenProvider) {
