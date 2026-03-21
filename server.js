@@ -19,7 +19,7 @@ const app = express();
 app.use(cors({
   origin: ['https://mushroomplanet.earth', 'http://localhost:8080', 'http://localhost:5500'],
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
+  allowedHeaders: ['Content-Type', 'x-discord-id'],
   credentials: true,
 }));
 app.use(express.json());
@@ -732,8 +732,15 @@ function generateToken() {
 
 function getSessionUser(req) {
   const token = req.cookies?.gov_session;
-  if (!token) return null;
-  return sessions.get(token) || null;
+  if (token && sessions.has(token)) return sessions.get(token);
+  // Fallback: check discord_id header for dev
+  const discordId = req.headers['x-discord-id'];
+  if (discordId) {
+    for (const user of sessions.values()) {
+      if (user.discord_id === discordId) return user;
+    }
+  }
+  return null;
 }
 
 // ----------------------------------------------------------------
@@ -861,13 +868,20 @@ app.get('/api/proposals/:id', async (req, res) => {
 // ----------------------------------------------------------------
 app.get('/api/proposals/:id/comments', async (req, res) => {
   try {
-    const snap = await db.ref(`Governance/Comments/${req.params.id}`).get();
+    const snap = await db.ref(`Governance/Proposals/${req.params.id}/Comments`).get();
     if (!snap.exists()) return res.json({ ok: true, comments: [] });
     const comments = [];
-    snap.forEach(child => comments.push({ id: child.key, ...child.val() }));
+    const val = snap.val();
+    Object.entries(val).forEach(([key, data]) => {
+      if (data && typeof data === 'object' && data.text) {
+        comments.push({ id: key, ...data });
+      }
+    });
     comments.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    console.log(`[COMMENTS] ${req.params.id} — returning ${comments.length} comments`);
     res.json({ ok: true, comments });
   } catch (err) {
+    console.error('[COMMENTS-ERROR]', err);
     res.status(500).json({ ok: false, comments: [] });
   }
 });
@@ -891,13 +905,14 @@ app.post('/api/proposals/:id/comments', async (req, res) => {
     const mvpSnap = await db.ref(`Pixie/Users/${sessionUser.discord_id}/MVP/total`).get();
     const mvp     = mvpSnap.exists() ? mvpSnap.val() : 0;
 
-    const commentRef = db.ref(`Governance/Comments/${req.params.id}`).push();
+    const commentRef = db.ref(`Governance/Proposals/${req.params.id}/Comments`).push();
     await commentRef.set({
-      author_id:   sessionUser.discord_id,
-      author_name: sessionUser.username,
-      author_mvp:  mvp,
-      text:        text.trim(),
-      created_at:  new Date().toISOString(),
+      author_id:     sessionUser.discord_id,
+      author_name:   sessionUser.username,
+      author_avatar: sessionUser.avatar || null,
+      author_mvp:    mvp,
+      text:          text.trim(),
+      created_at:    new Date().toISOString(),
     });
 
     // Increment comment count on proposal
@@ -951,7 +966,7 @@ app.post('/api/proposals/:id/vote', async (req, res) => {
 
     // Validate choice is one of the proposal options
     const validOptions = proposal.stage === 'proposal'
-      ? ['yes', 'no']
+      ? (proposal.options && proposal.options.length >= 2 ? proposal.options : ['yes', 'no'])
       : (proposal.options || []);
     if (!validOptions.includes(choice)) {
       return res.status(400).json({ ok: false, message: 'Invalid vote option' });

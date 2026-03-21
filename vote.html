@@ -9,10 +9,7 @@
   <link rel="stylesheet" href="styles.css" />
 
   <style>
-    body { padding-top: 55px !important; }
-    #global-menu { display: none !important; }
-    .main-menu { display: none !important; }
-    .mobile-menu { display: none !important; }
+    body { padding-top: 160px !important; }
     :root {
       --cream: #ffffe1;
       --yellow: #fece00;
@@ -363,7 +360,7 @@
       border: 1px solid rgba(255,255,225,0.08); margin-right: 0.3rem;
     }
     .toast {
-      position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+      position: fixed; bottom: 4rem; right: 2rem; z-index: 9999;
       background: var(--dark2); border: 1px solid rgba(255,255,225,0.1);
       border-radius: 0.875rem; padding: 0.875rem 1.25rem;
       font-size: 0.82rem; max-width: 320px;
@@ -407,11 +404,6 @@
     <nav class="container">
       <a href="index.html" class="logo">Mushroom Planet</a>
       <ul class="nav-links">
-        <li><a href="/index.html">HOME</a></li>
-        <li><a href="/sporebot.html">SPOREBOT</a></li>
-        <li><a href="/token.html">TOKEN</a></li>
-        <li><a href="/rewards.html">REWARDS</a></li>
-        <li><a href="/guides.html">GUIDES</a></li>
         <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
         <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
         <li><a href="/profile.html">PROFILE</a></li>
@@ -737,11 +729,11 @@
     if (!code) return;
 
     const savedState = sessionStorage.getItem('oauth_state');
-    if (state !== savedState) { showToast('OAuth state mismatch', 'error'); return; }
-
-    // Clean URL
+    // Clean URL immediately
     window.history.replaceState({}, document.title, window.location.pathname);
     sessionStorage.removeItem('oauth_state');
+
+    if (state !== savedState) { showToast('OAuth state mismatch', 'error'); return; }
 
     try {
       const res = await fetch(`${window.API_BASE}/api/auth/discord/callback`, {
@@ -912,7 +904,7 @@
       voteBar = `<div class="vote-bar-wrap">
         <div class="vote-bar-labels"><span>YES</span><span>${pct}% in favor</span></div>
         <div class="vote-bar-track"><div class="vote-bar-fill vbf-yes" style="width:${pct}%"></div></div>
-        <div class="vote-totals"><span class="vt-yes">${yes} yes</span><span class="vt-no">${p.vote_totals['no'] || 0} no</span></div>
+        <div class="vote-totals"><span class="vt-yes">${yes} Yes</span><span class="vt-no">${p.vote_totals['no'] || 0} No</span></div>
       </div>`;
     }
 
@@ -962,7 +954,8 @@
           el.style.width = el.dataset.width + '%';
         });
       }, 100);
-    } catch {
+    } catch(err) {
+      console.error('[OPEN-PROPOSAL-ERROR]', err);
       content.innerHTML = buildDetailHTML(p, []);
     }
   }
@@ -993,17 +986,14 @@
         ${myVote ? `<div style="font-size:0.72rem;color:rgba(255,255,225,0.35);margin-top:0.5rem;font-family:'Syne Mono',monospace;">You voted: ${escHtml(myVote)}</div>` : ''}
       </div>`;
     } else if (isProposal && canVote) {
+      const propOpts = p.options && p.options.length >= 2 ? p.options : ['Yes', 'No'];
       voteSection = `<div style="margin-bottom:1.5rem;">
-        <div style="font-family:'Syne Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.75rem;">Your Vote</div>
+        <div style="font-family:'Syne Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.75rem;">Your Vote · 1 person = 1 vote · 70% yes needed to advance</div>
         <div class="vote-options" id="vote-opts">
-          <div class="vote-option${myVote==='yes'?' selected':''}" onclick="selectVoteOption(this,'yes')">
+          ${propOpts.map(o => `<div class="vote-option${myVote===o?' selected':''}" onclick="selectVoteOption(this,'${escAttr(o)}')">
             <div class="vote-radio"><div class="vote-radio-dot"></div></div>
-            <span class="vote-option-label">Yes, advance this proposal</span>
-          </div>
-          <div class="vote-option${myVote==='no'?' selected':''}" onclick="selectVoteOption(this,'no')">
-            <div class="vote-radio"><div class="vote-radio-dot"></div></div>
-            <span class="vote-option-label">No, reject this proposal</span>
-          </div>
+            <span class="vote-option-label">${escHtml(o)}</span>
+          </div>`).join('')}
         </div>
         <button class="btn btn-green" onclick="castVote('${p.id}','proposal')" id="btn-cast-vote"${myVote?' disabled':''}>
           ${myVote ? 'Vote Cast' : 'Submit Vote'}
@@ -1030,10 +1020,10 @@
         </div>
         ${entries.map(([opt, val]) => {
           const pct = total > 0 ? ((val / total) * 100) : 0;
-          const color = opt === 'yes' ? 'var(--green)' : opt === 'no' ? 'var(--red)' : 'var(--yellow)';
+          const color = opt.toLowerCase() === 'yes' ? 'var(--green)' : opt.toLowerCase() === 'no' ? 'var(--red)' : 'var(--yellow)';
           return `<div style="margin-bottom:0.85rem;">
             <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:0.3rem;">
-              <span>${escHtml(opt)}</span>
+              <span>${escHtml(opt.charAt(0).toUpperCase() + opt.slice(1))}</span>
               <span style="font-family:'Syne Mono',monospace;color:${color};">${pct.toFixed(1)}% ${isVote ? `(${fmtMvp(val)} MVP)` : `(${val} votes)`}</span>
             </div>
             <div class="vote-bar-track" style="height:8px;">
@@ -1049,15 +1039,7 @@
 
     // Comments HTML
     const commentsHTML = comments.length
-      ? comments.map(c => `<div class="comment">
-          <div class="comment-header">
-            <div class="comment-avatar"></div>
-            <span class="comment-author">${escHtml(c.author_name)}</span>
-            <span class="comment-mvp">⚡${(c.author_mvp||0).toFixed(1)}</span>
-            <span class="comment-time">${timeAgo(c.created_at)}</span>
-          </div>
-          <div class="comment-body">${escHtml(c.text)}</div>
-        </div>`).join('')
+      ? comments.map(c => renderComment(c)).join('')
       : '<div style="font-size:0.78rem;color:rgba(255,255,225,0.25);padding:0.5rem 0;">No comments yet. Be the first!</div>';
 
     const commentInput = currentUser
@@ -1114,8 +1096,8 @@
     try {
       const res = await fetch(`${window.API_BASE}/api/proposals/${proposalId}/vote`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
         body: JSON.stringify({ discord_id: currentUser.discord_id, choice: selectedVote }),
       });
       const data = await res.json();
@@ -1144,35 +1126,36 @@
     try {
       const res = await fetch(`${window.API_BASE}/api/proposals/${proposalId}/comments`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
         body: JSON.stringify({ discord_id: currentUser.discord_id, text }),
       });
       const data = await res.json();
       if (!data.ok) { showToast(data.message || 'Comment failed', 'error'); return; }
       showToast('Comment posted!', 'success');
       input.value = '';
-      // Refresh comments
-      const commentRes = await fetch(`${window.API_BASE}/api/proposals/${proposalId}/comments`);
-      const commentData = await commentRes.json();
-      const listEl = document.getElementById('comment-list-' + proposalId);
-      if (listEl && commentData.comments) {
-        listEl.innerHTML = commentData.comments.map(c => `<div class="comment">
-          <div class="comment-header">
-            <div class="comment-avatar"></div>
-            <span class="comment-author">${escHtml(c.author_name)}</span>
-            <span class="comment-mvp">⚡${(c.author_mvp||0).toFixed(1)}</span>
-            <span class="comment-time">${timeAgo(c.created_at)}</span>
-          </div>
-          <div class="comment-body">${escHtml(c.text)}</div>
-        </div>`).join('');
-      }
+      closeModal('modal-detail');
     } catch { showToast('Error posting comment', 'error'); }
   }
 
   // ================================================================
   // CREATE PROPOSAL
   // ================================================================
+  function renderComment(c) {
+    const avatarHtml = c.author_avatar
+      ? `<img src="https://cdn.discordapp.com/avatars/${escHtml(c.author_id)}/${escHtml(c.author_avatar)}.png" class="comment-avatar" style="object-fit:cover;">`
+      : `<div class="comment-avatar" style="display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:rgba(255,255,225,0.3);">${escHtml((c.author_name||'?').charAt(0).toUpperCase())}</div>`;
+    return `<div class="comment">
+      <div class="comment-header">
+        ${avatarHtml}
+        <span class="comment-author">${escHtml(c.author_name)}</span>
+        <span class="comment-mvp">⚡${(c.author_mvp||0).toFixed(1)}</span>
+        <span class="comment-time">${timeAgo(c.created_at)}</span>
+      </div>
+      <div class="comment-body">${escHtml(c.text)}</div>
+    </div>`;
+  }
+  
   function openCreateModal() {
     if (!currentUser) { showToast('Connect Discord first', 'error'); return; }
     document.getElementById('modal-create').classList.add('open');
@@ -1217,8 +1200,8 @@
     try {
       const res = await fetch(`${window.API_BASE}/api/proposals/create`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
         body: JSON.stringify({ discord_id: currentUser.discord_id, title, description: desc, category, options, discord_link: discordLink }),
       });
       const data = await res.json();
