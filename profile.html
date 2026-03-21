@@ -1044,6 +1044,7 @@ function renderFarm(s) {
     { label: 'Gather',  cmd: '!gather',  done: gatherCD === 'Ready', cadence: 'Hourly', cooldown: gatherCD },
     { label: 'Cave',    cmd: '!cave',    done: caveCD   === 'Ready', cadence: 'Hourly', cooldown: caveCD },
     { label: 'Feed',    cmd: '!feed',    done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD },
+    { label: 'Dig',     cmd: '!dig',     done: daily.daily_dig === true, cadence: 'Daily' },
   ];
   const doneCount = DAILY_ACTIONS.filter(a => daily[a.key] === true).length;
   const totalCount = DAILY_ACTIONS.length;
