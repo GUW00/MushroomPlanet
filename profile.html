@@ -1041,10 +1041,10 @@ function renderFarm(s) {
     { label: 'Fan',     cmd: '!fan',     done: daily.daily_fan     === true, cadence: 'Daily' },
     { label: 'Explore', cmd: '!explore', done: daily.daily_explore === true, cadence: 'Daily' },
     { label: 'Toss',    cmd: '!toss',    done: daily.daily_toss    === true, cadence: 'Daily' },
+    { label: 'Dig',     cmd: '!dig',     done: daily.daily_dig === true, cadence: 'Daily' },
     { label: 'Gather',  cmd: '!gather',  done: gatherCD === 'Ready', cadence: 'Hourly', cooldown: gatherCD },
     { label: 'Cave',    cmd: '!cave',    done: caveCD   === 'Ready', cadence: 'Hourly', cooldown: caveCD },
     { label: 'Feed',    cmd: '!feed',    done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD },
-    { label: 'Dig',     cmd: '!dig',     done: daily.daily_dig === true, cadence: 'Daily' },
   ];
   const doneCount = DAILY_ACTIONS.filter(a => daily[a.key] === true).length;
   const totalCount = DAILY_ACTIONS.length;
