@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Governance | Mushroom Planet</title>
+  <meta name="description" content="Mushroom Planet governance — propose, discuss, and vote on the future of the ecosystem." />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne+Mono&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    body { padding-top: 55px !important; }
+    #global-menu { display: none !important; }
+    .main-menu { display: none !important; }
+    .mobile-menu { display: none !important; }
+    :root {
+      --cream: #ffffe1;
+      --yellow: #fece00;
+      --red: #fd464f;
+      --blue: #4fa8fd;
+      --dark: #0f0f0f;
+      --dark2: #1a1a1a;
+      --dark3: #242424;
+      --green: #22c55e;
+      --purple: #c084fc;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--dark);
+      color: var(--cream);
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden;
+      padding-top: 70px;
+    }
+
+    /* ---- STARFIELD ---- */
+    #starfield {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .star {
+      position: absolute; border-radius: 50%; background: var(--cream);
+      opacity: 0; animation: twinkle var(--dur) var(--delay) infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: var(--op); transform: scale(1); }
+    }
+
+    /* ---- HERO ---- */
+    .vote-hero {
+      position: relative; z-index: 1; text-align: center;
+      padding: 2rem 1rem 3rem;
+      background: radial-gradient(ellipse at 50% 0%, rgba(254,206,0,0.08) 0%, transparent 70%);
+    }
+    .vote-hero .eyebrow {
+      font-family: 'Syne Mono', monospace; font-size: 0.75rem;
+      letter-spacing: 0.3em; color: var(--yellow); text-transform: uppercase;
+      margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.2s forwards;
+    }
+    .vote-hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 700; line-height: 1.1;
+      margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.4s forwards;
+    }
+    .vote-hero h1 span { color: var(--yellow); }
+    .vote-hero p {
+      font-size: 1.1rem; max-width: 640px; margin: 0 auto 2.5rem;
+      color: rgba(255,255,225,0.7); opacity: 0; animation: fadeUp 0.6s 0.6s forwards;
+    }
+
+    /* ---- STAGE STRIP ---- */
+    .stage-strip {
+      position: relative; z-index: 1;
+      display: flex; justify-content: center; gap: 0;
+      padding: 0 1rem 3rem;
+      opacity: 0; animation: fadeUp 0.6s 0.8s forwards;
+    }
+    .stage-pill {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0.4rem; padding: 1rem 2rem;
+      background: var(--dark3); border: 1px solid rgba(255,255,225,0.08);
+      font-family: 'Syne Mono', monospace;
+      position: relative; min-width: 160px;
+    }
+    .stage-pill:first-child { border-radius: 1rem 0 0 1rem; }
+    .stage-pill:last-child  { border-radius: 0 1rem 1rem 0; }
+    .stage-pill + .stage-pill { border-left: none; }
+    .stage-pill.active { background: rgba(254,206,0,0.08); border-color: rgba(254,206,0,0.3); }
+    .stage-num { font-size: 0.6rem; letter-spacing: 0.2em; color: rgba(255,255,225,0.3); text-transform: uppercase; }
+    .stage-name { font-size: 0.78rem; font-weight: 600; color: var(--cream); }
+    .stage-sub  { font-size: 0.62rem; color: rgba(255,255,225,0.35); }
+    .stage-pill.active .stage-name { color: var(--yellow); }
+    .stage-arrow {
+      position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
+      font-size: 0.7rem; color: rgba(255,255,225,0.2); z-index: 2;
+      pointer-events: none;
+    }
+
+    /* ---- LAYOUT ---- */
+    .vote-section {
+      position: relative; z-index: 1; max-width: 1100px;
+      margin: 0 auto; padding: 0 1.5rem 5rem;
+    }
+    .section-label {
+      font-family: 'Syne Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--yellow); margin-bottom: 0.5rem;
+    }
+    .section-title {
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700;
+      margin-bottom: 2rem; display: flex; align-items: center; gap: 0.6rem;
+    }
+
+    /* ---- AUTH BAR ---- */
+    .auth-bar {
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1rem; padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem;
+    }
+    .auth-status { display: flex; align-items: center; gap: 0.75rem; }
+    .auth-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 2px solid var(--yellow); object-fit: cover;
+    }
+    .auth-avatar-placeholder {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--dark3); border: 2px solid rgba(255,255,225,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; color: rgba(255,255,225,0.3);
+    }
+    .auth-name { font-weight: 600; font-size: 0.9rem; }
+    .auth-sub  { font-size: 0.72rem; color: rgba(255,255,225,0.4); font-family: 'Syne Mono', monospace; }
+    .mvp-badge {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: rgba(254,206,0,0.1); border: 1px solid rgba(254,206,0,0.25);
+      border-radius: 999px; padding: 0.2em 0.7em;
+      font-family: 'Syne Mono', monospace; font-size: 0.65rem; color: var(--yellow);
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: 'Syne Mono', monospace; font-size: 0.72rem;
+      padding: 0.5em 1.2em; border-radius: 999px; border: 1px solid;
+      cursor: pointer; transition: all 0.2s; text-decoration: none;
+      white-space: nowrap; font-weight: 600;
+    }
+    .btn-discord { color: #5865f2; background: rgba(88,101,242,0.1); border-color: rgba(88,101,242,0.3); }
+    .btn-discord:hover { background: rgba(88,101,242,0.2); border-color: rgba(88,101,242,0.6); }
+    .btn-yellow { color: var(--yellow); background: rgba(254,206,0,0.08); border-color: rgba(254,206,0,0.25); }
+    .btn-yellow:hover { background: rgba(254,206,0,0.15); border-color: rgba(254,206,0,0.5); }
+    .btn-red    { color: var(--red); background: rgba(253,70,79,0.08); border-color: rgba(253,70,79,0.25); }
+    .btn-red:hover { background: rgba(253,70,79,0.15); border-color: rgba(253,70,79,0.5); }
+    .btn-ghost  { color: rgba(255,255,225,0.5); background: transparent; border-color: rgba(255,255,225,0.1); }
+    .btn-ghost:hover { color: var(--cream); border-color: rgba(255,255,225,0.3); }
+    .btn-green  { color: var(--green); background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.25); }
+    .btn-green:hover { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.5); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+    /* ---- PANELS ---- */
+    .panel {
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1.5rem; padding: 2rem; margin-bottom: 1rem;
+      transition: border-color 0.3s;
+    }
+    .panel:hover { border-color: rgba(255,255,225,0.12); }
+
+    /* ---- TABS ---- */
+    .tab-bar {
+      display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(255,255,225,0.07); padding-bottom: 1rem;
+    }
+    .tab {
+      font-family: 'Syne Mono', monospace; font-size: 0.72rem;
+      padding: 0.4em 1em; border-radius: 999px;
+      border: 1px solid rgba(255,255,225,0.12);
+      background: transparent; color: rgba(255,255,225,0.45);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .tab.active { border-color: var(--yellow); color: var(--yellow); background: rgba(254,206,0,0.08); }
+    .tab:hover:not(.active) { border-color: rgba(255,255,225,0.3); color: var(--cream); }
+    .tab-count {
+      display: inline-block; font-size: 0.6rem; padding: 0.1em 0.45em;
+      border-radius: 999px; background: rgba(255,255,225,0.08); margin-left: 0.3rem;
+    }
+
+    /* ---- PROPOSAL CARD ---- */
+    .proposal-card {
+      background: var(--dark3); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1.25rem; padding: 1.5rem; margin-bottom: 1rem;
+      cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
+    }
+    .proposal-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      border-radius: 3px 0 0 3px;
+    }
+    .proposal-card.stage-pre::before   { background: rgba(255,255,225,0.2); }
+    .proposal-card.stage-official::before { background: var(--blue); }
+    .proposal-card.stage-vote::before  { background: var(--yellow); }
+    .proposal-card.status-passed::before { background: var(--green); }
+    .proposal-card.status-failed::before { background: var(--red); }
+    .proposal-card:hover { border-color: rgba(255,255,225,0.18); transform: translateY(-2px); }
+
+    .proposal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
+    .proposal-title  { font-size: 1rem; font-weight: 700; line-height: 1.3; }
+    .proposal-meta   { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; font-size: 0.72rem; color: rgba(255,255,225,0.4); font-family: 'Syne Mono', monospace; }
+    .proposal-body   { font-size: 0.82rem; color: rgba(255,255,225,0.65); line-height: 1.6; margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 2; /* stylelint-disable-next-line */ -webkit-box-orient: vertical; overflow: hidden; }
+
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-family: 'Syne Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em;
+      padding: 0.2em 0.65em; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+    }
+    .badge-live    { background: rgba(34,197,94,0.12);  color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+    .badge-pending { background: rgba(79,168,253,0.12); color: var(--blue);  border: 1px solid rgba(79,168,253,0.25); }
+    .badge-passed  { background: rgba(34,197,94,0.12);  color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+    .badge-failed  { background: rgba(253,70,79,0.12);  color: var(--red);   border: 1px solid rgba(253,70,79,0.25); }
+    .badge-pre     { background: rgba(255,255,225,0.06); color: rgba(255,255,225,0.5); border: 1px solid rgba(255,255,225,0.1); }
+    .badge-closed  { background: rgba(255,255,225,0.04); color: rgba(255,255,225,0.3); border: 1px solid rgba(255,255,225,0.06); }
+    .live-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ---- VOTE BAR ---- */
+    .vote-bar-wrap { margin-top: 0.75rem; }
+    .vote-bar-labels { display: flex; justify-content: space-between; font-family: 'Syne Mono', monospace; font-size: 0.65rem; color: rgba(255,255,225,0.4); margin-bottom: 0.3rem; }
+    .vote-bar-track { height: 6px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; }
+    .vote-bar-fill  { height: 100%; border-radius: 999px; transition: width 1s cubic-bezier(0.16,1,0.3,1); }
+    .vbf-yes    { background: var(--green); }
+    .vbf-mvp    { background: linear-gradient(90deg, var(--yellow), var(--blue)); }
+    .vote-totals { display: flex; gap: 1rem; margin-top: 0.4rem; font-family: 'Syne Mono', monospace; font-size: 0.65rem; }
+    .vt-yes  { color: var(--green); }
+    .vt-no   { color: var(--red); }
+    .vt-mvp  { color: var(--yellow); }
+
+    /* ---- MODAL ---- */
+    .gov-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px); z-index: 1000;
+      display: none; align-items: flex-start; justify-content: center;
+      padding: 2rem 1rem; overflow-y: auto;
+    }
+    .gov-modal-overlay.open { display: flex; }
+    .gov-modal {
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.1);
+      border-radius: 1.75rem; padding: 2.5rem; max-width: 680px; width: 100%;
+      position: relative; animation: fadeUp 0.3s ease forwards;
+    }
+    .gov-modal-close {
+      position: absolute; top: 1.25rem; right: 1.25rem;
+      background: rgba(255,255,225,0.06); border: 1px solid rgba(255,255,225,0.1);
+      border-radius: 50%; width: 32px; height: 32px; cursor: pointer;
+      color: rgba(255,255,225,0.5); font-size: 0.8rem; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .gov-modal-close:hover { background: rgba(255,255,255,0.1); color: var(--cream); }
+    .gov-modal-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .modal-sub   { font-size: 0.8rem; color: rgba(255,255,225,0.5); margin-bottom: 1.75rem; font-family: 'Syne Mono', monospace; }
+
+    /* ---- VOTE OPTIONS ---- */
+    .vote-options { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .vote-option {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 1rem 1.25rem; border-radius: 1rem;
+      border: 1.5px solid rgba(255,255,225,0.1);
+      cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.02);
+    }
+    .vote-option:hover { border-color: rgba(255,255,225,0.25); background: rgba(255,255,255,0.04); }
+    .vote-option.selected { border-color: var(--yellow); background: rgba(254,206,0,0.06); }
+    .vote-radio {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid rgba(255,255,225,0.25); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .vote-option.selected .vote-radio { border-color: var(--yellow); background: var(--yellow); }
+    .vote-radio-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--dark); opacity: 0; transition: opacity 0.2s; }
+    .vote-option.selected .vote-radio-dot { opacity: 1; }
+    .vote-option-label { font-size: 0.9rem; font-weight: 600; }
+
+    /* ---- COMMENTS ---- */
+    .comments-section { margin-top: 2rem; }
+    .comments-title { font-size: 0.8rem; font-family: 'Syne Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,225,0.35); margin-bottom: 1rem; }
+    .comment-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+    .comment {
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,225,0.05);
+      border-radius: 0.875rem; padding: 0.875rem 1rem;
+    }
+    .comment-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+    .comment-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--dark3); flex-shrink: 0; }
+    .comment-author { font-size: 0.75rem; font-weight: 600; }
+    .comment-time   { font-size: 0.65rem; color: rgba(255,255,225,0.3); font-family: 'Syne Mono', monospace; margin-left: auto; }
+    .comment-mvp    { font-size: 0.6rem; color: var(--yellow); font-family: 'Syne Mono', monospace; }
+    .comment-body   { font-size: 0.8rem; color: rgba(255,255,225,0.7); line-height: 1.6; }
+    .comment-input-wrap { display: flex; gap: 0.75rem; align-items: flex-end; }
+    .comment-input {
+      flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,225,0.1);
+      border-radius: 0.875rem; padding: 0.75rem 1rem; color: var(--cream);
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.82rem; resize: none;
+      min-height: 60px; transition: border-color 0.2s; outline: none;
+    }
+    .comment-input:focus { border-color: rgba(255,255,225,0.25); }
+    .comment-input::placeholder { color: rgba(255,255,225,0.2); }
+
+    /* ---- CREATE PROPOSAL ---- */
+    .form-field { margin-bottom: 1.25rem; }
+    .form-label { font-family: 'Syne Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,225,0.4); margin-bottom: 0.5rem; display: block; }
+    .form-input, .form-textarea, .form-select {
+      width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,225,0.1);
+      border-radius: 0.875rem; padding: 0.75rem 1rem; color: var(--cream);
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.88rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: rgba(255,255,225,0.3); }
+    .form-textarea { resize: vertical; min-height: 120px; }
+    .form-select { appearance: none; cursor: pointer; }
+    .form-select option { background: var(--dark2); }
+    .form-hint { font-size: 0.7rem; color: rgba(255,255,225,0.3); margin-top: 0.35rem; font-family: 'Syne Mono', monospace; }
+    .options-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .option-row { display: flex; gap: 0.5rem; align-items: center; }
+    .option-row .form-input { flex: 1; }
+
+    /* ---- BURN NOTICE ---- */
+    .burn-notice {
+      background: rgba(253,70,79,0.07); border: 1px solid rgba(253,70,79,0.2);
+      border-radius: 1rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem;
+      display: flex; gap: 0.75rem; align-items: flex-start;
+    }
+    .burn-notice-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .burn-notice-text { font-size: 0.78rem; color: rgba(255,255,225,0.7); line-height: 1.6; }
+    .burn-amount { color: var(--red); font-weight: 700; font-family: 'Syne Mono', monospace; }
+
+    /* ---- INFO CARDS ---- */
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 3rem; }
+    .info-card {
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1.25rem; padding: 1.5rem;
+    }
+    .info-card-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+    .info-card-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .info-card-body  { font-size: 0.75rem; color: rgba(255,255,225,0.55); line-height: 1.7; }
+    .info-card-body strong { color: var(--cream); }
+
+    /* ---- MISC ---- */
+    .glow-divider {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+      margin: 3rem 0; opacity: 0.2;
+    }
+    .empty-state {
+      text-align: center; padding: 4rem 2rem;
+      color: rgba(255,255,225,0.25); font-family: 'Syne Mono', monospace; font-size: 0.78rem;
+    }
+    .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; }
+    .loading-state {
+      text-align: center; padding: 3rem; color: rgba(255,255,225,0.3);
+      font-family: 'Syne Mono', monospace; font-size: 0.78rem;
+    }
+    .tag {
+      display: inline-block; font-family: 'Syne Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.08em; padding: 0.2em 0.55em; border-radius: 999px;
+      background: rgba(255,255,225,0.05); color: rgba(255,255,225,0.35);
+      border: 1px solid rgba(255,255,225,0.08); margin-right: 0.3rem;
+    }
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+      background: var(--dark2); border: 1px solid rgba(255,255,225,0.1);
+      border-radius: 0.875rem; padding: 0.875rem 1.25rem;
+      font-size: 0.82rem; max-width: 320px;
+      transform: translateY(120%); transition: transform 0.3s ease;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .toast.show { transform: translateY(0); }
+    .toast.success { border-color: rgba(34,197,94,0.3); }
+    .toast.error   { border-color: rgba(253,70,79,0.3); }
+    .progress-bar {
+      position: fixed; bottom: 0; left: 0; height: 2px; z-index: 9999;
+      background: linear-gradient(90deg, var(--yellow), var(--red));
+      transition: width 0.3s ease; width: 0%;
+    }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    .vote-footer {
+      position: relative; z-index: 1; text-align: center; padding: 2rem 1rem;
+      font-size: 0.8rem; color: rgba(255,255,225,0.3);
+      border-top: 1px solid rgba(255,255,225,0.06);
+    }
+
+    @media (max-width: 600px) {
+      .stage-strip { flex-wrap: wrap; gap: 0.5rem; }
+      .stage-pill { border-radius: 0.75rem !important; min-width: 0; flex: 1; }
+      .stage-arrow { display: none; }
+      .vote-section { padding: 0 1rem 3rem; }
+      .modal { padding: 1.5rem; }
+      .auth-bar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="starfield"></div>
+
+  <header>
+    <nav class="container">
+      <a href="index.html" class="logo">Mushroom Planet</a>
+      <ul class="nav-links">
+        <li><a href="/index.html">HOME</a></li>
+        <li><a href="/sporebot.html">SPOREBOT</a></li>
+        <li><a href="/token.html">TOKEN</a></li>
+        <li><a href="/rewards.html">REWARDS</a></li>
+        <li><a href="/guides.html">GUIDES</a></li>
+        <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
+        <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
+        <li><a href="/profile.html">PROFILE</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div id="global-menu"></div>
+
+  <!-- HERO -->
+  <div class="vote-hero">
+    <div class="eyebrow">Community Governance</div>
+    <h1>Mycelium <span>Governance</span></h1>
+    <p>Shape the future of Mushroom Planet. Your voice, your vote, your ecosystem.</p>
+  </div>
+
+  <!-- STAGE PIPELINE -->
+  <div class="stage-strip">
+    <div class="stage-pill">
+      <span class="stage-num">Stage 1</span>
+      <span class="stage-name">Pre-Proposal</span>
+      <span class="stage-sub">Discord brainstorm</span>
+      <span class="stage-arrow">›</span>
+    </div>
+    <div class="stage-pill">
+      <span class="stage-num">Stage 2</span>
+      <span class="stage-name">Official Proposal</span>
+      <span class="stage-sub">1 vote · 5 days · SPORE burn</span>
+      <span class="stage-arrow">›</span>
+    </div>
+    <div class="stage-pill active">
+      <span class="stage-num">Stage 3</span>
+      <span class="stage-name">Official Vote</span>
+      <span class="stage-sub">MVP weighted · 5 days</span>
+    </div>
+  </div>
+
+  <div class="vote-section">
+
+    <!-- AUTH BAR -->
+    <div class="auth-bar reveal">
+      <div class="auth-status" id="auth-status">
+        <div class="auth-avatar-placeholder">👤</div>
+        <div>
+          <div class="auth-name" id="auth-name">Not connected</div>
+          <div class="auth-sub" id="auth-sub">Connect Discord to vote and comment</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;" id="auth-actions">
+        <a href="#" id="btn-login" class="btn btn-discord" onclick="startDiscordOAuth(event)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.031.053a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+          Connect Discord
+        </a>
+        <button id="btn-new-proposal" class="btn btn-yellow" style="display:none" onclick="openCreateModal()">
+          + New Proposal
+        </button>
+        <button id="btn-logout" class="btn btn-ghost" style="display:none" onclick="logout()">
+          Disconnect
+        </button>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="glow-divider"></div>
+    <div class="reveal">
+      <div class="section-label">How It Works</div>
+      <div class="section-title">Three Stages of Governance</div>
+    </div>
+    <div class="info-grid reveal">
+      <div class="info-card">
+        <div class="info-card-icon">💬</div>
+        <div class="info-card-title">Stage 1 — Pre-Proposal</div>
+        <div class="info-card-body">
+          <strong>Free · Discord only · No voting</strong><br><br>
+          Post your idea in <strong>#pre-proposals</strong> on Discord. Gauge community interest organically. If it gets traction, submit an Official Proposal.
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">📋</div>
+        <div class="info-card-title">Stage 2 — Official Proposal</div>
+        <div class="info-card-body">
+          <strong>6874 SPORE burn · 5 days · 1 person = 1 vote</strong><br><br>
+          Formalize your idea here. Requires <strong>42 users</strong> to vote and <strong>70% must say yes</strong> to advance. Costs SPORE to prevent spam.
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🗳️</div>
+        <div class="info-card-title">Stage 3 — Official Vote</div>
+        <div class="info-card-body">
+          <strong>Free · 5 days · MVP weighted</strong><br><br>
+          The binding governance vote. Every voter's <strong>MVP score</strong> is their vote weight. You must have MVP &gt; 0 to participate. Earn SPORE rewards for voting.
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">⚡</div>
+        <div class="info-card-title">Mycelium Voting Power</div>
+        <div class="info-card-body">
+          <strong>Score: 0 – 100 points</strong><br><br>
+          Your MVP is calculated across 7 categories. Use <strong>!mvp</strong> in Discord to see your current score and breakdown.<br><br>
+          In Official Votes, your MVP score <strong>is your vote weight</strong>. A voter with 80 MVP carries 80x the weight of someone with 1 MVP.
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">📊</div>
+        <div class="info-card-title">How MVP is Calculated</div>
+        <div class="info-card-body">
+          <strong>Mycelium Nodes</strong> — 25 pts max (0.5 per node)<br>
+          <strong>Staked SPORE</strong> — 20 pts max (0.1 per 10M)<br>
+          <strong>Planted SHROOM</strong> — 15 pts max (0.1 per 100K)<br>
+          <strong>Onchain SPORE</strong> — 10 pts max (0.1 per 10M)<br>
+          <strong>Farm Rank</strong> — 10 pts max<br>
+          <strong>Pixie XP</strong> — 10 pts max (0.1 per 100K XP)<br>
+          <strong>Onchain SHROOM</strong> — 5 pts max<br>
+          <strong>NFTs</strong> — 5 pts max
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🏆</div>
+        <div class="info-card-title">Why MVP Matters</div>
+        <div class="info-card-body">
+          The winning option is whichever side accumulates the <strong>highest total MVP sum</strong> — not just the most votes.<br><br>
+          Voters are <strong>rewarded with SPORE</strong> for participating. Higher MVP = larger reward.
+        </div>
+      </div>
+    </div>
+
+    <div class="glow-divider"></div>
+
+    <!-- PROPOSALS LIST -->
+    <div class="reveal">
+      <div class="section-label">Active Governance</div>
+      <div class="section-title">Proposals</div>
+    </div>
+
+    <div class="tab-bar reveal">
+      <button class="tab active" onclick="switchTab('all',this)">All <span class="tab-count" id="count-all">0</span></button>
+      <button class="tab" onclick="switchTab('vote',this)">Official Votes <span class="tab-count" id="count-vote">0</span></button>
+      <button class="tab" onclick="switchTab('proposal',this)">Official Proposals <span class="tab-count" id="count-proposal">0</span></button>
+      <button class="tab" onclick="switchTab('passed',this)">Passed <span class="tab-count" id="count-passed">0</span></button>
+      <button class="tab" onclick="switchTab('failed',this)">Failed <span class="tab-count" id="count-failed">0</span></button>
+    </div>
+
+    <div id="proposals-list" class="reveal">
+      <div class="loading-state">Loading proposals...</div>
+    </div>
+
+  </div><!-- /vote-section -->
+
+  <!-- ============================================================
+       PROPOSAL DETAIL MODAL
+       ============================================================ -->
+  <div class="gov-modal-overlay" id="modal-detail">
+    <div class="gov-modal" style="max-width:740px;">
+      <button class="gov-modal-close" onclick="closeModal('modal-detail')">✕</button>
+      <div id="modal-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CREATE PROPOSAL MODAL
+       ============================================================ -->
+  <div class="gov-modal-overlay" id="modal-create">
+    <div class="gov-modal">
+      <button class="gov-modal-close" onclick="closeModal('modal-create')">✕</button>
+      <div class="gov-modal-title">New Official Proposal</div>
+      <div class="gov-modal-sub">Submit a proposal that passed the Discord pre-proposal stage.</div>
+
+      <div class="burn-notice">
+        <div class="burn-notice-icon">🔥</div>
+        <div class="burn-notice-text">
+          Submitting an Official Proposal requires burning
+          <span class="burn-amount">6874 SPORE</span> from your Discord wallet.
+          This is non-refundable and helps prevent spam proposals.
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Proposal Title</label>
+        <input type="text" class="form-input" id="create-title" placeholder="A clear, concise title..." maxlength="120" />
+      </div>
+      <div class="form-field">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="create-desc" placeholder="Describe your proposal in detail. What problem does it solve? What change are you proposing?" style="min-height:140px;"></textarea>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="create-category">
+          <option value="ecosystem">Ecosystem</option>
+          <option value="tokenomics">Tokenomics</option>
+          <option value="rewards">Rewards</option>
+          <option value="governance">Governance</option>
+          <option value="partnerships">Partnerships</option>
+          <option value="technical">Technical</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Vote Options <span style="color:rgba(255,255,225,0.3);">(2–4 options)</span></label>
+        <div class="options-list" id="create-options">
+          <div class="option-row">
+            <input type="text" class="form-input" placeholder="Option A" />
+            <button class="btn btn-ghost" style="flex-shrink:0;border-radius:0.5rem;" disabled>—</button>
+          </div>
+          <div class="option-row">
+            <input type="text" class="form-input" placeholder="Option B" />
+            <button class="btn btn-ghost" style="flex-shrink:0;border-radius:0.5rem;" onclick="removeOption(this)">✕</button>
+          </div>
+        </div>
+        <button class="btn btn-ghost" style="margin-top:0.5rem;border-radius:0.5rem;" onclick="addOption()" id="btn-add-option">+ Add option</button>
+        <div class="form-hint">Option A and B are required. Max 4 options.</div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Pre-Proposal Discord Link <span style="color:rgba(255,255,225,0.3);">(optional)</span></label>
+        <input type="url" class="form-input" id="create-discord-link" placeholder="https://discord.com/channels/..." />
+        <div class="form-hint">Link to the Discord thread where this was discussed.</div>
+      </div>
+
+      <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+        <button class="btn btn-ghost" onclick="closeModal('modal-create')">Cancel</button>
+        <button class="btn btn-red" onclick="submitProposal()" id="btn-submit-proposal">
+          🔥 Burn & Submit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+  <div class="progress-bar" id="progress-bar"></div>
+
+  <div class="vote-footer">
+    Governance is community-driven and advisory. Major protocol changes require additional review. &copy; 2025 Mushroom Planet.
+  </div>
+
+  <!-- ============================================================
+       SCRIPTS
+       ============================================================ -->
+  <script type="module">
+    import config from './config.js';
+    window.addEventListener('DOMContentLoaded', () => {
+      const t = document.getElementById('global-menu');
+      if (t) t.innerHTML = config.menu.html;
+    });
+  </script>
+
+  <script>
+  window.API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://api.mushroomplanet.earth';
+
+  let DISCORD_CLIENT_ID = '';
+  const REDIRECT_URI = encodeURIComponent(window.location.origin + '/vote.html');
+  const BURN_AMOUNT = 68_740_000;
+
+  // ================================================================
+  // STARFIELD
+  // ================================================================
+  (function() {
+    const sf = document.getElementById('starfield');
+    for (let i = 0; i < 80; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      const sz = Math.random() * 2.5 + 0.5;
+      s.style.cssText = [
+        'width:' + sz + 'px', 'height:' + sz + 'px',
+        'top:'  + (Math.random()*100) + '%',
+        'left:' + (Math.random()*100) + '%',
+        '--dur:'   + (3 + Math.random()*5) + 's',
+        '--delay:' + (Math.random()*6) + 's',
+        '--op:'    + (0.2 + Math.random()*0.5),
+      ].join(';');
+      sf.appendChild(s);
+    }
+  })();
+
+  // ================================================================
+  // SCROLL REVEAL
+  // ================================================================
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(r => observer.observe(r));
+
+  // ================================================================
+  // STATE
+  // ================================================================
+  let currentUser = null;   // { discord_id, username, avatar, mvp }
+  let allProposals = [];
+  let currentTab = 'all';
+
+  // ================================================================
+  // TOAST
+  // ================================================================
+  function showToast(msg, type = 'info') {
+    const t = document.getElementById('toast');
+    t.textContent = (type === 'success' ? '✅ ' : type === 'error' ? '❌ ' : 'ℹ️ ') + msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => { t.classList.remove('show'); }, 3500);
+  }
+
+  // ================================================================
+  // DISCORD OAUTH
+  // ================================================================
+  async function startDiscordOAuth(e) {
+    e.preventDefault();
+    if (!DISCORD_CLIENT_ID) {
+      try {
+        const cfg = await fetch(`${window.API_BASE}/api/config/public`).then(r => r.json());
+        DISCORD_CLIENT_ID = cfg.discord_client_id || '';
+      } catch {}
+    }
+    if (!DISCORD_CLIENT_ID) { showToast('Config error, try again', 'error'); return; }
+    const state = Math.random().toString(36).slice(2);
+    sessionStorage.setItem('oauth_state', state);
+    const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=identify&state=${state}`;
+    window.location.href = url;
+  }
+
+  async function handleOAuthCallback() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+    if (!code) return;
+
+    const savedState = sessionStorage.getItem('oauth_state');
+    if (state !== savedState) { showToast('OAuth state mismatch', 'error'); return; }
+
+    // Clean URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+    sessionStorage.removeItem('oauth_state');
+
+    try {
+      const res = await fetch(`${window.API_BASE}/api/auth/discord/callback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, redirect_uri: window.location.origin + '/vote.html' }),
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!data.success) { showToast(data.message || 'Login failed', 'error'); return; }
+      currentUser = data.user;
+      localStorage.setItem('vote_user', JSON.stringify(currentUser));
+      updateAuthBar();
+      showToast('Connected as ' + currentUser.username, 'success');
+    } catch (err) {
+      showToast('Login error', 'error');
+    }
+  }
+
+  async function checkExistingSession() {
+    const stored = localStorage.getItem('vote_user');
+    if (!stored) return;
+    try {
+      const user = JSON.parse(stored);
+      // Refresh MVP from server
+      const res = await fetch(`${window.API_BASE}/api/vote/user/${user.discord_id}`);
+      const data = await res.json();
+      if (data.ok) {
+        currentUser = { ...user, mvp: data.mvp };
+        localStorage.setItem('vote_user', JSON.stringify(currentUser));
+      } else {
+        currentUser = user;
+      }
+      updateAuthBar();
+    } catch { localStorage.removeItem('vote_user'); }
+  }
+
+  function logout() {
+    currentUser = null;
+    localStorage.removeItem('vote_user');
+    updateAuthBar();
+    showToast('Disconnected', 'info');
+  }
+
+  function updateAuthBar() {
+    const nameEl    = document.getElementById('auth-name');
+    const subEl     = document.getElementById('auth-sub');
+    const statusEl  = document.getElementById('auth-status');
+    const loginBtn  = document.getElementById('btn-login');
+    const logoutBtn = document.getElementById('btn-logout');
+    const newPropBtn = document.getElementById('btn-new-proposal');
+
+    if (currentUser) {
+      const avatar = currentUser.avatar
+        ? `<img src="https://cdn.discordapp.com/avatars/${currentUser.discord_id}/${currentUser.avatar}.png" class="auth-avatar" alt="avatar">`
+        : `<div class="auth-avatar-placeholder">👤</div>`;
+      statusEl.innerHTML = `${avatar}<div>
+        <div class="auth-name">${escHtml(currentUser.username)}</div>
+        <div class="auth-sub">
+          <span class="mvp-badge">⚡ ${currentUser.mvp?.toFixed(1) || '0.0'} MVP</span>
+        </div>
+      </div>`;
+      loginBtn.style.display  = 'none';
+      logoutBtn.style.display = 'inline-flex';
+      newPropBtn.style.display = 'inline-flex';
+    } else {
+      statusEl.innerHTML = `<div class="auth-avatar-placeholder">👤</div>
+        <div>
+          <div class="auth-name">Not connected</div>
+          <div class="auth-sub">Connect Discord to vote and comment</div>
+        </div>`;
+      loginBtn.style.display  = 'inline-flex';
+      logoutBtn.style.display = 'none';
+      newPropBtn.style.display = 'none';
+    }
+  }
+
+  // ================================================================
+  // LOAD PROPOSALS
+  // ================================================================
+  async function loadProposals() {
+    try {
+      const res = await fetch(`${window.API_BASE}/api/proposals`);
+      const data = await res.json();
+      if (!data.ok) throw new Error();
+      allProposals = data.proposals || [];
+      updateCounts();
+      renderProposals();
+    } catch {
+      document.getElementById('proposals-list').innerHTML =
+        '<div class="empty-state"><div class="empty-icon">🍄</div>Could not load proposals.</div>';
+    }
+  }
+
+  function updateCounts() {
+    const votes     = allProposals.filter(p => p.stage === 'vote');
+    const proposals = allProposals.filter(p => p.stage === 'proposal');
+    const passed    = allProposals.filter(p => p.status === 'passed');
+    const failed    = allProposals.filter(p => p.status === 'failed');
+    document.getElementById('count-all').textContent      = allProposals.length;
+    document.getElementById('count-vote').textContent     = votes.length;
+    document.getElementById('count-proposal').textContent = proposals.length;
+    document.getElementById('count-passed').textContent   = passed.length;
+    document.getElementById('count-failed').textContent   = failed.length;
+  }
+
+  function filterProposals(tab) {
+    if (tab === 'all')      return allProposals;
+    if (tab === 'vote')     return allProposals.filter(p => p.stage === 'vote' && p.status === 'active');
+    if (tab === 'proposal') return allProposals.filter(p => p.stage === 'proposal' && p.status === 'active');
+    if (tab === 'passed')   return allProposals.filter(p => p.status === 'passed');
+    if (tab === 'failed')   return allProposals.filter(p => p.status === 'failed');
+    return allProposals;
+  }
+
+  function switchTab(tab, btn) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderProposals();
+  }
+
+  function renderProposals() {
+    const list = document.getElementById('proposals-list');
+    const filtered = filterProposals(currentTab);
+    if (!filtered.length) {
+      list.innerHTML = `<div class="empty-state"><div class="empty-icon">🌱</div>No proposals here yet.</div>`;
+      return;
+    }
+    list.innerHTML = filtered.map(p => buildProposalCard(p)).join('');
+  }
+
+  function buildProposalCard(p) {
+    const isVote     = p.stage === 'vote';
+    const isProposal = p.stage === 'proposal';
+    const stageClass = isVote ? 'stage-vote' : isProposal ? 'stage-official' : 'stage-pre';
+    const statusClass = (p.status === 'passed' || p.status === 'failed') ? 'status-' + p.status : '';
+
+    const badge = p.status === 'active'
+      ? (isVote
+          ? `<span class="status-badge badge-live"><span class="live-dot"></span>VOTE LIVE</span>`
+          : `<span class="status-badge badge-pending"><span class="live-dot"></span>OPEN</span>`)
+      : p.status === 'passed'
+        ? `<span class="status-badge badge-passed">PASSED</span>`
+        : p.status === 'failed'
+          ? `<span class="status-badge badge-failed">FAILED</span>`
+          : `<span class="status-badge badge-closed">CLOSED</span>`;
+
+    const timeLeft = p.ends_at ? timeRemaining(p.ends_at) : '';
+    const commentCount = p.comment_count || 0;
+
+    // Vote bar
+    let voteBar = '';
+    if (isVote && p.vote_totals) {
+      const opts  = Object.entries(p.vote_totals);
+      const total = opts.reduce((s, [, v]) => s + v, 0);
+      const top   = opts.sort((a, b) => b[1] - a[1])[0];
+      const pct   = total > 0 ? ((top[1] / total) * 100).toFixed(1) : 0;
+      voteBar = `<div class="vote-bar-wrap">
+        <div class="vote-bar-labels"><span>${escHtml(top[0])}</span><span>${pct}% leading</span></div>
+        <div class="vote-bar-track"><div class="vote-bar-fill vbf-mvp" style="width:${pct}%"></div></div>
+        <div class="vote-totals"><span class="vt-mvp">${fmtMvp(total)} total MVP</span><span style="color:rgba(255,255,225,0.25);">${p.voter_count || 0} voters</span></div>
+      </div>`;
+    } else if (isProposal && p.vote_totals) {
+      const yes   = p.vote_totals['yes'] || 0;
+      const total = yes + (p.vote_totals['no'] || 0);
+      const pct   = total > 0 ? ((yes / total) * 100).toFixed(1) : 0;
+      voteBar = `<div class="vote-bar-wrap">
+        <div class="vote-bar-labels"><span>YES</span><span>${pct}% in favor</span></div>
+        <div class="vote-bar-track"><div class="vote-bar-fill vbf-yes" style="width:${pct}%"></div></div>
+        <div class="vote-totals"><span class="vt-yes">${yes} yes</span><span class="vt-no">${p.vote_totals['no'] || 0} no</span></div>
+      </div>`;
+    }
+
+    const stageLbl = isVote ? 'Official Vote' : isProposal ? 'Official Proposal' : 'Pre-Proposal';
+
+    return `<div class="proposal-card ${stageClass} ${statusClass}" onclick="openProposal('${p.id}')">
+      <div class="proposal-header">
+        <div class="proposal-title">${escHtml(p.title)}</div>
+        ${badge}
+      </div>
+      <div class="proposal-body">${escHtml(p.description)}</div>
+      <div class="proposal-meta">
+        <span class="tag">${escHtml(p.category || 'general')}</span>
+        <span>${stageLbl}</span>
+        ${timeLeft ? `<span>· ${escHtml(timeLeft)}</span>` : ''}
+        <span>· ${commentCount} comments</span>
+        <span style="margin-left:auto;">by ${escHtml(p.author_name || 'Unknown')}</span>
+      </div>
+      ${voteBar}
+    </div>`;
+  }
+
+  // ================================================================
+  // PROPOSAL DETAIL MODAL
+  // ================================================================
+  async function openProposal(id) {
+    const p = allProposals.find(x => x.id === id);
+    if (!p) return;
+
+    const overlay = document.getElementById('modal-detail');
+    const content = document.getElementById('modal-detail-content');
+    content.innerHTML = '<div class="loading-state">Loading...</div>';
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    try {
+      const [propRes, commentRes] = await Promise.all([
+        fetch(`${window.API_BASE}/api/proposals/${id}`),
+        fetch(`${window.API_BASE}/api/proposals/${id}/comments`),
+      ]);
+      const prop     = (await propRes.json()).proposal || p;
+      const comments = (await commentRes.json()).comments || [];
+      content.innerHTML = buildDetailHTML(prop, comments);
+      // Animate bars
+      setTimeout(() => {
+        content.querySelectorAll('[data-width]').forEach(el => {
+          el.style.width = el.dataset.width + '%';
+        });
+      }, 100);
+    } catch {
+      content.innerHTML = buildDetailHTML(p, []);
+    }
+  }
+
+  function buildDetailHTML(p, comments) {
+    const isVote     = p.stage === 'vote';
+    const isProposal = p.stage === 'proposal';
+    const isActive   = p.status === 'active';
+    const canVote    = currentUser && isActive;
+    const myVote     = p.my_vote || null;
+    const timeLeft   = p.ends_at ? timeRemaining(p.ends_at) : 'Closed';
+
+    // Vote options
+    let voteSection = '';
+    if (isVote && canVote && currentUser.mvp > 0) {
+      const opts = p.options || ['Option A', 'Option B'];
+      voteSection = `<div style="margin-bottom:1.5rem;">
+        <div style="font-family:'Syne Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.75rem;">Cast Your Vote — Your MVP: ${(currentUser.mvp||0).toFixed(1)}</div>
+        <div class="vote-options" id="vote-opts">
+          ${opts.map(o => `<div class="vote-option${myVote===o?' selected':''}" onclick="selectVoteOption(this,'${escAttr(o)}')">
+            <div class="vote-radio"><div class="vote-radio-dot"></div></div>
+            <span class="vote-option-label">${escHtml(o)}</span>
+          </div>`).join('')}
+        </div>
+        <button class="btn btn-yellow" onclick="castVote('${p.id}','vote')" id="btn-cast-vote"${myVote?' disabled':''}>
+          ${myVote ? 'Vote Cast' : 'Cast Vote'}
+        </button>
+        ${myVote ? `<div style="font-size:0.72rem;color:rgba(255,255,225,0.35);margin-top:0.5rem;font-family:'Syne Mono',monospace;">You voted: ${escHtml(myVote)}</div>` : ''}
+      </div>`;
+    } else if (isProposal && canVote) {
+      voteSection = `<div style="margin-bottom:1.5rem;">
+        <div style="font-family:'Syne Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.75rem;">Your Vote</div>
+        <div class="vote-options" id="vote-opts">
+          <div class="vote-option${myVote==='yes'?' selected':''}" onclick="selectVoteOption(this,'yes')">
+            <div class="vote-radio"><div class="vote-radio-dot"></div></div>
+            <span class="vote-option-label">Yes, advance this proposal</span>
+          </div>
+          <div class="vote-option${myVote==='no'?' selected':''}" onclick="selectVoteOption(this,'no')">
+            <div class="vote-radio"><div class="vote-radio-dot"></div></div>
+            <span class="vote-option-label">No, reject this proposal</span>
+          </div>
+        </div>
+        <button class="btn btn-green" onclick="castVote('${p.id}','proposal')" id="btn-cast-vote"${myVote?' disabled':''}>
+          ${myVote ? 'Vote Cast' : 'Submit Vote'}
+        </button>
+      </div>`;
+    } else if (isVote && currentUser && currentUser.mvp <= 0) {
+      voteSection = `<div style="background:rgba(253,70,79,0.07);border:1px solid rgba(253,70,79,0.2);border-radius:1rem;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:0.78rem;color:rgba(255,255,225,0.6);">
+        ⚠️ You need <strong>MVP &gt; 0</strong> to vote in Official Votes. Use <strong>!stake</strong> in Discord to start building MVP.
+      </div>`;
+    } else if (!currentUser && isActive) {
+      voteSection = `<div style="background:rgba(88,101,242,0.08);border:1px solid rgba(88,101,242,0.2);border-radius:1rem;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:0.78rem;color:rgba(255,255,225,0.6);">
+        <a href="#" onclick="startDiscordOAuth(event)" style="color:#5865f2;font-weight:700;">Connect Discord</a> to participate in voting.
+      </div>`;
+    }
+
+    // Results
+    let resultsHTML = '';
+    if (p.vote_totals) {
+      const entries = Object.entries(p.vote_totals);
+      const total   = entries.reduce((s, [, v]) => s + v, 0);
+      resultsHTML = `<div style="margin-bottom:1.5rem;">
+        <div style="font-family:'Syne Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.75rem;">
+          ${isVote ? 'Vote Results (MVP Weight)' : 'Poll Results'}
+        </div>
+        ${entries.map(([opt, val]) => {
+          const pct = total > 0 ? ((val / total) * 100) : 0;
+          const color = opt === 'yes' ? 'var(--green)' : opt === 'no' ? 'var(--red)' : 'var(--yellow)';
+          return `<div style="margin-bottom:0.85rem;">
+            <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:0.3rem;">
+              <span>${escHtml(opt)}</span>
+              <span style="font-family:'Syne Mono',monospace;color:${color};">${pct.toFixed(1)}% ${isVote ? `(${fmtMvp(val)} MVP)` : `(${val} votes)`}</span>
+            </div>
+            <div class="vote-bar-track" style="height:8px;">
+              <div class="vote-bar-fill" style="background:${color};width:0%;transition:width 1s ease;" data-width="${pct.toFixed(1)}"></div>
+            </div>
+          </div>`;
+        }).join('')}
+        <div style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;margin-top:0.5rem;">
+          ${isVote ? `${p.voter_count || 0} voters · ${fmtMvp(total)} total MVP cast` : `${p.voter_count || 0} total votes`}
+        </div>
+      </div>`;
+    }
+
+    // Comments HTML
+    const commentsHTML = comments.length
+      ? comments.map(c => `<div class="comment">
+          <div class="comment-header">
+            <div class="comment-avatar"></div>
+            <span class="comment-author">${escHtml(c.author_name)}</span>
+            <span class="comment-mvp">⚡${(c.author_mvp||0).toFixed(1)}</span>
+            <span class="comment-time">${timeAgo(c.created_at)}</span>
+          </div>
+          <div class="comment-body">${escHtml(c.text)}</div>
+        </div>`).join('')
+      : '<div style="font-size:0.78rem;color:rgba(255,255,225,0.25);padding:0.5rem 0;">No comments yet. Be the first!</div>';
+
+    const commentInput = currentUser
+      ? `<div class="comment-input-wrap" style="margin-top:0.75rem;">
+          <textarea class="comment-input" id="comment-text-${p.id}" placeholder="Share your thoughts..."></textarea>
+          <button class="btn btn-yellow" style="border-radius:0.75rem;" onclick="postComment('${p.id}')">Post</button>
+        </div>`
+      : `<div style="font-size:0.75rem;color:rgba(255,255,225,0.3);margin-top:0.5rem;"><a href="#" onclick="startDiscordOAuth(event)" style="color:#5865f2;">Connect Discord</a> to comment.</div>`;
+
+    const discordLink = p.discord_link
+      ? `<a href="${escAttr(p.discord_link)}" target="_blank" class="btn btn-ghost" style="font-size:0.65rem;">View Discord Thread ↗</a>`
+      : '';
+
+    return `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+        <span class="tag">${escHtml(p.category || 'general')}</span>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          ${discordLink}
+          ${p.status === 'active' ? `<span style="font-family:'Syne Mono',monospace;font-size:0.65rem;color:rgba(255,255,225,0.3);">⏱ ${escHtml(timeLeft)}</span>` : ''}
+        </div>
+      </div>
+      <div class="gov-modal-title" style="font-size:1.4rem;margin-top:0.5rem;">${escHtml(p.title)}</div>
+      <div class="gov-modal-sub">by ${escHtml(p.author_name||'Unknown')} · ${p.stage === 'vote' ? 'Official Vote' : p.stage === 'proposal' ? 'Official Proposal' : 'Pre-Proposal'}</div>
+      <div style="font-size:0.85rem;color:rgba(255,255,225,0.7);line-height:1.7;margin-bottom:1.5rem;white-space:pre-wrap;">${escHtml(p.description)}</div>
+      ${voteSection}
+      ${resultsHTML}
+      <div class="comments-section">
+        <div class="comments-title">Discussion (${comments.length})</div>
+        <div class="comment-list" id="comment-list-${p.id}">${commentsHTML}</div>
+        ${commentInput}
+      </div>`;
+  }
+
+  // ================================================================
+  // VOTING
+  // ================================================================
+  let selectedVote = null;
+
+  function selectVoteOption(el, value) {
+    document.querySelectorAll('#vote-opts .vote-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedVote = value;
+  }
+
+  async function castVote(proposalId, type) {
+    if (!currentUser) { showToast('Connect Discord to vote', 'error'); return; }
+    if (!selectedVote) { showToast('Select an option first', 'error'); return; }
+    if (type === 'vote' && currentUser.mvp <= 0) { showToast('You need MVP > 0 to vote', 'error'); return; }
+
+    const btn = document.getElementById('btn-cast-vote');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    try {
+      const res = await fetch(`${window.API_BASE}/api/proposals/${proposalId}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ discord_id: currentUser.discord_id, choice: selectedVote }),
+      });
+      const data = await res.json();
+      if (!data.ok) { showToast(data.message || 'Vote failed', 'error'); btn.disabled = false; btn.textContent = 'Cast Vote'; return; }
+
+      showToast('Vote recorded!', 'success');
+      btn.textContent = 'Vote Cast';
+      // Refresh proposal data
+      await loadProposals();
+      openProposal(proposalId);
+    } catch {
+      showToast('Error submitting vote', 'error');
+      btn.disabled = false; btn.textContent = 'Cast Vote';
+    }
+  }
+
+  // ================================================================
+  // COMMENTS
+  // ================================================================
+  async function postComment(proposalId) {
+    if (!currentUser) { showToast('Connect Discord to comment', 'error'); return; }
+    const input = document.getElementById('comment-text-' + proposalId);
+    const text  = input?.value?.trim();
+    if (!text || text.length < 3) { showToast('Comment too short', 'error'); return; }
+
+    try {
+      const res = await fetch(`${window.API_BASE}/api/proposals/${proposalId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ discord_id: currentUser.discord_id, text }),
+      });
+      const data = await res.json();
+      if (!data.ok) { showToast(data.message || 'Comment failed', 'error'); return; }
+      showToast('Comment posted!', 'success');
+      input.value = '';
+      // Refresh comments
+      const commentRes = await fetch(`${window.API_BASE}/api/proposals/${proposalId}/comments`);
+      const commentData = await commentRes.json();
+      const listEl = document.getElementById('comment-list-' + proposalId);
+      if (listEl && commentData.comments) {
+        listEl.innerHTML = commentData.comments.map(c => `<div class="comment">
+          <div class="comment-header">
+            <div class="comment-avatar"></div>
+            <span class="comment-author">${escHtml(c.author_name)}</span>
+            <span class="comment-mvp">⚡${(c.author_mvp||0).toFixed(1)}</span>
+            <span class="comment-time">${timeAgo(c.created_at)}</span>
+          </div>
+          <div class="comment-body">${escHtml(c.text)}</div>
+        </div>`).join('');
+      }
+    } catch { showToast('Error posting comment', 'error'); }
+  }
+
+  // ================================================================
+  // CREATE PROPOSAL
+  // ================================================================
+  function openCreateModal() {
+    if (!currentUser) { showToast('Connect Discord first', 'error'); return; }
+    document.getElementById('modal-create').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function addOption() {
+    const list = document.getElementById('create-options');
+    const count = list.children.length;
+    if (count >= 4) { showToast('Max 4 options', 'info'); return; }
+    const row = document.createElement('div');
+    row.className = 'option-row';
+    const letter = String.fromCharCode(65 + count);
+    row.innerHTML = `<input type="text" class="form-input" placeholder="Option ${letter}" />
+      <button class="btn btn-ghost" style="flex-shrink:0;border-radius:0.5rem;" onclick="removeOption(this)">✕</button>`;
+    list.appendChild(row);
+    if (list.children.length >= 4) document.getElementById('btn-add-option').style.display = 'none';
+  }
+
+  function removeOption(btn) {
+    const row = btn.closest('.option-row');
+    if (row) { row.remove(); document.getElementById('btn-add-option').style.display = 'inline-flex'; }
+  }
+
+  async function submitProposal() {
+    if (!currentUser) { showToast('Connect Discord first', 'error'); return; }
+
+    const title    = document.getElementById('create-title').value.trim();
+    const desc     = document.getElementById('create-desc').value.trim();
+    const category = document.getElementById('create-category').value;
+    const discordLink = document.getElementById('create-discord-link').value.trim();
+    const optInputs   = document.querySelectorAll('#create-options .option-row input');
+    const options     = Array.from(optInputs).map(i => i.value.trim()).filter(Boolean);
+
+    if (!title || title.length < 10) { showToast('Title too short (min 10 chars)', 'error'); return; }
+    if (!desc  || desc.length  < 50) { showToast('Description too short (min 50 chars)', 'error'); return; }
+    if (options.length < 2)          { showToast('Need at least 2 vote options', 'error'); return; }
+
+    const btn = document.getElementById('btn-submit-proposal');
+    btn.disabled = true; btn.textContent = 'Submitting...';
+
+    try {
+      const res = await fetch(`${window.API_BASE}/api/proposals/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ discord_id: currentUser.discord_id, title, description: desc, category, options, discord_link: discordLink }),
+      });
+      const data = await res.json();
+      if (!data.ok) {
+        showToast(data.message || 'Submission failed', 'error');
+        btn.disabled = false; btn.textContent = '🔥 Burn & Submit';
+        return;
+      }
+      showToast('Proposal submitted! Burning ' + (BURN_AMOUNT/1e6).toFixed(2) + 'M SPORE', 'success');
+      closeModal('modal-create');
+      await loadProposals();
+    } catch {
+      showToast('Error submitting proposal', 'error');
+      btn.disabled = false; btn.textContent = '🔥 Burn & Submit';
+    }
+  }
+
+  // ================================================================
+  // MODAL HELPERS
+  // ================================================================
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+    selectedVote = null;
+  }
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) closeModal(overlay.id);
+    });
+  });
+
+  // ================================================================
+  // UTILS
+  // ================================================================
+  function escHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function escAttr(str) { return escHtml(str); }
+
+  function timeRemaining(iso) {
+    const diff = new Date(iso) - Date.now();
+    if (diff <= 0) return 'Ended';
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    if (d > 0) return `${d}d ${h}h left`;
+    const m = Math.floor((diff % 3600000) / 60000);
+    if (h > 0) return `${h}h ${m}m left`;
+    return `${m}m left`;
+  }
+
+  function timeAgo(iso) {
+    const diff = Date.now() - new Date(iso);
+    const m = Math.floor(diff / 60000);
+    if (m < 1)  return 'just now';
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    return `${Math.floor(h / 24)}d ago`;
+  }
+
+  function fmtMvp(v) {
+    if (v >= 1000) return (v/1000).toFixed(1) + 'K';
+    return v.toFixed(1);
+  }
+
+  // ================================================================
+  // INIT
+  // ================================================================
+  (async function init() {
+    await handleOAuthCallback();
+    await checkExistingSession();
+    await loadProposals();
+  })();
+
+  // expose for inline onclick
+  window.openProposal        = openProposal;
+  window.switchTab           = switchTab;
+  window.startDiscordOAuth   = startDiscordOAuth;
+  window.logout              = logout;
+  window.openCreateModal     = openCreateModal;
+  window.closeModal          = closeModal;
+  window.castVote            = castVote;
+  window.postComment         = postComment;
+  window.selectVoteOption    = selectVoteOption;
+  window.submitProposal      = submitProposal;
+  window.addOption           = addOption;
+  window.removeOption        = removeOption;
+  </script>
+</body>
+</html>

@@ -3,6 +3,7 @@ import cors from 'cors';
 import admin from 'firebase-admin';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 dotenv.config();
 
 const serviceAccount = JSON.parse(fs.readFileSync('./firebase.json', 'utf8'));
@@ -23,6 +24,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.static('public'));
+app.use(cookieParser());
 
 // ----------------------------------------------------------------
 // POST /api/send-code
@@ -697,6 +699,463 @@ app.get('/api/sporebot-totals', async (req, res) => {
   }
 });
 
+app.get('/api/config/public', (req, res) => {
+  res.json({ discord_client_id: process.env.DISCORD_CLIENT_ID });
+});
+
+// ================================================================
+// GOVERNANCE ENDPOINTS
+// Add these to server.js BEFORE app.listen()
+// Requires: npm install node-fetch (already used) + set env vars:
+//   DISCORD_CLIENT_ID=your_client_id
+//   DISCORD_CLIENT_SECRET=your_client_secret
+//   SESSION_SECRET=any_random_string
+// Also: npm install cookie-parser
+// Add near top of server.js: import cookieParser from 'cookie-parser';
+//                             app.use(cookieParser());
+// ================================================================
+
+const DISCORD_CLIENT_ID     = process.env.DISCORD_CLIENT_ID;
+const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
+const SESSION_SECRET        = process.env.SESSION_SECRET || 'mushroom-planet-secret';
+const PROPOSAL_BURN_AMOUNT  = 6874;
+const PROPOSAL_DURATION_DAYS   = 5;
+const VOTE_DURATION_DAYS       = 5;
+
+// Simple in-memory session map: token -> discord_id
+// For production you could swap this for Redis or Firebase
+const sessions = new Map();
+
+function generateToken() {
+  return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+}
+
+function getSessionUser(req) {
+  const token = req.cookies?.gov_session;
+  if (!token) return null;
+  return sessions.get(token) || null;
+}
+
+// ----------------------------------------------------------------
+// POST /api/auth/discord/callback
+// Exchanges Discord OAuth code for user identity, creates session
+// ----------------------------------------------------------------
+app.post('/api/auth/discord/callback', async (req, res) => {
+  const { code, redirect_uri } = req.body;
+  if (!code) return res.status(400).json({ success: false, message: 'Missing code' });
+
+  try {
+    // Exchange code for access token
+    const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id:     DISCORD_CLIENT_ID,
+        client_secret: DISCORD_CLIENT_SECRET,
+        grant_type:    'authorization_code',
+        code,
+        redirect_uri,
+      }),
+    });
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) {
+      return res.status(400).json({ success: false, message: 'Discord auth failed' });
+    }
+
+    // Fetch Discord user identity
+    const userRes = await fetch('https://discord.com/api/users/@me', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+    const discordUser = await userRes.json();
+    const discord_id  = discordUser.id;
+
+    // Check user exists in our Firebase
+    const pixieSnap = await db.ref(`Pixie/Users/${discord_id}`).get();
+    if (!pixieSnap.exists()) {
+      return res.status(404).json({ success: false, message: 'Discord account not found in Mushroom Planet. Make sure you have used the bot first.' });
+    }
+
+    // Read MVP from Firebase
+    const mvpSnap = await db.ref(`Pixie/Users/${discord_id}/MVP/total`).get();
+    const mvp     = mvpSnap.exists() ? mvpSnap.val() : 0;
+
+    const user = {
+      discord_id,
+      username: discordUser.username,
+      avatar:   discordUser.avatar,
+      mvp,
+    };
+
+    // Create session
+    const token = generateToken();
+    sessions.set(token, user);
+
+    res.cookie('gov_session', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    console.log(`[GOVERNANCE-AUTH] User ${discordUser.username} (${discord_id}) logged in`);
+    res.json({ success: true, user });
+
+  } catch (err) {
+    console.error('[GOVERNANCE-AUTH] Error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// ----------------------------------------------------------------
+// GET /api/vote/user/:discord_id
+// Returns current MVP for auth bar refresh
+// ----------------------------------------------------------------
+app.get('/api/vote/user/:discord_id', async (req, res) => {
+  try {
+    const snap = await db.ref(`Pixie/Users/${req.params.discord_id}/MVP/total`).get();
+    res.json({ ok: true, mvp: snap.exists() ? snap.val() : 0 });
+  } catch (err) {
+    res.json({ ok: false, mvp: 0 });
+  }
+});
+
+// ----------------------------------------------------------------
+// GET /api/proposals
+// Returns all proposals, sorted newest first
+// ----------------------------------------------------------------
+app.get('/api/proposals', async (req, res) => {
+  try {
+    const snap = await db.ref('Governance/Proposals').get();
+    if (!snap.exists()) return res.json({ ok: true, proposals: [] });
+
+    const proposals = [];
+    snap.forEach(child => {
+      const p = child.val();
+      proposals.push({ id: child.key, ...p });
+    });
+
+    proposals.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    res.json({ ok: true, proposals });
+  } catch (err) {
+    console.error('[PROPOSALS] Error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to load proposals' });
+  }
+});
+
+// ----------------------------------------------------------------
+// GET /api/proposals/:id
+// Single proposal detail
+// ----------------------------------------------------------------
+app.get('/api/proposals/:id', async (req, res) => {
+  try {
+    const snap = await db.ref(`Governance/Proposals/${req.params.id}`).get();
+    if (!snap.exists()) return res.status(404).json({ ok: false });
+    res.json({ ok: true, proposal: { id: req.params.id, ...snap.val() } });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// GET /api/proposals/:id/comments
+// ----------------------------------------------------------------
+app.get('/api/proposals/:id/comments', async (req, res) => {
+  try {
+    const snap = await db.ref(`Governance/Comments/${req.params.id}`).get();
+    if (!snap.exists()) return res.json({ ok: true, comments: [] });
+    const comments = [];
+    snap.forEach(child => comments.push({ id: child.key, ...child.val() }));
+    comments.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    res.json({ ok: true, comments });
+  } catch (err) {
+    res.status(500).json({ ok: false, comments: [] });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/proposals/:id/comments
+// Auth required
+// ----------------------------------------------------------------
+app.post('/api/proposals/:id/comments', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+
+  const { text } = req.body;
+  if (!text || text.trim().length < 3) return res.status(400).json({ ok: false, message: 'Comment too short' });
+  if (text.length > 1000) return res.status(400).json({ ok: false, message: 'Comment too long (max 1000 chars)' });
+
+  try {
+    const proposalSnap = await db.ref(`Governance/Proposals/${req.params.id}`).get();
+    if (!proposalSnap.exists()) return res.status(404).json({ ok: false, message: 'Proposal not found' });
+
+    const mvpSnap = await db.ref(`Pixie/Users/${sessionUser.discord_id}/MVP/total`).get();
+    const mvp     = mvpSnap.exists() ? mvpSnap.val() : 0;
+
+    const commentRef = db.ref(`Governance/Comments/${req.params.id}`).push();
+    await commentRef.set({
+      author_id:   sessionUser.discord_id,
+      author_name: sessionUser.username,
+      author_mvp:  mvp,
+      text:        text.trim(),
+      created_at:  new Date().toISOString(),
+    });
+
+    // Increment comment count on proposal
+    const countRef = db.ref(`Governance/Proposals/${req.params.id}/comment_count`);
+    const countSnap = await countRef.get();
+    await countRef.set((countSnap.val() || 0) + 1);
+
+    console.log(`[GOVERNANCE-COMMENT] ${sessionUser.username} commented on ${req.params.id}`);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[GOVERNANCE-COMMENT] Error:', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/proposals/:id/vote
+// Auth required. Handles both official-proposal (1p1v) and official-vote (MVP)
+// ----------------------------------------------------------------
+app.post('/api/proposals/:id/vote', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+
+  const { choice } = req.body;
+  if (!choice) return res.status(400).json({ ok: false, message: 'No choice provided' });
+
+  try {
+    const proposalSnap = await db.ref(`Governance/Proposals/${req.params.id}`).get();
+    if (!proposalSnap.exists()) return res.status(404).json({ ok: false, message: 'Proposal not found' });
+
+    const proposal = proposalSnap.val();
+
+    if (proposal.status !== 'active') return res.status(400).json({ ok: false, message: 'This vote is closed' });
+
+    const now = new Date();
+    if (proposal.ends_at && new Date(proposal.ends_at) < now) {
+      return res.status(400).json({ ok: false, message: 'Voting period has ended' });
+    }
+
+    // Check already voted
+    const existingSnap = await db.ref(`Governance/Votes/${req.params.id}/${sessionUser.discord_id}`).get();
+    if (existingSnap.exists()) return res.status(400).json({ ok: false, message: 'You have already voted' });
+
+    // For official votes, require MVP > 0
+    const mvpSnap = await db.ref(`Pixie/Users/${sessionUser.discord_id}/MVP/total`).get();
+    const mvp     = mvpSnap.exists() ? mvpSnap.val() : 0;
+
+    if (proposal.stage === 'vote' && mvp <= 0) {
+      return res.status(400).json({ ok: false, message: 'You need MVP > 0 to vote in Official Votes' });
+    }
+
+    // Validate choice is one of the proposal options
+    const validOptions = proposal.stage === 'proposal'
+      ? ['yes', 'no']
+      : (proposal.options || []);
+    if (!validOptions.includes(choice)) {
+      return res.status(400).json({ ok: false, message: 'Invalid vote option' });
+    }
+
+    // Record the vote weight
+    const weight = proposal.stage === 'vote' ? mvp : 1;
+
+    // Atomic update: record vote + update tally
+    const currentTotals  = proposal.vote_totals  || {};
+    const currentVoters  = proposal.voter_count   || 0;
+    currentTotals[choice] = (currentTotals[choice] || 0) + weight;
+
+    const updates = {};
+    updates[`Governance/Votes/${req.params.id}/${sessionUser.discord_id}`] = {
+      choice,
+      weight,
+      voted_at: new Date().toISOString(),
+    };
+    updates[`Governance/Proposals/${req.params.id}/vote_totals`]  = currentTotals;
+    updates[`Governance/Proposals/${req.params.id}/voter_count`]  = currentVoters + 1;
+
+    await db.ref().update(updates);
+
+    // Award SPORE reward for Official Vote participation
+    if (proposal.stage === 'vote') {
+      const rewardAmount = Math.max(500_000, Math.round(mvp * 100_000));
+      const walletRef = db.ref(`Pixie/Users/${sessionUser.discord_id}/Wallet`);
+      const walletSnap = await walletRef.get();
+      const wallet = walletSnap.val() || {};
+      await walletRef.update({
+        spore_wallet: (wallet.spore_wallet || 0) + rewardAmount,
+      });
+      console.log(`[GOVERNANCE-VOTE] ${sessionUser.username} voted on ${req.params.id} (${choice}, weight:${weight}, reward:${rewardAmount})`);
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[GOVERNANCE-VOTE] Error:', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/proposals/create
+// Auth required. Burns SPORE from Discord wallet, creates proposal.
+// ----------------------------------------------------------------
+app.post('/api/proposals/create', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+
+  const { title, description, category, options, discord_link } = req.body;
+
+  if (!title || title.length < 10)       return res.status(400).json({ ok: false, message: 'Title too short' });
+  if (!description || description.length < 50) return res.status(400).json({ ok: false, message: 'Description too short' });
+  if (!options || options.length < 2)    return res.status(400).json({ ok: false, message: 'Need at least 2 options' });
+  if (options.length > 4)                return res.status(400).json({ ok: false, message: 'Max 4 options' });
+
+  try {
+    // Check wallet has enough SPORE
+    const walletRef  = db.ref(`Pixie/Users/${sessionUser.discord_id}/Wallet`);
+    const walletSnap = await walletRef.get();
+    const wallet     = walletSnap.val() || {};
+    const sporeBalance = wallet.spore_wallet || 0;
+
+    if (sporeBalance < PROPOSAL_BURN_AMOUNT) {
+      return res.status(400).json({
+        ok: false,
+        message: `Insufficient SPORE. Need ${PROPOSAL_BURN_AMOUNT.toLocaleString()} but you have ${sporeBalance.toLocaleString()}.`,
+      });
+    }
+
+    // Burn SPORE (deduct from wallet — the tokens stay in bot economy as burned)
+    await walletRef.update({
+      spore_wallet: sporeBalance - PROPOSAL_BURN_AMOUNT,
+    });
+
+    // Log burn
+    await db.ref('Governance/Burns').push({
+      discord_id:  sessionUser.discord_id,
+      username:    sessionUser.username,
+      amount:      PROPOSAL_BURN_AMOUNT,
+      burned_at:   new Date().toISOString(),
+    });
+
+    const now     = new Date();
+    const endsAt  = new Date(now.getTime() + PROPOSAL_DURATION_DAYS * 24 * 60 * 60 * 1000);
+
+    const proposalRef = db.ref('Governance/Proposals').push();
+    await proposalRef.set({
+      title:        title.trim(),
+      description:  description.trim(),
+      category:     category || 'other',
+      options:      options.filter(Boolean),
+      stage:        'proposal',
+      status:       'active',
+      author_id:    sessionUser.discord_id,
+      author_name:  sessionUser.username,
+      discord_link: discord_link || null,
+      created_at:   now.toISOString(),
+      ends_at:      endsAt.toISOString(),
+      vote_totals:  { yes: 0, no: 0 },
+      voter_count:  0,
+      comment_count: 0,
+      spore_burned: PROPOSAL_BURN_AMOUNT,
+    });
+
+    console.log(`[GOVERNANCE-CREATE] ${sessionUser.username} created proposal "${title}" (burned ${PROPOSAL_BURN_AMOUNT} SPORE)`);
+    res.json({ ok: true, id: proposalRef.key });
+
+  } catch (err) {
+    console.error('[GOVERNANCE-CREATE] Error:', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/proposals/:id/advance
+// Admin only — advance proposal from 'proposal' stage to 'vote' stage
+// ----------------------------------------------------------------
+app.post('/api/proposals/:id/advance', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+
+  // Check admin
+  const ADMIN_IDS = (process.env.ADMIN_DISCORD_IDS || '').split(',');
+  if (!ADMIN_IDS.includes(sessionUser.discord_id)) {
+    return res.status(403).json({ ok: false, message: 'Admin only' });
+  }
+
+  try {
+    const snap = await db.ref(`Governance/Proposals/${req.params.id}`).get();
+    if (!snap.exists()) return res.status(404).json({ ok: false });
+    const proposal = snap.val();
+    if (proposal.stage !== 'proposal') return res.status(400).json({ ok: false, message: 'Can only advance Official Proposals to Official Vote' });
+
+    const now    = new Date();
+    const endsAt = new Date(now.getTime() + VOTE_DURATION_DAYS * 24 * 60 * 60 * 1000);
+
+    await db.ref(`Governance/Proposals/${req.params.id}`).update({
+      stage:       'vote',
+      status:      'active',
+      vote_totals: {},
+      voter_count: 0,
+      ends_at:     endsAt.toISOString(),
+      advanced_at: now.toISOString(),
+    });
+
+    // Reset votes for the new stage
+    await db.ref(`Governance/Votes/${req.params.id}`).remove();
+
+    console.log(`[GOVERNANCE-ADVANCE] Admin advanced "${proposal.title}" to Official Vote`);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[GOVERNANCE-ADVANCE] Error:', err);
+    res.status(500).json({ ok: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/proposals/:id/close
+// Admin only — close a vote and set final status (passed/failed)
+// ----------------------------------------------------------------
+app.post('/api/proposals/:id/close', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+
+  const ADMIN_IDS = (process.env.ADMIN_DISCORD_IDS || '').split(',');
+  if (!ADMIN_IDS.includes(sessionUser.discord_id)) {
+    return res.status(403).json({ ok: false, message: 'Admin only' });
+  }
+
+  try {
+    const snap = await db.ref(`Governance/Proposals/${req.params.id}`).get();
+    if (!snap.exists()) return res.status(404).json({ ok: false });
+    const proposal = snap.val();
+
+    // Determine outcome
+    let finalStatus = 'failed';
+    const totals = proposal.vote_totals || {};
+
+    if (proposal.stage === 'vote') {
+      // Highest MVP sum wins
+      const winner = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+      finalStatus = winner ? 'passed' : 'failed';
+    } else if (proposal.stage === 'proposal') {
+      const yes   = totals.yes || 0;
+      const total = yes + (totals.no || 0);
+      const yesPct = total > 0 ? yes / total : 0;
+      finalStatus = yesPct >= 0.70 ? 'passed' : 'failed';
+    }
+
+    await db.ref(`Governance/Proposals/${req.params.id}`).update({
+      status:    finalStatus,
+      closed_at: new Date().toISOString(),
+    });
+
+    console.log(`[GOVERNANCE-CLOSE] "${proposal.title}" closed as ${finalStatus}`);
+    res.json({ ok: true, status: finalStatus });
+  } catch (err) {
+    console.error('[GOVERNANCE-CLOSE] Error:', err);
+    res.status(500).json({ ok: false });
+  }
+});
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
