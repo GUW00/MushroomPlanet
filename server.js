@@ -878,7 +878,6 @@ app.get('/api/proposals/:id/comments', async (req, res) => {
       }
     });
     comments.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-    console.log(`[COMMENTS] ${req.params.id} — returning ${comments.length} comments`);
     res.json({ ok: true, comments });
   } catch (err) {
     console.error('[COMMENTS-ERROR]', err);
@@ -1068,7 +1067,7 @@ app.post('/api/proposals/create', async (req, res) => {
       discord_link: discord_link || null,
       created_at:   now.toISOString(),
       ends_at:      endsAt.toISOString(),
-      vote_totals:  { yes: 0, no: 0 },
+      vote_totals:  {},
       voter_count:  0,
       comment_count: 0,
       spore_burned: PROPOSAL_BURN_AMOUNT,

@@ -387,8 +387,9 @@
     }
 
     @media (max-width: 600px) {
-      .stage-strip { flex-wrap: wrap; gap: 0.5rem; }
-      .stage-pill { border-radius: 0.75rem !important; min-width: 0; flex: 1; }
+      .stage-strip { flex-direction: column; align-items: center; gap: 0.5rem; padding: 0 1rem 2rem; }
+      .stage-pill { border-radius: 0.75rem !important; min-width: 0; width: 100%; max-width: 320px; flex-direction: row; justify-content: flex-start; gap: 1rem; padding: 0.75rem 1.25rem; }
+      .stage-num { font-size: 0.55rem; white-space: nowrap; }
       .stage-arrow { display: none; }
       .vote-section { padding: 0 1rem 3rem; }
       .modal { padding: 1.5rem; }
@@ -701,7 +702,7 @@
     const t = document.getElementById('toast');
     t.textContent = (type === 'success' ? '✅ ' : type === 'error' ? '❌ ' : 'ℹ️ ') + msg;
     t.className = 'toast show ' + type;
-    setTimeout(() => { t.classList.remove('show'); }, 3500);
+    setTimeout(() => { t.className = 'toast'; }, 3500);
   }
 
   // ================================================================
