@@ -184,6 +184,7 @@
     .sp-val.green  { color: var(--green); }
     .sp-val.red    { color: var(--red); }
     .sp-val.purple { color: var(--purple); }
+    .sp-val.red    { color: var(--red); }
 
     /* ---- TABS ---- */
     .tab-bar {
@@ -451,7 +452,7 @@
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.75rem;">
         <div class="mvp-block">
-          <div class="mvp-score" id="prof-mvp">0.0</div>
+          <div class="mvp-score" style="color:var(--purple);" id="prof-mvp">0.0</div>
           <div class="mvp-label">MVP Score</div>
         </div>
         <button class="btn-sm" id="btn-logout" onclick="logout()">Disconnect</button>
@@ -462,7 +463,7 @@
     <div class="stat-strip reveal" id="stat-strip">
       <div class="stat-pill">
         <span class="sp-label">Planted</span>
-        <span class="sp-val yellow" id="qs-planted">—</span>
+        <span class="sp-val green" id="qs-planted">—</span>
       </div>
       <div class="stat-pill">
         <span class="sp-label">SPORE/Day</span>
@@ -474,7 +475,7 @@
       </div>
       <div class="stat-pill">
         <span class="sp-label">Farm Stage</span>
-        <span class="sp-val yellow" id="qs-stage">—</span>
+        <span class="sp-val red" id="qs-stage">—</span>
       </div>
       <div class="stat-pill">
         <span class="sp-label">Forage Streak</span>
@@ -526,7 +527,7 @@
           <div class="data-grid" style="margin-top:1rem;">
             <div>
               <div class="data-row"><span class="dr-label">Stage</span><span class="dr-val g" id="f-stage">—</span></div>
-              <div class="data-row"><span class="dr-label">Farm Rank</span><span class="dr-val y" id="f-rank">—</span></div>
+              <div class="data-row"><span class="dr-label">Farm Rank</span><span class="dr-val r" id="f-rank">—</span></div>
               <div class="data-row"><span class="dr-label">Spores / Day</span><span class="dr-val b" id="f-sgr">—</span></div>
               <div class="data-row"><span class="dr-label">Total APY</span><span class="dr-val b" id="f-apy">—</span></div>
               <div class="data-row"><span class="dr-label">Plots Filled</span><span class="dr-val" id="f-plots">—</span></div>
@@ -552,14 +553,14 @@
           <div class="card-title"><span class="card-title-accent">💰</span> Discord Wallet</div>
           <div class="data-grid">
             <div>
-              <div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val y" id="w-shroom">—</span></div>
+              <div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val r" id="w-shroom">—</span></div>
               <div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b" id="w-spore">—</span></div>
-              <div class="data-row"><span class="dr-label">Planted SHROOM</span><span class="dr-val y" id="w-planted">—</span></div>
+              <div class="data-row"><span class="dr-label">Planted SHROOM</span><span class="dr-val g" id="w-planted">—</span></div>
               <div class="data-row"><span class="dr-label">Farm SPORE</span><span class="dr-val b" id="w-spore-farm">—</span></div>
             </div>
             <div>
               <div class="data-row"><span class="dr-label">Wallet Address</span><span class="dr-val" id="w-addr">—</span></div>
-              <div class="data-row"><span class="dr-label">Onchain SHROOM</span><span class="dr-val y" id="w-oc-shroom">—</span></div>
+              <div class="data-row"><span class="dr-label">Onchain SHROOM</span><span class="dr-val r" id="w-oc-shroom">—</span></div>
               <div class="data-row"><span class="dr-label">Onchain SPORE</span><span class="dr-val b" id="w-oc-spore">—</span></div>
             </div>
           </div>
@@ -572,7 +573,7 @@
           <div class="card-title"><span class="card-title-accent">⚡</span> Staking</div>
           <div class="data-grid">
             <div>
-              <div class="data-row"><span class="dr-label">Staked SPORE</span><span class="dr-val b" id="s-staked">—</span></div>
+              <div class="data-row"><span class="dr-label">Staked SPORE</span><span class="dr-val g" id="s-staked">—</span></div>
               <div class="data-row"><span class="dr-label">Pending Rewards</span><span class="dr-val g" id="s-pending">—</span></div>
               <div class="data-row"><span class="dr-label">Mycelium Nodes</span><span class="dr-val p" id="s-nodes">—</span></div>
             </div>
@@ -1500,7 +1501,7 @@ function renderReddit(s, p) {
     '<div class="reddit-stat"><div class="rs-label">' + st.label + '</div><div class="rs-val">' + st.val + '</div></div>'
   ).join('');
 
-  rwEl.innerHTML = '<div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val y">' + fmt(bal.reddit_shrooms) + '</span></div>'
+  rwEl.innerHTML = '<div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val r">' + fmt(bal.reddit_shrooms) + '</span></div>'
     + '<div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b">' + fmt(bal.reddit_spores) + '</span></div>'
     + (r.Address ? '<div class="data-row"><span class="dr-label">Wallet</span><span class="dr-val">' + r.Address.slice(0,6) + '...' + r.Address.slice(-4) + '</span></div>' : '');
 
