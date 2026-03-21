@@ -1028,6 +1028,7 @@ function renderFarm(s) {
   const totalCount = DAILY_ACTIONS.length;
   const barPct = Math.round((doneCount / totalCount) * 100);
 
+  const grid = document.getElementById('daily-actions-grid');
   grid.innerHTML = '<div style="margin-bottom:1rem;">'
     + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;">'
     + '<span>Daily Progress</span><span>' + doneCount + ' / ' + totalCount + ' complete</span></div>'
