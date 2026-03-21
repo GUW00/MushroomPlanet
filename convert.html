@@ -768,35 +768,84 @@
     if (step === 'swap')      return doSwap();
   };
 
-  async function connectWallet() {
+async function connectWallet() {
+    // Build list of available wallets from injected providers
+    const providerList = window.ethereum?.providers || (window.ethereum ? [window.ethereum] : []);
     const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
 
-    // No injected provider — offer deep links on mobile, error on desktop
-    if (!window.ethereum) {
-      if (isMobile) {
-        const pageUrl = encodeURIComponent(window.location.href);
-        const choice = confirm('Open in wallet app?\n\nOK = MetaMask\nCancel = Coinbase Wallet');
-        window.location.href = choice
-          ? 'https://metamask.app.link/dapp/' + window.location.host + window.location.pathname
-          : 'https://go.cb-wallet.com/dapp?url=' + pageUrl;
-        return;
-      }
+    // No wallet at all on mobile — deep link
+    if (providerList.length === 0 && isMobile) {
+      showWalletModal([
+        { name: 'MetaMask', icon: 'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg', action: () => { window.location.href = 'https://metamask.app.link/dapp/' + window.location.host + window.location.pathname; } },
+        { name: 'Coinbase Wallet', icon: 'https://avatars.githubusercontent.com/u/18060234', action: () => { window.location.href = 'https://go.cb-wallet.com/dapp?url=' + encodeURIComponent(window.location.href); } },
+      ]);
+      return;
+    }
+    if (providerList.length === 0) {
       setStatus('No wallet detected. Install MetaMask or Coinbase Wallet.', 'error');
       return;
     }
 
-    // Desktop with multiple providers (e.g. Brave + MetaMask) — show picker
-    if (!isMobile && window.ethereum.providers?.length > 1) {
-      const pick = confirm('Choose wallet:\n\nOK = MetaMask\nCancel = Brave / Default');
-      const chosenProvider = pick
-        ? window.ethereum.providers.find(p => p.isMetaMask && !p.isBraveWallet)
-        : window.ethereum.providers.find(p => p.isBraveWallet) || window.ethereum.providers[0];
-      provider = new ethers.BrowserProvider(chosenProvider || window.ethereum);
-    } else {
-      provider = new ethers.BrowserProvider(window.ethereum);
+    // Map detected providers to named options
+    const options = providerList.map(p => {
+      let name = 'Unknown Wallet';
+      if (p.isBraveWallet)    name = 'Brave Wallet';
+      else if (p.isMetaMask)  name = 'MetaMask';
+      else if (p.isCoinbaseWallet) name = 'Coinbase Wallet';
+      else if (p.isRabby)     name = 'Rabby';
+      return { name, provider: p };
+    });
+
+    // If only one option, connect directly without showing picker
+    if (options.length === 1) {
+      await doConnect(options[0].provider);
+      return;
     }
 
+    // Show picker
+    showWalletModal(options.map(o => ({
+      name: o.name,
+      action: () => doConnect(o.provider),
+    })));
+  }
+
+  function showWalletModal(options) {
+    // Remove existing modal if any
+    document.getElementById('wallet-modal')?.remove();
+    const modal = document.createElement('div');
+    modal.id = 'wallet-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#1a1a1a;border:1px solid rgba(255,255,225,0.12);border-radius:1.25rem;padding:1.75rem;min-width:280px;max-width:360px;width:90%;';
+    box.innerHTML = `
+      <div style="font-family:'Syne Mono',monospace;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:1.25rem;">Connect Wallet</div>
+      <div id="wallet-options" style="display:flex;flex-direction:column;gap:0.6rem;"></div>
+      <button onclick="document.getElementById('wallet-modal').remove()" style="margin-top:1rem;width:100%;padding:0.55rem;background:transparent;border:1px solid rgba(255,255,225,0.1);border-radius:0.6rem;color:rgba(255,255,225,0.35);font-family:'Syne Mono',monospace;font-size:0.72rem;cursor:pointer;">Cancel</button>
+    `;
+    modal.appendChild(box);
+    document.body.appendChild(modal);
+
+    const optList = box.querySelector('#wallet-options');
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.style.cssText = 'width:100%;padding:0.85rem 1rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,225,0.1);border-radius:0.75rem;color:#ffffe1;font-family:Space Grotesk,sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;text-align:left;transition:all 0.2s;';
+      btn.textContent = opt.name;
+      btn.onmouseover = () => { btn.style.background = 'rgba(255,255,255,0.08)'; btn.style.borderColor = 'rgba(254,206,0,0.3)'; };
+      btn.onmouseout  = () => { btn.style.background = 'rgba(255,255,255,0.04)'; btn.style.borderColor = 'rgba(255,255,225,0.1)'; };
+      btn.onclick = () => {
+        document.getElementById('wallet-modal').remove();
+        opt.action();
+      };
+      optList.appendChild(btn);
+    });
+
+    // Close on backdrop click
+    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  }
+
+  async function doConnect(chosenProvider) {
     try {
+      provider = new ethers.BrowserProvider(chosenProvider);
       setStatus('Connecting...', 'info');
       await provider.send('eth_requestAccounts', []);
 
@@ -813,11 +862,9 @@
               rpcUrls: ['https://polygon-rpc.com/'],
               blockExplorerUrls: ['https://polygonscan.com/'],
             }]);
-          } else {
-            throw switchErr;
-          }
+          } else { throw switchErr; }
         }
-        provider = new ethers.BrowserProvider(window.ethereum);
+        provider = new ethers.BrowserProvider(chosenProvider);
       }
 
       signer     = await provider.getSigner();
