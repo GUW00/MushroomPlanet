@@ -1015,42 +1015,59 @@ function renderFarm(s) {
   setEl('f-spor-date', sporDate ? timeRemaining(sporDate) : '-');
 
   // Daily actions
+  // Hourly cooldown helper
+  function hourlyCooldown(tsStr) {
+    if (!tsStr) return 'Ready';
+    const last = new Date(tsStr.replace(' ', 'T') + (tsStr.includes('Z') ? '' : 'Z'));
+    const diff = 3600000 - (Date.now() - last.getTime());
+    if (diff <= 0) return 'Ready';
+    const m = Math.floor(diff / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    return m + 'm ' + s + 's';
+  }
+
+  const misc = s.Misc || {};
+  const gatherCD = hourlyCooldown(daily.last_gather);
+  const caveCD   = hourlyCooldown(daily.last_cave);
+  const feedCD   = hourlyCooldown(misc.last_hourly_feed);
+
   const DAILY_ACTIONS = [
-    { key: 'daily_forage',  label: 'Forage',  cmd: '!forage', required: true },
-    { key: 'daily_mist',    label: 'Mist',    cmd: '!mist' },
-    { key: 'daily_fan',     label: 'Fan',     cmd: '!fan' },
-    { key: 'daily_herb',    label: 'Gather',  cmd: '!gather' },
-    { key: 'daily_cave',    label: 'Cave',    cmd: '!cave' },
-    { key: 'daily_explore', label: 'Explore', cmd: '!explore' },
-    { key: 'daily_dig',     label: 'Dig',     cmd: '!dig' },
+    { label: 'Forage',  cmd: '!forage',  done: daily.daily_forage  === true, cadence: 'Daily',  required: true },
+    { label: 'Mist',    cmd: '!mist',    done: daily.daily_mist    === true, cadence: 'Daily' },
+    { label: 'Fan',     cmd: '!fan',     done: daily.daily_fan     === true, cadence: 'Daily' },
+    { label: 'Explore', cmd: '!explore', done: daily.daily_explore === true, cadence: 'Daily' },
+    { label: 'Toss',    cmd: '!toss',    done: daily.daily_toss    === true, cadence: 'Daily' },
+    { label: 'Gather',  cmd: '!gather',  done: gatherCD === 'Ready', cadence: 'Hourly', cooldown: gatherCD },
+    { label: 'Cave',    cmd: '!cave',    done: caveCD   === 'Ready', cadence: 'Hourly', cooldown: caveCD },
+    { label: 'Feed',    cmd: '!feed',    done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD },
   ];
   const doneCount = DAILY_ACTIONS.filter(a => daily[a.key] === true).length;
   const totalCount = DAILY_ACTIONS.length;
   const barPct = Math.round((doneCount / totalCount) * 100);
 
   const grid = document.getElementById('daily-actions-grid');
-  grid.innerHTML = '<div style="margin-bottom:1rem;">'
+  grid.style.display = 'block';
+  grid.innerHTML = '<div style="margin-bottom:0.875rem;">'
     + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;">'
     + '<span>Daily Progress</span><span>' + doneCount + ' / ' + totalCount + ' complete</span></div>'
     + '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
     + '<div style="height:100%;width:' + barPct + '%;background:linear-gradient(90deg,var(--green),#4ade80);border-radius:999px;transition:width 1s ease;"></div>'
     + '</div></div>'
-    + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.5rem;">'
+    + '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'
     + DAILY_ACTIONS.map(a => {
-      const done = daily[a.key] === true;
-      const bg     = done ? 'rgba(34,197,94,0.08)'  : a.required ? 'rgba(253,70,79,0.06)'  : 'rgba(255,255,255,0.02)';
-      const border = done ? 'rgba(34,197,94,0.3)'   : a.required ? 'rgba(253,70,79,0.25)'  : 'rgba(255,255,225,0.07)';
-      const icon   = done ? '✓' : a.required ? '!' : '○';
-      const iconCol= done ? '#22c55e' : a.required ? '#fd464f' : 'rgba(255,255,225,0.25)';
-      const labelCol = done ? '#22c55e' : a.required ? 'var(--cream)' : 'rgba(255,255,225,0.45)';
-      const cmdCol = done ? 'rgba(34,197,94,0.5)' : 'rgba(255,255,225,0.2)';
-      return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.875rem;border-radius:0.75rem;border:1px solid ' + border + ';background:' + bg + ';">'
-        + '<span style="font-size:0.9rem;color:' + iconCol + ';font-weight:700;width:14px;text-align:center;flex-shrink:0;">' + icon + '</span>'
-        + '<div style="display:flex;flex-direction:column;gap:0.1rem;min-width:0;">'
-        + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.8rem;font-weight:600;color:' + labelCol + ';">' + a.label + '</span>'
-        + '<span style="font-family:Syne Mono,monospace;font-size:0.58rem;color:' + cmdCol + ';">' + a.cmd + '</span>'
+      const bg     = a.done ? 'rgba(34,197,94,0.08)' : a.required ? 'rgba(253,70,79,0.05)' : 'rgba(255,255,255,0.02)';
+      const border = a.done ? 'rgba(34,197,94,0.25)' : a.required ? 'rgba(253,70,79,0.2)'  : 'rgba(255,255,225,0.07)';
+      const iconCol  = a.done ? '#22c55e' : a.required ? '#fd464f' : 'rgba(255,255,225,0.2)';
+      const labelCol = a.done ? '#22c55e' : 'rgba(255,255,225,0.75)';
+      const cmdCol   = a.done ? 'rgba(34,197,94,0.45)' : 'rgba(255,255,225,0.18)';
+      const subText  = a.done ? (a.cadence === 'Hourly' ? 'Ready' : 'Done') : (a.cooldown && a.cooldown !== 'Ready' ? a.cooldown : a.cadence);
+      const subCol   = a.done ? 'rgba(34,197,94,0.6)' : a.cooldown && a.cooldown !== 'Ready' ? 'rgba(253,70,79,0.5)' : 'rgba(255,255,225,0.2)';
+      return '<div style="display:flex;align-items:center;gap:0.45rem;padding:0.45rem 0.8rem;border-radius:0.625rem;border:1px solid ' + border + ';background:' + bg + ';white-space:nowrap;">'
+        + '<span style="font-size:0.75rem;color:' + iconCol + ';font-weight:700;">' + (a.done ? '✓' : '○') + '</span>'
+        + '<div style="display:flex;flex-direction:column;gap:0.05rem;">'
+        + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.75rem;font-weight:600;color:' + labelCol + ';">' + a.label + '</span>'
+        + '<span style="font-family:Syne Mono,monospace;font-size:0.52rem;color:' + subCol + ';">' + subText + '</span>'
         + '</div>'
-        + (done ? '' : (a.required ? '<span style="margin-left:auto;font-family:Syne Mono,monospace;font-size:0.55rem;color:var(--red);flex-shrink:0;">DO THIS</span>' : ''))
         + '</div>';
     }).join('')
     + '</div>';
