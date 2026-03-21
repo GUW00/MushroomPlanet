@@ -746,14 +746,27 @@ const safe = (v, fb = '-') => (v != null && v !== '') ? v : fb;
 
 function timeRemaining(iso) {
   if (!iso) return 'Unknown';
-  const diff = new Date(iso.replace(' ', 'T') + (iso.includes('Z') ? '' : 'Z')) - Date.now();
-  if (diff <= 0) return 'Ready!';
-  const d = Math.floor(diff / 86400000);
-  const h = Math.floor((diff % 86400000) / 3600000);
-  if (d > 0) return d + 'd ' + h + 'h';
-  const m = Math.floor((diff % 3600000) / 60000);
-  if (h > 0) return h + 'h ' + m + 'm';
-  return m + 'm';
+  try {
+    // Handle "2026-04-13 04:06 PM" format (no seconds, 12-hour)
+    let normalized = iso.trim();
+    if (/\d{4}-\d{2}-\d{2} \d{1,2}:\d{2} [AP]M/i.test(normalized)) {
+      const [datePart, timePart, ampm] = normalized.split(' ');
+      let [h, m] = timePart.split(':').map(Number);
+      if (ampm.toUpperCase() === 'PM' && h !== 12) h += 12;
+      if (ampm.toUpperCase() === 'AM' && h === 12) h = 0;
+      normalized = datePart + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00Z';
+    } else {
+      normalized = normalized.replace(' ', 'T') + (normalized.includes('Z') ? '' : 'Z');
+    }
+    const diff = new Date(normalized) - Date.now();
+    if (diff <= 0) return 'Ready!';
+    const d = Math.floor(diff / 86400000);
+    const h2 = Math.floor((diff % 86400000) / 3600000);
+    if (d > 0) return d + 'd ' + h2 + 'h';
+    const mn = Math.floor((diff % 3600000) / 60000);
+    if (h2 > 0) return h2 + 'h ' + mn + 'm';
+    return mn + 'm';
+  } catch { return 'Unknown'; }
 }
 
 const STAGE_ORDER = ['Spore','Germination','Mycelium','Fruiting','Sporulation','Golden_Sporulation'];
@@ -1042,6 +1055,7 @@ function renderFarm(s) {
     { label: 'Explore', cmd: '!explore', done: daily.daily_explore === true, cadence: 'Daily' },
     { label: 'Toss',    cmd: '!toss',    done: daily.daily_toss    === true, cadence: 'Daily' },
     { label: 'Dig',     cmd: '!dig',     done: daily.daily_dig === true, cadence: 'Daily' },
+    { label: 'Visit',   cmd: 'visit',    done: daily.daily_visit === true, cadence: 'Daily' },
     { label: 'Gather',  cmd: '!gather',  done: gatherCD === 'Ready', cadence: 'Hourly', cooldown: gatherCD },
     { label: 'Cave',    cmd: '!cave',    done: caveCD   === 'Ready', cadence: 'Hourly', cooldown: caveCD },
     { label: 'Feed',    cmd: '!feed',    done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD },
