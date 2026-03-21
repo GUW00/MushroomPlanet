@@ -765,55 +765,7 @@
   // ================================================================
   //  Wallet connect / disconnect
   // ================================================================
-  window.mainAction = async function() {
-    if (step === 'connect')   return connectWallet();
-    if (step === 'approve')   return doApprove();
-    if (step === 'swap')      return doSwap();
-  };
-
-async function connectWallet() {
-    // Build list of available wallets from injected providers
-    const providerList = window.ethereum?.providers || (window.ethereum ? [window.ethereum] : []);
-    const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
-
-    // No wallet at all on mobile — deep link
-    if (providerList.length === 0 && isMobile) {
-      showWalletModal([
-        { name: 'MetaMask', icon: 'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg', action: () => { window.location.href = 'https://metamask.app.link/dapp/' + window.location.host + window.location.pathname; } },
-        { name: 'Coinbase Wallet', icon: 'https://avatars.githubusercontent.com/u/18060234', action: () => { window.location.href = 'https://go.cb-wallet.com/dapp?url=' + encodeURIComponent(window.location.href); } },
-      ]);
-      return;
-    }
-    if (providerList.length === 0) {
-      setStatus('No wallet detected. Install MetaMask or Coinbase Wallet.', 'error');
-      return;
-    }
-
-    // Map detected providers to named options
-    const options = providerList.map(p => {
-      let name = 'Unknown Wallet';
-      if (p.isBraveWallet)    name = 'Brave Wallet';
-      else if (p.isMetaMask)  name = 'MetaMask';
-      else if (p.isCoinbaseWallet) name = 'Coinbase Wallet';
-      else if (p.isRabby)     name = 'Rabby';
-      return { name, provider: p };
-    });
-
-    // If only one option, connect directly without showing picker
-    if (options.length === 1) {
-      await doConnect(options[0].provider);
-      return;
-    }
-
-    // Show picker
-    showWalletModal(options.map(o => ({
-      name: o.name,
-      action: () => doConnect(o.provider),
-    })));
-  }
-
   function showWalletModal(options) {
-    // Remove existing modal if any
     document.getElementById('wallet-modal')?.remove();
     const modal = document.createElement('div');
     modal.id = 'wallet-modal';
@@ -827,7 +779,6 @@ async function connectWallet() {
     `;
     modal.appendChild(box);
     document.body.appendChild(modal);
-
     const optList = box.querySelector('#wallet-options');
     options.forEach(opt => {
       const btn = document.createElement('button');
@@ -835,15 +786,58 @@ async function connectWallet() {
       btn.textContent = opt.name;
       btn.onmouseover = () => { btn.style.background = 'rgba(255,255,255,0.08)'; btn.style.borderColor = 'rgba(254,206,0,0.3)'; };
       btn.onmouseout  = () => { btn.style.background = 'rgba(255,255,255,0.04)'; btn.style.borderColor = 'rgba(255,255,225,0.1)'; };
-      btn.onclick = () => {
-        document.getElementById('wallet-modal').remove();
-        opt.action();
-      };
+      btn.onclick = () => { document.getElementById('wallet-modal').remove(); opt.action(); };
       optList.appendChild(btn);
     });
-
-    // Close on backdrop click
     modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  }
+
+  window.mainAction = async function() {
+    if (step === 'connect')   return connectWallet();
+    if (step === 'approve')   return doApprove();
+    if (step === 'swap')      return doSwap();
+  };
+
+async function connectWallet() {
+    const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+
+    // Build provider list — check both .providers array and single injection
+    let providerList = [];
+    if (window.ethereum?.providers?.length) {
+      providerList = window.ethereum.providers;
+    } else if (window.ethereum) {
+      providerList = [window.ethereum];
+    }
+
+    // No wallet at all — mobile deep links
+    if (providerList.length === 0) {
+      if (isMobile) {
+        showWalletModal([
+          { name: 'MetaMask',          action: () => { window.location.href = 'https://metamask.app.link/dapp/' + window.location.host + window.location.pathname; } },
+          { name: 'Base Wallet',       action: () => { window.location.href = 'https://go.cb-wallet.com/dapp?url=' + encodeURIComponent(window.location.href); } },
+        ]);
+        return;
+      }
+      setStatus('No wallet detected. Install MetaMask or Base Wallet.', 'error');
+      return;
+    }
+
+    // Map providers to named options
+    const options = providerList.map(p => {
+      let name = 'Browser Wallet';
+      if (p.isBraveWallet)                          name = 'Brave Wallet';
+      else if (p.isMetaMask && !p.isBraveWallet)    name = 'MetaMask';
+      else if (p.isCoinbaseWallet || p.isBaseSdk)   name = 'Base Wallet';
+      else if (p.isRabby)                           name = 'Rabby';
+      else if (p.isTrust)                           name = 'Trust Wallet';
+      return { name, provider: p };
+    });
+
+    // ALWAYS show the picker — never auto-connect, even with one wallet
+    showWalletModal(options.map(o => ({
+      name: o.name,
+      action: () => doConnect(o.provider),
+    })));
   }
 
   async function doConnect(chosenProvider) {
@@ -888,9 +882,24 @@ async function connectWallet() {
     }
   }
 
-  window.disconnectWallet = function() {
+window.disconnectWallet = async function() {
+    // Clear all local state
     provider = null; signer = null; walletAddr = null;
     step = 'connect';
+
+    // Revoke permissions from the wallet — forces re-approval on next connect
+    if (window.ethereum) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_revokePermissions',
+          params: [{ eth_accounts: {} }],
+        });
+      } catch(e) {
+        // wallet_revokePermissions not supported by all wallets — fall back silently
+        console.log('[DISCONNECT] Permission revoke not supported, cleared local state only');
+      }
+    }
+
     document.getElementById('wallet-panel').style.display = 'none';
     document.getElementById('step-row').style.display     = 'none';
     updateButtonState();
