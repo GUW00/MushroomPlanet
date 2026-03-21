@@ -1313,53 +1313,81 @@ function renderPixie(p) {
 }
 
 function renderReddit(s, p) {
-  // Reddit data lives under Sporebot or Pixie depending on your DB structure
-  // We'll look in the sporebot data for Reddit-specific fields
-  const reddit = s.Reddit || {};
-  const redditFarm = s.Reddit_Farm || {};
-  const redditBal  = reddit.Balance || s.Reddit_Balance || {};
-  const redditDaily = reddit.Daily || {};
+  const r = profileData.reddit;
+  const redditName = profileData.redditName;
 
   const statsEl = document.getElementById('reddit-stats');
+  const rwEl    = document.getElementById('reddit-wallet-content');
+  const rdEl    = document.getElementById('reddit-daily-content');
+
+  if (!r || !redditName) {
+    statsEl.innerHTML = '<div class="empty-hint" style="grid-column:1/-1;">No Reddit account linked. Use !link in Reddit to connect.</div>';
+    rwEl.innerHTML    = '<div class="empty-hint">No Reddit wallet found.</div>';
+    rdEl.innerHTML    = '<div class="empty-hint">No Reddit daily data found.</div>';
+    return;
+  }
+
+  const bal     = r.Balance    || {};
+  const forage  = r.Forage     || {};
+  const feed    = r.Feed       || {};
+  const flair   = r.Flair      || {};
+  const tipping = r.Tipping    || {};
+  const gs      = r.Goodshroom || {};
+  const link    = r.Link       || {};
+  const airdrop = r.Airdrop    || {};
+
+  const shroomGiven    = (tipping.SHROOM?.Given    || 0) + (airdrop.SHROOM?.Given || 0);
+  const shroomReceived =  tipping.SHROOM?.Received || 0;
+  const sporeGiven     = (tipping.SPORE?.Given     || 0) + (airdrop.SPORE?.Given  || 0);
+  const sporeReceived  =  tipping.SPORE?.Received  || 0;
+
   const stats = [
-    { label: 'SHROOM Balance', val: fmt(redditBal.shroom_wallet || reddit.shroom_wallet) },
-    { label: 'SPORE Balance',  val: fmt(redditBal.spore_wallet  || reddit.spore_wallet) },
-    { label: 'Planted SHROOM', val: fmt(redditBal.shroom_farm   || reddit.shroom_farm) },
-    { label: 'Farm SPORE',     val: fmt(redditBal.spore_farm    || reddit.spore_farm) },
-    { label: 'Farm Stage',     val: safe(redditFarm.current_stage || reddit.current_stage) },
-    { label: 'Forage Streak',  val: safe((redditFarm.streak || reddit.streak), 0) + ' days' },
+    { label: 'Reddit Username', val: 'u/' + redditName },
+    { label: 'SHROOM Balance',  val: fmt(bal.reddit_shrooms) },
+    { label: 'SPORE Balance',   val: fmt(bal.reddit_spores) },
+    { label: 'Forage Streak',   val: (forage.streak || 0) + ' days' },
+    { label: 'Record Streak',   val: (forage.record_streak || 0) + ' days' },
+    { label: 'Total Forages',   val: fmt(forage.Total_Forage) },
+    { label: 'Vacation Days',   val: forage.vacation_days || 0 },
+    { label: 'Flair Rank',      val: safe(flair.Flair, 'SPROUT') },
+    { label: 'Total XP',        val: fmt(flair.Total_XP) },
+    { label: 'Total Fed',       val: fmt(feed.total_fed) + ' SHROOM' },
+    { label: 'Feed Milestone',  val: (feed.milestone || 0) + ' / 10' },
+    { label: 'Feed Boost',      val: (feed.feed_boost || 0) + '%' },
+    { label: 'SHROOM Given',    val: fmt(shroomGiven) },
+    { label: 'SHROOM Received', val: fmt(shroomReceived) },
+    { label: 'SPORE Given',     val: fmt(sporeGiven) },
+    { label: 'SPORE Received',  val: fmt(sporeReceived) },
+    { label: 'GS Tokens',       val: gs.Tokens   || 0 },
+    { label: 'GS Given',        val: gs.Given    || 0 },
+    { label: 'GS Received',     val: gs.Received || 0 },
+    { label: 'Discord Linked',  val: link.Discord_Link ? 'Yes' : 'No' },
+    { label: 'Wallet',          val: r.Address ? r.Address.slice(0,6) + '...' + r.Address.slice(-4) : 'Not registered' },
   ];
-  const hasData = stats.some(st => st.val !== '-' && st.val !== '0' && st.val !== '0 days');
-  if (!hasData) {
-    statsEl.innerHTML = '<div class="empty-hint" style="grid-column:1/-1;">No Reddit data found. Make sure you\'ve used the Reddit bot.</div>';
-  } else {
-    statsEl.innerHTML = stats.map(st => '<div class="reddit-stat"><div class="rs-label">' + st.label + '</div><div class="rs-val">' + st.val + '</div></div>').join('');
-  }
 
-  // Reddit daily
-  const rdEl = document.getElementById('reddit-daily-content');
-  const REDDIT_DAILY = ['daily_forage','daily_mist','daily_fan','daily_herb','daily_explore'];
-  const rdHasData = REDDIT_DAILY.some(k => redditDaily[k] != null);
-  if (!rdHasData) {
-    rdEl.innerHTML = '<div class="empty-hint">No Reddit daily data found.</div>';
-  } else {
-    rdEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;">' + REDDIT_DAILY.map(k => {
-      const done = redditDaily[k] === true;
-      const label = k.replace('daily_','').charAt(0).toUpperCase() + k.replace('daily_','').slice(1);
-      const color = done ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,225,0.08)';
+  statsEl.innerHTML = stats.map(st =>
+    '<div class="reddit-stat"><div class="rs-label">' + st.label + '</div><div class="rs-val">' + st.val + '</div></div>'
+  ).join('');
+
+  rwEl.innerHTML = '<div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val y">' + fmt(bal.reddit_shrooms) + '</span></div>'
+    + '<div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b">' + fmt(bal.reddit_spores) + '</span></div>'
+    + (r.Address ? '<div class="data-row"><span class="dr-label">Wallet</span><span class="dr-val">' + r.Address.slice(0,6) + '...' + r.Address.slice(-4) + '</span></div>' : '');
+
+  const questDone = r.Quests?.Daily_Quest === true;
+  const REDDIT_DAILY = [
+    { key: 'daily_forage', label: 'Forage' },
+    { key: 'daily_mist',   label: 'Mist' },
+    { key: 'daily_fan',    label: 'Fan' },
+  ];
+  rdEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;">'
+    + REDDIT_DAILY.map(a => {
+      const done    = forage[a.key] === true;
+      const border  = done ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,225,0.08)';
       const textCol = done ? '#22c55e' : 'rgba(255,255,225,0.35)';
-      return '<div style="padding:0.4rem 0.8rem;border-radius:999px;border:1px solid ' + color + ';font-family:Syne Mono,monospace;font-size:0.65rem;color:' + textCol + ';">' + (done ? '✓ ' : '') + label + '</div>';
-    }).join('') + '</div>';
-  }
-
-  // Reddit wallet
-  const rwEl = document.getElementById('reddit-wallet-content');
-  if (!hasData) {
-    rwEl.innerHTML = '<div class="empty-hint">No Reddit wallet data.</div>';
-  } else {
-    rwEl.innerHTML = '<div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val y">' + fmt(redditBal.shroom_wallet || reddit.shroom_wallet) + '</span></div>'
-      + '<div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b">' + fmt(redditBal.spore_wallet || reddit.spore_wallet) + '</span></div>';
-  }
+      return '<div style="padding:0.4rem 0.8rem;border-radius:999px;border:1px solid ' + border + ';font-family:Syne Mono,monospace;font-size:0.65rem;color:' + textCol + ';">' + (done ? '✓ ' : '') + a.label + '</div>';
+    }).join('')
+    + '<div style="padding:0.4rem 0.8rem;border-radius:999px;border:1px solid ' + (questDone ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,225,0.08)') + ';font-family:Syne Mono,monospace;font-size:0.65rem;color:' + (questDone ? '#22c55e' : 'rgba(255,255,225,0.35)') + ';">' + (questDone ? '✓ ' : '') + 'Daily Quest</div>'
+    + '</div>';
 }
 
 // ================================================================
