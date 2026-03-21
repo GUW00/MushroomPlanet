@@ -1065,8 +1065,9 @@ function renderFarm(s) {
     { label: 'Cave',    cmd: '!cave',    done: caveCD   === 'Ready', cadence: 'Hourly', cooldown: caveCD },
     { label: 'Feed',    cmd: '!feed',    done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD },
   ];
-  const doneCount = DAILY_ACTIONS.filter(a => daily[a.key] === true).length;
-  const totalCount = DAILY_ACTIONS.length;
+  const DAILY_ONLY = DAILY_ACTIONS.filter(a => a.cadence !== 'Hourly');
+  const doneCount = DAILY_ONLY.filter(a => a.done).length;
+  const totalCount = DAILY_ONLY.length;
   const barPct = Math.round((doneCount / totalCount) * 100);
 
   const grid = document.getElementById('daily-actions-grid');
