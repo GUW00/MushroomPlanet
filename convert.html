@@ -808,13 +808,20 @@ async function connectWallet() {
     } else if (window.ethereum) {
       providerList = [window.ethereum];
     }
+    // Deduplicate by wallet type — some browsers inject duplicates
+    const seen = new Set();
+    providerList = providerList.filter(p => {
+      const key = p.isBraveWallet ? 'brave' : p.isMetaMask ? 'metamask' : p.isCoinbaseWallet ? 'coinbase' : p.isRabby ? 'rabby' : Math.random();
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    });
 
     // No wallet at all — mobile deep links
     if (providerList.length === 0) {
       if (isMobile) {
         showWalletModal([
           { name: 'MetaMask',          action: () => { window.location.href = 'https://metamask.app.link/dapp/' + window.location.host + window.location.pathname; } },
-          { name: 'Base Wallet',       action: () => { window.location.href = 'https://go.cb-wallet.com/dapp?url=' + encodeURIComponent(window.location.href); } },
+          { name: 'Base Wallet',       action: () => { window.location.href = 'https://coinbase.com/wallet/dapp?url=' + encodeURIComponent(window.location.href); } },
         ]);
         return;
       }
