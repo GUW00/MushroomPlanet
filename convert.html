@@ -804,9 +804,17 @@ async function connectWallet() {
     // Build provider list — check both .providers array and single injection
     let providerList = [];
     if (window.ethereum?.providers?.length) {
-      providerList = window.ethereum.providers;
+      providerList = [...window.ethereum.providers];
     } else if (window.ethereum) {
       providerList = [window.ethereum];
+    }
+    // On mobile Brave, MetaMask may be injected separately as window.ethereum
+    // but Brave also injects itself — check both and add MetaMask if missed
+    if (isMobile && window.ethereum?.isMetaMask && !providerList.some(p => p.isMetaMask && !p.isBraveWallet)) {
+      providerList.push(window.ethereum);
+    }
+    if (isMobile && window.coinbaseWalletExtension) {
+      providerList.push(window.coinbaseWalletExtension);
     }
     // Deduplicate by wallet type — some browsers inject duplicates
     const seen = new Set();
