@@ -525,17 +525,20 @@
         <img src="/images/reddit.png" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display='none'">
         Reddit
       </button>
+      <button class="platform-btn" id="plat-wallet" onclick="setPlatform('wallet')">
+        <span>💰</span> Wallet
+      </button>
     </div>
 
     <!-- DISCORD PANEL -->
     <div id="panel-discord">
       <div class="tab-bar">
         <button class="tab active" onclick="switchTab('farm',this)">Farm</button>
-        <button class="tab" onclick="switchTab('wallet',this)">Wallet</button>
         <button class="tab" onclick="switchTab('staking',this)">Staking</button>
         <button class="tab" onclick="switchTab('nfts',this)">NFTs</button>
         <button class="tab" onclick="switchTab('companion',this)">Companion</button>
         <button class="tab" onclick="switchTab('inventory',this)">Inventory</button>
+        <button class="tab" onclick="switchTab('brewing',this)">Brewing</button>
         <button class="tab" onclick="switchTab('pixie',this)">Pixie XP</button>
       </div>
 
@@ -648,16 +651,26 @@
           <div class="gem-row" id="gems-content"></div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent">🧪</span> Potions</div>
-          <div id="potions-content"><div class="empty-hint">No potions brewed yet.</div></div>
-        </div>
-        <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><span class="card-title-accent">📜</span> Artifacts & Scrolls</div>
           <div id="artifacts-content"><div class="empty-hint">None found yet. Use !explore to discover.</div></div>
         </div>
       </div>
 
-      <!-- PIXIE XP TAB -->
+      <!-- BREWING TAB -->
+      <div class="tab-panel reveal" id="tab-brewing">
+        <div class="info-card">
+          <div class="card-title"><span class="card-title-accent">🧪</span> Active Potion</div>
+          <div id="brew-active-content"><div class="empty-hint">No active potion.</div></div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent">🧪</span> Stored Potions</div>
+          <div id="brew-stored-content"><div class="empty-hint">No stored potions.</div></div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent">🌿</span> Ingredients</div>
+          <div id="brew-ingredients-content"><div class="empty-hint">No ingredients.</div></div>
+        </div>
+      </div>
       <div class="tab-panel reveal" id="tab-pixie">
         <div class="info-card">
           <div class="card-title"><span class="card-title-accent">✨</span> Pixie Stats</div>
@@ -674,6 +687,15 @@
               <div class="data-row"><span class="dr-label">Social Butterfly</span><span class="dr-val g" id="px-social">—</span></div>
               <div class="data-row"><span class="dr-label">Verified</span><span class="dr-val" id="px-verified">—</span></div>
             </div>
+            <div>
+              <div class="data-row"><span class="dr-label">GS Tokens</span><span class="dr-val y" id="px-gs-tokens">—</span></div>
+              <div class="data-row"><span class="dr-label">GS Given/Recv</span><span class="dr-val" id="px-gs-given">—</span> / <span class="dr-val" id="px-gs-received">—</span></div>
+              <div class="data-row"><span class="dr-label">Tips Given</span><span class="dr-val b" id="px-tip-shroom">—</span></div>
+              <div class="data-row"><span class="dr-label">Raffles Given</span><span class="dr-val b" id="px-raf-shroom">—</span></div>
+              <div class="data-row"><span class="dr-label">Airdrops Given</span><span class="dr-val b" id="px-air-shroom">—</span></div>
+              <div class="data-row"><span class="dr-label">Total Given</span><span class="dr-val g" id="px-total-given">—</span></div>
+              <div class="data-row"><span class="dr-label">Total Received</span><span class="dr-val g" id="px-total-rec">—</span></div>
+            </div>
           </div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
@@ -686,6 +708,30 @@
         </div>
       </div>
     </div><!-- /panel-discord -->
+
+    <!-- WALLET PANEL -->
+    <div id="panel-wallet" style="display:none;">
+      <div class="info-card reveal">
+        <div class="card-title"><span class="card-title-accent">💰</span> Discord Wallet</div>
+        <div class="data-grid">
+          <div>
+            <div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val r" id="w-shroom">—</span></div>
+            <div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b" id="w-spore">—</span></div>
+            <div class="data-row"><span class="dr-label">Planted SHROOM</span><span class="dr-val g" id="w-planted">—</span></div>
+            <div class="data-row"><span class="dr-label">Farm SPORE</span><span class="dr-val b" id="w-spore-farm">—</span></div>
+          </div>
+          <div>
+            <div class="data-row"><span class="dr-label">Wallet Address</span><span class="dr-val" id="w-addr">—</span></div>
+            <div class="data-row"><span class="dr-label">Onchain SHROOM</span><span class="dr-val r" id="w-oc-shroom">—</span></div>
+            <div class="data-row"><span class="dr-label">Onchain SPORE</span><span class="dr-val b" id="w-oc-spore">—</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="info-card reveal" style="margin-top:1rem;">
+        <div class="card-title"><span class="card-title-accent">💰</span> Reddit Wallet</div>
+        <div id="wallet-reddit-content"><div class="empty-hint">No Reddit wallet linked.</div></div>
+      </div>
+    </div>
 
     <!-- REDDIT PANEL -->
     <div id="panel-reddit" style="display:none;">
@@ -961,8 +1007,11 @@ function setPlatform(plat) {
   currentPlatform = plat;
   document.getElementById('plat-discord').classList.toggle('active', plat === 'discord');
   document.getElementById('plat-reddit').classList.toggle('active', plat === 'reddit');
+  document.getElementById('plat-wallet').classList.toggle('active', plat === 'wallet');
   document.getElementById('panel-discord').style.display = plat === 'discord' ? 'block' : 'none';
   document.getElementById('panel-reddit').style.display  = plat === 'reddit'  ? 'block' : 'none';
+  document.getElementById('panel-wallet').style.display  = plat === 'wallet'  ? 'block' : 'none';
+  if(plat === 'wallet') renderWalletPanel();
 }
 window.setPlatform = setPlatform;
 
@@ -976,12 +1025,13 @@ function renderProfile() {
 
   renderHeader(s, p);
   renderQuickStats(s, p);
-  renderFarm(s);
+  renderFarm(s, p);
   renderWallet(s, p);
   renderStaking(s, p);
   renderNFTs(p);
   renderCompanion(s);
   renderInventory(s);
+  renderBrewing(s);
   renderPixie(p);
   renderReddit(s, p);
 }
@@ -1035,7 +1085,7 @@ function renderQuickStats(s, p) {
   setEl('qs-nodes',   staked > 0 ? Math.floor(staked / 100_000_000).toString() : '0');
 }
 
-function renderFarm(s) {
+function renderFarm(s, p) {
   const farm    = s.Farm    || {};
   const bal     = s.Balance || {};
   const daily   = s.Daily_Check || {};
@@ -1089,6 +1139,7 @@ function renderFarm(s) {
     { label: 'Toss',    cmd: '!toss',    done: daily.daily_toss    === true, cadence: 'Daily' },
     { label: 'Dig',     cmd: '!dig',     done: daily.daily_dig === true, cadence: 'Daily' },
     { label: 'Visit',   cmd: 'visit',    done: daily.daily_visit === true, cadence: 'Daily' },
+    { label: 'Social',  cmd: '100 XP/day', done: (p.Message_XP || {}).daily_limit >= 100, cadence: 'Daily' },
     { label: 'Gather',  cmd: '!gather',  done: gatherCD === 'Ready', cadence: 'Hourly', cooldown: gatherCD },
     { label: 'Cave',    cmd: '!cave',    done: caveCD   === 'Ready', cadence: 'Hourly', cooldown: caveCD },
     { label: 'Feed',    cmd: '!feed',    done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD },
@@ -1158,6 +1209,23 @@ function renderWallet(s, p) {
   setEl('w-addr',       addr ? addr.slice(0,6) + '...' + addr.slice(-4) : 'Not registered');
   setEl('w-oc-shroom',  onchain.shroom_balance != null ? fmt(onchain.shroom_balance) : 'Not synced');
   setEl('w-oc-spore',   onchain.spore_balance  != null ? fmt(onchain.spore_balance)  : 'Not synced');
+}
+
+function renderWalletPanel() {
+  if(!profileData) return;
+  const s = profileData.sporebot || {}, p = profileData.pixie || {};
+  renderWallet(s, p);
+  // Reddit wallet
+  const r = profileData.reddit, rwEl = document.getElementById('wallet-reddit-content');
+  if(r && profileData.redditName) {
+    const bal = r.Balance || {};
+    rwEl.innerHTML = '<div class="data-row"><span class="dr-label">Username</span><span class="dr-val">u/' + profileData.redditName + '</span></div>'
+      + '<div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val r">' + fmt(bal.reddit_shrooms) + '</span></div>'
+      + '<div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b">' + fmt(bal.reddit_spores) + '</span></div>'
+      + (r.Address ? '<div class="data-row"><span class="dr-label">Wallet</span><span class="dr-val">' + r.Address.slice(0,6) + '...' + r.Address.slice(-4) + '</span></div>' : '');
+  } else {
+    rwEl.innerHTML = '<div class="empty-hint">No Reddit wallet linked.</div>';
+  }
 }
 
 function renderStaking(s, p) {
@@ -1254,7 +1322,7 @@ function renderStaking(s, p) {
 function renderNFTs(p) {
   const wallet = p.Wallet || {};
   const nftWallet = wallet.NFT || {};
-  const keys = Object.keys(nftWallet).filter(k => k !== 'total_nft');
+
   const el = document.getElementById('nft-content');
 
   if (!keys.length) {
@@ -1446,6 +1514,42 @@ function renderInventory(s) {
   artEl.innerHTML = artHtml;
 }
 
+function renderBrewing(s) {
+  const inv = s.Inventory || {};
+  const potions = inv.Potions || {};
+  const ingredients = inv.Ingredients || {};
+  function cleanEmoji(str){ return str ? String(str).replace(/<:[^:]+:\d+>/g,'').trim() : ''; }
+
+  // Active potion
+  const activeEl = document.getElementById('brew-active-content');
+  const active = potions.Active_Potion;
+  if(active && typeof active === 'object'){
+    let h = '<div class="data-row"><span class="dr-label">Name</span><span class="dr-val p">' + cleanEmoji(active.name||'Unknown') + '</span></div>';
+    Object.entries(active).filter(([k])=>!['name','emoji','Potion Score','Potion_Score'].includes(k)).forEach(([k,v])=>{
+      h += '<div class="data-row"><span class="dr-label">' + k.replace(/_/g,' ') + '</span><span class="dr-val g">' + (typeof v==='number'?v+'%':v) + '</span></div>';
+    });
+    activeEl.innerHTML = h;
+  } else { activeEl.innerHTML = '<div class="empty-hint">No active potion. Use !potion in Discord.</div>'; }
+
+  // Stored potions
+  const storedEl = document.getElementById('brew-stored-content');
+  const stored = Object.entries(potions).filter(([k])=>k.startsWith('Potion_'));
+  if(stored.length){
+    storedEl.innerHTML = stored.map(([,v],i)=>typeof v==='object'?
+      '<div class="data-row"><span class="dr-label">' + (i+1) + '. ' + cleanEmoji(v.name||'Potion') + '</span><span class="dr-val">' + (v['Potion Score']?'Score: '+Number(v['Potion Score']).toFixed(1):'') + '</span></div>'
+      : '').join('');
+  } else { storedEl.innerHTML = '<div class="empty-hint">No stored potions.</div>'; }
+
+  // Ingredients
+  const ingEl = document.getElementById('brew-ingredients-content');
+  const owned = Object.entries(ingredients).filter(([,v])=>v>0);
+  if(owned.length){
+    ingEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">'
+      + owned.map(([k,v])=>'<span class="gem-chip owned">' + k.replace(/_/g,' ') + ' x' + v + '</span>').join('')
+      + '</div>';
+  } else { ingEl.innerHTML = '<div class="empty-hint">No ingredients. Use !gather or !cave.</div>'; }
+}
+
 function renderPixie(p) {
   const pixie  = p.Pixie       || {};
   const msgXp  = p.Message_XP  || {};
@@ -1462,6 +1566,29 @@ function renderPixie(p) {
   setEl('px-maxstreak',   safe(msgXp.max_streak, 0) + ' days');
   setEl('px-social',      quests.social_butterfly ? 'Completed' : 'In Progress');
   setEl('px-verified',    sec.Verified ? 'Yes' : 'No');
+
+  // GS & Tipping (matches /pixie command)
+  const gs       = pixie.GS || 0;
+  const gsStats  = p.GoodShroom || {};
+  const tipping  = p.Tipping || {};
+  const tipGiven  = tipping.Tipped?.Tipped_Shrooms || 0;
+  const tipSpore  = tipping.Tipped?.Tipped_Spores  || 0;
+  const rafShroom = tipping.Raffle?.Total_Shrooms  || 0;
+  const rafSpore  = tipping.Raffle?.Total_Spores   || 0;
+  const airShroom = tipping.Airdrop?.Total_Shrooms || 0;
+  const airSpore  = tipping.Airdrop?.Total_Spores  || 0;
+  const totalGivenShroom = tipGiven  + rafShroom + airShroom;
+  const totalGivenSpore  = tipSpore  + rafSpore  + airSpore;
+  const totalRec = tipping.Total?.Received || {};
+
+  setEl('px-gs-tokens',   gs);
+  setEl('px-gs-given',    gsStats.Given    || 0);
+  setEl('px-gs-received', gsStats.Received || 0);
+  setEl('px-tip-shroom',  fmt(tipGiven)  + ' / ' + fmt(tipSpore));
+  setEl('px-raf-shroom',  fmt(rafShroom) + ' / ' + fmt(rafSpore));
+  setEl('px-air-shroom',  fmt(airShroom) + ' / ' + fmt(airSpore));
+  setEl('px-total-given', fmt(totalGivenShroom) + ' SHROOM / ' + fmt(totalGivenSpore) + ' SPORE');
+  setEl('px-total-rec',   fmt(totalRec.Total_Shrooms||0) + ' SHROOM / ' + fmt(totalRec.Total_Spores||0) + ' SPORE');
 
   // Achievements
   const achEl = document.getElementById('achievements-content');
