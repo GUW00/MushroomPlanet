@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Home | Mushroom Planet</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0f0a">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:#0a0f0a;
+  touch-action:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+#canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
+#tooltip{
+  position:fixed;
+  background:rgba(0,0,0,.9);border:1px solid #fece00;
+  color:#fece00;font-family:'Press Start 2P',monospace;font-size:0.3rem;
+  padding:5px 10px;border-radius:2px;pointer-events:none;
+  display:none;white-space:nowrap;z-index:300;
+}
+#pwa-nav{
+  position:fixed;bottom:0;left:0;right:0;height:58px;
+  background:#0d0d0d;border-top:2px solid #fece00;
+  display:none;align-items:stretch;z-index:200;
+}
+@media(display-mode:standalone){#pwa-nav{display:flex;}}
+.pwa-tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;text-decoration:none;
+  color:rgba(255,255,225,0.35);font-family:'Press Start 2P',monospace;
+  font-size:0.28rem;transition:color .2s;
+}
+.pwa-tab span:first-child{font-size:1.2rem;}
+.pwa-tab.active{color:#fece00;}
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id="tooltip"></div>
+<nav id="pwa-nav">
+  <a href="/home.html"     class="pwa-tab active" data-page="home">    <span>🏡</span><span>Home</span></a>
+  <a href="/profile.html"  class="pwa-tab"         data-page="profile"> <span>🍄</span><span>Farm</span></a>
+  <a href="/treasury.html" class="pwa-tab"         data-page="treasury"><span>🏦</span><span>Treasury</span></a>
+  <a href="/vote.html"     class="pwa-tab"         data-page="vote">    <span>🗳</span><span>Vote</span></a>
+  <a href="/convert.html"  class="pwa-tab"         data-page="convert"> <span>🔄</span><span>Convert</span></a>
+</nav>
+<script>
+'use strict';
+
+const canvas  = document.getElementById('canvas');
+const ctx     = canvas.getContext('2d');
+const tooltip = document.getElementById('tooltip');
+ctx.imageSmoothingEnabled = false;
+
+let W = 0, H = 0, NAV_H = 0, SC = 1;
+
+function resize(){
+  NAV_H = window.matchMedia('(display-mode:standalone)').matches ? 58 : 0;
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight - NAV_H;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  SC = Math.max(0.5, Math.min(1.5, Math.min(W/520, H/480)));
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ================================================================
+// NOISE HELPER
+// ================================================================
+function noise(x, y){
+  const n = Math.sin(x*127.1 + y*311.7)*43758.5453;
+  return n - Math.floor(n);
+}
+function r(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(x|0,y|0,w|0,h|0); }
+
+// ================================================================
+// CLICKABLE ZONES
+// ================================================================
+// Defined as fractions of W,H; resolved each frame
+const ZONES = [
+  { id:'farmhouse', label:'FARM HOUSE', url:'/profile.html', cx:0.38, cy:0.48, rw:0.17, rh:0.25 },
+  { id:'farm',      label:'FARM PLOTS', url:'/profile.html', cx:0.66, cy:0.62, rw:0.20, rh:0.18 },
+];
+let hoveredId = null;
+
+function hitTest(sx, sy){
+  for(const z of ZONES){
+    const cx=z.cx*W, cy=z.cy*H, hw=z.rw*W*0.5, hh=z.rh*H*0.5;
+    if(sx>=cx-hw && sx<=cx+hw && sy>=cy-hh && sy<=cy+hh) return z;
+  }
+  return null;
+}
+
+// ================================================================
+// DRAW HELPERS  (pixel art style from map.html)
+// ================================================================
+function drawGrass(x,y,w,h){
+  r(x,y,w,h,'#4a7c3f');
+  ctx.fillStyle='#3a6030';
+  for(let ty=y;ty<y+h;ty+=4) for(let tx=x;tx<x+w;tx+=4) if(noise(tx,ty)<0.12) ctx.fillRect(tx,ty,4,4);
+  ctx.fillStyle='#5a9248';
+  for(let ty=y;ty<y+h;ty+=4) for(let tx=x;tx<x+w;tx+=4) if(noise(tx+88,ty+66)<0.05) ctx.fillRect(tx,ty,4,4);
+}
+
+function drawPath(x,y,w,h){
+  r(x,y,w,h,'#b89a58');
+  r(x,y+h*0.3|0,w,h*0.4|0,'#a88848');
+  ctx.fillStyle='#c8a868';
+  for(let px=x;px<x+w;px+=32) ctx.fillRect(px,y+h*0.4|0,18,4);
+}
+
+function drawTree(x,y,s){
+  s=s||1;
+  const TW=30*s|0,TH=44*s|0;
+  r(x+TW*.36|0,y+TH*.58|0,TW*.28|0,TH*.44|0,'#3a2010');
+  r(x+TW*.04|0,y+TH*.50|0,TW*.92|0,TH*.50|0,'#162a08');
+  r(x+TW*.08|0,y+TH*.34|0,TW*.84|0,TH*.30|0,'#245a15');
+  r(x+TW*.18|0,y+TH*.18|0,TW*.64|0,TH*.26|0,'#2d7020');
+  r(x+TW*.28|0,y+TH*.04|0,TW*.44|0,TH*.22|0,'#3a8828');
+  r(x+TW*.38|0,y+2,       TW*.24|0,TH*.12|0,'#4e9e38');
+}
+
+function drawShroom(x,y,s){
+  s=s||1;
+  const SW=18*s|0,SH=22*s|0;
+  r(x+SW*.28|0,y+SH*.55|0,SW*.42|0,SH*.47|0,'#ded0b0');
+  r(x,          y+SH*.46|0,SW,      SH*.27|0,'#881818');
+  r(x+SW*.08|0, y+SH*.27|0,SW*.84|0,SH*.30|0,'#cc2828');
+  r(x+SW*.18|0, y+SH*.10|0,SW*.64|0,SH*.24|0,'#e03838');
+  r(x+SW*.20|0, y+SH*.12|0,SW*.22|0,SH*.16|0,'#fff');
+  r(x+SW*.58|0, y+SH*.22|0,SW*.20|0,SW*.15|0,'#fff');
+}
+
+function drawPond(cx, cy, rx, ry, t){
+  // Water base
+  ctx.fillStyle='#1a508a';
+  ctx.beginPath(); ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2); ctx.fill();
+  // Shimmer
+  const sh=Math.sin(t*1.2)*0.5+0.5;
+  ctx.fillStyle=`rgba(42,122,191,${0.35+sh*0.25})`;
+  ctx.beginPath(); ctx.ellipse(cx-rx*0.15,cy-ry*0.1,rx*0.55,ry*0.35,0.2,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=`rgba(80,160,220,${0.2+sh*0.15})`;
+  ctx.beginPath(); ctx.ellipse(cx+rx*0.1,cy+ry*0.1,rx*0.3,ry*0.18,-0.3,0,Math.PI*2); ctx.fill();
+  // Reeds left side
+  [[cx-rx*0.75,cy+ry*0.3],[cx-rx*0.85,cy-ry*0.05],[cx-rx*0.65,cy-ry*0.2]].forEach(([rx2,ry2])=>{
+    r(rx2-2,ry2-18*SC,3,18*SC,'#5a6a28');
+    ctx.fillStyle='#8a3010';
+    ctx.beginPath(); ctx.ellipse(rx2,ry2-18*SC,4*SC,7*SC,0.15,0,Math.PI*2); ctx.fill();
+  });
+  // Lily pads
+  ctx.fillStyle='#2a6820';
+  [[cx+rx*0.2,cy-ry*0.25],[cx-rx*0.1,cy+ry*0.3],[cx+rx*0.45,cy+ry*0.1]].forEach(([lx,ly])=>{
+    ctx.beginPath(); ctx.ellipse(lx,ly,7*SC,4*SC,Math.random()*0.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#ee4444'; ctx.beginPath(); ctx.arc(lx,ly-4*SC,2*SC,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#2a6820';
+  });
+  // Shore edge
+  ctx.strokeStyle='rgba(100,160,80,.5)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.ellipse(cx,cy,rx+2,ry+2,0,0,Math.PI*2); ctx.stroke();
+}
+
+// ================================================================
+// MUSHROOM FARMHOUSE
+// ================================================================
+function drawFarmhouse(cx, cy, hovered, t){
+  const s = SC;
+  const bw=82*s|0, bh=58*s|0;
+  const bx=(cx-bw/2)|0, by=(cy-bh)|0;
+
+  // Ground shadow
+  ctx.fillStyle='rgba(0,0,0,.22)';
+  ctx.beginPath(); ctx.ellipse(cx,cy+5,bw*0.52,bh*0.16,0,0,Math.PI*2); ctx.fill();
+
+  // --- STEM left face ---
+  ctx.fillStyle='#d4c898';
+  ctx.beginPath();
+  ctx.moveTo(bx,       by+bh);
+  ctx.lineTo(bx,       by);
+  ctx.lineTo(cx,       by-bh*0.22);
+  ctx.lineTo(cx,       by+bh-bh*0.22);
+  ctx.closePath(); ctx.fill();
+  // Stem right face
+  ctx.fillStyle='#e8dca8';
+  ctx.beginPath();
+  ctx.moveTo(cx,       by-bh*0.22);
+  ctx.lineTo(bx+bw,    by);
+  ctx.lineTo(bx+bw,    by+bh);
+  ctx.lineTo(cx,       by+bh-bh*0.22);
+  ctx.closePath(); ctx.fill();
+  // Stem top face
+  ctx.fillStyle='#f0e8c0';
+  ctx.beginPath();
+  ctx.moveTo(cx,    by-bh*0.5);
+  ctx.lineTo(bx+bw, by);
+  ctx.lineTo(cx,    by+bh*0.5);
+  ctx.lineTo(bx,    by);
+  ctx.closePath(); ctx.fill();
+
+  // Door arch
+  ctx.fillStyle='#3a1a06';
+  ctx.beginPath();
+  ctx.arc(cx, by+bh*0.58, bw*0.17, Math.PI, 0);
+  ctx.rect(cx-bw*0.17, by+bh*0.58, bw*0.34, bh*0.38);
+  ctx.fill();
+  // Door handle
+  ctx.fillStyle='#fece00';
+  ctx.fillRect((cx+bw*0.07)|0,(by+bh*0.70)|0,4,4);
+
+  // Windows
+  const gw=(bw*0.13)|0, gh=(bh*0.14)|0;
+  ctx.fillStyle=`rgba(254,206,0,${Math.sin(t*0.7)*0.12+0.72})`;
+  ctx.fillRect((bx+bw*0.09)|0,(by+bh*0.22)|0,gw,gh);
+  ctx.fillRect((bx+bw*0.72)|0,(by+bh*0.22)|0,gw,gh);
+  // Window cross
+  ctx.fillStyle='rgba(180,130,0,.4)';
+  ctx.fillRect((bx+bw*0.09+gw/2)|0,(by+bh*0.22)|0,1,gh);
+  ctx.fillRect((bx+bw*0.09)|0,    (by+bh*0.22+gh/2)|0,gw,1);
+  ctx.fillRect((bx+bw*0.72+gw/2)|0,(by+bh*0.22)|0,1,gh);
+  ctx.fillRect((bx+bw*0.72)|0,    (by+bh*0.22+gh/2)|0,gw,1);
+
+  // --- CAP ---
+  const capY  = by - bh*0.72;
+  const capRx = bw*0.82, capRy = bh*0.78;
+  // Underside
+  ctx.fillStyle='#c8b880';
+  ctx.beginPath(); ctx.ellipse(cx,by-bh*0.06,bw*0.46,bh*0.26,0,0,Math.PI*2); ctx.fill();
+  // Cap gradient
+  const cg=ctx.createRadialGradient(cx-bw*0.14,capY-bh*0.22,2,cx,capY,capRx);
+  cg.addColorStop(0,'#ff6060'); cg.addColorStop(0.42,'#dd2020'); cg.addColorStop(1,'#881010');
+  ctx.fillStyle=cg;
+  ctx.beginPath(); ctx.ellipse(cx,capY,capRx,capRy,0,0,Math.PI*2); ctx.fill();
+  // White dots
+  [[-0.30,-0.34,0.11],[0.26,-0.46,0.09],[0.09,-0.13,0.07],[-0.11,0.15,0.055]].forEach(([dx,dy,dr])=>{
+    ctx.fillStyle=`rgba(255,255,255,${0.86+Math.sin(t+dx*5)*0.1})`;
+    ctx.beginPath(); ctx.arc(cx+dx*capRx, capY+dy*capRy*1.2, dr*capRx, 0, Math.PI*2); ctx.fill();
+  });
+  // Highlight
+  ctx.fillStyle='rgba(255,180,180,.2)';
+  ctx.beginPath(); ctx.ellipse(cx-bw*0.22,capY-bh*0.3,capRx*0.4,capRy*0.3,-0.38,0,Math.PI*2); ctx.fill();
+
+  // Chimney
+  r((bx+bw*0.74)|0,(by-bh*0.12)|0,(bw*0.1)|0,(bh*0.28)|0,'#5a4030');
+  r((bx+bw*0.72)|0,(by-bh*0.14)|0,(bw*0.14)|0,(bh*0.06)|0,'#4a3020');
+  // Smoke puffs
+  if(Math.sin(t*0.9) > 0.3){
+    ctx.fillStyle=`rgba(220,220,220,${Math.sin(t*0.9)*0.25})`;
+    ctx.beginPath(); ctx.arc(bx+bw*0.79, by-bh*0.22-Math.sin(t*0.9)*6, 6*SC, 0, Math.PI*2); ctx.fill();
+  }
+
+  // Hover ring
+  if(hovered){
+    ctx.strokeStyle=`rgba(254,206,0,${Math.sin(t*3)*0.3+0.7})`;
+    ctx.lineWidth=3;
+    ctx.beginPath(); ctx.ellipse(cx,cy+2,bw*0.55,bh*0.18,0,0,Math.PI*2); ctx.stroke();
+  }
+
+  // Label
+  const lsz=Math.max(5,bw*0.095)|0;
+  ctx.font=`${lsz}px "Press Start 2P"`;
+  ctx.textAlign='center';
+  ctx.fillStyle='rgba(0,0,0,.75)';
+  ctx.fillRect((cx-bw*0.55)|0,(capY-capRy-lsz*2.1)|0,(bw*1.1)|0,(lsz*1.8)|0);
+  ctx.fillStyle='#fece00';
+  ctx.fillText('FARM HOUSE', cx, capY-capRy-lsz*0.5);
+  ctx.textAlign='left';
+}
+
+// ================================================================
+// FARM PLOTS  (7x6 grid like map.html)
+// ================================================================
+function drawFarmPlots(cx, cy, hovered, t){
+  const s=SC;
+  const cols=7, rows=6;
+  const pw=18*s|0, ph=13*s|0, gap=3*s|0;
+  const gw=cols*(pw+gap), gh=rows*(ph+gap);
+  const px=cx-gw/2|0, py=cy-gh/2|0;
+
+  // Soil bed
+  r(px-10,py-8,gw+20,gh+16,'#6a4820');
+  r(px-8, py-6,gw+16,gh+12,'#5a3818');
+  // Fence posts around
+  ctx.fillStyle='#8a6030';
+  for(let fc=0;fc<=cols;fc++){
+    r(px+fc*(pw+gap)-2,py-14,4,gh+28,'#6a4020');
+    r(px+fc*(pw+gap)-4,py-14,8,5,'#8a5828');
+  }
+  // Horizontal rails
+  r(px-6,py-10,gw+12,4,'#7a5028');
+  r(px-6,py+gh+6,gw+12,4,'#7a5028');
+
+  // Individual plots
+  for(let row=0;row<rows;row++){
+    for(let col=0;col<cols;col++){
+      const bx=px+col*(pw+gap), by=py+row*(ph+gap);
+      const idx=row*cols+col;
+      // Soil
+      r(bx,by,pw,ph,'#4a2408');
+      for(let rl=0;rl<ph;rl+=3) r(bx,by+rl,pw,1,'#3a1a04');
+      // Mushroom in each plot (vary by index)
+      const hasMushroom = idx < 32; // simulate ~32 filled plots
+      if(hasMushroom){
+        const mx=bx+pw/2-4*s, my=by+ph-9*s;
+        // Stem
+        r(mx+2*s|0,my+4*s|0,3*s|0,5*s|0,'#ddd0a0');
+        // Cap
+        ctx.fillStyle=idx%7===0?'#fece00':idx%5===0?'#cc4488':'#cc2222';
+        ctx.beginPath(); ctx.ellipse(mx+3*s,my+3*s,5*s,3*s,0,0,Math.PI*2); ctx.fill();
+        // Dot
+        ctx.fillStyle='rgba(255,255,255,.8)';
+        ctx.beginPath(); ctx.arc(mx+2*s,my+2*s,1.2*s,0,Math.PI*2); ctx.fill();
+      }
+      // Glow on filled plots
+      if(hasMushroom && (Math.sin(t*1.8+idx*0.4)>0.5)){
+        ctx.fillStyle='rgba(96,165,250,.08)';
+        ctx.fillRect(bx,by,pw,ph);
+      }
+    }
+  }
+
+  // Hover glow
+  if(hovered){
+    ctx.strokeStyle=`rgba(254,206,0,${Math.sin(t*3)*0.3+0.7})`;
+    ctx.lineWidth=3;
+    ctx.strokeRect(px-12,py-16,gw+24,gh+32);
+  }
+
+  // Label
+  const lsz=Math.max(5,pw*0.55)|0;
+  ctx.font=`${lsz}px "Press Start 2P"`;
+  ctx.textAlign='center';
+  ctx.fillStyle='rgba(0,0,0,.75)';
+  ctx.fillRect((cx-gw*0.52)|0,(py-30)|0,(gw*1.04)|0,(lsz*1.8)|0);
+  ctx.fillStyle='#fece00';
+  ctx.fillText('FARM PLOTS', cx, py-30+lsz*1.3);
+  ctx.textAlign='left';
+}
+
+// ================================================================
+// PARTICLES
+// ================================================================
+const parts=[], flies=[];
+function initParts(){
+  parts.length=0; flies.length=0;
+  const n=Math.min(35,(W*H/15000)|0);
+  for(let i=0;i<n;i++) parts.push(newPart());
+  const fn=Math.max(6,W/80)|0;
+  for(let i=0;i<fn;i++) flies.push({
+    x:Math.random()*W, y:H*0.3+Math.random()*H*0.55,
+    vx:(Math.random()-0.5)*0.35, vy:(Math.random()-0.5)*0.22,
+    phase:Math.random()*Math.PI*2,
+  });
+}
+function newPart(){
+  return {x:Math.random()*W,y:Math.random()*H,
+    vx:(Math.random()-0.5)*0.15,vy:-(0.2+Math.random()*0.35),
+    life:Math.random(),col:Math.random()<0.55?'#fece00':'#ffffe1',size:1.5+Math.random()*2};
+}
+function tick(dt){
+  for(let i=parts.length-1;i>=0;i--){
+    const p=parts[i]; p.x+=p.vx*dt*60; p.y+=p.vy*dt*60; p.life-=dt*0.09;
+    if(p.life<=0||p.y<-10) parts[i]=newPart();
+  }
+  for(const f of flies){
+    f.x+=f.vx*dt*60; f.y+=f.vy*dt*60; f.phase+=dt*1.8;
+    if(f.x<0)f.x=W; if(f.x>W)f.x=0;
+    if(f.y<H*0.15)f.y=H*0.88; if(f.y>H*0.95)f.y=H*0.25;
+  }
+}
+
+// ================================================================
+// MAIN DRAW
+// ================================================================
+function draw(t){
+  // Sky
+  const sky=ctx.createLinearGradient(0,0,0,H*0.55);
+  sky.addColorStop(0,'#0d1a0a'); sky.addColorStop(0.5,'#142014'); sky.addColorStop(1,'#1e3a1e');
+  ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+
+  // Stars
+  for(let i=0;i<90;i++){
+    const sx=(i*137.5+42)%W, sy=(i*97.3+84)%(H*0.5);
+    ctx.globalAlpha=(Math.sin(t*1.4+i)*0.3+0.7)*0.7;
+    ctx.fillStyle='#ffffe8';
+    ctx.fillRect(sx|0,sy|0,i%6===0?2:1,i%6===0?2:1);
+  }
+  ctx.globalAlpha=1;
+
+  // Moon
+  const mx=W*0.82, my=H*0.09, mr=Math.max(14,SC*26);
+  const mg=ctx.createRadialGradient(mx-mr*0.3,my-mr*0.3,1,mx,my,mr);
+  mg.addColorStop(0,'#fffce0'); mg.addColorStop(0.5,'#f0e888'); mg.addColorStop(1,'#c0b840');
+  ctx.fillStyle=mg; ctx.shadowColor='rgba(240,220,80,.4)'; ctx.shadowBlur=16;
+  ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+
+  // Ground
+  const gY=H*0.48;
+  drawGrass(0,gY,W,H-gY);
+
+  // Paths - one from farmhouse down to farm
+  const fhCx=ZONES[0].cx*W, fhCy=ZONES[0].cy*H;
+  const fmCx=ZONES[1].cx*W, fmCy=ZONES[1].cy*H;
+  // Horizontal connector
+  drawPath(fhCx,gY+H*0.06,fmCx-fhCx,14*SC|0);
+  // Short vertical from farmhouse base
+  drawPath(fhCx-6*SC|0,gY,12*SC|0,H*0.09);
+  // Short vertical to farm
+  drawPath(fmCx-6*SC|0,gY,12*SC|0,H*0.14);
+
+  // Trees - edges (left column, right column, top row)
+  const treeSc=SC*0.9;
+  const treeSp=44*SC|0;
+  // Left edge
+  for(let ty=0;ty<H*0.92;ty+=treeSp) drawTree(0,ty,treeSc);
+  for(let ty=0;ty<H*0.92;ty+=treeSp) drawTree(28*SC|0,ty-20,treeSc*0.8);
+  // Right edge
+  for(let ty=0;ty<H*0.85;ty+=treeSp) drawTree(W-34*SC|0,ty,treeSc);
+  for(let ty=0;ty<H*0.85;ty+=treeSp) drawTree(W-58*SC|0,ty-18,treeSc*0.75);
+  // Top edge
+  for(let tx=50*SC|0;tx<W-50*SC;tx+=treeSp) drawTree(tx,0,treeSc*0.82);
+
+  // Pond (bottom left area)
+  const pCx=W*0.18, pCy=H*0.76;
+  drawPond(pCx, pCy, 62*SC, 34*SC, t);
+
+  // Small decorative shrooms near pond and paths
+  [[0.12,0.60],[0.24,0.70],[0.50,0.72],[0.80,0.66],[0.88,0.72],[0.30,0.56]].forEach(([fx,fy])=>{
+    drawShroom(fx*W-8*SC,fy*H-11*SC,SC*0.72);
+  });
+
+  // Fireflies
+  for(const f of flies){
+    const b2=(Math.sin(f.phase)+1)/2;
+    ctx.globalAlpha=b2*0.55; ctx.fillStyle='#ccff88';
+    ctx.fillRect(f.x|0,f.y|0,2,2);
+  }
+  ctx.globalAlpha=1;
+
+  // Particles
+  for(const p of parts){
+    ctx.globalAlpha=Math.max(0,p.life)*0.6; ctx.fillStyle=p.col;
+    ctx.fillRect(p.x|0,p.y|0,p.size|0,p.size|0);
+  }
+  ctx.globalAlpha=1;
+
+  // --- DRAW FARM PLOTS first (further back) ---
+  drawFarmPlots(fmCx, fmCy, hoveredId==='farm', t);
+
+  // --- DRAW FARMHOUSE ---
+  drawFarmhouse(fhCx, fhCy, hoveredId==='farmhouse', t);
+
+  // Title
+  const tsz=Math.max(8,SC*13)|0;
+  ctx.font=`${tsz}px "Press Start 2P"`;
+  ctx.textAlign='center';
+  ctx.fillStyle='rgba(0,0,0,.65)';
+  ctx.fillRect(W/2-W*0.32,H*0.02,W*0.64,tsz*1.9|0);
+  ctx.fillStyle=`rgba(254,206,0,${Math.sin(t*0.7)*0.1+0.88})`;
+  ctx.shadowColor='rgba(254,206,0,.45)'; ctx.shadowBlur=8;
+  ctx.fillText('MUSHROOM PLANET', W/2, H*0.02+tsz*1.35);
+  ctx.shadowBlur=0; ctx.textAlign='left';
+}
+
+// ================================================================
+// INPUT
+// ================================================================
+canvas.addEventListener('mousemove', e=>{
+  const z=hitTest(e.clientX,e.clientY);
+  hoveredId=z?z.id:null;
+  if(z){
+    tooltip.style.display='block'; tooltip.textContent=z.label;
+    tooltip.style.left=(e.clientX+14)+'px'; tooltip.style.top=(e.clientY-22)+'px';
+    canvas.style.cursor='pointer';
+  } else {
+    tooltip.style.display='none'; canvas.style.cursor='default';
+  }
+});
+canvas.addEventListener('mouseleave',()=>{ hoveredId=null; tooltip.style.display='none'; });
+canvas.addEventListener('click',e=>{ const z=hitTest(e.clientX,e.clientY); if(z?.url) location.href=z.url; });
+canvas.addEventListener('touchend',e=>{
+  e.preventDefault();
+  const t2=e.changedTouches[0];
+  const z=hitTest(t2.clientX,t2.clientY);
+  if(z?.url) location.href=z.url;
+},{passive:false});
+
+// ================================================================
+// LOOP
+// ================================================================
+let lastTs=0, elapsed=0;
+function loop(ts){
+  const dt=Math.min((ts-lastTs)/1000,0.05);
+  lastTs=ts; elapsed+=dt;
+  tick(dt); draw(elapsed);
+  requestAnimationFrame(loop);
+}
+initParts();
+requestAnimationFrame(ts=>{ lastTs=ts; requestAnimationFrame(loop); });
+
+document.querySelectorAll('.pwa-tab').forEach(t=>{
+  if(t.dataset.page==='home') t.classList.add('active');
+});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+</script>
+</body>
+</html>
