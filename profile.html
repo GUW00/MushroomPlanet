@@ -17,6 +17,12 @@
   <script type="module" src="config.js"></script>
 
   <style>
+    @media (display-mode: standalone) {
+      header { display: none !important; }
+      #global-menu { display: none !important; }
+      body { padding-top: 0 !important; }
+      .hero { padding-top: 1.5rem !important; }
+    }
     .pwa-tab {
       flex: 1; display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 0.2rem;
