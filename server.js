@@ -2,8 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import admin from 'firebase-admin';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config();
 
 const serviceAccount = JSON.parse(fs.readFileSync('./firebase.json', 'utf8'));
@@ -23,7 +26,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
 // ----------------------------------------------------------------
