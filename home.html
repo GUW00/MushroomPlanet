@@ -84,8 +84,8 @@ function r(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(x|0,y|0,w|0,h|0); }
 // ================================================================
 // Defined as fractions of W,H; resolved each frame
 const ZONES = [
-  { id:'farmhouse', label:'FARM HOUSE', url:'/profile.html', cx:0.38, cy:0.48, rw:0.17, rh:0.25 },
-  { id:'farm',      label:'FARM PLOTS', url:'/profile.html', cx:0.66, cy:0.62, rw:0.20, rh:0.18 },
+  { id:'farmhouse', label:'FARM HOUSE', url:'/profile.html', cx:0.35, cy:0.42, rw:0.20, rh:0.28 },
+  { id:'farm',      label:'FARM PLOTS', url:'/profile.html', cx:0.66, cy:0.65, rw:0.28, rh:0.26 },
 ];
 let hoveredId = null;
 
@@ -277,7 +277,7 @@ function drawFarmhouse(cx, cy, hovered, t){
 function drawFarmPlots(cx, cy, hovered, t){
   const s=SC;
   const cols=7, rows=6;
-  const pw=18*s|0, ph=13*s|0, gap=3*s|0;
+  const pw=26*s|0, ph=19*s|0, gap=4*s|0;
   const gw=cols*(pw+gap), gh=rows*(ph+gap);
   const px=cx-gw/2|0, py=cy-gh/2|0;
 
@@ -377,31 +377,14 @@ function tick(dt){
 // MAIN DRAW
 // ================================================================
 function draw(t){
-  // Sky
-  const sky=ctx.createLinearGradient(0,0,0,H*0.55);
-  sky.addColorStop(0,'#0d1a0a'); sky.addColorStop(0.5,'#142014'); sky.addColorStop(1,'#1e3a1e');
-  ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+  // Full grass background - no sky
+  ctx.fillStyle='#4a7c3f'; ctx.fillRect(0,0,W,H);
 
-  // Stars
-  for(let i=0;i<90;i++){
-    const sx=(i*137.5+42)%W, sy=(i*97.3+84)%(H*0.5);
-    ctx.globalAlpha=(Math.sin(t*1.4+i)*0.3+0.7)*0.7;
-    ctx.fillStyle='#ffffe8';
-    ctx.fillRect(sx|0,sy|0,i%6===0?2:1,i%6===0?2:1);
-  }
-  ctx.globalAlpha=1;
+  // Daytime - no stars or moon
 
-  // Moon
-  const mx=W*0.82, my=H*0.09, mr=Math.max(14,SC*26);
-  const mg=ctx.createRadialGradient(mx-mr*0.3,my-mr*0.3,1,mx,my,mr);
-  mg.addColorStop(0,'#fffce0'); mg.addColorStop(0.5,'#f0e888'); mg.addColorStop(1,'#c0b840');
-  ctx.fillStyle=mg; ctx.shadowColor='rgba(240,220,80,.4)'; ctx.shadowBlur=16;
-  ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fill();
-  ctx.shadowBlur=0;
-
-  // Ground
-  const gY=H*0.48;
-  drawGrass(0,gY,W,H-gY);
+  // Grass texture over full bg
+  const gY=0;
+  drawGrass(0,0,W,H);
 
   // Paths - one from farmhouse down to farm
   const fhCx=ZONES[0].cx*W, fhCy=ZONES[0].cy*H;
@@ -426,7 +409,7 @@ function draw(t){
   for(let tx=50*SC|0;tx<W-50*SC;tx+=treeSp) drawTree(tx,0,treeSc*0.82);
 
   // Pond (bottom left area)
-  const pCx=W*0.18, pCy=H*0.76;
+  const pCx=W*0.22, pCy=H*0.80;
   drawPond(pCx, pCy, 62*SC, 34*SC, t);
 
   // Small decorative shrooms near pond and paths
