@@ -598,6 +598,10 @@
           <div class="card-title"><span class="card-title-accent">⚡</span> MVP Breakdown</div>
           <div id="mvp-breakdown"></div>
         </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent">🌿</span> Node Breakdown</div>
+          <div id="nodes-breakdown"><div class="empty-hint">No nodes yet.</div></div>
+        </div>
       </div>
 
       <!-- NFTs TAB -->
@@ -681,10 +685,6 @@
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><span class="card-title-accent">🏆</span> Achievements</div>
           <div id="achievements-content"><div class="empty-hint">No achievements yet.</div></div>
-        </div>
-        <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent">🌿</span> Node Breakdown</div>
-          <div id="nodes-breakdown"><div class="empty-hint">No nodes yet.</div></div>
         </div>
       </div>
     </div><!-- /panel-discord -->
@@ -1492,9 +1492,25 @@ function renderBrewing(s) {
   const storedEl = document.getElementById('brew-stored-content');
   const stored = Object.entries(potions).filter(([k])=>k.startsWith('Potion_'));
   if(stored.length){
-    storedEl.innerHTML = stored.map(([,v],i)=>typeof v==='object'?
-      '<div class="data-row"><span class="dr-label">' + (i+1) + '. ' + cleanEmoji(v.name||'Potion') + '</span><span class="dr-val">' + (v['Potion Score']?'Score: '+Number(v['Potion Score']).toFixed(1):'') + '</span></div>'
-      : '').join('');
+    storedEl.innerHTML = stored.map(([,v],i)=>{
+      if(typeof v !== 'object') return '';
+      const score = v['Potion Score'] ? Number(v['Potion Score']).toFixed(1) : null;
+      const stats = Object.entries(v)
+        .filter(([k])=>!['name','emoji','Potion Score','Potion_Score'].includes(k))
+        .map(([k,val])=>'<div style="display:flex;justify-content:space-between;padding:0.25rem 0 0.25rem 0.75rem;font-size:0.75rem;border-top:1px solid rgba(255,255,225,0.04);">'
+          +'<span style="color:rgba(255,255,225,0.35);">'+k.replace(/_/g,' ')+'</span>'
+          +'<span style="font-family:Syne Mono,monospace;color:var(--green);">'+(typeof val==='number'?val+'%':val)+'</span>'
+          +'</div>').join('');
+      return '<div style="border-bottom:1px solid rgba(255,255,225,0.05);padding-bottom:0.25rem;margin-bottom:0.25rem;">'
+        +'<div class="data-row" style="cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'
+        +'<span class="dr-label">'+(i+1)+'. '+cleanEmoji(v.name||'Potion')+'</span>'
+        +'<span class="dr-val" style="display:flex;align-items:center;gap:0.5rem;">'
+        +(score?'<span style="color:rgba(255,255,225,0.3);">'+score+'/10</span>':'')
+        +'<span style="color:rgba(255,255,225,0.25);font-size:0.65rem;">tap</span>'
+        +'</span></div>'
+        +'<div style="display:none;">'+stats+'</div>'
+        +'</div>';
+    }).join('');
   } else { storedEl.innerHTML = '<div class="empty-hint">No stored potions.</div>'; }
 
   // Ingredients
