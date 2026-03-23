@@ -724,11 +724,18 @@
       </div>
       <div class="info-card reveal" style="margin-top:1rem;">
         <div class="card-title">
+          <img src="/images/sporulation1.webp" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          LP Positions
+        </div>
+        <div id="w-lp-content"><div class="empty-hint" style="padding:1rem 0;">No wallet registered.</div></div>
+      </div>
+      <div class="info-card reveal" style="margin-top:1rem;">
+        <div class="card-title">
           <img src="/images/wallet.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
           Onchain Balances
         </div>
         <div>
-          <div class="data-row"><span class="dr-label">Wallet Address</span><span class="dr-val" id="w-addr">—</span></div>
+          <div class="data-row"><span class="dr-label"><img src="/images/blockchain.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Wallet Address</span><span class="dr-val" id="w-addr">—</span></div>
           <div class="data-row">
             <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
             <span class="dr-val r" id="w-oc-shroom">—</span>
@@ -740,7 +747,6 @@
         </div>
       </div>
     </div>
-``
 
     <!-- REDDIT PANEL -->
     <div id="panel-reddit" style="display:none;">
@@ -1229,6 +1235,7 @@ function renderWalletPanel() {
   if(!profileData) return;
   const s = profileData.sporebot || {}, p = profileData.pixie || {};
   renderWallet(s, p);
+  fetchUserLPPositions(p);
   // Reddit wallet
   const r = profileData.reddit, rwEl = document.getElementById('wallet-reddit-content');
   if(r && profileData.redditName) {
@@ -1240,6 +1247,89 @@ function renderWalletPanel() {
   } else {
     rwEl.innerHTML = '<div class="empty-hint">No Reddit wallet linked.</div>';
   }
+}
+
+async function fetchUserLPPositions(p) {
+  const lpEl = document.getElementById('w-lp-content');
+  if (!lpEl) return;
+  const addr = (p.Wallet || {}).Address || '';
+  if (!addr) { lpEl.innerHTML = '<div class="empty-hint" style="padding:1rem 0;">No wallet registered.</div>'; return; }
+
+  lpEl.innerHTML = '<div style="font-family:Syne Mono,monospace;font-size:0.7rem;color:rgba(255,255,225,0.25);padding:0.5rem 0;">Checking LP positions...</div>';
+
+  const LP_POOLS = [
+    { label: 'SHROOM / WETH', contract: '0x28def03d8dc0d186fabae9c46043e8ef9bffcc28', token0: 'SHROOM', token1: 'WETH',  color0: 'var(--red)',  color1: '#9b8cff' },
+    { label: 'SPORE / WETH',  contract: '0xc373382eec590374278534494109a0cdae1fbbc8', token0: 'SPORE',  token1: 'WETH',  color0: 'var(--blue)', color1: '#9b8cff' },
+    { label: 'SPORE / SHROOM',contract: '0x2a91571238303c6700a9336342c754e159243168', token0: 'SPORE',  token1: 'SHROOM',color0: 'var(--blue)', color1: 'var(--red)' },
+  ];
+
+  const RPC = 'https://polygon-rpc.com';
+  const balOf = '0x70a08231';
+  const totalSup = '0x18160ddd';
+
+  async function call(to, data) {
+    const res = await fetch(RPC, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ jsonrpc:'2.0', method:'eth_call', params:[{to, data},'latest'], id:1 }) });
+    const j = await res.json();
+    return j.result;
+  }
+  async function getReserves(contract) {
+    // getReserves() selector: 0x0902f1ac
+    const res = await call(contract, '0x0902f1ac');
+    if (!res || res === '0x') return null;
+    const r0 = BigInt('0x' + res.slice(2,66));
+    const r1 = BigInt('0x' + res.slice(66,130));
+    return { r0, r1 };
+  }
+
+  const results = [];
+  for (const pool of LP_POOLS) {
+    try {
+      const userHex  = addr.slice(2).toLowerCase().padStart(64,'0');
+      const [balHex, supHex, reserves] = await Promise.all([
+        call(pool.contract, balOf + userHex),
+        call(pool.contract, totalSup),
+        getReserves(pool.contract),
+      ]);
+      const userBal = BigInt(balHex);
+      const totalSup2 = BigInt(supHex);
+      if (userBal === 0n || totalSup2 === 0n) continue;
+
+      const share = Number(userBal) / Number(totalSup2);
+      const sharePct = (share * 100).toFixed(3);
+
+      let token0Bal = null, token1Bal = null;
+      if (reserves) {
+        // Both tokens use 18 decimals for these pools
+        token0Bal = Number(reserves.r0) / 1e18 * share;
+        token1Bal = Number(reserves.r1) / 1e18 * share;
+      }
+
+      const fmtV = v => v >= 1e9 ? (v/1e9).toFixed(3)+'B' : v >= 1e6 ? (v/1e6).toFixed(2)+'M' : v >= 1e3 ? (v/1e3).toFixed(2)+'K' : v.toFixed(4);
+
+      results.push({ pool, sharePct, token0Bal, token1Bal, fmtV });
+    } catch(e) { /* skip failed pool */ }
+  }
+
+  if (!results.length) {
+    lpEl.innerHTML = '<div class="empty-hint" style="padding:1rem 0;">No LP positions found for this wallet.</div>';
+    return;
+  }
+
+  lpEl.innerHTML = results.map(({ pool, sharePct, token0Bal, token1Bal, fmtV }) =>
+    '<div class="data-row" style="flex-direction:column;align-items:flex-start;gap:0.3rem;padding:0.75rem 0;">'
+    + '<span style="font-family:Syne Mono,monospace;font-size:0.72rem;color:rgba(255,255,225,0.6);">'
+    + '<span style="color:' + pool.color0 + ';">' + pool.token0 + '</span>'
+    + ' / <span style="color:' + pool.color1 + ';">' + pool.token1 + '</span>'
+    + ' &nbsp;<span style="color:rgba(255,255,225,0.25);font-size:0.62rem;">' + sharePct + '% of pool</span></span>'
+    + (token0Bal !== null
+        ? '<span style="display:flex;gap:1rem;font-family:Syne Mono,monospace;font-size:0.7rem;">'
+          + '<span style="color:' + pool.color0 + ';">' + fmtV(token0Bal) + ' ' + pool.token0 + '</span>'
+          + '<span style="color:' + pool.color1 + ';">' + fmtV(token1Bal) + ' ' + pool.token1 + '</span>'
+          + '</span>'
+        : '')
+    + '</div>'
+  ).join('');
 }
 
 function renderStaking(s, p) {
