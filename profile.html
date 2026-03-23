@@ -735,7 +735,7 @@
           Onchain Balances
         </div>
         <div>
-          <div class="data-row"><span class="dr-label"><img src="/images/blockchain.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Wallet Address</span><span class="dr-val" id="w-addr">—</span></div>
+          <div class="data-row"><span class="dr-label"><img src="/images/blockchain.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Wallet Address</span><span class="dr-val" id="w-addr" onclick="copyWalletAddr()" style="cursor:pointer;transition:color 0.2s;" title="Click to copy">—</span></div>
           <div class="data-row">
             <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
             <span class="dr-val r" id="w-oc-shroom">—</span>
@@ -1230,7 +1230,17 @@ function renderWallet(s, p) {
   setEl('w-oc-shroom',  onchain.shroom_balance != null ? fmt(onchain.shroom_balance) : 'Not synced');
   setEl('w-oc-spore',   onchain.spore_balance  != null ? fmt(onchain.spore_balance)  : 'Not synced');
 }
-
+function copyWalletAddr() {
+  const p = (profileData?.pixie?.Wallet?.Address) || '';
+  if (!p) return;
+  navigator.clipboard.writeText(p).then(() => {
+    const el = document.getElementById('w-addr');
+    const orig = el.textContent;
+    el.textContent = 'Copied!';
+    el.style.color = 'var(--green)';
+    setTimeout(() => { el.textContent = orig; el.style.color = ''; }, 1500);
+  });
+}
 function renderWalletPanel() {
   if(!profileData) return;
   const s = profileData.sporebot || {}, p = profileData.pixie || {};
@@ -1258,7 +1268,7 @@ async function fetchUserLPPositions(p) {
   lpEl.innerHTML = '<div style="font-family:Syne Mono,monospace;font-size:0.7rem;color:rgba(255,255,225,0.25);padding:0.5rem 0;">Checking LP positions...</div>';
 
   const LP_POOLS = [
-    { label: 'SHROOM / WETH',  contract: '0x28def03d8dc0d186fabae9c46043e8ef9bffcc28', token0: 'SHROOM', token1: 'WETH',  img0: '/images/shroom.png', img1: '/images/eth.png',   color0: 'var(--red)',  color1: '#9b8cff' },
+    { label: 'WETH / SHROOM',  contract: '0x28def03d8dc0d186fabae9c46043e8ef9bffcc28', token0: 'WETH', token1: 'SHROOM',  img0: '/images/eth.png', img1: '/images/shroom.png', color0: '#9b8cff', color1: 'var(--red)' },
     { label: 'SPORE / WETH',   contract: '0x2a91571238303c6700a9336342c754e159243168', token0: 'SPORE',  token1: 'WETH',  img0: '/images/spore.png',  img1: '/images/eth.png',   color0: 'var(--blue)', color1: '#9b8cff' },
     { label: 'SPORE / SHROOM', contract: '0xc373382eec590374278534494109a0cdae1fbbc8', token0: 'SPORE',  token1: 'SHROOM',img0: '/images/spore.png',  img1: '/images/shroom.png',color0: 'var(--blue)', color1: 'var(--red)' },
   ];
@@ -1323,11 +1333,11 @@ async function fetchUserLPPositions(p) {
     '<div class="data-row" style="flex-direction:column;align-items:flex-start;gap:0.35rem;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,225,0.05);">'
     + '<div style="display:flex;align-items:center;justify-content:space-between;width:100%;">'
     + '<span style="font-family:Syne Mono,monospace;font-size:0.72rem;">'
-    + iEl(pool.img0) + '<span style="color:' + pool.color0 + ';">' + pool.token0 + '</span>'
+    + '<span style="color:' + pool.color0 + ';">' + pool.token0 + '</span>'
     + '<span style="color:rgba(255,255,225,0.25);margin:0 0.3rem;">/</span>'
-    + iEl(pool.img1) + '<span style="color:' + pool.color1 + ';">' + pool.token1 + '</span>'
+    + '<span style="color:' + pool.color1 + ';">' + pool.token1 + '</span>'
     + '</span>'
-    + '<span style="font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.3);">' + sharePct + '% of pool</span>'
+    + '<span style="font-family:Syne Mono,monospace;font-size:0.72rem;color:var(--yellow);">' + sharePct + '% of pool</span>'
     + '</div>'
     + (token0Bal !== null
         ? '<div style="display:flex;gap:1.5rem;font-family:Syne Mono,monospace;font-size:0.75rem;">'
