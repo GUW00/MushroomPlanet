@@ -705,8 +705,14 @@
             <span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
             <span class="dr-val b" id="w-spore">—</span>
           </div>
-          <div class="data-row"><span class="dr-label">Planted SHROOM</span><span class="dr-val g" id="w-planted">—</span></div>
-          <div class="data-row"><span class="dr-label">Farm SPORE</span><span class="dr-val b" id="w-spore-farm">—</span></div>
+          <div class="data-row">
+            <span class="dr-label"><img src="/images/shroomfarm.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Planted SHROOM</span>
+            <span class="dr-val g" id="w-planted">—</span>
+          </div>
+          <div class="data-row">
+            <span class="dr-label"><img src="/images/sporulation1.webp" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Spores Generated</span>
+            <span class="dr-val b" id="w-spore-farm">—</span>
+          </div>
         </div>
       </div>
       <div class="info-card reveal" style="margin-top:1rem;">
@@ -718,7 +724,8 @@
       </div>
       <div class="info-card reveal" style="margin-top:1rem;">
         <div class="card-title">
-          <img src="/images/blockchain.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          <img src="/images/shroom.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          <img src="/images/spore.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
           Onchain Balances
         </div>
         <div>
@@ -1227,9 +1234,10 @@ function renderWalletPanel() {
   const r = profileData.reddit, rwEl = document.getElementById('wallet-reddit-content');
   if(r && profileData.redditName) {
     const bal = r.Balance || {};
-    rwEl.innerHTML = '<div class="data-row"><span class="dr-label">Username</span><span class="dr-val">u/' + profileData.redditName + '</span></div>'
-      + '<div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val r">' + fmt(bal.reddit_shrooms) + '</span></div>'
-      + '<div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b">' + fmt(bal.reddit_spores) + '</span></div>';
+    const img = (src) => '<img src="/images/' + src + '" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">';
+    rwEl.innerHTML = '<div class="data-row"><span class="dr-label">' + img('reddit.png') + 'Username</span><span class="dr-val">u/' + profileData.redditName + '</span></div>'
+      + '<div class="data-row"><span class="dr-label">' + img('shroom.png') + 'SHROOM</span><span class="dr-val r">' + fmt(bal.reddit_shrooms) + '</span></div>'
+      + '<div class="data-row"><span class="dr-label">' + img('spore.png') + 'SPORE</span><span class="dr-val b">' + fmt(bal.reddit_spores) + '</span></div>';
   } else {
     rwEl.innerHTML = '<div class="empty-hint">No Reddit wallet linked.</div>';
   }
