@@ -1262,26 +1262,17 @@ async function fetchUserLPPositions(p) {
     { label: 'SPORE / SHROOM',contract: '0x2a91571238303c6700a9336342c754e159243168', token0: 'SPORE',  token1: 'SHROOM',color0: 'var(--blue)', color1: 'var(--red)' },
   ];
 
-  const RPC = window.API_BASE + '/api/rpc-proxy' || 'https://polygon-rpc.com';
   const balOf = '0x70a08231';
   const totalSup = '0x18160ddd';
 
   async function call(to, data) {
-    // Route through our API to use Alchemy - avoids public RPC rate limits
-    const res = await fetch(window.API_BASE + '/api/rpc-call', {
+    const res = await fetch(window.API_BASE + '/api/rpc/polygon', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ to, data })
+      body: JSON.stringify({ jsonrpc:'2.0', method:'eth_call', params:[{to, data},'latest'], id:1 })
     });
-    if (res.ok) {
-      const j = await res.json();
-      if (j.result) return j.result;
-    }
-    // Fallback to public RPC
-    const res2 = await fetch('https://rpc.ankr.com/polygon', { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ jsonrpc:'2.0', method:'eth_call', params:[{to, data},'latest'], id:1 }) });
-    const j2 = await res2.json();
-    return j2.result;
+    const j = await res.json();
+    return j.result;
   }
   async function getReserves(contract) {
     // getReserves() selector: 0x0902f1ac
