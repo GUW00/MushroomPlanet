@@ -938,18 +938,23 @@ async function loadProfileData() {
   if (!currentUser) return;
   showState('loading');
   try {
+    console.log('[LOAD] fetching for', currentUser.discord_id);
     const [discordRes, redditRes] = await Promise.all([
       fetch(window.API_BASE + '/api/user/' + currentUser.discord_id),
       fetch(window.API_BASE + '/api/reddit-user/' + currentUser.discord_id),
     ]);
+    console.log('[LOAD] discord status', discordRes.status);
+    console.log('[LOAD] reddit status', redditRes.status);
     const discordData = await discordRes.json();
     const redditData  = await redditRes.json();
+    console.log('[LOAD] discordData', discordData);
     profileData = discordData;
     profileData.reddit     = redditData.reddit || null;
     profileData.redditName = redditData.redditName || null;
     renderProfile();
     showState('profile');
-  } catch {
+  } catch(err) {
+    console.error('[LOAD] failed', err);
     showState('gate');
   }
 }
@@ -1303,6 +1308,7 @@ function renderNFTs(p) {
   const wallet = p.Wallet || {};
   const nftWallet = wallet.NFT || {};
 
+  const keys = Object.keys(nftWallet).filter(k => k !== 'total_nft');
   const el = document.getElementById('nft-content');
 
   if (!keys.length) {
