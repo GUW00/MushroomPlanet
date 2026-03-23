@@ -417,6 +417,29 @@
       .mvp-block { align-items: flex-start; }
       .page-section { padding: 0 1rem 3rem; }
     }
+    .nft-modal-overlay {
+      position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:2000;
+      display:flex;align-items:center;justify-content:center;padding:1rem;
+      opacity:0;transition:opacity 0.2s;pointer-events:none;
+    }
+    .nft-modal-overlay.open { opacity:1;pointer-events:all; }
+    .nft-modal {
+      background:var(--dark2);border:1px solid rgba(255,255,225,0.12);
+      border-radius:1.25rem;padding:0;max-width:380px;width:100%;
+      max-height:85vh;overflow-y:auto;
+      transform:translateY(20px);transition:transform 0.2s;
+    }
+    .nft-modal-overlay.open .nft-modal { transform:translateY(0); }
+    .nft-modal-img { width:100%;border-radius:1.25rem 1.25rem 0 0;display:block; }
+    .nft-modal-body { padding:1.25rem; }
+    .nft-modal-name {
+      font-size:1rem;font-weight:700;margin-bottom:0.25rem;
+    }
+    .nft-modal-close {
+      position:sticky;top:0;float:right;background:rgba(0,0,0,0.5);
+      border:none;color:var(--cream);font-size:1.1rem;cursor:pointer;
+      padding:0.3rem 0.6rem;border-radius:0 1.25rem 0 0.5rem;z-index:1;
+    }
   </style>
 </head>
 <body>
@@ -767,6 +790,19 @@
       </div>
     </div>
 
+    <!-- NFT MODAL -->
+    <div id="nft-modal-overlay" class="nft-modal-overlay" onclick="closeNftModal(event)">
+      <div class="nft-modal">
+        <button class="nft-modal-close" onclick="document.getElementById('nft-modal-overlay').classList.remove('open')">✕</button>
+        <img id="nft-modal-img" class="nft-modal-img" src="" alt="">
+        <div class="nft-modal-body">
+          <div class="nft-modal-name" id="nft-modal-name"></div>
+          <div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.15em;color:rgba(255,255,225,0.3);margin-bottom:0.75rem;" id="nft-modal-rarity"></div>
+          <div id="nft-modal-stats"></div>
+          <div id="nft-modal-traits" style="margin-top:0.75rem;"></div>
+        </div>
+      </div>
+    </div>
   </div><!-- /profile-content -->
 
 </div>
@@ -1242,6 +1278,127 @@ function copyWalletAddr() {
     setTimeout(() => { el.textContent = orig; el.style.color = ''; }, 1500);
   });
 }
+function closeNftModal(e) {
+  if (e.target === document.getElementById('nft-modal-overlay')) {
+    document.getElementById('nft-modal-overlay').classList.remove('open');
+  }
+}
+window.closeNftModal = closeNftModal;
+
+// Trait slot -> stat mapping (mirrors sporebot_unique_config.py)
+const TRAIT_SLOT_STAT = {
+  Arms:'Harvest Bonus', Background:'Plant Limit', Cap:'Kid Totem Chance',
+  Eyes:'Queen Totem Chance', Face:'King Totem Chance', Spots:'Gold Totem Chance',
+  Legs:'Double Herb Chance', Hands:'Rare Herb Chance', Pixie:'Spore Yield', Shoes:'Herb Find Rate',
+};
+const ITEM_BONUSES = {
+  'Red-Shroom-(Rare)':     ['Harvest Bonus', 5],
+  'Pink-Shroom-(Rare)':    ['Harvest Bonus', 2],
+  'Blue-Shroom-(Rare)':    ['Harvest Bonus', 1],
+  'Spores':                ['Spore Yield', 2],
+  'Elder-Pipe-(Super-Rare)':['Pipe Reduction', 1],
+  'Blue-Potion-(Rare)':    ['Extra Brews', 2],
+  'Red-Potion-(Rare)':     ['Extra Brews', 3],
+  'Gold-Shroom-(Legendary)':['Gold Totem Chance', 5],
+  'Gold-Spores-(Legendary)':['Spore Yield', 5],
+  'Gold-Shovel-(Legendary)':['Harvest Bonus', 100],
+};
+const MOUTH_BONUSES = {
+  'Gold-(Legendary)':     ['Plant Limit', 1000000],
+  'Excited-(Super-Rare)': ['Rare Herb Chance', 10],
+  'Happy-(Rare)':         ['Double Herb Chance', 10],
+  'Upset-(Rare)':         ['Extra Brews', 2],
+};
+const RARITY_BY_NAME = {
+  'Common':'Common','Uncommon':'Uncommon','Rare':'Rare',
+  'Super Rare':'Super Rare','Legendary':'Legendary',
+  'Blue-(Rare)':'Uncommon','Pink-(Rare)':'Uncommon',
+};
+const STAT_VALS = { Uncommon:1, Rare:2, 'Super Rare':5 };
+const STAT_EMOJI = {
+  'Spore Yield':'🍄','Harvest Bonus':'🌱','Queen Totem Chance':'👑',
+  'King Totem Chance':'👑','Kid Totem Chance':'🧒','Gold Totem Chance':'🏅',
+  'Herb Find Rate':'🌿','Rare Herb Chance':'✨','Double Herb Chance':'⚡',
+  'Extra Brews':'🧪','Plant Limit':'🪴','Pipe Reduction':'🪵',
+};
+const PLANT_LIMIT_VALS = { Uncommon:200000, Rare:500000, 'Super Rare':1000000 };
+const HERB_VALS = { Uncommon:5, Rare:10, 'Super Rare':15 };
+const DOUBLE_HERB_VALS = { Uncommon:5, Rare:10, 'Super Rare':25 };
+
+function openSporebotModal(tokenId, imageUrl, traits) {
+  const overlay = document.getElementById('nft-modal-overlay');
+  document.getElementById('nft-modal-name').textContent = 'Sporebot #' + tokenId;
+  document.getElementById('nft-modal-rarity').textContent = '';
+
+  const img = document.getElementById('nft-modal-img');
+  img.src = imageUrl || 'https://alchemy.mypinata.cloud/ipfs/QmYh9hwJZNTDy192auvCq1jnpvhmLhAFW4qRRcXSraNntL/' + tokenId + '.png';
+  img.style.display = imageUrl ? 'block' : 'none';
+
+  // Calculate bonuses from traits
+  const bonuses = {};
+  function addBonus(stat, val) {
+    if (!stat) return;
+    bonuses[stat] = (bonuses[stat] || 0) + val;
+  }
+
+  if (traits && typeof traits === 'object') {
+    // Trait slots
+    for (const [slot, stat] of Object.entries(TRAIT_SLOT_STAT)) {
+      const traitVal = traits[slot];
+      if (!traitVal) continue;
+      // Determine rarity from trait value string
+      let rarity = 'Common';
+      if (traitVal.includes('Legendary')) rarity = 'Legendary';
+      else if (traitVal.includes('Super-Rare') || traitVal.includes('Super Rare')) rarity = 'Super Rare';
+      else if (traitVal.includes('Rare')) rarity = 'Rare';
+      else if (traitVal.includes('Uncommon') || traitVal.includes('Blue') || traitVal.includes('Pink')) rarity = 'Uncommon';
+
+      if (rarity === 'Common') continue;
+
+      let val = STAT_VALS[rarity] || 0;
+      if (stat === 'Plant Limit') val = PLANT_LIMIT_VALS[rarity] || 0;
+      else if (stat === 'Herb Find Rate' || stat === 'Rare Herb Chance') val = HERB_VALS[rarity] || 0;
+      else if (stat === 'Double Herb Chance') val = DOUBLE_HERB_VALS[rarity] || 0;
+      addBonus(stat, val);
+    }
+    // Item bonus
+    const item = traits['Item'];
+    if (item && ITEM_BONUSES[item]) addBonus(...ITEM_BONUSES[item]);
+    // Mouth bonus
+    const mouth = traits['Mouth'];
+    if (mouth && MOUTH_BONUSES[mouth]) addBonus(...MOUTH_BONUSES[mouth]);
+  }
+
+  // Render stats
+  const statsEl = document.getElementById('nft-modal-stats');
+  const entries = Object.entries(bonuses).filter(([,v]) => v > 0);
+  if (entries.length) {
+    statsEl.innerHTML = '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.15em;color:rgba(255,255,225,0.3);margin-bottom:0.5rem;">BONUSES</div>'
+      + entries.map(([stat, val]) => {
+          const fmt2 = stat === 'Plant Limit' ? '+' + (val/1000000).toFixed(1) + 'M limit' : '+' + val + (stat.includes('Chance') || stat.includes('Rate') || stat.includes('Bonus') || stat.includes('Yield') ? '%' : '');
+          return '<div class="data-row"><span class="dr-label">' + (STAT_EMOJI[stat]||'') + ' ' + stat + '</span><span class="dr-val g">' + fmt2 + '</span></div>';
+        }).join('');
+  } else {
+    statsEl.innerHTML = '<div class="empty-hint" style="padding:0.75rem 0;text-align:left;">No active bonuses (Common traits only)</div>';
+  }
+
+  // Render raw traits
+  const traitsEl = document.getElementById('nft-modal-traits');
+  if (traits && Object.keys(traits).length) {
+    traitsEl.innerHTML = '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.15em;color:rgba(255,255,225,0.3);margin-bottom:0.5rem;margin-top:0.5rem;">TRAITS</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'
+      + Object.entries(traits).map(([k,v]) =>
+          '<span style="font-family:Syne Mono,monospace;font-size:0.6rem;padding:0.25em 0.6em;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,225,0.08);color:rgba(255,255,225,0.5);">'
+          + '<span style="color:rgba(255,255,225,0.25);">' + k + ':</span> ' + v + '</span>'
+        ).join('')
+      + '</div>';
+  } else {
+    traitsEl.innerHTML = '';
+  }
+
+  overlay.classList.add('open');
+}
+window.openSporebotModal = openSporebotModal;
 function renderWalletPanel() {
   if(!profileData) return;
   const s = profileData.sporebot || {}, p = profileData.pixie || {};
@@ -1472,7 +1629,8 @@ function renderNFTs(p) {
     if (!image && tokenId && col === 'Sporebots') {
       image = 'https://alchemy.mypinata.cloud/ipfs/QmYh9hwJZNTDy192auvCq1jnpvhmLhAFW4qRRcXSraNntL/' + tokenId + '.png';
     }
-    groups[col].push({ label, count: parseInt(entry.count || 1), image });
+    const traits = entry.traits || null;
+    groups[col].push({ label, count: parseInt(entry.count || 1), image, tokenId, traits, col });
   });
 
   if (groups['Sporebots']) {
@@ -1490,7 +1648,14 @@ function renderNFTs(p) {
       + '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.3);margin-bottom:0.5rem;">' + col + '</div>'
       + '<div class="nft-grid">';
     groups[col].forEach(item => {
-      html += '<div class="nft-card">';
+      const isSporebot = col === 'Sporebots' && item.tokenId;
+      const safeId = 'sb_' + item.tokenId;
+      window._sporebotCache = window._sporebotCache || {};
+      window._sporebotCache[safeId] = { tokenId: item.tokenId, image: item.image||'', traits: item.traits||{} };
+      const clickAttr = isSporebot
+        ? ' onclick="openSporebotModal(window._sporebotCache[\''+safeId+'\'].tokenId,window._sporebotCache[\''+safeId+'\'].image,window._sporebotCache[\''+safeId+'\'].traits)" style="cursor:pointer;"'
+        : '';
+      html += '<div class="nft-card"' + clickAttr + '>';
       if (item.image) {
         html += '<img src="' + fixIpfs(item.image) + '" alt="' + item.label + '" loading="lazy" onerror="this.style.display=\'none\'">';
       } else {
