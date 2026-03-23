@@ -692,26 +692,49 @@
     <!-- WALLET PANEL -->
     <div id="panel-wallet" style="display:none;">
       <div class="info-card reveal">
-        <div class="card-title"><span class="card-title-accent">💰</span> Discord Wallet</div>
-        <div class="data-grid">
-          <div>
-            <div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val r" id="w-shroom">—</span></div>
-            <div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b" id="w-spore">—</span></div>
-            <div class="data-row"><span class="dr-label">Planted SHROOM</span><span class="dr-val g" id="w-planted">—</span></div>
-            <div class="data-row"><span class="dr-label">Farm SPORE</span><span class="dr-val b" id="w-spore-farm">—</span></div>
+        <div class="card-title">
+          <img src="/images/discord.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Discord Wallet
+        </div>
+        <div>
+          <div class="data-row">
+            <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
+            <span class="dr-val r" id="w-shroom">—</span>
           </div>
-          <div>
-            <div class="data-row"><span class="dr-label">Wallet Address</span><span class="dr-val" id="w-addr">—</span></div>
-            <div class="data-row"><span class="dr-label">Onchain SHROOM</span><span class="dr-val r" id="w-oc-shroom">—</span></div>
-            <div class="data-row"><span class="dr-label">Onchain SPORE</span><span class="dr-val b" id="w-oc-spore">—</span></div>
+          <div class="data-row">
+            <span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
+            <span class="dr-val b" id="w-spore">—</span>
           </div>
+          <div class="data-row"><span class="dr-label">Planted SHROOM</span><span class="dr-val g" id="w-planted">—</span></div>
+          <div class="data-row"><span class="dr-label">Farm SPORE</span><span class="dr-val b" id="w-spore-farm">—</span></div>
         </div>
       </div>
       <div class="info-card reveal" style="margin-top:1rem;">
-        <div class="card-title"><span class="card-title-accent">💰</span> Reddit Wallet</div>
+        <div class="card-title">
+          <img src="/images/reddit.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Reddit Wallet
+        </div>
         <div id="wallet-reddit-content"><div class="empty-hint">No Reddit wallet linked.</div></div>
       </div>
+      <div class="info-card reveal" style="margin-top:1rem;">
+        <div class="card-title">
+          <img src="/images/blockchain.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Onchain Balances
+        </div>
+        <div>
+          <div class="data-row"><span class="dr-label">Wallet Address</span><span class="dr-val" id="w-addr">—</span></div>
+          <div class="data-row">
+            <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
+            <span class="dr-val r" id="w-oc-shroom">—</span>
+          </div>
+          <div class="data-row">
+            <span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
+            <span class="dr-val b" id="w-oc-spore">—</span>
+          </div>
+        </div>
+      </div>
     </div>
+``
 
     <!-- REDDIT PANEL -->
     <div id="panel-reddit" style="display:none;">
@@ -1206,8 +1229,7 @@ function renderWalletPanel() {
     const bal = r.Balance || {};
     rwEl.innerHTML = '<div class="data-row"><span class="dr-label">Username</span><span class="dr-val">u/' + profileData.redditName + '</span></div>'
       + '<div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val r">' + fmt(bal.reddit_shrooms) + '</span></div>'
-      + '<div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b">' + fmt(bal.reddit_spores) + '</span></div>'
-      + (r.Address ? '<div class="data-row"><span class="dr-label">Wallet</span><span class="dr-val">' + r.Address.slice(0,6) + '...' + r.Address.slice(-4) + '</span></div>' : '');
+      + '<div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b">' + fmt(bal.reddit_spores) + '</span></div>';
   } else {
     rwEl.innerHTML = '<div class="empty-hint">No Reddit wallet linked.</div>';
   }
