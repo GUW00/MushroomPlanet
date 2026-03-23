@@ -1258,8 +1258,9 @@ async function fetchUserLPPositions(p) {
   lpEl.innerHTML = '<div style="font-family:Syne Mono,monospace;font-size:0.7rem;color:rgba(255,255,225,0.25);padding:0.5rem 0;">Checking LP positions...</div>';
 
   const LP_POOLS = [
-    { label: 'SHROOM / WETH', contract: '0x28def03d8dc0d186fabae9c46043e8ef9bffcc28', token0: 'SHROOM', token1: 'WETH',  color0: 'var(--red)',  color1: '#9b8cff' },
-    { label: 'SPORE / SHROOM',contract: '0x2a91571238303c6700a9336342c754e159243168', token0: 'SPORE',  token1: 'SHROOM',color0: 'var(--blue)', color1: 'var(--red)' },
+    { label: 'SHROOM / WETH',  contract: '0x28def03d8dc0d186fabae9c46043e8ef9bffcc28', token0: 'SHROOM', token1: 'WETH',  img0: '/images/shroom.png', img1: '/images/eth.png',   color0: 'var(--red)',  color1: '#9b8cff' },
+    { label: 'SPORE / WETH',   contract: '0x2a91571238303c6700a9336342c754e159243168', token0: 'SPORE',  token1: 'WETH',  img0: '/images/spore.png',  img1: '/images/eth.png',   color0: 'var(--blue)', color1: '#9b8cff' },
+    { label: 'SPORE / SHROOM', contract: '0xc373382eec590374278534494109a0cdae1fbbc8', token0: 'SPORE',  token1: 'SHROOM',img0: '/images/spore.png',  img1: '/images/shroom.png',color0: 'var(--blue)', color1: 'var(--red)' },
   ];
 
   const balOf = '0x70a08231';
@@ -1317,17 +1318,22 @@ async function fetchUserLPPositions(p) {
     return;
   }
 
+  const iEl = (src) => '<img src="' + src + '" style="width:13px;height:13px;vertical-align:middle;margin-right:3px;border-radius:50%;" onerror="this.style.display=\'none\'">';
   lpEl.innerHTML = results.map(({ pool, sharePct, token0Bal, token1Bal, fmtV }) =>
-    '<div class="data-row" style="flex-direction:column;align-items:flex-start;gap:0.3rem;padding:0.75rem 0;">'
-    + '<span style="font-family:Syne Mono,monospace;font-size:0.72rem;color:rgba(255,255,225,0.6);">'
-    + '<span style="color:' + pool.color0 + ';">' + pool.token0 + '</span>'
-    + ' / <span style="color:' + pool.color1 + ';">' + pool.token1 + '</span>'
-    + ' &nbsp;<span style="color:rgba(255,255,225,0.25);font-size:0.62rem;">' + sharePct + '% of pool</span></span>'
+    '<div class="data-row" style="flex-direction:column;align-items:flex-start;gap:0.35rem;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,225,0.05);">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;width:100%;">'
+    + '<span style="font-family:Syne Mono,monospace;font-size:0.72rem;">'
+    + iEl(pool.img0) + '<span style="color:' + pool.color0 + ';">' + pool.token0 + '</span>'
+    + '<span style="color:rgba(255,255,225,0.25);margin:0 0.3rem;">/</span>'
+    + iEl(pool.img1) + '<span style="color:' + pool.color1 + ';">' + pool.token1 + '</span>'
+    + '</span>'
+    + '<span style="font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.3);">' + sharePct + '% of pool</span>'
+    + '</div>'
     + (token0Bal !== null
-        ? '<span style="display:flex;gap:1rem;font-family:Syne Mono,monospace;font-size:0.7rem;">'
-          + '<span style="color:' + pool.color0 + ';">' + fmtV(token0Bal) + ' ' + pool.token0 + '</span>'
-          + '<span style="color:' + pool.color1 + ';">' + fmtV(token1Bal) + ' ' + pool.token1 + '</span>'
-          + '</span>'
+        ? '<div style="display:flex;gap:1.5rem;font-family:Syne Mono,monospace;font-size:0.75rem;">'
+          + '<span>' + iEl(pool.img0) + '<span style="color:' + pool.color0 + ';">' + fmtV(token0Bal) + ' ' + pool.token0 + '</span></span>'
+          + '<span>' + iEl(pool.img1) + '<span style="color:' + pool.color1 + ';">' + fmtV(token1Bal) + ' ' + pool.token1 + '</span></span>'
+          + '</div>'
         : '')
     + '</div>'
   ).join('');
