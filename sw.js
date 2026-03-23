@@ -1,4 +1,4 @@
-const CACHE = 'mp-v10';
+const CACHE = 'mp-v11';
 const SHELL = [
   '/profile.html', '/treasury.html', '/vote.html', '/convert.html',
   '/styles.css', '/config.js',
