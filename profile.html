@@ -578,26 +578,6 @@
         </div>
       </div>
 
-      <!-- WALLET TAB -->
-      <div class="tab-panel reveal" id="tab-wallet">
-        <div class="info-card">
-          <div class="card-title"><span class="card-title-accent">💰</span> Discord Wallet</div>
-          <div class="data-grid">
-            <div>
-              <div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val r" id="w-shroom">—</span></div>
-              <div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b" id="w-spore">—</span></div>
-              <div class="data-row"><span class="dr-label">Planted SHROOM</span><span class="dr-val g" id="w-planted">—</span></div>
-              <div class="data-row"><span class="dr-label">Farm SPORE</span><span class="dr-val b" id="w-spore-farm">—</span></div>
-            </div>
-            <div>
-              <div class="data-row"><span class="dr-label">Wallet Address</span><span class="dr-val" id="w-addr">—</span></div>
-              <div class="data-row"><span class="dr-label">Onchain SHROOM</span><span class="dr-val r" id="w-oc-shroom">—</span></div>
-              <div class="data-row"><span class="dr-label">Onchain SPORE</span><span class="dr-val b" id="w-oc-spore">—</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- STAKING TAB -->
       <div class="tab-panel reveal" id="tab-staking">
         <div class="info-card">
@@ -1463,35 +1443,6 @@ function renderInventory(s) {
     const qty = owned ? ' x' + gems[g] : '';
     return '<span class="gem-chip ' + (owned ? 'owned' : '') + '">' + (GEM_LABELS[g] || g) + qty + '</span>';
   }).join('');
-
-  // Potions
-  const potionsEl = document.getElementById('potions-content');
-  const active = potions.Active_Potion;
-  const stored = Object.entries(potions).filter(([k]) => k.startsWith('Potion_'));
-
-  function cleanEmoji(str) { return str ? String(str).replace(/<:[^:]+:\d+>/g, '').trim() : ''; }
-
-  let potHtml = '';
-  if (active && typeof active === 'object') {
-    potHtml += '<div style="margin-bottom:0.75rem;padding-bottom:0.75rem;border-bottom:1px solid rgba(255,255,225,0.06);">'
-      + '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.35rem;">ACTIVE POTION</div>'
-      + '<div class="data-row"><span class="dr-label">Name</span><span class="dr-val p">' + cleanEmoji(active.name || 'Unknown') + '</span></div>';
-    Object.entries(active).filter(([k]) => !['name','emoji','Potion Score','Potion_Score'].includes(k)).forEach(([k,v]) => {
-      potHtml += '<div class="data-row"><span class="dr-label">' + k.replace(/_/g,' ') + '</span><span class="dr-val g">' + (typeof v === 'number' ? v + '%' : v) + '</span></div>';
-    });
-    potHtml += '</div>';
-  }
-  if (stored.length) {
-    potHtml += '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.35rem;">STORED (' + stored.length + ')</div>';
-    stored.forEach(([,v]) => {
-      if (typeof v === 'object') {
-        potHtml += '<div class="data-row"><span class="dr-label">' + cleanEmoji(v.name || 'Potion') + '</span>'
-          + '<span class="dr-val" style="font-size:0.7rem;">' + (v['Potion Score'] ? 'Score: ' + Number(v['Potion Score']).toFixed(1) : '') + '</span></div>';
-      }
-    });
-  }
-  if (!potHtml) potHtml = '<div class="empty-hint">No potions brewed yet.</div>';
-  potionsEl.innerHTML = potHtml;
 
   // Artifacts & Scrolls
   const ART_LABELS = {
