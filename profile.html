@@ -694,20 +694,20 @@
       <div class="tab-panel reveal" id="tab-pixie">
         <div class="info-card">
           <div class="card-title"><span class="card-title-accent">✨</span> Pixie Stats</div>
-          <div class="data-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="data-grid" style="grid-template-columns:1fr 1fr;align-items:start;">
             <div>
               <div class="data-row"><span class="dr-label">Level</span><span class="dr-val g" id="px-level">—</span></div>
               <div class="data-row"><span class="dr-label">Total XP</span><span class="dr-val b" id="px-xp">—</span></div>
               <div class="data-row"><span class="dr-label">Flair Rank</span><span class="dr-val p" id="px-flair">—</span></div>
-              <div class="data-row"><span class="dr-label">Flair Title</span><span class="dr-val" id="px-flair-title">—</span></div>
+              <div class="data-row"><span class="dr-label">GS Tokens</span><span class="dr-val y" id="px-gs-tokens">—</span></div>
+              <div class="data-row"><span class="dr-label">GS Given</span><span class="dr-val y" id="px-gs-given">—</span></div>
             </div>
             <div>
               <div class="data-row"><span class="dr-label">Msg Streak</span><span class="dr-val" id="px-streak">—</span></div>
               <div class="data-row"><span class="dr-label">Max Msg Streak</span><span class="dr-val" id="px-maxstreak">—</span></div>
               <div class="data-row"><span class="dr-label">Social Butterfly</span><span class="dr-val g" id="px-social">—</span></div>
               <div class="data-row"><span class="dr-label">Verified</span><span class="dr-val" id="px-verified">—</span></div>
-              <div class="data-row"><span class="dr-label">GS Tokens</span><span class="dr-val y" id="px-gs-tokens">—</span></div>
-              <div class="data-row"><span class="dr-label">GS Given / Recv</span><span class="dr-val" id="px-gs-given">—</span><span style="color:rgba(255,255,225,0.3);margin:0 0.25rem;">/</span><span class="dr-val" id="px-gs-received">—</span></div>
+              <div class="data-row"><span class="dr-label">GS Received</span><span class="dr-val y" id="px-gs-received">—</span></div>
             </div>
           </div>
         </div>
@@ -2110,9 +2110,9 @@ function renderPixie(p) {
   const ach    = p.Achievements || {};
 
   setEl('px-level',       safe(pixie.LvL, 1));
-  setEl('px-xp',          fmt(pixie.XP));
+  setEl('px-xp',          fmt(pixie.Total_XP || pixie.XP || pixie.xp || 0));
   setEl('px-flair',       safe(flair.Flair, 'SPROUT'));
-  setEl('px-flair-title', safe(flair.Title, '-'));
+  setEl('px-flair-title', safe(flair.Title || flair.title, '-'));
   setEl('px-streak',      safe(msgXp.current_streak, 0) + ' days');
   setEl('px-maxstreak',   safe(msgXp.max_streak, 0) + ' days');
   setEl('px-social',      quests.social_butterfly ? 'Completed' : 'In Progress');
