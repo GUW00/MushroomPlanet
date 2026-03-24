@@ -1205,6 +1205,7 @@ app.get('/api/reddit-user/:discord_id', async (req, res) => {
     res.status(500).json({ ok: false });
   }
 });
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

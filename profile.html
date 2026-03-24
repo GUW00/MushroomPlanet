@@ -219,14 +219,22 @@
       display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;
     }
     .tab {
-      font-family: 'Syne Mono', monospace; font-size: 0.7rem;
-      padding: 0.45em 1.1em; border-radius: 999px;
-      border: 1px solid rgba(255,255,225,0.12);
-      background: transparent; color: rgba(255,255,225,0.4);
-      cursor: pointer; transition: all 0.2s;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem;
+      padding: 0.5em 1.3em; border-radius: 999px;
+      border: 1px solid rgba(255,255,225,0.15);
+      background: rgba(255,255,255,0.03); color: rgba(255,255,225,0.6);
+      cursor: pointer; transition: all 0.2s; letter-spacing: 0.04em;
+      font-weight: 600;
     }
-    .tab.active { border-color: var(--yellow); color: var(--yellow); background: rgba(254,206,0,0.08); }
-    .tab:hover:not(.active) { border-color: rgba(255,255,225,0.3); color: var(--cream); }
+    .tab.active {
+      border-color: var(--yellow); color: var(--yellow);
+      background: rgba(254,206,0,0.1);
+      box-shadow: 0 0 12px rgba(254,206,0,0.15);
+    }
+    .tab:hover:not(.active) {
+      border-color: rgba(255,255,225,0.35); color: var(--cream);
+      background: rgba(255,255,255,0.05);
+    }
 
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
@@ -241,7 +249,7 @@
     .card-title {
       font-family: 'Syne Mono', monospace; font-size: 0.65rem;
       letter-spacing: 0.2em; text-transform: uppercase;
-      color: rgba(255,255,225,0.35); margin-bottom: 1rem;
+      color: rgba(255,255,225,0.7); margin-bottom: 1rem;
       display: flex; align-items: center; gap: 0.5rem;
     }
     .card-title-accent { color: var(--yellow); }
@@ -257,7 +265,7 @@
       font-size: 0.82rem;
     }
     .data-row:last-child { border-bottom: none; }
-    .dr-label { color: rgba(255,255,225,0.4); }
+    .dr-label { color: rgba(255,255,225,0.75); }
     .dr-val   { color: var(--cream); font-family: 'Syne Mono', monospace; font-size: 0.78rem; text-align: right; max-width: 55%; word-break: break-all; }
     .dr-val.y { color: var(--yellow); }
     .dr-val.b { color: var(--blue); }
@@ -418,27 +426,30 @@
       .page-section { padding: 0 1rem 3rem; }
     }
     .nft-modal-overlay {
-      position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:2000;
-      display:flex;align-items:center;justify-content:center;padding:1rem;
+      position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;
+      display:flex;align-items:flex-start;justify-content:center;
+      padding:1rem;padding-top:170px;
+      overflow-y:auto;
       opacity:0;transition:opacity 0.2s;pointer-events:none;
     }
     .nft-modal-overlay.open { opacity:1;pointer-events:all; }
     .nft-modal {
       background:var(--dark2);border:1px solid rgba(255,255,225,0.12);
-      border-radius:1.25rem;padding:0;max-width:380px;width:100%;
-      max-height:85vh;overflow-y:auto;
+      border-radius:1.25rem;padding:0;max-width:360px;width:100%;
+      position:relative;margin-top:auto;margin-bottom:auto;
       transform:translateY(20px);transition:transform 0.2s;
     }
     .nft-modal-overlay.open .nft-modal { transform:translateY(0); }
-    .nft-modal-img { width:100%;border-radius:1.25rem 1.25rem 0 0;display:block; }
+    .nft-modal-img { width:100%;height:auto;border-radius:1.25rem 1.25rem 0 0;display:block; }
     .nft-modal-body { padding:1.25rem; }
     .nft-modal-name {
       font-size:1rem;font-weight:700;margin-bottom:0.25rem;
     }
     .nft-modal-close {
-      position:sticky;top:0;float:right;background:rgba(0,0,0,0.5);
-      border:none;color:var(--cream);font-size:1.1rem;cursor:pointer;
-      padding:0.3rem 0.6rem;border-radius:0 1.25rem 0 0.5rem;z-index:1;
+      position:absolute;top:0.5rem;right:0.5rem;
+      background:rgba(0,0,0,0.6);border:none;color:var(--cream);
+      font-size:1rem;cursor:pointer;padding:0.3rem 0.65rem;
+      border-radius:999px;z-index:10;line-height:1;
     }
   </style>
 </head>
@@ -517,24 +528,20 @@
         <span class="sp-val red" id="qs-planted">—</span>
       </div>
       <div class="stat-pill">
-        <span class="sp-label">SPORE/Day</span>
+        <span class="sp-label">NFT Boost</span>
+        <span class="sp-val yellow" id="qs-nft-boost">—</span>
+      </div>
+      <div class="stat-pill">
+        <span class="sp-label">Total Planted</span>
+        <span class="sp-val green" id="qs-total-planted">—</span>
+      </div>
+      <div class="stat-pill">
+        <span class="sp-label">SPORES/Day</span>
         <span class="sp-val blue" id="qs-sgr">—</span>
       </div>
       <div class="stat-pill">
-        <span class="sp-label">Staked SPORE</span>
+        <span class="sp-label">Staked SPORES</span>
         <span class="sp-val green" id="qs-staked">—</span>
-      </div>
-      <div class="stat-pill">
-        <span class="sp-label">Farm Stage</span>
-        <span class="sp-val red" id="qs-stage">—</span>
-      </div>
-      <div class="stat-pill">
-        <span class="sp-label">Forage Streak</span>
-        <span class="sp-val" id="qs-streak">—</span>
-      </div>
-      <div class="stat-pill">
-        <span class="sp-label">Nodes</span>
-        <span class="sp-val purple" id="qs-nodes">—</span>
       </div>
     </div>
 
@@ -599,6 +606,10 @@
         <div class="info-card">
           <div class="card-title"><span class="card-title-accent">📅</span> Daily Actions</div>
           <div id="daily-actions-grid" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent">⚡</span> Spore Generation Breakdown</div>
+          <div id="sgr-breakdown-content"><div class="empty-hint">No breakdown available.</div></div>
         </div>
       </div>
 
@@ -682,7 +693,7 @@
       <div class="tab-panel reveal" id="tab-pixie">
         <div class="info-card">
           <div class="card-title"><span class="card-title-accent">✨</span> Pixie Stats</div>
-          <div class="data-grid">
+          <div class="data-grid" style="grid-template-columns:1fr 1fr;">
             <div>
               <div class="data-row"><span class="dr-label">Level</span><span class="dr-val g" id="px-level">—</span></div>
               <div class="data-row"><span class="dr-label">Total XP</span><span class="dr-val b" id="px-xp">—</span></div>
@@ -694,13 +705,23 @@
               <div class="data-row"><span class="dr-label">Max Msg Streak</span><span class="dr-val" id="px-maxstreak">—</span></div>
               <div class="data-row"><span class="dr-label">Social Butterfly</span><span class="dr-val g" id="px-social">—</span></div>
               <div class="data-row"><span class="dr-label">Verified</span><span class="dr-val" id="px-verified">—</span></div>
+              <div class="data-row"><span class="dr-label">GS Tokens</span><span class="dr-val y" id="px-gs-tokens">—</span></div>
+              <div class="data-row"><span class="dr-label">GS Given / Recv</span><span class="dr-val" id="px-gs-given">—</span><span style="color:rgba(255,255,225,0.3);margin:0 0.25rem;">/</span><span class="dr-val" id="px-gs-received">—</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent">💸</span> Tipping & Community</div>
+          <div class="data-grid" style="grid-template-columns:1fr 1fr;">
+            <div>
+              <div class="data-row"><span class="dr-label">Tips Given</span><span class="dr-val b" id="px-tip-given">—</span></div>
+              <div class="data-row"><span class="dr-label">Tips Received</span><span class="dr-val b" id="px-tip-recv">—</span></div>
+              <div class="data-row"><span class="dr-label">Raffles Given</span><span class="dr-val b" id="px-raf-given">—</span></div>
+              <div class="data-row"><span class="dr-label">Raffles Received</span><span class="dr-val b" id="px-raf-recv">—</span></div>
             </div>
             <div>
-              <div class="data-row"><span class="dr-label">GS Tokens</span><span class="dr-val y" id="px-gs-tokens">—</span></div>
-              <div class="data-row"><span class="dr-label">GS Given/Recv</span><span class="dr-val" id="px-gs-given">—</span> / <span class="dr-val" id="px-gs-received">—</span></div>
-              <div class="data-row"><span class="dr-label">Tips Given</span><span class="dr-val b" id="px-tip-shroom">—</span></div>
-              <div class="data-row"><span class="dr-label">Raffles Given</span><span class="dr-val b" id="px-raf-shroom">—</span></div>
-              <div class="data-row"><span class="dr-label">Airdrops Given</span><span class="dr-val b" id="px-air-shroom">—</span></div>
+              <div class="data-row"><span class="dr-label">Airdrops Given</span><span class="dr-val b" id="px-air-given">—</span></div>
+              <div class="data-row"><span class="dr-label">Airdrops Received</span><span class="dr-val b" id="px-air-recv">—</span></div>
               <div class="data-row"><span class="dr-label">Total Given</span><span class="dr-val g" id="px-total-given">—</span></div>
               <div class="data-row"><span class="dr-label">Total Received</span><span class="dr-val g" id="px-total-rec">—</span></div>
             </div>
@@ -774,20 +795,114 @@
 
     <!-- REDDIT PANEL -->
     <div id="panel-reddit" style="display:none;">
-      <div class="info-card reveal">
-        <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">🤖</span> Reddit Bot Stats</div>
-        <div class="reddit-stat-grid" id="reddit-stats">
-          <div class="empty-hint">No Reddit data found.</div>
+      <!-- No Reddit linked state -->
+      <div id="reddit-no-account" style="display:none;">
+        <div class="auth-gate" style="padding:2rem;margin-bottom:0;">
+          <div class="auth-gate-icon" style="font-size:2rem;">🤖</div>
+          <h3 style="font-size:1rem;">No Reddit Account Linked</h3>
+          <p>Use <code style="background:rgba(255,255,255,0.06);padding:0.1em 0.4em;border-radius:4px;">!link</code> in the Mushroom Planet subreddit to connect your Reddit account.</p>
         </div>
       </div>
-      <div class="info-card reveal" style="margin-top:1rem;" id="reddit-wallet-card">
-        <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">💰</span> Reddit Wallet</div>
-        <div id="reddit-wallet-content"><div class="empty-hint">No Reddit wallet linked.</div></div>
+      <!-- Reddit linked content -->
+      <div id="reddit-linked-content">
+        <!-- Identity + Flair -->
+        <div class="info-card reveal">
+          <div class="card-title">
+            <img src="/images/reddit.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+            Reddit Identity
+          </div>
+          <div class="data-grid">
+            <div>
+              <div class="data-row"><span class="dr-label">Username</span><span class="dr-val" id="r-username">—</span></div>
+              <div class="data-row"><span class="dr-label">Flair Rank</span><span class="dr-val" id="r-flair">—</span></div>
+              <div class="data-row"><span class="dr-label">Total XP</span><span class="dr-val b" id="r-xp">—</span></div>
+            </div>
+            <div>
+              <div class="data-row"><span class="dr-label">Discord Linked</span><span class="dr-val g" id="r-linked">—</span></div>
+              <div class="data-row"><span class="dr-label">GS Tokens</span><span class="dr-val y" id="r-gs-tokens">—</span></div>
+              <div class="data-row"><span class="dr-label">GS Given / Recv</span><span class="dr-val" id="r-gs-stat">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Daily Activity -->
+        <div class="info-card reveal" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">📅</span> Daily Activity</div>
+          <div id="reddit-daily-content"><div class="empty-hint">No daily data found.</div></div>
+        </div>
+
+        <!-- Forage Stats -->
+        <div class="info-card reveal" style="margin-top:1rem;">
+          <div class="card-title">
+            <img src="/images/shroom.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+            Forage Stats
+          </div>
+          <div class="data-grid">
+            <div>
+              <div class="data-row"><span class="dr-label">Streak</span><span class="dr-val y" id="r-streak">—</span></div>
+              <div class="data-row"><span class="dr-label">Record Streak</span><span class="dr-val" id="r-maxstreak">—</span></div>
+              <div class="data-row"><span class="dr-label">Total Forages</span><span class="dr-val" id="r-total-forages">—</span></div>
+              <div class="data-row"><span class="dr-label">Vacation Days</span><span class="dr-val g" id="r-vacation">—</span></div>
+            </div>
+            <div>
+              <div class="data-row"><span class="dr-label">Feed Boost</span><span class="dr-val g" id="r-feed-boost">—</span></div>
+              <div class="data-row"><span class="dr-label">NFT Forage Bonus</span><span class="dr-val p" id="r-nft-bonus">—</span></div>
+              <div class="data-row"><span class="dr-label">Flair Forage Bonus</span><span class="dr-val y" id="r-flair-bonus">—</span></div>
+              <div class="data-row"><span class="dr-label">Total Forage Bonus</span><span class="dr-val g" id="r-total-bonus">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feed Stats -->
+        <div class="info-card reveal" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">🐾</span> Feed Stats</div>
+          <div class="data-grid">
+            <div>
+              <div class="data-row"><span class="dr-label">Total Fed</span><span class="dr-val g" id="r-total-fed">—</span></div>
+              <div class="data-row"><span class="dr-label">Feed Milestone</span><span class="dr-val y" id="r-feed-milestone">—</span></div>
+              <div class="data-row"><span class="dr-label">Spore Bags Earned</span><span class="dr-val b" id="r-spore-bags">—</span></div>
+            </div>
+            <div>
+              <div class="data-row"><span class="dr-label">Total Feeds</span><span class="dr-val" id="r-total-feeds">—</span></div>
+              <div class="data-row"><span class="dr-label">Feed Cooldown</span><span class="dr-val" id="r-feed-cd">—</span></div>
+              <div class="data-row"><span class="dr-label">Gemstone Unlocked</span><span class="dr-val g" id="r-gemstone">—</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-card reveal" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">🤝</span> Tipping & Community</div>
+          <div class="data-grid">
+            <div>
+              <div class="data-row"><span class="dr-label"><img src="/images/shroom.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">SHROOM Given</span><span class="dr-val r" id="r-shroom-given">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/shroom.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">SHROOM Received</span><span class="dr-val r" id="r-shroom-recv">—</span></div>
+            </div>
+            <div>
+              <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">SPORE Given</span><span class="dr-val b" id="r-spore-given">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">SPORE Received</span><span class="dr-val b" id="r-spore-recv">—</span></div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="info-card reveal" style="margin-top:1rem;">
-        <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">📅</span> Reddit Daily Activity</div>
-        <div id="reddit-daily-content"><div class="empty-hint">No daily data found.</div></div>
-      </div>
+      <!-- XP Breakdown -->
+        <div class="info-card reveal" style="margin-top:1rem;">
+          <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">📊</span> XP Breakdown</div>
+          <div class="data-grid">
+            <div>
+              <div class="data-row"><span class="dr-label">Total XP</span><span class="dr-val y" id="r-xp-total">—</span></div>
+              <div class="data-row"><span class="dr-label">Next Rank</span><span class="dr-val" id="r-xp-next">—</span></div>
+              <div class="data-row"><span class="dr-label">XP Needed</span><span class="dr-val" id="r-xp-needed">—</span></div>
+              <div class="data-row"><span class="dr-label">Streak XP</span><span class="dr-val b" id="r-xp-streak">—</span></div>
+              <div class="data-row"><span class="dr-label">Forage XP</span><span class="dr-val b" id="r-xp-forage">—</span></div>
+            </div>
+            <div>
+              <div class="data-row"><span class="dr-label">Post Upvote XP</span><span class="dr-val b" id="r-xp-posts">—</span></div>
+              <div class="data-row"><span class="dr-label">Comment XP</span><span class="dr-val b" id="r-xp-comments">—</span></div>
+              <div class="data-row"><span class="dr-label">Quest XP</span><span class="dr-val b" id="r-xp-quests">—</span></div>
+              <div class="data-row"><span class="dr-label">GoodBot XP</span><span class="dr-val b" id="r-xp-goodbot">—</span></div>
+              <div class="data-row"><span class="dr-label">Feed XP</span><span class="dr-val b" id="r-xp-feed">—</span></div>
+            </div>
+          </div>
+        </div>
     </div>
 
     <!-- NFT MODAL -->
@@ -1134,12 +1249,16 @@ function renderQuickStats(s, p) {
   const planted = bal.shroom_farm || 0;
   const staked  = staking.staked_spores || 0;
 
-  setEl('qs-planted', fmt(planted) + ' SHROOM');
-  setEl('qs-sgr',     fmt(farm.spore_generation_rate) + ' / day');
-  setEl('qs-staked',  fmt(staked));
-  setEl('qs-stage',   safe(farm.current_stage, 'Inactive'));
-  setEl('qs-streak',  safe(farm.streak, 0) + ' days');
-  setEl('qs-nodes',   staked > 0 ? Math.floor(staked / 100_000_000).toString() : '0');
+  const nftWallet = profileData.pixie?.Wallet?.NFT || {};
+  const farmBoostCount = Object.entries(nftWallet)
+    .filter(([k]) => k.startsWith('Farm Boost'))
+    .reduce((sum, [,v]) => sum + (v?.count || 1), 0);
+  const nftBoost = farmBoostCount * 1_000_000;
+  setEl('qs-planted',       fmt(planted) + ' SHROOM');
+  setEl('qs-nft-boost',     fmt(nftBoost) + ' SHROOM');
+  setEl('qs-total-planted', fmt(planted + nftBoost) + ' SHROOM');
+  setEl('qs-sgr',           fmt(farm.spore_generation_rate) + ' / day');
+  setEl('qs-staked',        fmt(staked));
 }
 
 function renderFarm(s, p) {
@@ -1171,6 +1290,63 @@ function renderFarm(s, p) {
   const sporDate = farm.Sporulation_Date || farm.Golden_Sporulation_Date || null;
   setEl('f-spor-date', sporDate ? timeRemaining(sporDate) : '-');
 
+  const STAGE_ORDER2 = ['Spore','Germination','Mycelium','Fruiting','Sporulation','Golden_Sporulation'];
+  const curIdx = STAGE_ORDER2.indexOf(farm.current_stage);
+  const nextStage = curIdx >= 0 && curIdx < STAGE_ORDER2.length - 1 ? STAGE_ORDER2[curIdx + 1] : 'Max Stage';
+  setEl('f2-next-stage', nextStage);
+  const STAGE_DAYS2 = {Spore:0,Germination:7,Mycelium:14,Fruiting:21,Sporulation:42,Golden_Sporulation:84};
+  if (nextStage !== 'Max Stage' && farm.planted_time) {
+    let pt = farm.planted_time;
+    if (!pt.includes('T')) pt = pt.replace(' ', 'T');
+    if (!pt.endsWith('Z') && !pt.includes('+')) pt += 'Z';
+    const plantedMs = new Date(pt).getTime();
+    const nextMs = plantedMs + (STAGE_DAYS2[nextStage] || 0) * 86400000;
+    const diff = nextMs - Date.now();
+    setEl('f2-next-time', diff <= 0 ? 'Ready!' : Math.floor(diff/86400000) + 'd ' + Math.floor((diff%86400000)/3600000) + 'h');
+  } else {
+    setEl('f2-next-time', nextStage === 'Max Stage' ? 'Max Stage' : '-');
+  }
+
+  // SGR Breakdown
+  const apy = farm.APY_Breakdown || {};
+  const sgrEl = document.getElementById('sgr-breakdown-content');
+  if (Object.keys(apy).length) {
+    const sgrRows = [
+      { label: 'Stage Bonus',       key: 'stage_bonus',           suffix: '%', color: 'var(--green)',   emoji: '🍄' },
+      { label: 'Rank Bonus',        key: 'rank_bonus',            suffix: '%', color: 'var(--yellow)',  emoji: '🏆' },
+      { label: 'In-Game Sporebot',  key: 'ingame_sporebot_bonus', suffix: '%', color: 'var(--blue)',    emoji: '🤖' },
+      { label: 'Potion Bonus',      key: 'potion_bonus',          suffix: '%', color: 'var(--purple)',  emoji: '🧪' },
+      { label: 'Collector Items',   key: 'collector_bonus',       suffix: '%', color: 'var(--green)',   emoji: '💎' },
+      { label: 'Rootsong Gemstone', key: 'rootsong_bonus',        suffix: '%', color: 'var(--green)',   emoji: '🌿' },
+      { label: 'Sunspore Gemstone', key: 'sunspore_bonus',        suffix: '%', color: 'var(--yellow)',  emoji: '☀️' },
+      { label: 'Spirit Gemstone',   key: 'brewing_bonus',         suffix: '%', color: 'var(--purple)',  emoji: '✨' },
+      { label: 'Sporebot NFT',      key: 'sporebot_bonus',        suffix: '%', color: 'var(--purple)',  emoji: '🤖' },
+      { label: 'LP Provider',       key: 'lp_bonus',              suffix: '%', color: '#9b8cff',        emoji: '💧' },
+      { label: 'Mooshie NFTs',      key: 'mooshie_bonus',         suffix: '%', color: 'var(--yellow)',  emoji: '🖼️' },
+      { label: 'Guwoo NFT',         key: 'guwoo_bonus',           suffix: '%', color: 'var(--yellow)',  emoji: '🐾' },
+    ];
+    const activeRows = sgrRows.filter(r => apy[r.key] > 0);
+    const totalApy = Math.round((farm.APY || 0) * 100);
+    const ingameKeys = ['stage_bonus','rank_bonus','ingame_sporebot_bonus','potion_bonus','collector_bonus','rootsong_bonus','sunspore_bonus','brewing_bonus'];
+    const onchainKeys = ['sporebot_bonus','lp_bonus','mooshie_bonus','guwoo_bonus'];
+    const ingameRows = activeRows.filter(r => ingameKeys.includes(r.key));
+    const onchainRows = activeRows.filter(r => onchainKeys.includes(r.key));
+    const sectionHdr = (emoji, label, first) =>
+      '<div style="font-family:Syne Mono,monospace;font-size:0.65rem;letter-spacing:0.15em;font-weight:600;color:rgba(255,255,225,0.85);padding:0.75rem 0 0.35rem;'
+      + (first ? '' : 'border-top:1px solid rgba(255,255,225,0.08);margin-top:0.25rem;')
+      + '">'
+      + emoji + ' ' + label + '</div>';
+    const row = r =>
+      '<div class="data-row"><span style="color:rgba(255,255,225,0.8);font-size:0.82rem;">' + r.emoji + ' ' + r.label + '</span>'
+      + '<span style="font-family:Syne Mono,monospace;font-size:0.82rem;font-weight:600;color:' + r.color + ';">+' + Number(apy[r.key]).toFixed(1) + r.suffix + '</span></div>';
+    sgrEl.innerHTML = '<div style="display:flex;flex-direction:column;gap:0;">'
+      + (ingameRows.length ? sectionHdr('🍄', 'IN-GAME BONUSES (FREE)', true) + ingameRows.map(row).join('') : '')
+      + (onchainRows.length ? sectionHdr('🌐', 'ON-CHAIN BONUSES', false) + onchainRows.map(row).join('') : '')
+      + '<div class="data-row" style="margin-top:0.5rem;border-top:1px solid rgba(255,255,225,0.1);padding-top:0.5rem;">'
+      + '<span style="font-family:Syne Mono,monospace;font-size:0.72rem;color:rgba(255,255,225,0.75);">⚡ TOTAL APY</span>'
+      + '<span style="font-family:Syne Mono,monospace;font-size:0.9rem;font-weight:700;color:var(--yellow);">' + totalApy + '%</span></div>'
+      + '</div>';
+  } else { sgrEl.innerHTML = '<div class="empty-hint">Run !farm in Discord to generate breakdown data.</div>'; }
   // Daily actions
   // Hourly cooldown helper
   function hourlyCooldown(tsStr) {
@@ -1209,7 +1385,7 @@ function renderFarm(s, p) {
   const grid = document.getElementById('daily-actions-grid');
   grid.style.display = 'block';
   grid.innerHTML = '<div style="margin-bottom:0.875rem;">'
-    + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;">'
+    + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.65);margin-bottom:0.4rem;">'
     + '<span>Daily Progress</span><span>' + doneCount + ' / ' + totalCount + ' complete</span></div>'
     + '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
     + '<div style="height:100%;width:' + barPct + '%;background:linear-gradient(90deg,var(--green),#4ade80);border-radius:999px;transition:width 1s ease;"></div>'
@@ -1251,6 +1427,23 @@ function renderFarm(s, p) {
         + '</div>';
     }).join('')
     + '</div>';
+
+  // Weather — fetched live from API
+  fetch(window.API_BASE + '/api/weather')
+    .then(r => r.json())
+    .then(d => {
+      const w = d.weather || {};
+      const cond = (w.condition || 'none').replace(/_/g,' ');
+      setEl('w-condition',    cond.charAt(0).toUpperCase() + cond.slice(1));
+      setEl('w-family',       w.condition_family || '—');
+      setEl('w-temp',         w.temp_f != null ? w.temp_f + 'F (' + w.temp_tier + ')' : (w.temp_tier || '—'));
+      setEl('w-sky',          w.sky || '—');
+      setEl('w-mist',         w.mist_mult != null ? 'x' + Number(w.mist_mult).toFixed(2) : '—');
+      setEl('w-fan',          w.fan_mult  != null ? 'x' + Number(w.fan_mult).toFixed(2)  : '—');
+      setEl('w-mist-blocked', w.mist_blocked ? 'Blocked' : 'Active');
+      setEl('w-fan-blocked',  w.fan_blocked  ? 'Blocked' : 'Active');
+    })
+    .catch(() => {});
 }
 
 function renderWallet(s, p) {
@@ -1316,10 +1509,18 @@ const RARITY_BY_NAME = {
 };
 const STAT_VALS = { Uncommon:1, Rare:2, 'Super Rare':5 };
 const STAT_EMOJI = {
-  'Spore Yield':'🍄','Harvest Bonus':'🌱','Queen Totem Chance':'👑',
-  'King Totem Chance':'👑','Kid Totem Chance':'🧒','Gold Totem Chance':'🏅',
-  'Herb Find Rate':'🌿','Rare Herb Chance':'✨','Double Herb Chance':'⚡',
-  'Extra Brews':'🧪','Plant Limit':'🪴','Pipe Reduction':'🪵',
+  'Spore Yield':        '<img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Harvest Bonus':      '<img src="/images/shroomfarm.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Queen Totem Chance': '<img src="/images/queen.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'King Totem Chance':  '<img src="/images/king.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Kid Totem Chance':   '<img src="/images/kidshroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Gold Totem Chance':  '<img src="/images/gold_totem.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Herb Find Rate':     '<img src="/images/herbs.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Rare Herb Chance':   '<img src="/images/clover.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Double Herb Chance': '<img src="/images/boost.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Extra Brews':        '<img src="/images/potion2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Plant Limit':        '<img src="/images/shroomfarm.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Pipe Reduction':     '<img src="/images/pipe.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
 };
 const PLANT_LIMIT_VALS = { Uncommon:200000, Rare:500000, 'Super Rare':1000000 };
 const HERB_VALS = { Uncommon:5, Rare:10, 'Super Rare':15 };
@@ -1376,25 +1577,13 @@ function openSporebotModal(tokenId, imageUrl, traits) {
     statsEl.innerHTML = '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.15em;color:rgba(255,255,225,0.3);margin-bottom:0.5rem;">BONUSES</div>'
       + entries.map(([stat, val]) => {
           const fmt2 = stat === 'Plant Limit' ? '+' + (val/1000000).toFixed(1) + 'M limit' : '+' + val + (stat.includes('Chance') || stat.includes('Rate') || stat.includes('Bonus') || stat.includes('Yield') ? '%' : '');
-          return '<div class="data-row"><span class="dr-label">' + (STAT_EMOJI[stat]||'') + ' ' + stat + '</span><span class="dr-val g">' + fmt2 + '</span></div>';
+          return '<div class="data-row"><span class="dr-label">' + (STAT_EMOJI[stat]||'') + stat + '</span><span class="dr-val g">' + fmt2 + '</span></div>';
         }).join('');
   } else {
     statsEl.innerHTML = '<div class="empty-hint" style="padding:0.75rem 0;text-align:left;">No active bonuses (Common traits only)</div>';
   }
 
-  // Render raw traits
-  const traitsEl = document.getElementById('nft-modal-traits');
-  if (traits && Object.keys(traits).length) {
-    traitsEl.innerHTML = '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.15em;color:rgba(255,255,225,0.3);margin-bottom:0.5rem;margin-top:0.5rem;">TRAITS</div>'
-      + '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'
-      + Object.entries(traits).map(([k,v]) =>
-          '<span style="font-family:Syne Mono,monospace;font-size:0.6rem;padding:0.25em 0.6em;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,225,0.08);color:rgba(255,255,225,0.5);">'
-          + '<span style="color:rgba(255,255,225,0.25);">' + k + ':</span> ' + v + '</span>'
-        ).join('')
-      + '</div>';
-  } else {
-    traitsEl.innerHTML = '';
-  }
+  document.getElementById('nft-modal-traits').innerHTML = '';
 
   overlay.classList.add('open');
 }
@@ -1818,9 +2007,35 @@ function renderBrewing(s) {
   // Ingredients
   const ingEl = document.getElementById('brew-ingredients-content');
   const owned = Object.entries(ingredients).filter(([,v])=>v>0);
+  const ING_EMOJI = {
+    'Sunspore':'/images/sunspore.png','Ashroot':'/images/ashroot.png',
+    'Glowcap':'/images/glowcap.png','Dreamdust':'/images/dreamdust.png',
+    'Frostmoss':'/images/frostmoss.png','Elderbloom':'/images/elderbloom.png',
+    'Voidspore':'/images/voidspore.png',
+  };
+  const TIER_COLOR = {
+    'Sunspore':'rgba(254,206,0,0.12)','Ashroot':'rgba(34,197,94,0.1)',
+    'Glowcap':'rgba(34,197,94,0.1)','Dreamdust':'rgba(79,168,253,0.12)',
+    'Frostmoss':'rgba(79,168,253,0.12)','Elderbloom':'rgba(192,132,252,0.12)',
+    'Voidspore':'rgba(253,70,79,0.12)',
+  };
+  const TIER_BORDER = {
+    'Sunspore':'rgba(254,206,0,0.3)','Ashroot':'rgba(34,197,94,0.25)',
+    'Glowcap':'rgba(34,197,94,0.25)','Dreamdust':'rgba(79,168,253,0.3)',
+    'Frostmoss':'rgba(79,168,253,0.3)','Elderbloom':'rgba(192,132,252,0.3)',
+    'Voidspore':'rgba(253,70,79,0.35)',
+  };
   if(owned.length){
     ingEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">'
-      + owned.map(([k,v])=>'<span class="gem-chip owned">' + k.replace(/_/g,' ') + ' x' + v + '</span>').join('')
+      + owned.map(([k,v]) => {
+          const bg  = TIER_COLOR[k]  || 'rgba(254,206,0,0.08)';
+          const bdr = TIER_BORDER[k] || 'rgba(254,206,0,0.25)';
+          const img = ING_EMOJI[k] ? '<img src="' + ING_EMOJI[k] + '" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">' : '🌿 ';
+          return '<div style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.35em 0.75em;border-radius:999px;background:' + bg + ';border:1px solid ' + bdr + ';font-family:Syne Mono,monospace;font-size:0.72rem;color:var(--cream);">'
+            + img + '<span style="font-weight:600;">' + k + '</span>'
+            + '<span style="color:rgba(255,255,225,0.5);margin-left:2px;">×' + v + '</span>'
+            + '</div>';
+        }).join('')
       + '</div>';
   } else { ingEl.innerHTML = '<div class="empty-hint">No ingredients. Use !gather or !cave.</div>'; }
 }
@@ -1859,11 +2074,21 @@ function renderPixie(p) {
   setEl('px-gs-tokens',   gs);
   setEl('px-gs-given',    gsStats.Given    || 0);
   setEl('px-gs-received', gsStats.Received || 0);
-  setEl('px-tip-shroom',  fmt(tipGiven)  + ' / ' + fmt(tipSpore));
-  setEl('px-raf-shroom',  fmt(rafShroom) + ' / ' + fmt(rafSpore));
-  setEl('px-air-shroom',  fmt(airShroom) + ' / ' + fmt(airSpore));
-  setEl('px-total-given', fmt(totalGivenShroom) + ' SHROOM / ' + fmt(totalGivenSpore) + ' SPORE');
-  setEl('px-total-rec',   fmt(totalRec.Total_Shrooms||0) + ' SHROOM / ' + fmt(totalRec.Total_Spores||0) + ' SPORE');
+  const fmtKp = v => { v = Number(v||0); if(v>=1e6) return (v/1e6).toFixed(2)+'M'; if(v>=1e3) return (v/1e3).toFixed(0)+'K'; return v.toLocaleString(); };
+  const tipRecvShroom = tipping.Total?.Received?.Total_Shrooms || 0;
+  const tipRecvSpore  = tipping.Total?.Received?.Total_Spores  || 0;
+  const rafRecvShroom = tipping.Raffle?.Received?.Total_Shrooms || 0;
+  const rafRecvSpore  = tipping.Raffle?.Received?.Total_Spores  || 0;
+  const airRecvShroom = tipping.Airdrop?.Received?.Total_Shrooms || 0;
+  const airRecvSpore  = tipping.Airdrop?.Received?.Total_Spores  || 0;
+  setEl('px-tip-given',   fmtKp(tipGiven)      + ' S / ' + fmtKp(tipSpore)      + ' SP');
+  setEl('px-tip-recv',    fmtKp(tipRecvShroom) + ' S / ' + fmtKp(tipRecvSpore)  + ' SP');
+  setEl('px-raf-given',   fmtKp(rafShroom)     + ' S / ' + fmtKp(rafSpore)      + ' SP');
+  setEl('px-raf-recv',    fmtKp(rafRecvShroom) + ' S / ' + fmtKp(rafRecvSpore)  + ' SP');
+  setEl('px-air-given',   fmtKp(airShroom)     + ' S / ' + fmtKp(airSpore)      + ' SP');
+  setEl('px-air-recv',    fmtKp(airRecvShroom) + ' S / ' + fmtKp(airRecvSpore)  + ' SP');
+  setEl('px-total-given', fmtKp(totalGivenShroom) + ' S / ' + fmtKp(totalGivenSpore) + ' SP');
+  setEl('px-total-rec',   fmtKp(tipRecvShroom)    + ' S / ' + fmtKp(tipRecvSpore)    + ' SP');
 
   // Achievements
   const achEl = document.getElementById('achievements-content');
@@ -1900,28 +2125,28 @@ function renderPixie(p) {
   });
 
   const ACHIEVEMENTS = [
-    { label: 'All Scrolls',       done: scrollCount   >= 10,  progress: scrollCount   + ' / 10' },
-    { label: 'All Artifacts',     done: artifactCount >= 10,  progress: artifactCount + ' / 10' },
-    { label: 'All Gemstones',     done: gemsFound     >= 5,   progress: gemsFound     + ' / 5'  },
-    { label: 'Max Bond All Pets', done: maxBondCount  >= 12,  progress: maxBondCount  + ' / 12' },
-    { label: 'Max SGR Bonus',     done: sgr           >= 25,  progress: sgr.toFixed(1)+ '% / 25%'},
-    { label: 'Brewing Lv.100',    done: brewingLvl    >= 100, progress: 'Lv.' + brewingLvl      },
-    { label: 'Herbology Lv.100',  done: herbLvl       >= 100, progress: 'Lv.' + herbLvl         },
-    { label: 'Legend Rank',       done: farmRank === 'LEGEND',progress: farmRank                },
-    { label: 'Golden Sporulation',done: currentStage === 'Golden_Sporulation', progress: currentStage || 'Not reached' },
+    { label: 'All Scrolls',       emoji: '📜', done: scrollCount   >= 10,  progress: scrollCount   + ' / 10' },
+    { label: 'All Artifacts',     emoji: '🗿', done: artifactCount >= 10,  progress: artifactCount + ' / 10' },
+    { label: 'All Gemstones',     emoji: '💎', done: gemsFound     >= 5,   progress: gemsFound     + ' / 5'  },
+    { label: 'Max Bond All Pets', emoji: '🐾', done: maxBondCount  >= 12,  progress: maxBondCount  + ' / 12' },
+    { label: 'Max SGR Bonus',     emoji: '🤖', done: sgr           >= 25,  progress: sgr.toFixed(1)+ '% / 25%'},
+    { label: 'Brewing Lv.100',    emoji: '🧪', done: brewingLvl    >= 100, progress: 'Lv.' + brewingLvl      },
+    { label: 'Herbology Lv.100',  emoji: '🌿', done: herbLvl       >= 100, progress: 'Lv.' + herbLvl         },
+    { label: 'Legend Rank',       emoji: '👑', done: farmRank === 'LEGEND',progress: farmRank                },
+    { label: 'Golden Sporulation',emoji: '✨', done: currentStage === 'Golden_Sporulation', progress: currentStage || 'Not reached' },
   ];
 
   const doneCount2 = ACHIEVEMENTS.filter(a => a.done).length;
   achEl.innerHTML = '<div style="margin-bottom:0.875rem;display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);">'
-    + '<span>End-Game Progress</span><span>' + doneCount2 + ' / 9</span></div>'
+    + '<span style="color:rgba(255,255,225,0.75);">End-Game Progress</span><span style="color:rgba(255,255,225,0.75);">' + doneCount2 + ' / 9</span></div>'
     + '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;margin-bottom:1rem;">'
     + '<div style="height:100%;width:' + Math.round(doneCount2/9*100) + '%;background:linear-gradient(90deg,var(--yellow),#f97316);border-radius:999px;transition:width 1s ease;"></div>'
     + '</div>'
     + ACHIEVEMENTS.map(a =>
         '<div class="data-row">'
-        + '<span class="dr-label">' + a.label + '</span>'
+        + '<span class="dr-label">' + a.emoji + ' ' + a.label + '</span>'
         + '<div style="display:flex;align-items:center;gap:0.5rem;">'
-        + '<span style="font-family:Syne Mono,monospace;font-size:0.7rem;color:rgba(255,255,225,0.3);">' + a.progress + '</span>'
+        + '<span style="font-family:Syne Mono,monospace;font-size:0.7rem;color:rgba(255,255,225,0.65);">' + a.progress + '</span>'
         + '<span style="font-size:0.8rem;color:' + (a.done ? 'var(--green)' : 'rgba(255,255,225,0.15)') + ';">' + (a.done ? '✓' : '○') + '</span>'
         + '</div></div>'
       ).join('');
@@ -1931,16 +2156,17 @@ function renderReddit(s, p) {
   const r = profileData.reddit;
   const redditName = profileData.redditName;
 
-  const statsEl = document.getElementById('reddit-stats');
-  const rwEl    = document.getElementById('reddit-wallet-content');
-  const rdEl    = document.getElementById('reddit-daily-content');
+  const noAccEl  = document.getElementById('reddit-no-account');
+  const linkedEl = document.getElementById('reddit-linked-content');
+  const rdEl     = document.getElementById('reddit-daily-content');
 
   if (!r || !redditName) {
-    statsEl.innerHTML = '<div class="empty-hint" style="grid-column:1/-1;">No Reddit account linked. Use !link in Reddit to connect.</div>';
-    rwEl.innerHTML    = '<div class="empty-hint">No Reddit wallet found.</div>';
-    rdEl.innerHTML    = '<div class="empty-hint">No Reddit daily data found.</div>';
+    if (noAccEl)  noAccEl.style.display  = 'block';
+    if (linkedEl) linkedEl.style.display = 'none';
     return;
   }
+  if (noAccEl)  noAccEl.style.display  = 'none';
+  if (linkedEl) linkedEl.style.display = 'block';
 
   const bal     = r.Balance    || {};
   const forage  = r.Forage     || {};
@@ -1951,91 +2177,136 @@ function renderReddit(s, p) {
   const link    = r.Link       || {};
   const airdrop = r.Airdrop    || {};
 
+  // Identity
+  setEl('r-username',    'u/' + redditName);
+  setEl('r-flair',       safe(flair.Flair, 'SPROUT'));
+  setEl('r-xp',         fmt(flair.Total_XP));
+  setEl('r-linked',     link.Discord_Link ? 'Yes' : 'No');
+  setEl('r-gs-tokens',  gs.Tokens   || 0);
+  setEl('r-gs-stat',    (gs.Given || 0) + ' / ' + (gs.Received || 0));
+
+  // Forage
+  setEl('r-streak',          (forage.streak || 0) + ' days');
+  setEl('r-maxstreak',       (forage.record_streak || 0) + ' days');
+  setEl('r-total-forages',   fmt(forage.Total_Forage));
+  setEl('r-vacation',        forage.vacation_days || 0);
+  setEl('r-total-shroom',    fmt(bal.reddit_shrooms));
+  setEl('r-total-spore',     fmt(bal.reddit_spores));
+  const feedBoost  = feed.feed_boost || 0;
+  const nftBonus   = r.Wallet?.NFT_Forage_Bonus || 0;
+  const flairName  = flair.Flair || 'SPROUT';
+  const FLAIR_BONUS = {'BRONZE':5,'SILVER':10,'GOLD':23,'EMERALD':42,'DIAMOND':69,'MASTER':85,'GRANDMASTER':100};
+  const flairBonusVal = Object.entries(FLAIR_BONUS).find(([k]) => flairName.toUpperCase().includes(k))?.[1] || 0;
+  const totalBonus = feedBoost + nftBonus + flairBonusVal;
+  setEl('r-feed-boost',   feedBoost + '%');
+  setEl('r-nft-bonus',    nftBonus + '%');
+  setEl('r-flair-bonus',  flairBonusVal + '%');
+  setEl('r-total-bonus',  totalBonus + '%');
+  // Tipping
   const shroomGiven    = (tipping.SHROOM?.Given    || 0) + (airdrop.SHROOM?.Given || 0);
   const shroomReceived =  tipping.SHROOM?.Received || 0;
   const sporeGiven     = (tipping.SPORE?.Given     || 0) + (airdrop.SPORE?.Given  || 0);
   const sporeReceived  =  tipping.SPORE?.Received  || 0;
+  const fmtK = v => {
+    if (v == null) return '-';
+    v = Number(v);
+    if (v >= 1_000_000) return (v / 1_000_000).toFixed(2) + 'M';
+    if (v >= 1_000)     return (v / 1_000).toFixed(0) + 'K';
+    return v.toLocaleString();
+  };
+  setEl('r-shroom-given', fmtK(shroomGiven));
+  setEl('r-shroom-recv',  fmtK(shroomReceived));
+  setEl('r-spore-given',  fmtK(sporeGiven));
+  setEl('r-spore-recv',   fmtK(sporeReceived));
 
-  const stats = [
-    { label: 'Reddit Username', val: 'u/' + redditName },
-    { label: 'SHROOM Balance',  val: fmt(bal.reddit_shrooms) },
-    { label: 'SPORE Balance',   val: fmt(bal.reddit_spores) },
-    { label: 'Forage Streak',   val: (forage.streak || 0) + ' days' },
-    { label: 'Record Streak',   val: (forage.record_streak || 0) + ' days' },
-    { label: 'Total Forages',   val: fmt(forage.Total_Forage) },
-    { label: 'Vacation Days',   val: forage.vacation_days || 0 },
-    { label: 'Flair Rank',      val: safe(flair.Flair, 'SPROUT') },
-    { label: 'Total XP',        val: fmt(flair.Total_XP) },
-    { label: 'Total Fed',       val: fmt(feed.total_fed) + ' SHROOM' },
-    { label: 'Feed Milestone',  val: (feed.milestone || 0) + ' / 10' },
-    { label: 'Feed Boost',      val: (feed.feed_boost || 0) + '%' },
-    { label: 'SHROOM Given',    val: fmt(shroomGiven) },
-    { label: 'SHROOM Received', val: fmt(shroomReceived) },
-    { label: 'SPORE Given',     val: fmt(sporeGiven) },
-    { label: 'SPORE Received',  val: fmt(sporeReceived) },
-    { label: 'GS Tokens',       val: gs.Tokens   || 0 },
-    { label: 'GS Given',        val: gs.Given    || 0 },
-    { label: 'GS Received',     val: gs.Received || 0 },
-    { label: 'Discord Linked',  val: link.Discord_Link ? 'Yes' : 'No' },
-    { label: 'Wallet',          val: r.Address ? r.Address.slice(0,6) + '...' + r.Address.slice(-4) : 'Not registered' },
-  ];
+  // XP Breakdown — calculated from raw Firebase flair stats
+  // XP values are stored directly under Flair/XP by calculate_flair_xp
+  const flairXP    = flair.XP || {};
+  const flairStats = flair.Stats || {};
+  const totalXP    = flair.Total_XP || 0;
+  const xpStreak   = flairXP.streak        || 0;
+  const xpPosts    = flairXP.post_upvotes  || 0;
+  const xpComments = flairXP.comment_upvotes || 0;
+  const xpQuests   = flairXP.quest         || 0;
+  const xpGoodbot  = flairXP.Goodbot       || 0;
+  const xpForage   = flairXP.forage        || 0;
+  const xpFeed     = flairXP.feed          || 0;
 
-  statsEl.innerHTML = stats.map(st =>
-    '<div class="reddit-stat"><div class="rs-label">' + st.label + '</div><div class="rs-val">' + st.val + '</div></div>'
-  ).join('');
+  const FLAIR_TIERS = [[4206874,'GRANDMASTER'],[2000000,'MASTER'],[1000000,'DIAMOND'],[750000,'EMERALD'],[500000,'GOLD'],[250000,'SILVER'],[100000,'BRONZE'],[0,'SPROUT']];
+  let nextRank = 'MAXED', xpNeeded = 0;
+  for (const [thresh, rank] of [...FLAIR_TIERS].reverse()) {
+    if (totalXP < thresh) { nextRank = rank; xpNeeded = thresh - totalXP; break; }
+  }
 
-  rwEl.innerHTML = '<div class="data-row"><span class="dr-label">SHROOM</span><span class="dr-val r">' + fmt(bal.reddit_shrooms) + '</span></div>'
-    + '<div class="data-row"><span class="dr-label">SPORE</span><span class="dr-val b">' + fmt(bal.reddit_spores) + '</span></div>'
-    + (r.Address ? '<div class="data-row"><span class="dr-label">Wallet</span><span class="dr-val">' + r.Address.slice(0,6) + '...' + r.Address.slice(-4) + '</span></div>' : '');
+  setEl('r-xp-total',    fmt(totalXP) + ' XP');
+  setEl('r-xp-next',     nextRank);
+  setEl('r-xp-needed',   fmt(xpNeeded) + ' XP');
+  setEl('r-xp-streak',   '+' + fmt(xpStreak));
+  setEl('r-xp-forage',   '+' + fmt(xpForage));
+  setEl('r-xp-posts',    '+' + fmt(xpPosts));
+  setEl('r-xp-comments', '+' + fmt(xpComments));
+  setEl('r-xp-quests',   '+' + fmt(xpQuests));
+  setEl('r-xp-goodbot',  '+' + fmt(xpGoodbot));
+  setEl('r-xp-feed',     '+' + fmt(xpFeed));
 
-  const questDone   = r.Quests?.Daily_Quest === true;
-  const forageDone  = forage.daily_forage === true;
-  const feedCooldown = feed.last_feed_time
-    ? (function() {
-        const last = new Date(feed.last_feed_time);
-        const diff = 3600000 - (Date.now() - last.getTime());
-        if (diff <= 0) return 'Ready';
-        const m = Math.floor(diff / 60000);
-        const s = Math.floor((diff % 60000) / 1000);
-        return m + 'm ' + s + 's';
-      })()
-    : 'Ready';
+  // Daily activity
+  const questDone  = r.Quests?.Daily_Quest === true;
+  const forageDone = forage.daily_forage === true;
+  const feedCooldown = feed.last_feed_time ? (function() {
+    // last_feed_time is stored as ISO without Z suffix from Python datetime.utcnow().isoformat()
+    let ts = feed.last_feed_time;
+    if (!ts.endsWith('Z') && !ts.includes('+')) ts += 'Z';
+    const last = new Date(ts);
+    const diff = 3600000 - (Date.now() - last.getTime());
+    if (diff <= 0) return 'Ready';
+    const m = Math.floor(diff / 60000);
+    const s2 = Math.floor((diff % 60000) / 1000);
+    return m + 'm ' + s2 + 's';
+  })() : 'Ready';
   const feedReady = feedCooldown === 'Ready';
 
-  const REDDIT_ACTIONS = [
-    { label: 'Forage',      cmd: '!forage',  done: forageDone,  cadence: 'Daily',  required: true },
-    { label: 'Feed',        cmd: '!feed',    done: feedReady,   cadence: 'Hourly', required: false, customState: feedReady ? 'READY' : feedCooldown },
-    { label: 'Daily Quest', cmd: '!quest',   done: questDone,   cadence: 'Daily',  required: false },
+  setEl('r-total-fed',      fmt(feed.total_fed) + ' SHROOM');
+  setEl('r-feed-milestone', (feed.milestone || 0) + ' / 10');
+  setEl('r-spore-bags',     (feed.spore_bag_counter || 0).toString());
+  setEl('r-total-feeds',    fmt(feed.Total_Feeds));
+  setEl('r-feed-cd',        feedReady ? 'Ready' : feedCooldown);
+  setEl('r-gemstone',       feed.gemstone_unlocked ? 'Yes' : 'No');
+
+  const ACTIONS = [
+    
+    { label: 'Forage',      cmd: '!forage', done: forageDone, cadence: 'Daily',  required: true,  img: '/images/shroom.png' },
+    { label: 'Feed',        cmd: '!feed',   done: feedReady,  cadence: 'Hourly', required: false, img: '/images/shroomfarm.png', customState: feedReady ? 'READY' : feedCooldown },
+    { label: 'Daily Quest', cmd: '!quest',  done: questDone,  cadence: 'Daily',  required: false, img: '/images/scroll.png' },
   ];
 
-  const doneCount = [forageDone, feedReady, questDone].filter(Boolean).length;
-  const totalCount = REDDIT_ACTIONS.length;
-  const barPct = Math.round((doneCount / totalCount) * 100);
+  const doneCount  = ACTIONS.filter(a => a.done).length;
+  const barPct     = Math.round((doneCount / ACTIONS.length) * 100);
 
   rdEl.innerHTML = '<div style="margin-bottom:1rem;">'
     + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;">'
-    + '<span>Daily Progress</span><span>' + doneCount + ' / ' + totalCount + ' complete</span></div>'
+    + '<span>Daily Progress</span><span>' + doneCount + ' / ' + ACTIONS.length + ' complete</span></div>'
     + '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
     + '<div style="height:100%;width:' + barPct + '%;background:linear-gradient(90deg,#ff6314,#ff9a14);border-radius:999px;transition:width 1s ease;"></div>'
     + '</div></div>'
-    + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem;">'
-    + REDDIT_ACTIONS.map(a => {
-      const bg     = a.done ? 'rgba(34,197,94,0.08)'  : a.required ? 'rgba(253,70,79,0.06)'  : 'rgba(255,255,255,0.02)';
-      const border = a.done ? 'rgba(34,197,94,0.3)'   : a.required ? 'rgba(253,70,79,0.25)'  : 'rgba(255,255,225,0.07)';
-      const icon   = a.done ? '✓' : a.required ? '!' : '○';
-      const iconCol  = a.done ? '#22c55e' : a.required ? '#fd464f' : 'rgba(255,255,225,0.25)';
-      const labelCol = a.done ? '#22c55e' : 'var(--cream)';
-      const stateLabel = a.customState || (a.done ? 'Done' : a.cadence);
-      const stateCol   = a.done ? 'rgba(34,197,94,0.5)' : a.required ? 'rgba(253,70,79,0.6)' : 'rgba(255,255,225,0.25)';
-      return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.875rem;border-radius:0.75rem;border:1px solid ' + border + ';background:' + bg + ';">'
-        + '<span style="font-size:0.9rem;color:' + iconCol + ';font-weight:700;width:14px;text-align:center;flex-shrink:0;">' + icon + '</span>'
-        + '<div style="display:flex;flex-direction:column;gap:0.1rem;min-width:0;">'
-        + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.8rem;font-weight:600;color:' + labelCol + ';">' + a.label + '</span>'
-        + '<span style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,100,20,0.7);">' + a.cmd + '</span>'
-        + '</div>'
-        + '<span style="margin-left:auto;font-family:Syne Mono,monospace;font-size:0.55rem;color:' + stateCol + ';flex-shrink:0;">' + stateLabel + '</span>'
-        + '</div>';
-    }).join('')
+    + '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'
+    + ACTIONS.map(a => {
+        const isHourly    = a.cadence === 'Hourly';
+        const onCooldown  = isHourly && !a.done;
+        const hourlyReady = isHourly && a.done;
+        const bg     = !isHourly && a.done ? 'rgba(34,197,94,0.08)' : hourlyReady ? 'rgba(253,70,79,0.08)' : onCooldown ? 'rgba(254,206,0,0.05)' : a.required ? 'rgba(253,70,79,0.05)' : 'rgba(255,255,255,0.02)';
+        const border = !isHourly && a.done ? 'rgba(34,197,94,0.25)' : hourlyReady ? 'rgba(253,70,79,0.3)' : onCooldown ? 'rgba(254,206,0,0.25)' : a.required ? 'rgba(253,70,79,0.2)' : 'rgba(255,255,225,0.07)';
+        const iconCol  = !isHourly && a.done ? '#22c55e' : hourlyReady ? '#fd464f' : onCooldown ? '#fece00' : 'rgba(255,255,225,0.2)';
+        const labelCol = !isHourly && a.done ? '#22c55e' : hourlyReady ? '#fd464f' : onCooldown ? '#fece00' : 'rgba(255,255,225,0.75)';
+        const icon     = !isHourly && a.done ? '✓' : hourlyReady ? '!' : onCooldown ? '◷' : '○';
+        const subText  = a.customState || (hourlyReady ? 'Use Now!' : onCooldown ? a.customState||a.cadence : a.done ? 'Done' : a.cadence);
+        const subCol   = !isHourly && a.done ? 'rgba(34,197,94,0.6)' : hourlyReady ? 'rgba(253,70,79,0.7)' : onCooldown ? 'rgba(254,206,0,0.6)' : 'rgba(255,100,20,0.6)';
+        return '<div style="display:flex;align-items:center;gap:0.45rem;padding:0.45rem 0.8rem;border-radius:0.625rem;border:1px solid ' + border + ';background:' + bg + ';white-space:nowrap;">'
+          + '<span style="font-size:0.75rem;color:' + iconCol + ';font-weight:700;">' + icon + '</span>'
+          + '<div style="display:flex;flex-direction:column;gap:0.05rem;">'
+          + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.75rem;font-weight:600;color:' + labelCol + ';">' + a.label + '</span>'
+          + '<span style="font-family:Syne Mono,monospace;font-size:0.52rem;color:' + subCol + ';">' + subText + '</span>'
+          + '</div></div>';
+      }).join('')
     + '</div>';
 }
 
