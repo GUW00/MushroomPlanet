@@ -1171,21 +1171,42 @@ window.disconnectWallet = async function() {
 .pwa-nav{position:fixed;bottom:0;left:0;right:0;height:65px;background:#111;border-top:1px solid rgba(255,255,225,0.08);display:none;align-items:stretch;z-index:999;padding-bottom:env(safe-area-inset-bottom);}
 @media(display-mode:standalone){.pwa-nav{display:flex;}body{padding-bottom:80px!important;}}
 .pwa-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.2rem;text-decoration:none;color:rgba(255,255,225,0.35);font-family:'Syne Mono',monospace;font-size:0.55rem;letter-spacing:0.05em;transition:color 0.2s;}
-.pwa-tab span:first-child{font-size:1.3rem;}
+.pwa-tab span:first-child{font-size:1.3rem;display:flex;align-items:center;justify-content:center;}
 .pwa-tab.active{color:#fece00;}
 @media(display-mode:standalone){header{display:none!important;}#global-menu{display:none!important;}html body{padding-top:0!important;}.vote-hero{padding-top:1.5rem!important;}}
 </style>
 <nav class="pwa-nav">
-  <a href="/profile.html"  class="pwa-tab" data-page="profile">  <span>👤</span><span>Profile</span></a>
-  <a href="/treasury.html" class="pwa-tab" data-page="treasury"> <span>🏦</span><span>Treasury</span></a>
-  <a href="/vote.html"     class="pwa-tab" data-page="vote">     <span>🗳️</span><span>Vote</span></a>
-  <a href="/convert.html"  class="pwa-tab" data-page="convert">  <span>🔄</span><span>Convert</span></a>
+  <a href="/profile.html" class="pwa-tab" data-page="profile" id="pwa-profile-tab">
+    <span id="pwa-avatar-wrap"><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;border:1px solid rgba(255,255,225,0.2);" onerror="this.style.display='none'"></span>
+    <span>Profile</span>
+  </a>
+  <a href="/vote.html" class="pwa-tab" data-page="vote">
+    <span><img src="/images/vote.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Vote</span>
+  </a>
+  <a href="/convert.html" class="pwa-tab" data-page="convert">
+    <span><img src="/images/swaps.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Convert</span>
+  </a>
+    <a href="/treasury.html" class="pwa-tab" data-page="treasury">
+    <span><img src="/images/treasury.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Treasury</span>
+  </a>
 </nav>
 <script>
-(function(){
-  const page=window.location.pathname.split('/').pop().replace('.html','')||'home';
-  document.querySelectorAll('.pwa-tab').forEach(t=>{if(t.dataset.page===page)t.classList.add('active');});
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+(function() {
+  const page = window.location.pathname.split('/').pop().replace('.html','') || 'profile';
+  document.querySelectorAll('.pwa-tab').forEach(t => {
+    if (t.dataset.page === page) t.classList.add('active');
+  });
+  try {
+    const user = JSON.parse(localStorage.getItem('mp_profile_user') || '{}');
+    if (user.discord_id && user.avatar) {
+      const wrap = document.getElementById('pwa-avatar-wrap');
+      if (wrap) wrap.innerHTML = '<img src="https://cdn.discordapp.com/avatars/' + user.discord_id + '/' + user.avatar + '.png" style="width:26px;height:26px;object-fit:cover;border-radius:50%;border:2px solid rgba(254,206,0,0.5);">';
+    }
+  } catch(e) {}
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
 })();
 </script>
 </body>
