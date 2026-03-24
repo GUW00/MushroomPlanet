@@ -2510,19 +2510,24 @@ function renderReddit(s, p) {
   padding-bottom:env(safe-area-inset-bottom);
 ">
   <a href="/home.html" class="pwa-tab" data-page="home">
-    <span>🏡</span><span>Home</span>
+    <span><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:4px;" onerror="this.style.display='none'"></span>
+    <span>Home</span>
   </a>
-  <a href="/profile.html" class="pwa-tab" data-page="profile">
-    <span>👤</span><span>Profile</span>
+  <a href="/profile.html" class="pwa-tab" data-page="profile" id="pwa-profile-tab">
+    <span id="pwa-avatar-wrap"><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;border:1px solid rgba(255,255,225,0.2);" onerror="this.style.display='none'"></span>
+    <span>Profile</span>
   </a>
   <a href="/treasury.html" class="pwa-tab" data-page="treasury">
-    <span>🏦</span><span>Treasury</span>
+    <span><img src="/images/treasury.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Treasury</span>
   </a>
   <a href="/vote.html" class="pwa-tab" data-page="vote">
-    <span>🗳️</span><span>Vote</span>
+    <span><img src="/images/vote.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Vote</span>
   </a>
   <a href="/convert.html" class="pwa-tab" data-page="convert">
-    <span>🔄</span><span>Convert</span>
+    <span><img src="/images/swaps.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Convert</span>
   </a>
 </nav>
 <script>
@@ -2531,6 +2536,14 @@ function renderReddit(s, p) {
   document.querySelectorAll('.pwa-tab').forEach(t => {
     if (t.dataset.page === page) t.classList.add('active');
   });
+  // Set profile avatar from localStorage
+  try {
+    const user = JSON.parse(localStorage.getItem('mp_profile_user') || '{}');
+    if (user.discord_id && user.avatar) {
+      const wrap = document.getElementById('pwa-avatar-wrap');
+      if (wrap) wrap.innerHTML = '<img src="https://cdn.discordapp.com/avatars/' + user.discord_id + '/' + user.avatar + '.png" style="width:26px;height:26px;object-fit:cover;border-radius:50%;border:2px solid rgba(254,206,0,0.5);">';
+    }
+  } catch(e) {}
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   }
