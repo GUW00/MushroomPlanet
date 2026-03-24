@@ -712,18 +712,18 @@
         </div>
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/gift.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Tipping & Community</div>
-          <div class="data-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="data-grid" style="grid-template-columns:1fr 1fr;align-items:start;">
             <div>
-              <div class="data-row"><span class="dr-label">Tips Given</span><span class="dr-val b" id="px-tip-given">—</span></div>
-              <div class="data-row"><span class="dr-label">Tips Received</span><span class="dr-val b" id="px-tip-recv">—</span></div>
-              <div class="data-row"><span class="dr-label">Raffles Given</span><span class="dr-val b" id="px-raf-given">—</span></div>
-              <div class="data-row"><span class="dr-label">Raffles Received</span><span class="dr-val b" id="px-raf-recv">—</span></div>
+              <div class="data-row"><span class="dr-label">Tips Given</span><span class="dr-val" id="px-tip-given">—</span></div>
+              <div class="data-row"><span class="dr-label">Tips Received</span><span class="dr-val" id="px-tip-recv">—</span></div>
+              <div class="data-row"><span class="dr-label">Raffles Given</span><span class="dr-val" id="px-raf-given">—</span></div>
+              <div class="data-row"><span class="dr-label">Raffles Received</span><span class="dr-val" id="px-raf-recv">—</span></div>
             </div>
             <div>
-              <div class="data-row"><span class="dr-label">Airdrops Given</span><span class="dr-val b" id="px-air-given">—</span></div>
-              <div class="data-row"><span class="dr-label">Airdrops Received</span><span class="dr-val b" id="px-air-recv">—</span></div>
-              <div class="data-row"><span class="dr-label">Total Given</span><span class="dr-val g" id="px-total-given">—</span></div>
-              <div class="data-row"><span class="dr-label">Total Received</span><span class="dr-val g" id="px-total-rec">—</span></div>
+              <div class="data-row"><span class="dr-label">Airdrops Given</span><span class="dr-val" id="px-air-given">—</span></div>
+              <div class="data-row"><span class="dr-label">Airdrops Received</span><span class="dr-val" id="px-air-recv">—</span></div>
+              <div class="data-row"><span class="dr-label">Total Given</span><span class="dr-val" id="px-total-given">—</span></div>
+              <div class="data-row"><span class="dr-label">Total Received</span><span class="dr-val" id="px-total-rec">—</span></div>
             </div>
           </div>
         </div>
@@ -2204,14 +2204,21 @@ function renderPixie(p) {
   const rafRecvSpore  = tipping.Raffle?.Received?.Total_Spores  || 0;
   const airRecvShroom = tipping.Airdrop?.Received?.Total_Shrooms || 0;
   const airRecvSpore  = tipping.Airdrop?.Received?.Total_Spores  || 0;
-  setEl('px-tip-given',   fmtKp(tipGiven)      + ' S / ' + fmtKp(tipSpore)      + ' SP');
-  setEl('px-tip-recv',    fmtKp(tipRecvShroom) + ' S / ' + fmtKp(tipRecvSpore)  + ' SP');
-  setEl('px-raf-given',   fmtKp(rafShroom)     + ' S / ' + fmtKp(rafSpore)      + ' SP');
-  setEl('px-raf-recv',    fmtKp(rafRecvShroom) + ' S / ' + fmtKp(rafRecvSpore)  + ' SP');
-  setEl('px-air-given',   fmtKp(airShroom)     + ' S / ' + fmtKp(airSpore)      + ' SP');
-  setEl('px-air-recv',    fmtKp(airRecvShroom) + ' S / ' + fmtKp(airRecvSpore)  + ' SP');
-  setEl('px-total-given', fmtKp(totalGivenShroom) + ' S / ' + fmtKp(totalGivenSpore) + ' SP');
-  setEl('px-total-rec',   fmtKp(tipRecvShroom)    + ' S / ' + fmtKp(tipRecvSpore)    + ' SP');
+  const tipVal = (s, sp) =>
+    '<img src="/images/shroom.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display=\'none\'">'
+    + '<span style="color:var(--red);">' + fmtKp(s) + '</span>'
+    + '<span style="color:rgba(255,255,225,0.2);margin:0 0.4rem;">|</span>'
+    + '<img src="/images/spore.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display=\'none\'">'
+    + '<span style="color:var(--blue);">' + fmtKp(sp) + '</span>';
+  const setTip = (id, s, sp) => { const e = document.getElementById(id); if(e) e.innerHTML = tipVal(s, sp); };
+  setTip('px-tip-given',   tipGiven,      tipSpore);
+  setTip('px-tip-recv',    tipRecvShroom, tipRecvSpore);
+  setTip('px-raf-given',   rafShroom,     rafSpore);
+  setTip('px-raf-recv',    rafRecvShroom, rafRecvSpore);
+  setTip('px-air-given',   airShroom,     airSpore);
+  setTip('px-air-recv',    airRecvShroom, airRecvSpore);
+  setTip('px-total-given', totalGivenShroom, totalGivenSpore);
+  setTip('px-total-rec',   tipRecvShroom,    tipRecvSpore);
 
   // Achievements
   const achEl = document.getElementById('achievements-content');
