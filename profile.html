@@ -45,6 +45,7 @@
     }
     .hero { background-image: none !important; }
     .hero::before { display: none !important; }
+    @media (display-mode: standalone) { .hero { display: none !important; } }
     body { padding-top: 120px !important; }
     :root {
       --cream: #ffffe1;
@@ -512,11 +513,6 @@
           <div class="profile-badges" id="prof-badges"></div>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.75rem;">
-        <div class="mvp-block">
-          <div class="mvp-score" style="color:var(--purple);" id="prof-mvp">0.0</div>
-          <div class="mvp-label">MVP Score</div>
-        </div>
         <button class="btn-sm" id="btn-logout" onclick="logout()">Disconnect</button>
       </div>
     </div>
@@ -524,7 +520,7 @@
     <!-- QUICK STATS STRIP -->
     <div class="stat-strip reveal" id="stat-strip">
       <div class="stat-pill">
-        <span class="sp-label">Planted</span>
+        <span class="sp-label">Planted Shrooms</span>
         <span class="sp-val red" id="qs-planted">—</span>
       </div>
       <div class="stat-pill">
@@ -541,7 +537,11 @@
       </div>
       <div class="stat-pill">
         <span class="sp-label">Staked SPORES</span>
-        <span class="sp-val green" id="qs-staked">—</span>
+        <span class="sp-val blue" id="qs-staked">—</span>
+      </div>
+      <div class="stat-pill">
+        <span class="sp-label">MVP Score</span>
+        <span class="sp-val purple" id="qs-mvp">—</span>
       </div>
     </div>
 
@@ -588,27 +588,27 @@
           </div>
           <div class="data-grid" style="margin-top:1rem;">
             <div>
-              <div class="data-row"><span class="dr-label">Stage</span><span class="dr-val g" id="f-stage">—</span></div>
-              <div class="data-row"><span class="dr-label">Farm Rank</span><span class="dr-val r" id="f-rank">—</span></div>
-              <div class="data-row"><span class="dr-label">Spores / Day</span><span class="dr-val b" id="f-sgr">—</span></div>
-              <div class="data-row"><span class="dr-label">Total APY</span><span class="dr-val b" id="f-apy">—</span></div>
-              <div class="data-row"><span class="dr-label">Plots Filled</span><span class="dr-val" id="f-plots">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/shroomfarm.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Stage</span><span class="dr-val g" id="f-stage">—</span></div>
+              <div class="data-row"><span class="dr-label"><span id="f-rank-img" style="margin-right:4px;"></span>Farm Rank</span><span class="dr-val r" id="f-rank">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Spores / Day</span><span class="dr-val b" id="f-sgr">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/apy1.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total APY</span><span class="dr-val b" id="f-apy">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/planting.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Plots Filled</span><span class="dr-val" id="f-plots">—</span></div>
             </div>
             <div>
-              <div class="data-row"><span class="dr-label">Forage Streak</span><span class="dr-val" id="f-streak">—</span></div>
-              <div class="data-row"><span class="dr-label">Max Streak</span><span class="dr-val" id="f-maxstreak">—</span></div>
-              <div class="data-row"><span class="dr-label">Vacation Days</span><span class="dr-val y" id="f-vacation">—</span></div>
-              <div class="data-row"><span class="dr-label">Lifetime SPORE</span><span class="dr-val b" id="f-lifetime">—</span></div>
-              <div class="data-row"><span class="dr-label">Sporulation In</span><span class="dr-val" id="f-spor-date">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/forage.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Forage Streak</span><span class="dr-val" id="f-streak">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/streak.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Max Streak</span><span class="dr-val" id="f-maxstreak">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/vacation.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Vacation Days</span><span class="dr-val y" id="f-vacation">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/sporulation1.webp" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Lifetime SPORE</span><span class="dr-val b" id="f-lifetime">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/time.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Sporulation In</span><span class="dr-val" id="f-spor-date">—</span></div>
             </div>
           </div>
         </div>
         <div class="info-card">
-          <div class="card-title"><span class="card-title-accent">📅</span> Daily Actions</div>
+          <div class="card-title"><span class="dr-label"><img src="/images/cooldown.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Farm Cooldowns</span></div>
           <div id="daily-actions-grid" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent">⚡</span> Spore Generation Breakdown</div>
+          <div class="card-title"><span class="dr-label"><img src="/images/sgr1.webp" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Sprore Generation Breakdown</span></div>
           <div id="sgr-breakdown-content"><div class="empty-hint">No breakdown available.</div></div>
         </div>
       </div>
@@ -616,17 +616,17 @@
       <!-- STAKING TAB -->
       <div class="tab-panel reveal" id="tab-staking">
         <div class="info-card">
-          <div class="card-title"><span class="card-title-accent">⚡</span> Staking</div>
+          <div class="card-title"><img src="/images/spore.png" style="width:14px;height:14px;object-fit:contain;opacity:0.9;" onerror="this.style.display='none'"> Staking</div>
           <div class="data-grid" style="grid-template-columns:1fr 1fr;">
             <div>
-              <div class="data-row"><span class="dr-label">Staked SPORE</span><span class="dr-val g" id="s-staked">—</span></div>
-              <div class="data-row"><span class="dr-label">Pending Rewards</span><span class="dr-val g" id="s-pending">—</span></div>
-              <div class="data-row"><span class="dr-label">Total Earned</span><span class="dr-val g" id="s-total-earned">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Staked SPORE</span><span class="dr-val g" id="s-staked">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/sgr1.webp" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Pending Rewards</span><span class="dr-val g" id="s-pending">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/sporulation1.webp" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total Earned</span><span class="dr-val g" id="s-total-earned">—</span></div>
             </div>
             <div>
-              <div class="data-row"><span class="dr-label">Staking APY</span><span class="dr-val y" id="s-apy">—</span></div>
-              <div class="data-row"><span class="dr-label">Mycelium Nodes</span><span class="dr-val p" id="s-nodes">—</span></div>
-              <div class="data-row"><span class="dr-label">Next Node At</span><span class="dr-val b" id="s-next-node">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/apy1.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Staking APY</span><span class="dr-val y" id="s-apy">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/mycelium.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Mycelium Nodes</span><span class="dr-val p" id="s-nodes">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/cooldown.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Next Node At</span><span class="dr-val b" id="s-next-node">—</span></div>
             </div>
           </div>
         </div>
@@ -651,11 +651,10 @@
       <!-- COMPANION TAB -->
       <div class="tab-panel reveal" id="tab-companion">
         <div class="info-card">
-          <div class="card-title"><span class="card-title-accent">🐾</span> Active Companion</div>
+          <div class="card-title"><img src="/images/animals.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Active Companion</div>
           <div id="companion-content"><div class="empty-hint">No active companion.</div></div>
         </div>
         <div class="info-card" id="pets-roster-card">
-          <div class="card-title"><span class="card-title-accent">🐾</span> All Companions</div>
           <div id="pets-roster"></div>
         </div>
       </div>
@@ -663,15 +662,15 @@
       <!-- INVENTORY TAB -->
       <div class="tab-panel reveal" id="tab-inventory">
         <div class="info-card">
-          <div class="card-title"><span class="card-title-accent">🎒</span> Items</div>
+          <div class="card-title"><img src="/images/backpacks.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Items</div>
           <div id="items-content"><div class="empty-hint">No items yet.</div></div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent">💎</span> Gemstones</div>
+          <div class="card-title"><img src="/images/gemstones.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Gemstones</div>
           <div class="gem-row" id="gems-content"></div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent">📜</span> Artifacts & Scrolls</div>
+          <div class="card-title"><img src="/images/artifact.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Artifacts & Scrolls <img src="/images/scroll.png" style="width:14px;height:14px;object-fit:contain;margin-left:2px;" onerror="this.style.display='none'"></div>
           <div id="artifacts-content"><div class="empty-hint">None found yet. Use !explore to discover.</div></div>
         </div>
       </div>
@@ -679,21 +678,21 @@
       <!-- BREWING TAB -->
       <div class="tab-panel reveal" id="tab-brewing">
         <div class="info-card">
-          <div class="card-title"><span class="card-title-accent">🧪</span> Active Potion</div>
+          <div class="card-title"><img src="/images/potionrecipe.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Active Potion</div>
           <div id="brew-active-content"><div class="empty-hint">No active potion.</div></div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent">🧪</span> Stored Potions</div>
+          <div class="card-title"><img src="/images/potionrecipe.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Stored Potions</div>
           <div id="brew-stored-content"><div class="empty-hint">No stored potions.</div></div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent">🌿</span> Ingredients</div>
+          <div class="card-title"><img src="/images/herbs.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Ingredients</div>
           <div id="brew-ingredients-content"><div class="empty-hint">No ingredients.</div></div>
         </div>
       </div>
       <div class="tab-panel reveal" id="tab-pixie">
         <div class="info-card">
-          <div class="card-title"><span class="card-title-accent">✨</span> Pixie Stats</div>
+          <div class="card-title"><img src="/images/pixie.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Pixie Stats</div>
           <div class="data-grid" style="grid-template-columns:1fr 1fr;align-items:start;">
             <div>
               <div class="data-row"><span class="dr-label">Level</span><span class="dr-val g" id="px-level">—</span></div>
@@ -712,7 +711,7 @@
           </div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent">💸</span> Tipping & Community</div>
+          <div class="card-title"><img src="/images/gift.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Tipping & Community</div>
           <div class="data-grid" style="grid-template-columns:1fr 1fr;">
             <div>
               <div class="data-row"><span class="dr-label">Tips Given</span><span class="dr-val b" id="px-tip-given">—</span></div>
@@ -729,7 +728,7 @@
           </div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent">🏆</span> Achievements</div>
+          <div class="card-title"><img src="/images/badge.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Achievements</div>
           <div id="achievements-content"><div class="empty-hint">No achievements yet.</div></div>
         </div>
       </div>
@@ -1237,8 +1236,6 @@ function renderHeader(s, p) {
   if (flair.Flair)       badges.push('<span class="badge badge-purple">' + flair.Flair + '</span>');
   if (sec.Verified)      badges.push('<span class="badge badge-green">PIXIE VERIFIED</span>');
   if (staking.staked_spores > 0) {
-    const nodes = Math.floor(staking.staked_spores / 100_000_000);
-    if (nodes > 0) badges.push('<span class="badge badge-blue">' + nodes + ' NODES</span>');
   }
   badgeEl.innerHTML = badges.join('');
 }
@@ -1255,11 +1252,12 @@ function renderQuickStats(s, p) {
     .filter(([k]) => k.startsWith('Farm Boost'))
     .reduce((sum, [,v]) => sum + (v?.count || 1), 0);
   const nftBoost = farmBoostCount * 1_000_000;
-  setEl('qs-planted',       fmt(planted) + ' SHROOM');
-  setEl('qs-nft-boost',     fmt(nftBoost) + ' SHROOM');
-  setEl('qs-total-planted', fmt(planted + nftBoost) + ' SHROOM');
-  setEl('qs-sgr',           fmt(farm.spore_generation_rate) + ' / day');
+  setEl('qs-planted',       fmt(planted) + '');
+  setEl('qs-nft-boost',     fmt(nftBoost) + '');
+  setEl('qs-total-planted', fmt(planted + nftBoost) + '');
+  setEl('qs-sgr',           fmt(farm.spore_generation_rate) + '');
   setEl('qs-staked',        fmt(staked));
+  setEl('qs-mvp',           (currentUser?.mvp || 0).toFixed(1));
 }
 
 function renderFarm(s, p) {
@@ -1279,7 +1277,15 @@ function renderFarm(s, p) {
   }, 300);
 
   setEl('f-stage',    stage);
-  setEl('f-rank',     safe(farm.farm_rank, 'BRONZE'));
+  const RANK_IMGS = {
+    BRONZE:'bronze.png',SILVER:'silver.png',GOLD:'gold.png',
+    EMERALD:'emerald.png',DIAMOND:'diamond.png',MASTER:'masters.png',
+    GRANDMASTER:'grandmaster.png',LEGEND:'legend1.webp'
+  };
+  const rankName = safe(farm.farm_rank, 'BRONZE').toUpperCase();
+  setEl('f-rank', rankName);
+  const rankImgEl = document.getElementById('f-rank-img');
+  if(rankImgEl) rankImgEl.innerHTML = '<img src="/images/' + (RANK_IMGS[rankName]||'bronze.png') + '" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;" onerror="this.style.display=\'none\'">';
   setEl('f-sgr',      fmt(farm.spore_generation_rate) + ' / day');
   setEl('f-apy',      farm.APY != null ? Math.round(farm.APY * 100) + '%' : '-');
   setEl('f-plots',    filled + ' / 42');
@@ -1312,19 +1318,20 @@ function renderFarm(s, p) {
   const apy = farm.APY_Breakdown || {};
   const sgrEl = document.getElementById('sgr-breakdown-content');
   if (Object.keys(apy).length) {
+    const sgrI = (f) => '<img src="/images/' + f + '" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">';
     const sgrRows = [
-      { label: 'Stage Bonus',       key: 'stage_bonus',           suffix: '%', color: 'var(--green)',   emoji: '🍄' },
-      { label: 'Rank Bonus',        key: 'rank_bonus',            suffix: '%', color: 'var(--yellow)',  emoji: '🏆' },
-      { label: 'In-Game Sporebot',  key: 'ingame_sporebot_bonus', suffix: '%', color: 'var(--blue)',    emoji: '🤖' },
-      { label: 'Potion Bonus',      key: 'potion_bonus',          suffix: '%', color: 'var(--purple)',  emoji: '🧪' },
-      { label: 'Collector Items',   key: 'collector_bonus',       suffix: '%', color: 'var(--green)',   emoji: '💎' },
-      { label: 'Rootsong Gemstone', key: 'rootsong_bonus',        suffix: '%', color: 'var(--green)',   emoji: '🌿' },
-      { label: 'Sunspore Gemstone', key: 'sunspore_bonus',        suffix: '%', color: 'var(--yellow)',  emoji: '☀️' },
-      { label: 'Spirit Gemstone',   key: 'brewing_bonus',         suffix: '%', color: 'var(--purple)',  emoji: '✨' },
-      { label: 'Sporebot NFT',      key: 'sporebot_bonus',        suffix: '%', color: 'var(--purple)',  emoji: '🤖' },
-      { label: 'LP Provider',       key: 'lp_bonus',              suffix: '%', color: '#9b8cff',        emoji: '💧' },
-      { label: 'Mooshie NFTs',      key: 'mooshie_bonus',         suffix: '%', color: 'var(--yellow)',  emoji: '🖼️' },
-      { label: 'Guwoo NFT',         key: 'guwoo_bonus',           suffix: '%', color: 'var(--yellow)',  emoji: '🐾' },
+      { label: 'Stage Bonus',       key: 'stage_bonus',           suffix: '%', color: 'var(--green)',   emoji: sgrI((farm.current_stage||'spore').toLowerCase().replace('_','')+'.png') },
+      { label: 'Rank Bonus',        key: 'rank_bonus',            suffix: '%', color: 'var(--yellow)',  emoji: sgrI(RANK_IMGS[rankName]||'bronze.png') },
+      { label: 'In-Game Sporebot',  key: 'ingame_sporebot_bonus', suffix: '%', color: 'var(--blue)',    emoji: sgrI('sporebot.png') },
+      { label: 'Potion Bonus',      key: 'potion_bonus',          suffix: '%', color: 'var(--purple)',  emoji: sgrI('potionrecipe.png') },
+      { label: 'Collector Items',   key: 'collector_bonus',       suffix: '%', color: 'var(--green)',   emoji: sgrI('backpack1.png') },
+      { label: 'Rootsong Gemstone', key: 'rootsong_bonus',        suffix: '%', color: 'var(--green)',   emoji: sgrI('rootsong_gemstone.png') },
+      { label: 'Sunspore Gemstone', key: 'sunspore_bonus',        suffix: '%', color: 'var(--yellow)',  emoji: sgrI('sunspore_gemstone.png') },
+      { label: 'Spirit Gemstone',   key: 'brewing_bonus',         suffix: '%', color: 'var(--purple)',  emoji: sgrI('spirit_gemstone.png') },
+      { label: 'Sporebot NFT',      key: 'sporebot_bonus',        suffix: '%', color: 'var(--purple)',  emoji: sgrI('nft.png') },
+      { label: 'LP Provider',       key: 'lp_bonus',              suffix: '%', color: '#9b8cff',        emoji: sgrI('lp.png') },
+      { label: 'Mooshie NFTs',      key: 'mooshie_bonus',         suffix: '%', color: 'var(--yellow)',  emoji: sgrI('king.png') },
+      { label: 'Guwoo NFT',         key: 'guwoo_bonus',           suffix: '%', color: 'var(--yellow)',  emoji: sgrI('guwoo.png') },
     ];
     const activeRows = sgrRows.filter(r => apy[r.key] > 0);
     const totalApy = Math.round((farm.APY || 0) * 100);
@@ -1332,19 +1339,19 @@ function renderFarm(s, p) {
     const onchainKeys = ['sporebot_bonus','lp_bonus','mooshie_bonus','guwoo_bonus'];
     const ingameRows = activeRows.filter(r => ingameKeys.includes(r.key));
     const onchainRows = activeRows.filter(r => onchainKeys.includes(r.key));
-    const sectionHdr = (emoji, label, first) =>
-      '<div style="font-family:Syne Mono,monospace;font-size:0.65rem;letter-spacing:0.15em;font-weight:600;color:rgba(255,255,225,0.85);padding:0.75rem 0 0.35rem;'
+    const sectionHdr = (img, label, first) =>
+      '<div style="font-family:Syne Mono,monospace;font-size:0.65rem;letter-spacing:0.15em;font-weight:600;color:rgba(255,255,225,0.85);padding:0.75rem 0 0.35rem;display:flex;align-items:center;gap:0.4rem;'
       + (first ? '' : 'border-top:1px solid rgba(255,255,225,0.08);margin-top:0.25rem;')
-      + '">'
-      + emoji + ' ' + label + '</div>';
+      + '"><img src="/images/' + img + '" style="width:13px;height:13px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+      + label + '</div>';
     const row = r =>
-      '<div class="data-row"><span style="color:rgba(255,255,225,0.8);font-size:0.82rem;">' + r.emoji + ' ' + r.label + '</span>'
+      '<div class="data-row"><span style="color:rgba(255,255,225,0.8);font-size:0.82rem;display:flex;align-items:center;">' + r.emoji + r.label + '</span>'
       + '<span style="font-family:Syne Mono,monospace;font-size:0.82rem;font-weight:600;color:' + r.color + ';">+' + Number(apy[r.key]).toFixed(1) + r.suffix + '</span></div>';
     sgrEl.innerHTML = '<div style="display:flex;flex-direction:column;gap:0;">'
-      + (ingameRows.length ? sectionHdr('🍄', 'IN-GAME BONUSES (FREE)', true) + ingameRows.map(row).join('') : '')
-      + (onchainRows.length ? sectionHdr('🌐', 'ON-CHAIN BONUSES', false) + onchainRows.map(row).join('') : '')
+      + (ingameRows.length ? sectionHdr('shroomfarm.png', 'IN-GAME BONUSES (FREE)', true) + ingameRows.map(row).join('') : '')
+      + (onchainRows.length ? sectionHdr('blockchain.png', 'ON-CHAIN BONUSES', false) + onchainRows.map(row).join('') : '')
       + '<div class="data-row" style="margin-top:0.5rem;border-top:1px solid rgba(255,255,225,0.1);padding-top:0.5rem;">'
-      + '<span style="font-family:Syne Mono,monospace;font-size:0.72rem;color:rgba(255,255,225,0.75);">⚡ TOTAL APY</span>'
+      + '<span style="font-family:Syne Mono,monospace;font-size:0.72rem;color:rgba(255,255,225,0.75);display:flex;align-items:center;gap:0.35rem;"><img src="/images/apy1.png" style="width:13px;height:13px;object-fit:contain;" onerror="this.style.display=\'none\'"> TOTAL APY</span>'
       + '<span style="font-family:Syne Mono,monospace;font-size:0.9rem;font-weight:700;color:var(--yellow);">' + totalApy + '%</span></div>'
       + '</div>';
   } else { sgrEl.innerHTML = '<div class="empty-hint">Run !farm in Discord to generate breakdown data.</div>'; }
@@ -1366,17 +1373,17 @@ function renderFarm(s, p) {
   const feedCD   = hourlyCooldown(misc.last_hourly_feed);
 
   const DAILY_ACTIONS = [
-    { label: 'Forage',  cmd: '!forage',  done: daily.daily_forage  === true, cadence: 'Daily',  required: true },
-    { label: 'Mist',    cmd: '!mist',    done: daily.daily_mist    === true, cadence: 'Daily' },
-    { label: 'Fan',     cmd: '!fan',     done: daily.daily_fan     === true, cadence: 'Daily' },
-    { label: 'Explore', cmd: '!explore', done: daily.daily_explore === true, cadence: 'Daily' },
-    { label: 'Toss',    cmd: '!toss',    done: daily.daily_toss    === true, cadence: 'Daily' },
-    { label: 'Dig',     cmd: '!dig',     done: daily.daily_dig === true, cadence: 'Daily' },
-    { label: 'Visit',   cmd: 'visit',    done: daily.daily_visit === true, cadence: 'Daily' },
-    { label: 'Social',  cmd: '100 XP/day', done: (p.Message_XP || {}).daily_limit >= 100, cadence: 'Daily' },
-    { label: 'Gather',  cmd: '!gather',  done: gatherCD === 'Ready', cadence: 'Hourly', cooldown: gatherCD },
-    { label: 'Cave',    cmd: '!cave',    done: caveCD   === 'Ready', cadence: 'Hourly', cooldown: caveCD },
-    { label: 'Feed',    cmd: '!feed',    done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD },
+    { label: 'Forage',  img:'forage.png',    done: daily.daily_forage  === true, cadence: 'Daily',  required: true },
+    { label: 'Mist',    img:'mist.png',      done: daily.daily_mist    === true, cadence: 'Daily' },
+    { label: 'Fan',     img:'fan.png',       done: daily.daily_fan     === true, cadence: 'Daily' },
+    { label: 'Explore', img:'explore.png',   done: daily.daily_explore === true, cadence: 'Daily' },
+    { label: 'Toss',    img:'well.png',      done: daily.daily_toss    === true, cadence: 'Daily' },
+    { label: 'Dig',     img:'shovel.png',       done: daily.daily_dig     === true, cadence: 'Daily' },
+    { label: 'Visit',   img:'wimble.png',     done: daily.daily_visit   === true, cadence: 'Daily' },
+    { label: 'Social',  img:'pixie.png',     done: (p.Message_XP || {}).daily_limit >= 100, cadence: 'Daily' },
+    { label: 'Gather',  img:'herbs.png',    done: gatherCD === 'Ready', cadence: 'Hourly', cooldown: gatherCD },
+    { label: 'Cave',    img:'cave.png',      done: caveCD   === 'Ready', cadence: 'Hourly', cooldown: caveCD },
+    { label: 'Feed',    img:'shroomfarm.png',done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD },
   ];
   const DAILY_ONLY = DAILY_ACTIONS.filter(a => a.cadence !== 'Hourly');
   const doneCount = DAILY_ONLY.filter(a => a.done).length;
@@ -1386,8 +1393,8 @@ function renderFarm(s, p) {
   const grid = document.getElementById('daily-actions-grid');
   grid.style.display = 'block';
   grid.innerHTML = '<div style="margin-bottom:0.875rem;">'
-    + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.65);margin-bottom:0.4rem;">'
-    + '<span>Daily Progress</span><span>' + doneCount + ' / ' + totalCount + ' complete</span></div>'
+    + '<div style="display:flex;justify-content:space-between;font-family:Space Grotesk,sans-serif;font-size:0.75rem;font-weight:600;color:rgba(255,255,225,0.75);margin-bottom:0.4rem;">'
+    + '<span>Farm Cooldowns</span><span style="font-family:Syne Mono,monospace;font-size:0.65rem;color:rgba(255,255,225,0.45);">' + doneCount + ' / ' + totalCount + ' complete</span></div>'
     + '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
     + '<div style="height:100%;width:' + barPct + '%;background:linear-gradient(90deg,var(--green),#4ade80);border-radius:999px;transition:width 1s ease;"></div>'
     + '</div></div>'
@@ -1419,32 +1426,15 @@ function renderFarm(s, p) {
       const subText  = hourlyReady ? 'Use Now!' : onCooldown ? a.cooldown : a.done ? 'Done' : a.cadence;
       const subCol   = hourlyReady ? 'rgba(253,70,79,0.7)' : onCooldown ? 'rgba(254,206,0,0.6)' : a.done ? 'rgba(34,197,94,0.6)' : 'rgba(255,255,225,0.2)';
       const cmdCol   = 'rgba(255,255,225,0.15)';
-      return '<div style="display:flex;align-items:center;gap:0.45rem;padding:0.45rem 0.8rem;border-radius:0.625rem;border:1px solid ' + border + ';background:' + bg + ';white-space:nowrap;">'
-        + '<span style="font-size:0.75rem;color:' + iconCol + ';font-weight:700;">' + icon + '</span>'
-        + '<div style="display:flex;flex-direction:column;gap:0.05rem;">'
-        + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.75rem;font-weight:600;color:' + labelCol + ';">' + a.label + '</span>'
-        + '<span style="font-family:Syne Mono,monospace;font-size:0.52rem;color:' + subCol + ';">' + subText + '</span>'
+      return '<div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;border-radius:0.75rem;border:1px solid ' + border + ';background:' + bg + ';white-space:nowrap;min-width:80px;">'
+        + '<img src="/images/' + a.img + '" style="width:16px;height:16px;object-fit:contain;flex-shrink:0;" onerror="this.style.display=\'none\'">'
+        + '<div style="display:flex;flex-direction:column;gap:0.1rem;">'
+        + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;font-weight:700;color:' + labelCol + ';">' + a.label + '</span>'
+        + '<span style="font-family:Syne Mono,monospace;font-size:0.55rem;color:' + subCol + ';">' + subText + '</span>'
         + '</div>'
         + '</div>';
     }).join('')
     + '</div>';
-
-  // Weather — fetched live from API
-  fetch(window.API_BASE + '/api/weather')
-    .then(r => r.json())
-    .then(d => {
-      const w = d.weather || {};
-      const cond = (w.condition || 'none').replace(/_/g,' ');
-      setEl('w-condition',    cond.charAt(0).toUpperCase() + cond.slice(1));
-      setEl('w-family',       w.condition_family || '—');
-      setEl('w-temp',         w.temp_f != null ? w.temp_f + 'F (' + w.temp_tier + ')' : (w.temp_tier || '—'));
-      setEl('w-sky',          w.sky || '—');
-      setEl('w-mist',         w.mist_mult != null ? 'x' + Number(w.mist_mult).toFixed(2) : '—');
-      setEl('w-fan',          w.fan_mult  != null ? 'x' + Number(w.fan_mult).toFixed(2)  : '—');
-      setEl('w-mist-blocked', w.mist_blocked ? 'Blocked' : 'Active');
-      setEl('w-fan-blocked',  w.fan_blocked  ? 'Blocked' : 'Active');
-    })
-    .catch(() => {});
 }
 
 function renderWallet(s, p) {
@@ -1522,6 +1512,10 @@ const STAT_EMOJI = {
   'Extra Brews':        '<img src="/images/potion2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
   'Plant Limit':        '<img src="/images/shroomfarm.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
   'Pipe Reduction':     '<img src="/images/pipe.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Artifact_Discovery': '<img src="/images/artifacts.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Artifact Discovery': '<img src="/images/artifacts.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Scroll_Find_Rate':   '<img src="/images/scroll.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Scroll Find Rate':   '<img src="/images/scroll.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
 };
 const PLANT_LIMIT_VALS = { Uncommon:200000, Rare:500000, 'Super Rare':1000000 };
 const HERB_VALS = { Uncommon:5, Rare:10, 'Super Rare':15 };
@@ -1702,7 +1696,7 @@ function renderStaking(s, p) {
   const staked  = staking.staked_spores || 0;
   const nodes   = staked > 0 ? Math.floor(staked / 100_000_000) : 0;
 
-  setEl('s-staked',       fmt(staked));
+  setEl('s-staked',       fmt(staking.staked_spores || 0));
   setEl('s-pending',      fmt(staking.pending_rewards || 0));
   // Count matured nodes (age >= 90 days)
   const nodesObj = staking.nodes || {};
@@ -1790,8 +1784,8 @@ function renderStaking(s, p) {
     const nextNodePct = staked > 0 ? Math.round((staked % 100_000_000) / 100_000_000 * 100) : 0;
     if (nextNodePct > 0) {
       nbHtml += '<div style="margin-top:0.75rem;">'
-        + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);margin-bottom:0.35rem;">'
-        + '<span>Next Node Progress</span><span>' + nextNodePct + '%</span></div>'
+        + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.7rem;color:rgba(232,242,234,0.3);margin-bottom:0.35rem;">'
+        + '<span><img src="/images/growth.png" style="width:12px;height:12px;object-fit:contain;vertical-align:middle;margin-right:3px;" onerror="this.style.display=\'none\'">Next Node Progress</span><span>' + nextNodePct + '%</span></div>'
         + '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
         + '<div style="height:100%;width:' + nextNodePct + '%;background:var(--purple);border-radius:999px;"></div>'
         + '</div></div>';
@@ -1820,6 +1814,7 @@ function renderNFTs(p) {
     const displayName = k.replace(/ ID\d+$/, '');
     const tokenMatch  = k.match(/ ID(\d+)$/);
     const tokenId     = tokenMatch ? tokenMatch[1] : null;
+    if (k === 'total_reward' || k === 'Total_reward' || displayName.toLowerCase().includes('total_reward')) return;
     const col = displayName.includes('SporeBots') || displayName.includes('Sporebot') ? 'Sporebots'
               : displayName.includes('Farm Boost') ? 'Farm Boost'
               : displayName.includes('Mooshie') || displayName.includes('Kid Shroom') || displayName.includes('House') ? 'Mooshie Collection'
@@ -1889,22 +1884,39 @@ function renderCompanion(s) {
     }
     const bl = bondLevel(days);
     const bondPct = Math.min(100, (days / 42) * 100);
+    const ACTIVE_PET_IMGS = {
+      turtle:'/images/turtle.png',bunny:'/images/bunny.png',fox:'/images/fox.png',
+      frog:'/images/frog.png',wolf:'/images/wolf.png',duck:'/images/duck.png',
+      deer:'/images/deer.png',owl:'/images/owl.png',bear:'/images/bear.png',
+      monkey:'/images/monkey.png',songbird:'/images/songbird.png',panda:'/images/panda1.png'
+    };
+    const ACTIVE_BONUS_LABELS = {
+      turtle:'Herb Find Rate',bunny:'Double Herb Chance',fox:'Rare Herb Chance',frog:'Extra Daily Brews',
+      wolf:'Daily Cave Runs',duck:'Vacation Interval',deer:'Harvest Bonus',owl:'Patience',
+      bear:'Plant Limit Bonus',monkey:'Monkey Visit Chance',songbird:'MVP Node Speed',panda:'Spore Yield'
+    };
+    const ACTIVE_UNIQUE_LABELS = {
+      turtle:'Quick Gather',bunny:'Triple Harvest',fox:'Void Seeker',frog:"Alchemist's Vault",
+      wolf:"Wolf's Instinct",duck:'Vacation Trader',deer:"Nature's Head Start",owl:'A Party of 3',
+      bear:"Bear's Protection",monkey:"Jester's Jackpot",songbird:"Songbird's Melody",panda:"Panda's Aura"
+    };
+    const uniqueActive = bl >= 5;
     el.innerHTML = '<div class="companion-card">'
-      + '<div class="companion-emoji">' + (CEMOJIS[activeKey] || '🐾') + '</div>'
+      + '<img src="' + (ACTIVE_PET_IMGS[activeKey]||'') + '" style="width:56px;height:56px;object-fit:contain;flex-shrink:0;" onerror="this.style.display=\'none\'">'
       + '<div style="flex:1;">'
-      + '<div style="font-weight:700;margin-bottom:0.25rem;">' + activeKey.charAt(0).toUpperCase() + activeKey.slice(1) + '</div>'
-      + '<div style="font-size:0.8rem;color:rgba(255,255,225,0.5);margin-bottom:0.5rem;">Lv.' + bl + ' - ' + (BOND_LBLS[bl] || '') + ' &nbsp; ' + days + ' days together</div>'
+      + '<div style="font-weight:700;font-size:1rem;margin-bottom:0.2rem;">' + activeKey.charAt(0).toUpperCase() + activeKey.slice(1) + '</div>'
+      + '<div style="font-size:0.78rem;color:rgba(255,255,225,0.5);margin-bottom:0.35rem;">Lv.' + bl + ' - ' + (BOND_LBLS[bl] || '') + ' &nbsp;|&nbsp; ' + days + ' days together</div>'
+      + '<div style="font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.55);margin-bottom:0.35rem;">' + (ACTIVE_BONUS_LABELS[activeKey]||'') + '</div>'
+      + '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;margin-bottom:0.5rem;color:' + (uniqueActive ? 'var(--purple)' : 'rgba(255,255,225,0.2)') + ';">'
+      + (uniqueActive ? '✨ Unique: ' + ACTIVE_UNIQUE_LABELS[activeKey] : '🔒 Unique unlocks at Bond Lv.5')
+      + '</div>'
       + '<div class="companion-bond-bar"><div class="companion-bond-fill" style="width:' + bondPct + '%;"></div></div>'
       + '</div></div>';
   }
 
   // Roster
   const rosterEl = document.getElementById('pets-roster');
-  const allPets = Object.keys(comp.pets || {});
-  if (!allPets.length) {
-    rosterEl.innerHTML = '<div class="empty-hint">No companions adopted yet.</div>';
-    return;
-  }
+
   const UNLOCK_THRESHOLDS = {
     turtle:1,bunny:2,fox:3,frog:4,wolf:5,duck:6,
     deer:7,owl:8,bear:9,monkey:10,songbird:11,panda:12
@@ -1943,7 +1955,7 @@ function renderCompanion(s) {
       turtle:'/images/turtle.png',bunny:'/images/bunny.png',fox:'/images/fox.png',
       frog:'/images/frog.png',wolf:'/images/wolf.png',duck:'/images/duck.png',
       deer:'/images/deer.png',owl:'/images/owl.png',bear:'/images/bear.png',
-      monkey:'/images/monkey.png',songbird:'/images/songbird.png',panda:'/images/panda.png'
+      monkey:'/images/monkey.png',songbird:'/images/songbird.png',panda:'/images/panda1.png'
     };
     const petImg = '<img src="' + (PET_IMGS[k]||'') + '" style="width:36px;height:36px;object-fit:contain;flex-shrink:0;" onerror="this.style.display=\'none\'">';
     const lockOpacity = unlocked ? '1' : '0.35';
@@ -1951,15 +1963,15 @@ function renderCompanion(s) {
     return '<div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid rgba(255,255,225,0.05);opacity:' + lockOpacity + ';">'
       + petImg
       + '<div style="flex:1;">'
-      + '<div style="font-size:0.85rem;font-weight:600;">' + name
+      + '<div style="font-size:0.85rem;font-weight:600;color:' + (unlocked ? 'var(--cream)' : 'rgba(255,255,225,0.6)') + ';">' + name
       + (unlocked ? ' <span style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.4);">Lv.' + bl + ' &nbsp; ' + days + 'd</span>' : '')
       + '</div>'
-      + '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.4);">' + (BONUS_LABELS[k]||'') + '</div>'
+      + '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:' + (unlocked ? 'rgba(255,255,225,0.55)' : 'rgba(255,255,225,0.35)') + ';">' + (BONUS_LABELS[k]||'') + '</div>'
       + (unlocked
           ? '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;margin-top:0.1rem;color:' + (uniqueUnlocked ? 'var(--purple)' : 'rgba(255,255,225,0.2)') + ';">'
             + (uniqueUnlocked ? '✨ ' + UNIQUE_LABELS[k] : '🔒 Unique: Reach Bond Lv.5')
             + '</div>'
-          : '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.25);">Feed ' + (UNLOCK_FEED[k]||0).toLocaleString() + ' SHROOM to unlock</div>'
+          : '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.55);">Feed ' + (UNLOCK_FEED[k]||0).toLocaleString() + ' SHROOM to unlock</div>'
         )
       + '</div>'
       + (isActive ? '<span style="font-family:Syne Mono,monospace;font-size:0.58rem;color:var(--green);padding:0.15em 0.5em;border:1px solid rgba(34,197,94,0.3);border-radius:999px;">ACTIVE</span>' : '')
@@ -1979,16 +1991,26 @@ function renderInventory(s) {
   const ITEM_MAP = {
     Golden_Shovel:'Golden Shovel', Elder_Pipe:'Elder Pipe', Feather:'Feather',
     Wildtongue_Gemstone:'Wildtongue Gemstone', Mooshie_Gemstone:'Mooshie Gemstone',
+    animal_gemstone:'Mystical Gemstone',
     King_Totem:'King Totem', Queen_Totem:'Queen Totem', Kid_Totem:'Kid Totem',
     Gold_Totem:'Gold Totem', Miner_Helmet:'Miner Helmet', Well_Access:'Well Access',
   };
   const ownedItems = Object.entries(items).filter(([,v]) => v && v !== false);
   const itemsEl = document.getElementById('items-content');
   if (ownedItems.length) {
+    const ITEM_IMGS = {
+      Golden_Shovel:'/images/shovel.png', Elder_Pipe:'/images/pipe.png',
+      Feather:'/images/feather.png', Wildtongue_Gemstone:'/images/wildtongue_gemstone.png',
+      Mooshie_Gemstone:'/images/mystical_gemstone.png', King_Totem:'/images/king.png',
+      Queen_Totem:'/images/queen.png', Kid_Totem:'/images/kidshroom.png',
+      Gold_Totem:'/images/goldmooshie.png', Miner_Helmet:'/images/miner_helmet.png',
+      Well_Access:'/images/well.png', animal_gemstone:'/images/Mystical_Gemstone.png',
+    };
     itemsEl.innerHTML = ownedItems.map(([k,v]) => {
       const label = ITEM_MAP[k] || k.replace(/_/g,' ');
       const qty = typeof v === 'number' && v > 1 ? ' x' + v : '';
-      return '<div class="data-row"><span class="dr-label">' + label + qty + '</span><span class="dr-val g">Owned</span></div>';
+      const img = ITEM_IMGS[k] ? '<img src="' + ITEM_IMGS[k] + '" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;margin-right:5px;" onerror="this.style.display=\'none\'">' : '';
+      return '<div class="data-row"><span class="dr-label">' + img + label + qty + '</span><span class="dr-val g">Owned</span></div>';
     }).join('');
   } else {
     itemsEl.innerHTML = '<div class="empty-hint">No items yet.</div>';
@@ -1999,7 +2021,26 @@ function renderInventory(s) {
   gemsEl.innerHTML = GEMS.map(g => {
     const owned = gems[g] && gems[g] > 0;
     const qty = owned ? ' x' + gems[g] : '';
-    return '<span class="gem-chip ' + (owned ? 'owned' : '') + '">' + (GEM_LABELS[g] || g) + qty + '</span>';
+    const GEM_IMGS = {
+      'Shroomstone_Quartz':'/images/shroomstone_quartz.png',
+      'Shroomcap_Ruby':'/images/Shroomcap_ruby.png',
+      'Sporelight_Sapphire':'/images/sporelight_sapphire.png',
+      'Moonglow_Amethyst':'/images/moonglow_amethyst.png',
+      'Prismcap_Diamond':'/images/prismcap_diamond.png',
+    };
+    const GEM_COLORS = {
+      'Shroomstone_Quartz':  { bg:'rgba(200,220,255,0.12)', border:'rgba(180,210,255,0.35)', text:'#b8d4ff' },
+      'Shroomcap_Ruby':      { bg:'rgba(253,70,79,0.12)',   border:'rgba(253,70,79,0.35)',   text:'#fd464f' },
+      'Sporelight_Sapphire': { bg:'rgba(79,168,253,0.15)',  border:'rgba(79,168,253,0.45)',  text:'#4fa8fd' },
+      'Moonglow_Amethyst':   { bg:'rgba(112,112,252,0.12)', border:'rgba(192,132,252,0.35)', text:'#c084fc' },
+      'Prismcap_Diamond':    { bg:'rgba(255,255,255,0.1)',   border:'rgba(255,255,255,0.35)', text:'#ffffff' },
+    };
+    const gc = owned ? (GEM_COLORS[g] || { bg:'rgba(254,206,0,0.08)', border:'rgba(254,206,0,0.3)', text:'var(--yellow)' }) : null;
+    const gImg = GEM_IMGS[g] ? '<img src="' + GEM_IMGS[g] + '" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">' : '💎 ';
+    const chipStyle = owned && gc
+      ? 'style="background:' + gc.bg + ';border-color:' + gc.border + ';color:' + gc.text + ';"'
+      : '';
+    return '<span class="gem-chip ' + (owned ? 'owned' : '') + '" ' + chipStyle + '>' + gImg + (GEM_LABELS[g] || g) + qty + '</span>';
   }).join('');
 
   // Artifacts & Scrolls
@@ -2015,10 +2056,20 @@ function renderInventory(s) {
   let artHtml = '';
   if (ownedArts.length) {
     artHtml += '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.35rem;">ARTIFACTS</div>';
-    artHtml += ownedArts.map(([k]) => '<div class="data-row"><span class="dr-label">' + (ART_LABELS[k] || k.replace(/_/g,' ')) + '</span><span class="dr-val y">Found</span></div>').join('');
+    const ART_IMGS = {
+      Elderwood_Bow:'/images/bow.png', Wizard_Staff:'/images/wizardstaff.png',
+      Reshi_Shield:'/images/shield.png', Spell_Book:'/images/spell-book.png',
+      Wizard_Hat:'/images/wizardhat.png', Healing_Potion:'/images/potion2.png',
+      Mooshie_Ring:'/images/magic-ring.png', Magical_Mirror:'/images/magic-mirror.png',
+      Deathcap_Dagger:'/images/dagger.png', Arcane_Amulet:'/images/amulet.png',
+    };
+    artHtml += ownedArts.map(([k]) => {
+      const img = ART_IMGS[k] ? '<img src="' + ART_IMGS[k] + '" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;margin-right:5px;" onerror="this.style.display=\'none\'">' : '🗿 ';
+      return '<div class="data-row"><span class="dr-label">' + img + (ART_LABELS[k] || k.replace(/_/g,' ')) + '</span><span class="dr-val y">Found</span></div>';
+    }).join('');
   }
   artHtml += '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin:0.75rem 0 0.35rem;">SCROLLS</div>';
-  artHtml += '<div class="data-row"><span class="dr-label">Scrolls Found</span><span class="dr-val p">' + ownedScrolls.length + ' / 10</span></div>';
+  artHtml += '<div class="data-row"><span class="dr-label"><img src="/images/scroll.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">Scrolls Found</span><span class="dr-val p">' + ownedScrolls.length + ' / 10</span></div>';
   if (!ownedArts.length && !ownedScrolls.length) artHtml = '<div class="empty-hint">None found yet. Use !explore to discover.</div>';
   artEl.innerHTML = artHtml;
 }
@@ -2033,9 +2084,19 @@ function renderBrewing(s) {
   const activeEl = document.getElementById('brew-active-content');
   const active = potions.Active_Potion;
   if(active && typeof active === 'object'){
-    let h = '<div class="data-row"><span class="dr-label">Name</span><span class="dr-val p">' + cleanEmoji(active.name||'Unknown') + '</span></div>';
+    const potionId = (active.emoji||'').match(/:potion(\d+):/)?.[1] || (active.emoji||'').match(/:(\d+)>/)?.[1];
+    const potionImgSrc = potionId ? '/images/potion' + potionId + '.png' : '/images/potion2.png';
+    let h = '<div class="data-row" style="margin-bottom:0.5rem;">'
+      + '<span class="dr-label" style="display:flex;align-items:center;gap:0.5rem;">'
+      + '<img src="' + potionImgSrc + '" style="width:28px;height:28px;object-fit:contain;" onerror="this.src=\'/images/potion2.png\'">'
+      + '<span style="font-size:0.9rem;font-weight:600;color:var(--purple);">' + cleanEmoji(active.name||'Unknown') + '</span>'
+      + '</span>'
+      + (active['Potion Score'] ? '<span class="dr-val" style="color:rgba(255,255,225,0.4);">' + Number(active['Potion Score']).toFixed(2) + '/10</span>' : '')
+      + '</div>';
     Object.entries(active).filter(([k])=>!['name','emoji','Potion Score','Potion_Score'].includes(k)).forEach(([k,v])=>{
-      h += '<div class="data-row"><span class="dr-label">' + k.replace(/_/g,' ') + '</span><span class="dr-val g">' + (typeof v==='number'?v+'%':v) + '</span></div>';
+      const statLabel = k.replace(/_/g,' ');
+      const statImg = STAT_EMOJI[statLabel] || STAT_EMOJI[k] || '';
+      h += '<div class="data-row"><span class="dr-label">' + statImg + statLabel + '</span><span class="dr-val g">' + (typeof v==='number'?v+'%':v) + '</span></div>';
     });
     activeEl.innerHTML = h;
   } else { activeEl.innerHTML = '<div class="empty-hint">No active potion. Use !potion in Discord.</div>'; }
@@ -2049,12 +2110,13 @@ function renderBrewing(s) {
       const score = v['Potion Score'] ? Number(v['Potion Score']).toFixed(1) : null;
       const stats = Object.entries(v)
         .filter(([k])=>!['name','emoji','Potion Score','Potion_Score'].includes(k))
-        .map(([k,val])=>'<div style="display:flex;justify-content:space-between;padding:0.25rem 0 0.25rem 0.75rem;font-size:0.75rem;border-top:1px solid rgba(255,255,225,0.04);">'
-          +'<span style="color:rgba(255,255,225,0.35);">'+k.replace(/_/g,' ')+'</span>'
+        .map(([k,val])=>{const sl=k.replace(/_/g,' ');return '<div style="display:flex;justify-content:space-between;padding:0.25rem 0 0.25rem 0.75rem;font-size:0.75rem;border-top:1px solid rgba(255,255,225,0.04);">'
+          +'<span style="color:rgba(255,255,225,0.55);display:flex;align-items:center;">'+(STAT_EMOJI[sl]||STAT_EMOJI[k]||'')+sl+'</span>'
           +'<span style="font-family:Syne Mono,monospace;color:var(--green);">'+(typeof val==='number'?val+'%':val)+'</span>'
-          +'</div>').join('');
+          +'</div>';}).join('');
       return '<div style="border-bottom:1px solid rgba(255,255,225,0.05);padding-bottom:0.25rem;margin-bottom:0.25rem;">'
         +'<div class="data-row" style="cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'
+        +(function(){const id=(v.emoji||'').match(/:potion(\d+):/)?.[1]||(v.emoji||'').match(/:(\d+)>/)?.[1];const src=id?'/images/potion'+id+'.png':'/images/potion2.png';return '<img src="'+src+'" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:6px;" onerror="this.src=\'/images/potion2.png\'">';})()
         +'<span class="dr-label">'+(i+1)+'. '+cleanEmoji(v.name||'Potion')+'</span>'
         +'<span class="dr-val" style="display:flex;align-items:center;gap:0.5rem;">'
         +(score?'<span style="color:rgba(255,255,225,0.3);">'+score+'/10</span>':'')
@@ -2185,16 +2247,17 @@ function renderPixie(p) {
     if (bondLv(days) >= 5) maxBondCount++;
   });
 
+  const ACH_IMG = (src) => '<img src="/images/' + src + '" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;" onerror="this.style.display=\'none\'">';
   const ACHIEVEMENTS = [
-    { label: 'All Scrolls',       emoji: '📜', done: scrollCount   >= 10,  progress: scrollCount   + ' / 10' },
-    { label: 'All Artifacts',     emoji: '🗿', done: artifactCount >= 10,  progress: artifactCount + ' / 10' },
-    { label: 'All Gemstones',     emoji: '💎', done: gemsFound     >= 5,   progress: gemsFound     + ' / 5'  },
-    { label: 'Max Bond All Pets', emoji: '🐾', done: maxBondCount  >= 12,  progress: maxBondCount  + ' / 12' },
-    { label: 'Max SGR Bonus',     emoji: '🤖', done: sgr           >= 25,  progress: sgr.toFixed(1)+ '% / 25%'},
-    { label: 'Brewing Lv.100',    emoji: '🧪', done: brewingLvl    >= 100, progress: 'Lv.' + brewingLvl      },
-    { label: 'Herbology Lv.100',  emoji: '🌿', done: herbLvl       >= 100, progress: 'Lv.' + herbLvl         },
-    { label: 'Legend Rank',       emoji: '👑', done: farmRank === 'LEGEND',progress: farmRank                },
-    { label: 'Golden Sporulation',emoji: '✨', done: currentStage === 'Golden_Sporulation', progress: currentStage || 'Not reached' },
+    { label: 'All Scrolls',       emoji: ACH_IMG('scroll.png'),              done: scrollCount   >= 10,  progress: scrollCount   + ' / 10' },
+    { label: 'All Artifacts',     emoji: ACH_IMG('artifacts.png'),            done: artifactCount >= 10,  progress: artifactCount + ' / 10' },
+    { label: 'All Gemstones',     emoji: ACH_IMG('gemstones.png'),    done: gemsFound     >= 5,   progress: gemsFound     + ' / 5'  },
+    { label: 'Max Bond All Pets', emoji: ACH_IMG('animals.png'),             done: maxBondCount  >= 12,  progress: maxBondCount  + ' / 12' },
+    { label: 'Max SGR Bonus',     emoji: ACH_IMG('sporebot.png'),            done: sgr           >= 25,  progress: sgr.toFixed(1)+ '% / 25%'},
+    { label: 'Brewing Lv.100',    emoji: ACH_IMG('potion17.png'),             done: brewingLvl    >= 100, progress: 'Lv.' + brewingLvl      },
+    { label: 'Herbology Lv.100',  emoji: ACH_IMG('herbs.png'),                done: herbLvl       >= 100, progress: 'Lv.' + herbLvl         },
+    { label: 'Legend Rank',       emoji: ACH_IMG('legend1.webp'),          done: farmRank === 'LEGEND',progress: farmRank                },
+    { label: 'Golden Sporulation',emoji: ACH_IMG('sporulation1.webp'),  done: currentStage === 'Golden_Sporulation', progress: currentStage || 'Not reached' },
   ];
 
   const doneCount2 = ACHIEVEMENTS.filter(a => a.done).length;
@@ -2344,7 +2407,7 @@ function renderReddit(s, p) {
   const barPct     = Math.round((doneCount / ACTIONS.length) * 100);
 
   rdEl.innerHTML = '<div style="margin-bottom:1rem;">'
-    + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;">'
+    + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.92rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;">'
     + '<span>Daily Progress</span><span>' + doneCount + ' / ' + ACTIONS.length + ' complete</span></div>'
     + '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
     + '<div style="height:100%;width:' + barPct + '%;background:linear-gradient(90deg,#ff6314,#ff9a14);border-radius:999px;transition:width 1s ease;"></div>'
@@ -2364,7 +2427,7 @@ function renderReddit(s, p) {
         return '<div style="display:flex;align-items:center;gap:0.45rem;padding:0.45rem 0.8rem;border-radius:0.625rem;border:1px solid ' + border + ';background:' + bg + ';white-space:nowrap;">'
           + '<span style="font-size:0.75rem;color:' + iconCol + ';font-weight:700;">' + icon + '</span>'
           + '<div style="display:flex;flex-direction:column;gap:0.05rem;">'
-          + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.75rem;font-weight:600;color:' + labelCol + ';">' + a.label + '</span>'
+          + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.75rem;font-weight:600;color:' + labelCol + ';display:flex;align-items:center;gap:0.3rem;"><img src="/images/' + a.img + '" style="width:12px;height:12px;object-fit:contain;" onerror="this.style.display=\'none\'">' + a.label + '</span>'
           + '<span style="font-family:Syne Mono,monospace;font-size:0.52rem;color:' + subCol + ';">' + subText + '</span>'
           + '</div></div>';
       }).join('')
