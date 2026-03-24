@@ -617,24 +617,25 @@
       <div class="tab-panel reveal" id="tab-staking">
         <div class="info-card">
           <div class="card-title"><span class="card-title-accent">⚡</span> Staking</div>
-          <div class="data-grid">
+          <div class="data-grid" style="grid-template-columns:1fr 1fr;">
             <div>
               <div class="data-row"><span class="dr-label">Staked SPORE</span><span class="dr-val g" id="s-staked">—</span></div>
               <div class="data-row"><span class="dr-label">Pending Rewards</span><span class="dr-val g" id="s-pending">—</span></div>
-              <div class="data-row"><span class="dr-label">Mycelium Nodes</span><span class="dr-val p" id="s-nodes">—</span></div>
+              <div class="data-row"><span class="dr-label">Total Earned</span><span class="dr-val g" id="s-total-earned">—</span></div>
             </div>
             <div>
               <div class="data-row"><span class="dr-label">Staking APY</span><span class="dr-val y" id="s-apy">—</span></div>
-              <div class="data-row"><span class="dr-label">Total Staking Earned</span><span class="dr-val g" id="s-total-earned">—</span></div>
+              <div class="data-row"><span class="dr-label">Mycelium Nodes</span><span class="dr-val p" id="s-nodes">—</span></div>
+              <div class="data-row"><span class="dr-label">Next Node At</span><span class="dr-val b" id="s-next-node">—</span></div>
             </div>
           </div>
         </div>
         <div class="info-card">
-          <div class="card-title"><span class="card-title-accent">⚡</span> MVP Breakdown</div>
+          <div class="card-title"><img src="/images/mvp.png" style="width:14px;height:14px;object-fit:contain;opacity:0.9;" onerror="this.style.display='none'"> MVP Breakdown</div>
           <div id="mvp-breakdown"></div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent">🌿</span> Node Breakdown</div>
+          <div class="card-title"><img src="/images/mycelium.png" style="width:14px;height:14px;object-fit:contain;opacity:0.9;" onerror="this.style.display='none'"> Node Breakdown</div>
           <div id="nodes-breakdown"><div class="empty-hint">No nodes yet.</div></div>
         </div>
       </div>
@@ -1716,9 +1717,11 @@ function renderStaking(s, p) {
     if (cycles >= 1) maturedNodes++;
     totalMvp += cycles;
   });
-  setEl('s-nodes', maturedNodes + ' / ' + nodes + ' mature');
-  setEl('s-apy',          '20%');
+  const nodeApr = staking.songbird_apr ? '30%' : '20%';
+  setEl('s-nodes',        maturedNodes + ' mature / ' + nodes + ' total');
+  setEl('s-apy',          nodeApr);
   setEl('s-total-earned', fmt(staking.lifetime_rewards || 0));
+  setEl('s-pending',      fmt(staking.pending_rewards || 0));
 
   // MVP breakdown
   const mvp = p.MVP || {};
@@ -1729,29 +1732,34 @@ function renderStaking(s, p) {
     return;
   }
   const categories = [
-    { key: 'mycelium_nodes',   label: 'Mycelium Nodes',  max: 25 },
-    { key: 'staked_spore',     label: 'Staked SPORE',    max: 20 },
-    { key: 'planted_shroom',   label: 'Planted SHROOM',  max: 15 },
-    { key: 'onchain_spore',    label: 'Onchain SPORE',   max: 10 },
-    { key: 'farm_rank',        label: 'Farm Rank',       max: 10 },
-    { key: 'pixie_xp',         label: 'Pixie XP',        max: 10 },
-    { key: 'onchain_shroom',   label: 'Onchain SHROOM',  max: 5  },
-    { key: 'nfts',             label: 'NFTs',             max: 5  },
+    { key: 'mycelium_nodes',   label: 'Mycelium Nodes',  max: 25, img: 'mycelium.png' },
+    { key: 'staked_spore',     label: 'Staked SPORE',    max: 20, img: 'spore.png' },
+    { key: 'planted_shroom',   label: 'Planted SHROOM',  max: 15, img: 'shroom.png' },
+    { key: 'onchain_spore',    label: 'Onchain SPORE',   max: 10, img: 'blockchain.png' },
+    { key: 'farm_rank',        label: 'Farm Rank',       max: 10, img: 'shroomfarm.png' },
+    { key: 'pixie_xp',         label: 'Pixie XP',        max: 10, img: 'pixie.png' },
+    { key: 'onchain_shroom',   label: 'Onchain SHROOM',  max: 5,  img: 'blockchain.png' },
+    { key: 'nfts',             label: 'NFTs',             max: 5,  img: 'nft.png' },
   ];
   mbEl.innerHTML = categories.map(cat => {
     const val = breakdown[cat.key] || 0;
     const pct = Math.min(100, (val / cat.max) * 100);
     return '<div style="margin-bottom:0.875rem;">'
       + '<div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:0.3rem;">'
-      + '<span style="color:rgba(255,255,225,0.5);">' + cat.label + '</span>'
-      + '<span style="font-family:Syne Mono,monospace;color:var(--yellow);">' + val.toFixed(1) + ' / ' + cat.max + '</span>'
+      + '<span style="color:rgba(255,255,225,0.75);display:flex;align-items:center;gap:0.35rem;"><img src="/images/' + cat.img + '" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;" onerror="this.style.display=\'none\'">' + cat.label + '</span>'
+      + '<span style="font-family:Syne Mono,monospace;color:var(--purple);">' + val.toFixed(1) + ' / ' + cat.max + '</span>'
       + '</div>'
       + '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
-      + '<div style="height:100%;background:var(--yellow);border-radius:999px;width:' + pct + '%;transition:width 1s ease;"></div>'
+      + '<div style="height:100%;background:var(--purple);border-radius:999px;width:' + pct + '%;transition:width 1s ease;"></div>'
       + '</div></div>';
   }).join('');
 
   // Node breakdown
+  const nextNodeNeeded = nodes > 0
+    ? (100_000_000 - (staked % 100_000_000)).toLocaleString() + ' more SPORE'
+    : (100_000_000 - staked).toLocaleString() + ' more SPORE';
+  setEl('s-next-node', staked > 0 && staked % 100_000_000 === 0 ? 'Node active' : nextNodeNeeded);
+
   const nbEl = document.getElementById('nodes-breakdown');
   if (!nodes || !Object.keys(nodesObj).length) {
     nbEl.innerHTML = '<div class="empty-hint">No nodes. Stake 100M SPORE to create your first node.</div>';
@@ -1765,14 +1773,19 @@ function renderStaking(s, p) {
       const ageDays = (nowMs - created.getTime()) / 86400000;
       const cycles  = Math.floor(ageDays / 90);
       const daysToNext = 90 - Math.floor(ageDays % 90);
-      const status = cycles >= 1
-        ? cycles + ' MVP earned — next in ' + daysToNext + 'd'
-        : 'Maturing — ' + Math.floor(90 - ageDays) + 'd remaining';
-      const col = cycles >= 1 ? 'var(--green)' : 'var(--yellow)';
-      nbHtml += '<div class="data-row">'
-        + '<span class="dr-label">Node #' + i + '</span>'
-        + '<span style="font-family:Syne Mono,monospace;font-size:0.72rem;color:' + col + ';">' + status + '</span>'
-        + '</div>';
+      const agePct = Math.min(100, Math.round((ageDays % 90) / 90 * 100));
+      const statusLabel = cycles >= 1
+        ? cycles + ' MVP | next in ' + daysToNext + 'd'
+        : Math.floor(90 - ageDays) + 'd to mature';
+      const col = 'var(--green)';
+      nbHtml += '<div style="padding:0.5rem 0;border-bottom:1px solid rgba(255,255,225,0.05);">'
+        + '<div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.3rem;">'
+        + '<span class="dr-label"><img src="/images/growing.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">Node #' + i + '</span>'
+        + '<span style="font-family:Syne Mono,monospace;font-size:0.7rem;color:' + col + ';">' + statusLabel + '</span>'
+        + '</div>'
+        + '<div style="height:3px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
+        + '<div style="height:100%;width:' + agePct + '%;background:' + col + ';border-radius:999px;transition:width 1s ease;"></div>'
+        + '</div></div>';
     }
     const nextNodePct = staked > 0 ? Math.round((staked % 100_000_000) / 100_000_000 * 100) : 0;
     if (nextNodePct > 0) {
@@ -1780,7 +1793,7 @@ function renderStaking(s, p) {
         + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);margin-bottom:0.35rem;">'
         + '<span>Next Node Progress</span><span>' + nextNodePct + '%</span></div>'
         + '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
-        + '<div style="height:100%;width:' + nextNodePct + '%;background:var(--blue);border-radius:999px;"></div>'
+        + '<div style="height:100%;width:' + nextNodePct + '%;background:var(--purple);border-radius:999px;"></div>'
         + '</div></div>';
     }
     nbEl.innerHTML = nbHtml;
@@ -1892,15 +1905,63 @@ function renderCompanion(s) {
     rosterEl.innerHTML = '<div class="empty-hint">No companions adopted yet.</div>';
     return;
   }
-  rosterEl.innerHTML = allPets.map(k => {
+  const UNLOCK_THRESHOLDS = {
+    turtle:1,bunny:2,fox:3,frog:4,wolf:5,duck:6,
+    deer:7,owl:8,bear:9,monkey:10,songbird:11,panda:12
+  };
+  const UNLOCK_FEED = {
+    turtle:50000,bunny:100000,fox:150000,frog:200000,wolf:250000,duck:300000,
+    deer:350000,owl:420000,bear:500000,monkey:550000,songbird:600000,panda:687420
+  };
+  const UNIQUE_LABELS = {
+    turtle:'Quick Gather',bunny:'Triple Harvest',fox:'Void Seeker',frog:"Alchemist's Vault",
+    wolf:"Wolf's Instinct",duck:'Vacation Trader',deer:"Nature's Head Start",owl:'A Party of 3',
+    bear:"Bear's Protection",monkey:"Jester's Jackpot",songbird:"Songbird's Melody",panda:"Panda's Aura"
+  };
+  const BONUS_LABELS = {
+    turtle:'Herb Find Rate',bunny:'Double Herb Chance',fox:'Rare Herb Chance',frog:'Extra Daily Brews',
+    wolf:'Daily Cave Runs',duck:'Vacation Interval',deer:'Harvest Bonus',owl:'Patience',
+    bear:'Plant Limit Bonus',monkey:'Monkey Visit Chance',songbird:'MVP Node Speed',panda:'Spore Yield'
+  };
+  const feedAmount = s.Misc?.feed_amount || 0;
+  const ALL_COMPANIONS = ['turtle','bunny','fox','frog','wolf','duck','deer','owl','bear','monkey','songbird','panda'];
+
+  rosterEl.innerHTML = ALL_COMPANIONS.map(k => {
     const pd = (comp.pets || {})[k] || {};
-    const days = pd.total_days || 0;
+    let days = pd.total_days || 0;
+    if (k === activeKey && comp.adopted_at) {
+      const a = new Date(comp.adopted_at.replace(' ','T') + 'Z');
+      days += Math.floor((Date.now() - a.getTime()) / 86400000);
+    }
     const bl = bondLevel(days);
     const isActive = k === activeKey;
-    return '<div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid rgba(255,255,225,0.05);">'
-      + '<span style="font-size:1.5rem;">' + (CEMOJIS[k] || '🐾') + '</span>'
-      + '<span style="flex:1;font-size:0.85rem;">' + k.charAt(0).toUpperCase() + k.slice(1) + '</span>'
-      + '<span style="font-family:Syne Mono,monospace;font-size:0.65rem;color:rgba(255,255,225,0.35);">Lv.' + bl + ' &nbsp; ' + days + 'd</span>'
+    const unlocked = feedAmount >= (UNLOCK_FEED[k] || 0);
+    const uniqueUnlocked = unlocked && bl >= 5;
+    const name = k.charAt(0).toUpperCase() + k.slice(1);
+
+    const PET_IMGS = {
+      turtle:'/images/turtle.png',bunny:'/images/bunny.png',fox:'/images/fox.png',
+      frog:'/images/frog.png',wolf:'/images/wolf.png',duck:'/images/duck.png',
+      deer:'/images/deer.png',owl:'/images/owl.png',bear:'/images/bear.png',
+      monkey:'/images/monkey.png',songbird:'/images/songbird.png',panda:'/images/panda.png'
+    };
+    const petImg = '<img src="' + (PET_IMGS[k]||'') + '" style="width:36px;height:36px;object-fit:contain;flex-shrink:0;" onerror="this.style.display=\'none\'">';
+    const lockOpacity = unlocked ? '1' : '0.35';
+
+    return '<div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid rgba(255,255,225,0.05);opacity:' + lockOpacity + ';">'
+      + petImg
+      + '<div style="flex:1;">'
+      + '<div style="font-size:0.85rem;font-weight:600;">' + name
+      + (unlocked ? ' <span style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.4);">Lv.' + bl + ' &nbsp; ' + days + 'd</span>' : '')
+      + '</div>'
+      + '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.4);">' + (BONUS_LABELS[k]||'') + '</div>'
+      + (unlocked
+          ? '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;margin-top:0.1rem;color:' + (uniqueUnlocked ? 'var(--purple)' : 'rgba(255,255,225,0.2)') + ';">'
+            + (uniqueUnlocked ? '✨ ' + UNIQUE_LABELS[k] : '🔒 Unique: Reach Bond Lv.5')
+            + '</div>'
+          : '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.25);">Feed ' + (UNLOCK_FEED[k]||0).toLocaleString() + ' SHROOM to unlock</div>'
+        )
+      + '</div>'
       + (isActive ? '<span style="font-family:Syne Mono,monospace;font-size:0.58rem;color:var(--green);padding:0.15em 0.5em;border:1px solid rgba(34,197,94,0.3);border-radius:999px;">ACTIVE</span>' : '')
       + '</div>';
   }).join('');
@@ -2030,7 +2091,7 @@ function renderBrewing(s) {
       + owned.map(([k,v]) => {
           const bg  = TIER_COLOR[k]  || 'rgba(254,206,0,0.08)';
           const bdr = TIER_BORDER[k] || 'rgba(254,206,0,0.25)';
-          const img = ING_EMOJI[k] ? '<img src="' + ING_EMOJI[k] + '" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">' : '🌿 ';
+          const img = ING_EMOJI[k] ? '<img src="' + ING_EMOJI[k] + '" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">' : '<img src="/images/mvp.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">';
           return '<div style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.35em 0.75em;border-radius:999px;background:' + bg + ';border:1px solid ' + bdr + ';font-family:Syne Mono,monospace;font-size:0.72rem;color:var(--cream);">'
             + img + '<span style="font-weight:600;">' + k + '</span>'
             + '<span style="color:rgba(255,255,225,0.5);margin-left:2px;">×' + v + '</span>'
