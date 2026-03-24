@@ -2004,7 +2004,7 @@ function renderInventory(s) {
       Mooshie_Gemstone:'/images/mystical_gemstone.png', King_Totem:'/images/king.png',
       Queen_Totem:'/images/queen.png', Kid_Totem:'/images/kidshroom.png',
       Gold_Totem:'/images/goldmooshie.png', Miner_Helmet:'/images/miner_helmet.png',
-      Well_Access:'/images/well.png', animal_gemstone:'/images/Mystical_Gemstone.png',
+      Well_Access:'/images/well.png', animal_gemstone:'/images/mystical_gemstone.png',
     };
     itemsEl.innerHTML = ownedItems.map(([k,v]) => {
       const label = ITEM_MAP[k] || k.replace(/_/g,' ');
@@ -2023,7 +2023,7 @@ function renderInventory(s) {
     const qty = owned ? ' x' + gems[g] : '';
     const GEM_IMGS = {
       'Shroomstone_Quartz':'/images/shroomstone_quartz.png',
-      'Shroomcap_Ruby':'/images/Shroomcap_ruby.png',
+      'Shroomcap_Ruby':'/images/shroomcap_ruby.png',
       'Sporelight_Sapphire':'/images/sporelight_sapphire.png',
       'Moonglow_Amethyst':'/images/moonglow_amethyst.png',
       'Prismcap_Diamond':'/images/prismcap_diamond.png',
