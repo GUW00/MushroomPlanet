@@ -57,8 +57,11 @@
       padding: 5rem 0.75rem 1.5rem;
       background: radial-gradient(ellipse at 50% 0%, rgba(253,70,79,0.12) 0%, transparent 70%);
     }
-    @media(max-width:768px){
-      .hero { padding: 1rem 1rem 1.5rem; }
+    @media(max-width:768px), (display-mode: standalone) {
+      .vote-hero { padding: 1rem 1rem 1rem; }
+      .vote-hero h1 { font-size: clamp(1.6rem, 5vw, 2.5rem); margin-bottom: 0.35rem; }
+      .vote-hero p { font-size: 0.88rem; margin-bottom: 0.75rem; }
+      .vote-hero .eyebrow { margin-bottom: 0.35rem; }
     }
     .vote-hero .eyebrow {
       font-family: 'Syne Mono', monospace; font-size: 0.75rem;
