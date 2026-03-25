@@ -14,7 +14,7 @@
   <meta name="description" content="Your Mushroom Planet profile - farm stats, wallet, NFTs, and activity across Discord and Reddit." />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne+Mono&display=swap" />
   <link rel="stylesheet" href="styles.css" />
-  <script type="module" src="config.js"></script>
+  <script type="module" src="config.js?v=2"></script>
 
   <style>
     .header-icons { display: none; }
@@ -251,13 +251,13 @@
       font-weight: 600; display: flex; align-items: center;
     }
     @media(display-mode:standalone) {
-      .tab-bar { gap: 0.25rem; }
-      .tab { flex: 1; justify-content: center; padding: 0.5em 0.4em; font-size: 0.65rem; min-width: 0; }
-      .tab img { width: 11px; height: 11px; margin-right: 3px; }
+      .tab-bar { gap: 0.3rem; }
+      .tab { flex: 1; justify-content: center; padding: 0.6em 0.2em; font-size: 0; min-width: 0; }
+      .tab img { width: 18px !important; height: 18px !important; margin-right: 0 !important; }
     }
     @media(max-width: 480px) {
       .tab-bar { gap: 0.25rem; }
-      .tab { flex: 1; justify-content: center; padding: 0.5em 0.4em; font-size: 0.65rem; min-width: 0; }
+      .tab { flex: 1; justify-content: center; padding: 0.5em 0.4em; font-size: 0.58rem; min-width: 0; }
       .tab img { width: 11px; height: 11px; margin-right: 3px; }
     }
     .tab.active {
@@ -406,6 +406,11 @@
       color: rgba(255,255,225,0.4); cursor: pointer; font-family: 'Space Grotesk', sans-serif;
       font-size: 0.82rem; font-weight: 600; transition: all 0.2s;
     }
+    @media(display-mode:standalone) {
+      .platform-strip { gap: 0.4rem; }
+      .platform-btn { flex: 1; justify-content: center; padding: 0.5rem 0.4rem; font-size: 0.72rem; }
+      .platform-btn img { width: 16px; height: 16px; }
+    }
     .platform-btn.active {
       background: rgba(254,206,0,0.08); border-color: rgba(254,206,0,0.3); color: var(--yellow);
     }
@@ -459,6 +464,20 @@
       .mvp-block { align-items: flex-start; }
       .page-section { padding: 0 1rem 3rem; }
       .ing-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    @media(display-mode:standalone) {
+      .profile-header {
+        flex-direction: row; align-items: center;
+        padding: 1.25rem; gap: 1rem;
+      }
+      .profile-identity { gap: 0.875rem; }
+      .profile-avatar { width: 52px; height: 52px; }
+      .profile-avatar-placeholder { width: 52px; height: 52px; font-size: 1.4rem; }
+      .profile-name { font-size: 1.1rem; }
+      .profile-sub { font-size: 0.58rem; flex-direction: column; gap: 0.2rem; }
+      .profile-badges { gap: 0.3rem; margin-top: 0.3rem; }
+      .badge { font-size: 0.52rem; padding: 0.15em 0.5em; }
+      .btn-sm { font-size: 0.55rem; padding: 0.25em 0.65em; }
     }
     @media(min-width: 601px) {
       .ing-grid { grid-template-columns: repeat(4, 1fr) !important; }
@@ -1260,7 +1279,8 @@ function renderHeader(s, p) {
 
   const name = misc.username || wallet.username || currentUser?.username || 'Unknown Farmer';
   setEl('prof-username', name);
-  setEl('prof-discord-tag', 'Discord: ' + (currentUser?.discord_id || ''));
+  const did = currentUser?.discord_id || '';
+  setEl('prof-discord-tag', 'Discord: ' + (did ? did.slice(0,6) + '...' + did.slice(-4) : ''));
   setEl('prof-joined', 'Joined: ' + safe(p.Misc?.created_at || misc.created_at, 'Unknown'));
   setEl('prof-mvp', (currentUser?.mvp || 0).toFixed(1));
 

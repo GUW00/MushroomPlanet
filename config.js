@@ -59,7 +59,6 @@ const config = {
   menu: {
     html: `
       <div class="main-menu desktop-only">
-        <a href="index.html">Home</a>
         <a href="profile.html">Sporebot</a>
         <a href="convert.html">Convert</a>
         <a href="vote.html">Goverance</a>
@@ -68,7 +67,6 @@ const config = {
       </div>
 
       <div class="mobile-menu mobile-only">
-        <a href="index.html">Home</a>
         <a href="profile.html">Sporebot</a>
         <a href="convert.html">Convert</a>
         <a href="vote.html">Goverance</a>
