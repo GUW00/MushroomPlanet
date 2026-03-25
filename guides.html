@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+=<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -350,35 +350,74 @@
       <div class="section-title">Ultimate Sporebot Guide</div>
     </div>
 
-    <!-- Quick Stats -->
+    <!-- Getting Started cards -->
     <div class="info-grid reveal">
       <div class="info-card">
-        <div class="info-card-icon">🌾</div>
-        <div class="info-card-title">Daily Forage</div>
-        <div class="info-card-body">Earn up to <strong>6,874 SHROOMS</strong> daily by building your streak. SPORE rewards scale at 100x the SHROOM amount.</div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">🔗</div>
-        <div class="info-card-title">Wallet Linking</div>
-        <div class="info-card-body">Link your Reddit account to Discord and verify your Polygon wallet to earn a one-time bonus of <strong>5,000 SHROOMS</strong> and <strong>500,000 SPORES</strong>.</div>
+        <div class="info-card-icon">🌱</div>
+        <div class="info-card-title">Starting Out</div>
+        <div class="info-card-body">
+          Verify in <strong>#verify</strong>, then use <code>!start</code> in <strong>#farming</strong> to receive <strong>1,000 SHROOMS</strong>. Use <code>!plant 1000</code> to plant them and start your Mushroom Farm.
+        </div>
       </div>
       <div class="info-card">
         <div class="info-card-icon">💧</div>
         <div class="info-card-title">Faucet / Sprout</div>
-        <div class="info-card-body">New users can claim a one-time <strong>1,000 SHROOMS</strong> and <strong>100,000 SPORES</strong> via <code>!sprout</code> or <code>!faucet</code>.</div>
+        <div class="info-card-body">New Reddit users can claim a one-time bonus of <strong>1,000 SHROOMS</strong> and <strong>100,000 SPORES</strong> via <code>!sprout</code>.</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🔗</div>
+        <div class="info-card-title">Wallet Linking</div>
+        <div class="info-card-body">Link Reddit to Discord and verify your Polygon wallet via <code>!register 0xYourAddress</code> to earn a one-time bonus of <strong>5,000 SHROOMS</strong> + <strong>500,000 SPORES</strong>.</div>
       </div>
     </div>
 
     <div class="glow-divider"></div>
 
+    <!-- Daily Commands -->
+    <div class="guide-card reveal">
+      <h3>📅 Daily Commands</h3>
+      <p>Daily commands reset once per day and are used in <strong>#daily-forage</strong>. Hourly commands can be used multiple times and go in <strong>#hourly-tasks</strong>.</p>
+
+      <h4>Daily (once per day)</h4>
+      <ul>
+        <li><code>!forage</code> — Earn SHROOMS based on your streak (up to 6,874/day at Day 420+)</li>
+        <li><code>!mist</code> &amp; <code>!fan</code> — Earn random SHROOMS and maintain your farm</li>
+        <li><code>!explore</code> — Discover scrolls, artifacts, secret gardens, and recipes</li>
+        <li><code>!visit</code> — Visit Wimblecap daily to earn rewards and learn about your items</li>
+        <li><code>!dig</code> — Find SHROOMS, SPORES, crypto, NFTs, or a Golden Chest</li>
+        <li><code>!toss</code> — Earn various rewards including the rare Sporulation Jackpot</li>
+      </ul>
+
+      <h4>Hourly (multiple times per day)</h4>
+      <ul>
+        <li><code>!gather</code> — Collect herbs to use in brewing potions</li>
+        <li><code>!cave</code> — Navigate the cave puzzle for gemstones</li>
+        <li><code>!feed</code> — Feed forest animals (requires Wildtongue Gemstone)</li>
+      </ul>
+
+      <h4>Other Useful Commands</h4>
+      <ul>
+        <li><code>!plant [amount]</code> — Plant SHROOMS into your farm</li>
+        <li><code>!farm</code> — View your farm details and SGR</li>
+        <li><code>!home</code> — View cooldowns, items, stats, and more</li>
+        <li><code>!sporebots</code> — View your in-game Sporebot and NFT Sporebot helper</li>
+        <li><code>!convert [amount]</code> — Convert at 100:1 ratio (100 SPORES = 1 SHROOM)</li>
+        <li><code>!transfer [amt] [token]</code> — Transfer from Reddit to your Discord wallet</li>
+        <li><code>!shop</code> — Sell gemstones, buy herbs, craft ingredients</li>
+        <li><code>!freeze</code> — Freeze your farm to protect your forage streak (SGR stops)</li>
+        <li><code>!brew</code> — Overview of brewing and detailed instructions</li>
+        <li><code>!stake</code> — View your stake or get started staking SPORES</li>
+        <li><code>/balance</code> — View Farm, Discord, Reddit and on-chain balances plus NFTs</li>
+      </ul>
+    </div>
+
     <!-- Forage Streaks -->
     <div class="guide-card reveal">
-      <h3>🔥 Forage Streak Progression</h3>
-      <p>A new forage thread is posted automatically every day at <strong>4:20 EST</strong>. Comment <code>!forage</code> to earn and grow your streak. Rewards scale continuously — the higher your streak, the more you earn each day.</p>
-      <p>Miss a day and lose your streak — unless you have a <strong>Vacation Day</strong> saved up (earned every 7 consecutive forage days).</p>
+      <h3>🔥 Daily Forage Streak</h3>
+      <p>Comment <code>!forage</code> every day to grow your streak. Rewards scale continuously — miss a day and your streak resets unless you have a <strong>Vacation Day</strong> saved up (earned automatically every 7 consecutive forage days).</p>
 
       <div class="streak-grid">
-        <div class="sg-head">Streak Days</div>
+        <div class="sg-head">Streak Range</div>
         <div class="sg-head">SHROOMS / day</div>
         <div class="sg-head">SPORES / day</div>
 
@@ -388,7 +427,7 @@
 
         <div class="sg-cell"><strong>Days 2-100</strong></div>
         <div class="sg-cell">+15 per day</div>
-        <div class="sg-cell">Scales with SHROOM</div>
+        <div class="sg-cell">Scales 100x SHROOM</div>
 
         <div class="sg-cell"><strong>Day 101</strong></div>
         <div class="sg-cell">2,500 base</div>
@@ -396,7 +435,7 @@
 
         <div class="sg-cell"><strong>Days 102-400</strong></div>
         <div class="sg-cell">+10 per day</div>
-        <div class="sg-cell">Scales with SHROOM</div>
+        <div class="sg-cell">Scales 100x SHROOM</div>
 
         <div class="sg-cell"><strong>Day 401</strong></div>
         <div class="sg-cell">5,490 base</div>
@@ -404,39 +443,39 @@
 
         <div class="sg-cell"><strong>Days 402-419</strong></div>
         <div class="sg-cell">+69 per day</div>
-        <div class="sg-cell">Scales with SHROOM</div>
+        <div class="sg-cell">Scales 100x SHROOM</div>
 
         <div class="sg-cell"><strong>Day 420+</strong></div>
         <div class="sg-cell"><strong>6,874 MAX</strong></div>
         <div class="sg-cell"><strong>687,400 MAX</strong></div>
       </div>
 
-      <h4>Flair Bonuses</h4>
-      <p>Your Reddit flair rank adds a percentage bonus on top of your base forage reward:</p>
+      <h4>Forage Streak Milestone Unlocks</h4>
       <ul>
-        <li><strong>Bronze</strong>: +5%</li>
-        <li><strong>Silver</strong>: +10%</li>
-        <li><strong>Gold</strong>: +23%</li>
-        <li><strong>Emerald</strong>: +42%</li>
-        <li><strong>Diamond</strong>: +69%</li>
-        <li><strong>Master</strong>: +85%</li>
-        <li><strong>Grandmaster</strong>: +100%</li>
+        <li><strong>Day 7</strong>: Golden Shovel — enables treasure finds in <code>!dig</code></li>
+        <li><strong>Day 21</strong>: Queen Totem — chance for bonus SPORES from <code>!mist</code></li>
+        <li><strong>Day 42</strong>: King Totem — chance for bonus SPORES from <code>!fan</code></li>
+        <li><strong>Day 69</strong>: Kid Totem — additional SPORE bonus</li>
+        <li><strong>Day 100</strong>: Gold Totem — chance at an extra <code>!toss</code></li>
       </ul>
-      <p style="margin-top:0.5rem;">NFT holders (King/Queen/Gold/Kid Shroom/Mooshie House) with 7+ day hold earn an additional <strong>10% per NFT</strong>, capped at <strong>+50%</strong>.</p>
+
+      <h4>Flair Bonuses on Forage</h4>
+      <ul>
+        <li><strong>Bronze</strong>: +5% | <strong>Silver</strong>: +10% | <strong>Gold</strong>: +23%</li>
+        <li><strong>Emerald</strong>: +42% | <strong>Diamond</strong>: +69% | <strong>Master</strong>: +85% | <strong>Grandmaster</strong>: +100%</li>
+      </ul>
     </div>
 
     <!-- Farm System -->
     <div class="guide-card reveal">
-      <h3>🌾 Farm System</h3>
-      <p>Plant SHROOMS to generate SPORES continuously. Your Farm Rank determines your planting limit and a permanent yield bonus. Farms progress through 6 growth stages over a 42-day cycle, each increasing your SPORE generation rate.</p>
+      <h3>🌾 Farm System &amp; SGR</h3>
+      <p>Plant SHROOMS to passively generate SPORES based on your <strong>Spore Generation Rate (SGR)</strong>. Your farm advances through growth stages over a 42-day cycle, each increasing your SGR.</p>
 
-      <h4>Growth Stages (SPORE Generation Rate bonus)</h4>
+      <h4>Growth Stages</h4>
       <div class="streak-grid">
         <div class="sg-head">Stage</div>
         <div class="sg-head">Day Reached</div>
         <div class="sg-head">SGR Bonus</div>
-
-        <div class="sg-cell">Inactive</div><div class="sg-cell">-</div><div class="sg-cell">0%</div>
         <div class="sg-cell">Spore</div><div class="sg-cell">Day 1</div><div class="sg-cell">4%</div>
         <div class="sg-cell">Germination</div><div class="sg-cell">Day 5</div><div class="sg-cell">8%</div>
         <div class="sg-cell">Mycelium</div><div class="sg-cell">Day 15</div><div class="sg-cell">12%</div>
@@ -445,7 +484,7 @@
         <div class="sg-cell">Golden Sporulation <span class="badge">Legend Only</span></div><div class="sg-cell">Day 294</div><div class="sg-cell">25%</div>
       </div>
 
-      <h4>Farm Ranks (unlocked by harvesting at Sporulation)</h4>
+      <h4>Farm Ranks (unlock by harvesting at Sporulation)</h4>
       <div class="rank-grid">
         <div class="sg-head">Rank</div>
         <div class="sg-head">Yield Bonus</div>
@@ -459,37 +498,65 @@
         <div class="sg-cell">Grandmaster</div><div class="sg-cell">+20%</div><div class="sg-cell">5,000,000</div>
         <div class="sg-cell">Legend</div><div class="sg-cell">+25%</div><div class="sg-cell">6,874,000</div>
       </div>
+      <p style="margin-top:0.75rem;">After harvesting, replant all your SHROOMS to resume earning.</p>
 
-      <h4>Harvesting</h4>
-      <p>Once your farm reaches Sporulation (Day 42), use <code>!harvest</code> to advance your Farm Rank. Each harvest earns a permanent <strong>+3% yield bonus</strong>, a new custom name, and custom border colors in <code>!farm</code>.</p>
+      <h4>All SGR Sources (in-game cap: 100%)</h4>
+      <ul>
+        <li><strong>Farm Rank</strong>: up to 25% (BRONZE 0% through LEGEND 25%)</li>
+        <li><strong>Farm Stage</strong>: up to 20% (Sporulation)</li>
+        <li><strong>Potion Brew</strong>: up to 10% (Spore Yield stat)</li>
+        <li><strong>5 Gemstones</strong>: up to 25% (5% each — Wildtongue, Feather, Rootsong, Sunspore, Spirit Gemstone)</li>
+        <li><strong>In-Game Sporebot Bonus</strong>: up to 25% (5 activity categories, 5% each)</li>
+      </ul>
+      <p>Additional SGR from on-chain support:</p>
+      <ul>
+        <li><strong>Liquidity Provider (LP)</strong>: SHROOM/WETH or SPORE/WETH V2 pools</li>
+        <li><strong>Guwoo NFT</strong>: +5%</li>
+        <li><strong>Sporebot NFT</strong>: +1% to +5% (based on Spore Yield trait rarity)</li>
+        <li><strong>LP NFTs</strong> (King Mooshie Pool / Mooshie Family Portrait): +2% to +10%</li>
+      </ul>
     </div>
 
-    <!-- Forage Unlocks -->
+    <!-- In-Game Sporebot Bonus -->
     <div class="guide-card reveal">
-      <h3>🌲 Forage Streak Milestone Unlocks</h3>
-      <p>As you build your forage streak, you unlock permanent items that boost your rewards:</p>
+      <h3>🤖 In-Game Sporebot Bonus (up to 25% SGR)</h3>
+      <p>Your community activity unlocks up to <strong>25% additional SGR</strong>. Each of 5 categories contributes up to 5%:</p>
       <ul>
-        <li><strong>Day 7</strong>: Golden Shovel — enables treasure finds in <code>!dig</code></li>
-        <li><strong>Day 21</strong>: Queen Totem — chance to earn bonus SPORES from <code>!mist</code></li>
-        <li><strong>Day 42</strong>: King Totem — chance to earn bonus SPORES from <code>!fan</code></li>
-        <li><strong>Day 69</strong>: Kid Totem — additional SPORE bonus</li>
-        <li><strong>Day 100</strong>: Gold Totem — chance at an extra <code>!toss</code></li>
+        <li><strong>SHROOMS Given</strong>: 1% per 1M SHROOMS tipped/raffled/airdropped (max 5M)</li>
+        <li><strong>SPORES Given</strong>: 1% per 100M SPORES given (max 500M)</li>
+        <li><strong>Pixie Level</strong>: scales to 5% at Level 420</li>
+        <li><strong>Message XP</strong>: scales to 5% at 500,000 Message XP</li>
+        <li><strong>Goodshrooms Received</strong>: scales to 5% at 100 GS tokens received</li>
       </ul>
-
-      <h4>Vacation Days</h4>
-      <p>Every <strong>7 consecutive forage days</strong> you earn 1 Vacation Day. Vacation Days are spent automatically when you miss a forage — preserving your streak. Use <code>!flute</code> in Discord to check your Vacation Day balance and how the system works.</p>
+      <p>Use <code>!sporebots</code> to view your current breakdown.</p>
     </div>
 
-    <!-- Visit System -->
+    <!-- Spore Staking -->
     <div class="guide-card reveal">
-      <h3>🧙 Visit System — Wimblecap</h3>
-      <p>Use <code>!visit</code> to spend time with Wimblecap, the wise forest elder. Each visit counts toward your total visit milestone and can reward SHROOMS or special items.</p>
+      <h3>🌀 SPORE Staking &amp; MVP</h3>
+      <p>Stake SPORES to earn passive rewards and build <strong>Mycelium Voting Power (MVP)</strong> for governance. Use <code>!stake</code> to get started.</p>
+
+      <h4>Staking Rate</h4>
       <ul>
-        <li><strong>50th visit</strong>: Unlock the <strong>Elder Pipe</strong> — use <code>!pipe</code> to reset your daily cooldowns (14-day cooldown)</li>
-        <li><strong>100, 150, 200, 250, 300, 420 visits</strong>: Milestone SHROOM rewards</li>
-        <li><strong>Every 30 visits after 450</strong>: Recurring SHROOM rewards</li>
+        <li><strong>20% APR</strong> flat rate for all stakers</li>
+        <li>Every <strong>100M SPORES</strong> staked = 1 Mycelium Node</li>
+        <li>Each node runs a <strong>90-day cycle</strong> — every 90 days = +1 MVP per node</li>
+        <li>MVP accumulates infinitely (180 days = 2 MVP per node)</li>
       </ul>
-      <p>Wimblecap also lets you browse your collected <strong>Artifacts</strong>, <strong>Scrolls</strong>, and <strong>Items</strong> from the visit menu.</p>
+
+      <h4>Unstaking Options</h4>
+      <ul>
+        <li><strong>Fast Unstake (7 days)</strong>: Lose ALL MVP, get SPORES back faster</li>
+        <li><strong>Slow Unstake (42 days)</strong>: Keep ALL MVP, longer wait</li>
+      </ul>
+      <p>SGR stops immediately when you unstake (either option).</p>
+
+      <h4>What MVP Is Used For</h4>
+      <ul>
+        <li>Governance voting weight on proposals</li>
+        <li>Influencing Sporebot decisions</li>
+        <li>Higher MVP = more influence</li>
+      </ul>
     </div>
 
     <!-- Dig + Toss + Cave -->
@@ -498,8 +565,8 @@
         <div class="info-card-icon">⛏️</div>
         <div class="info-card-title">Dig System</div>
         <div class="info-card-body">
-          Register your wallet and use <code>!dig</code> to treasure hunt. Rewards come from a live community-funded pool.<br><br>
-          <strong>Common dig</strong>: 420 - 2,420 SHROOMS<br>
+          Use <code>!dig</code> daily to treasure hunt from a community-funded pool.<br><br>
+          <strong>Common</strong>: 420 - 2,420 SHROOMS<br>
           <strong>Bronze chest</strong>: 25,000 SHROOMS<br>
           <strong>Silver chest</strong>: 50,000 SHROOMS<br>
           <strong>Golden chest</strong>: 1,000,000 SHROOMS<br>
@@ -510,68 +577,125 @@
         <div class="info-card-icon">🪙</div>
         <div class="info-card-title">Toss a Coin</div>
         <div class="info-card-body">
-          Use <code>!toss</code> once per day to throw a coin into the Mooshie Well. Possible outcomes:<br><br>
-          <strong>Farm advance</strong>: Skip 1-3 farm days (most common)<br>
-          <strong>SHROOMS</strong>: 100 - 2,420 SHROOMS<br>
-          <strong>Vacation Day</strong>: Protect your streak<br>
-          <strong>Sporulation Jackpot</strong>: 100,000,000 SPORES (rare — one winner/month)
+          Use <code>!toss</code> once per day. Possible outcomes:<br><br>
+          <strong>Farm advance</strong>: Skip 1-3 days (most common, 70%)<br>
+          <strong>Vacation Day</strong>: Streak protection (10%)<br>
+          <strong>SHROOMS</strong>: 100 - 2,420 (5%)<br>
+          <strong>Miner Helmet</strong>: dig bonus item (0.5%)<br>
+          <strong>Sporulation Jackpot</strong>: 100M SPORES — one winner/month (0.1%)
         </div>
       </div>
       <div class="info-card">
         <div class="info-card-icon">🕳️</div>
         <div class="info-card-title">Cave System</div>
         <div class="info-card-body">
-          Enter the cave with <code>!cave</code> for a path-choosing puzzle. Costs <strong>10,000 SPORES</strong> to enter. Find gemstones along the way:<br><br>
-          <strong>Shroomstone Quartz</strong>: 10,000 SPORE value (common)<br>
-          <strong>Shroomcap Ruby</strong>: 50,000 (uncommon)<br>
-          <strong>Sporelight Sapphire</strong>: 100,000 (rare)<br>
-          <strong>Moonglow Amethyst</strong>: 150,000 (very rare)<br>
-          <strong>Prismcap Diamond</strong>: 420,000 (ultra rare)
+          Use <code>!cave</code> for a path puzzle. Entry costs <strong>10,000 SPORES</strong>. Find gemstones:<br><br>
+          <strong>Shroomstone Quartz</strong>: 10,000 SP (common)<br>
+          <strong>Shroomcap Ruby</strong>: 50,000 SP<br>
+          <strong>Sporelight Sapphire</strong>: 100,000 SP<br>
+          <strong>Moonglow Amethyst</strong>: 150,000 SP<br>
+          <strong>Prismcap Diamond</strong>: 420,000 SP (ultra rare)
         </div>
       </div>
       <div class="info-card">
         <div class="info-card-icon">🧪</div>
-        <div class="info-card-title">Potions & Brewing</div>
+        <div class="info-card-title">Potions &amp; Brewing</div>
         <div class="info-card-body">
-          Brew potions using foraged herbs to boost farm stats. Ingredient slots unlock by rank:<br><br>
-          <strong>Bronze</strong>: 2 ingredients (Sunspore, Ashroot, Glowcap)<br>
-          <strong>Silver/Gold</strong>: 3 ingredients (+ Frostmoss, Veilfruit, Dreamdust)<br>
-          <strong>Emerald+</strong>: 4 ingredients (+ Bloodberry, Elderbloom, Woobud)<br>
-          <strong>Mythic</strong>: Voidspore — adds a 4th stat
+          Brew potions with <code>!brew</code> to boost SGR and farm stats. Ingredient slots by rank:<br><br>
+          <strong>Bronze</strong>: 2 ingredients<br>
+          <strong>Silver / Gold</strong>: 3 ingredients<br>
+          <strong>Emerald+</strong>: 4 ingredients<br>
+          <strong>Mythic (Voidspore)</strong>: adds a 4th stat<br><br>
+          Higher rank and brewing level = better stat rolls.
         </div>
       </div>
       <div class="info-card">
         <div class="info-card-icon">🔐</div>
         <div class="info-card-title">NFT Rewards</div>
         <div class="info-card-body">
-          Verified NFT holders earn rewards daily or monthly:<br><br>
-          <strong>King / Queen / Mooshie House</strong>: 200,000 SPORES/NFT/day (live)<br>
-          <strong>Kid Shroom</strong>: 20,000 SHROOMS + 1,500,000 SPORES/month (18-month program, started Feb 2025)<br>
-          <strong>Gold Mooshie</strong>: 15,000 SHROOMS + 2,000,000 SPORES/month (36-month program, started Nov 2025)
+          Verified NFT holders earn rewards:<br><br>
+          <strong>King / Queen / Mooshie House</strong>: 200,000 SPORES/NFT/day<br>
+          <strong>Kid Shroom</strong>: 20,000 SHROOMS + 1,500,000 SPORES/month (18-month program, Feb 2025)<br>
+          <strong>Gold Mooshie</strong>: 15,000 SHROOMS + 2,000,000 SPORES/month (36-month program, Nov 2025)<br><br>
+          Use <code>!nft</code> in <strong>#wallet-web3</strong> to verify ownership.
         </div>
       </div>
       <div class="info-card">
-        <div class="info-card-icon">📈</div>
-        <div class="info-card-title">XP, GS & Leaderboards</div>
+        <div class="info-card-icon">🚜</div>
+        <div class="info-card-title">Farm Boost NFT</div>
         <div class="info-card-body">
-          Earn XP through activity on Discord. Level up your Pixie to earn <strong>Goodshroom Tokens (GS)</strong>. Gift GS tokens to others with <code>!goodshroom @user</code> — each GS token delivers <strong>6,874 SPORES</strong> to the recipient. Live leaderboards track streaks, farm ranks, tips, and more.
+          Each Farm Boost NFT permanently plants <strong>1,000,000 SHROOMS</strong> in your farm. These SHROOMS can never be withdrawn (locked in the NFT) but all earned SPORES are withdrawable. If you sell the NFT, the 1M planted SHROOMS transfer to the buyer.
         </div>
       </div>
       <div class="info-card">
-        <div class="info-card-icon">🎟️</div>
-        <div class="info-card-title">Raffles & Airdrops</div>
+        <div class="info-card-icon">🤖</div>
+        <div class="info-card-title">Sporebot NFT</div>
         <div class="info-card-body">
-          Create a raffle with <code>!raffle [amount] [shroom/spore] [hours]</code>. Airdrop participation requires wallet verification to prevent bot abuse.
+          Each Sporebot has unique traits that boost your farm. Only 1 can be active at a time.<br><br>
+          <strong>Spore Yield</strong>: +1% (Common) to +5% (Super Rare)<br>
+          Other traits: Harvest Bonus, Plant Limit, Totem Chances, Herb bonuses<br><br>
+          Use <code>!sporebots</code> to activate and view your bonuses.
         </div>
       </div>
       <div class="info-card">
-        <div class="info-card-icon">💸</div>
-        <div class="info-card-title">Withdrawals</div>
+        <div class="info-card-icon">🧙</div>
+        <div class="info-card-title">Visit System</div>
         <div class="info-card-body">
-          Withdraw SHROOMS and SPORES on-chain with <code>!withdraw</code>. Requires wallet registration via <code>!register</code> and Pixie verification.<br><br>
-          Daily limits: <strong>1,000,000 SHROOMS</strong> and <strong>100,000,000 SPORES</strong>.
+          Use <code>!visit</code> daily to visit Wimblecap. Milestones reward SHROOMS and items:<br><br>
+          <strong>50th visit</strong>: Elder Pipe — <code>!pipe</code> resets all daily cooldowns (14-day cooldown)<br>
+          <strong>100, 150, 200, 250, 300, 420 visits</strong>: Milestone SHROOM rewards<br><br>
+          Also browse your Artifacts, Scrolls, and Items from the visit menu.
         </div>
       </div>
+    </div>
+
+    <!-- Free Trial -->
+    <div class="guide-card reveal">
+      <h3>⏳ Free Trial &amp; Minimum Requirements</h3>
+      <p>New users get a <strong>42-day free trial</strong> to explore Sporebot without needing a wallet or NFTs. Once the trial ends, meet <strong>ONE</strong> of the following to keep farming:</p>
+      <ul>
+        <li><strong>Option 1 — On-chain holdings</strong>: Hold <strong>500,000+ SHROOM-equivalent</strong> on-chain for at least 3 consecutive farming days (1 SHROOM = 100 SPORES for equivalency)</li>
+        <li><strong>Option 2 — NFT holdings</strong>: Hold 2 Sporebots OR any 1 Mooshie NFT (House, King, Queen, Gold, Kid Shroom) — must be held for 3+ days</li>
+        <li><strong>Option 3 — Liquidity Provider</strong>: Earn an LP Bonus of 0.1 or higher by providing liquidity to SHROOM/WETH or SPORE/WETH V2 pools — LP holders qualify immediately</li>
+      </ul>
+    </div>
+
+    <!-- Withdrawals -->
+    <div class="guide-card reveal">
+      <h3>💸 Blockchain &amp; Withdrawals</h3>
+      <p>Register your Polygon wallet in <strong>#wallet-web3</strong> with <code>!register 0xYourAddress</code>, then withdraw anytime:</p>
+      <ul>
+        <li><code>!withdraw [amount] shrooms</code> — send SHROOMS to your wallet</li>
+        <li><code>!withdraw [amount] spores</code> — send SPORES to your wallet</li>
+      </ul>
+      <p><strong>Daily withdrawal limits:</strong> 1,000,000 SHROOMS and 100,000,000 SPORES per day.</p>
+    </div>
+
+    <!-- Social / Community -->
+    <div class="guide-card reveal">
+      <h3>🌐 Social &amp; Community Features</h3>
+
+      <h4>Tipping</h4>
+      <ul>
+        <li><code>!tip [amount] [shrooms/spores] @username</code></li>
+        <li>Reply to a message and use <code>!tip [amount] [shrooms/spores]</code> (no @ needed)</li>
+        <li>Tag multiple users to split the tip evenly</li>
+        <li>Minimum: <strong>100 SPORES</strong> per person | No minimum for SHROOMS</li>
+        <li>Earn 1 XP per SHROOM tipped, 1 XP per 100 SPORES tipped</li>
+      </ul>
+
+      <h4>Airdrops &amp; Raffles</h4>
+      <ul>
+        <li><code>!airdrop [amount] [shrooms/spores] [hours]</code> — distribute to multiple users</li>
+        <li><code>!raffle [amount] [shrooms/spores] [hours]</code> — host a raffle in #giveaways</li>
+      </ul>
+
+      <h4>Goodshroom Tokens (GS)</h4>
+      <p>Earn GS tokens by leveling up your Pixie. Gift them to outstanding community members — each GS token delivers <strong>6,874 SPORES</strong> to the recipient.</p>
+      <ul>
+        <li><code>!goodshroom @username</code> or <code>!gs @username</code></li>
+        <li>Reply to a message and use <code>!gs</code> (no @ needed)</li>
+      </ul>
     </div>
 
     <div class="cta-row reveal">
@@ -582,7 +706,7 @@
 
   </section>
 
-  <!-- ============================================================
+    <!-- ============================================================
        LP GUIDE
        ============================================================ -->
   <section id="guide-lp" class="guide-section">
