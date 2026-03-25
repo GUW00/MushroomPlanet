@@ -636,8 +636,6 @@
   <div class="toast" id="toast"></div>
   <div class="progress-bar" id="progress-bar"></div>
 
-  <div class="vote-footer">
-    Governance is community-driven and advisory. Major protocol changes require additional review. &copy; 2025 Mushroom Planet.
   </div>
 
   <!-- ============================================================
@@ -756,10 +754,11 @@
   }
 
   async function checkExistingSession() {
-    const stored = localStorage.getItem('vote_user') || localStorage.getItem('mp_profile_user');
+    const stored = localStorage.getItem('vote_user');
     if (!stored) return;
     try {
       const user = JSON.parse(stored);
+      // Refresh MVP from server
       const res = await fetch(`${window.API_BASE}/api/vote/user/${user.discord_id}`);
       const data = await res.json();
       if (data.ok) {
@@ -1295,11 +1294,6 @@
   <style>
 .pwa-nav{position:fixed;bottom:0;left:0;right:0;height:65px;background:#111;border-top:1px solid rgba(255,255,225,0.08);display:none;align-items:stretch;z-index:999;padding-bottom:env(safe-area-inset-bottom);}
 @media(display-mode:standalone){.pwa-nav{display:flex;}body{padding-bottom:80px!important;}}
-.vote-hero{padding:1.25rem 1rem 0.5rem!important;}
-  .vote-hero h1{font-size:1.75rem!important;margin-bottom:0.35rem!important;}
-  .vote-hero p{font-size:0.8rem!important;margin-bottom:0.5rem!important;}
-  .vote-hero .eyebrow{margin-bottom:0.35rem!important;}
-  .stage-strip{padding:0 1rem 0.5rem!important;}
 .pwa-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.2rem;text-decoration:none;color:rgba(255,255,225,0.35);font-family:'Syne Mono',monospace;font-size:0.55rem;letter-spacing:0.05em;transition:color 0.2s;}
 .pwa-tab span:first-child{font-size:1.3rem;display:flex;align-items:center;justify-content:center;}
 .pwa-tab.active{color:#fece00;}
