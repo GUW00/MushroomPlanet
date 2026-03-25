@@ -1,4 +1,4 @@
-=<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -65,19 +65,7 @@
       color: rgba(255,255,225,0.65); opacity: 0; animation: fadeUp 0.6s 0.6s forwards;
     }
 
-    /* PRICE BAR */
-    .price-bar {
-      position: relative; z-index: 1;
-      display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;
-      padding: 0.75rem 1.5rem;
-      background: var(--dark2); border-bottom: 1px solid rgba(255,255,225,0.06);
-      font-family: 'Syne Mono', monospace; font-size: 0.72rem; letter-spacing: 0.05em;
-    }
-    .price-item { display: flex; align-items: center; gap: 0.5rem; }
-    .price-item img { width: 18px; height: 18px; object-fit: contain; }
-    .price-item a { text-decoration: none; color: rgba(255,255,225,0.55); transition: color 0.2s; }
-    .price-item a:hover { color: var(--yellow); }
-    .price-item strong { color: var(--cream); }
+
 
     /* TAB SELECTOR */
     .guide-tabs {
@@ -243,7 +231,16 @@
       margin-bottom: 0.5rem; font-size: 0.8rem;
     }
     .contract-row img { width: 22px; height: 22px; object-fit: contain; }
-    .contract-row a { color: var(--blue); font-family: 'Syne Mono', monospace; font-size: 0.68rem; margin-left: auto; }
+    .contract-name { color: var(--cream); text-decoration: none; font-weight: 600; transition: color 0.2s; }
+    .contract-name:hover { color: var(--yellow); }
+    .copy-btn {
+      margin-left: auto; font-family: 'Syne Mono', monospace; font-size: 0.62rem;
+      padding: 0.3em 0.85em; border-radius: 999px; border: 1px solid rgba(79,168,253,0.3);
+      background: rgba(79,168,253,0.08); color: var(--blue); cursor: pointer;
+      transition: all 0.2s; white-space: nowrap; letter-spacing: 0.04em;
+    }
+    .copy-btn:hover { background: rgba(79,168,253,0.18); border-color: rgba(79,168,253,0.6); }
+    .copy-btn.copied { color: var(--green); border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.08); }
 
     @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
 
@@ -297,21 +294,7 @@
 
   <div id="global-menu"></div>
 
-  <!-- PRICE BAR -->
-  <div class="price-bar">
-    <div class="price-item">
-      <img src="/images/shroom_small.png" alt="SHROOM" />
-      <a href="https://www.geckoterminal.com/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28" target="_blank" rel="noopener noreferrer">
-        SHROOM <strong id="shroom-price">...</strong>
-      </a>
-    </div>
-    <div class="price-item">
-      <img src="/images/spore_small.png" alt="SPORE" />
-      <a href="https://www.geckoterminal.com/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8" target="_blank" rel="noopener noreferrer">
-        SPORE <strong id="spore-price">...</strong>
-      </a>
-    </div>
-  </div>
+
 
   <!-- HERO -->
   <div class="guide-hero">
@@ -346,362 +329,78 @@
   <section id="guide-sporebot" class="guide-section active">
 
     <div class="reveal">
-      <div class="section-label">Getting Started</div>
-      <div class="section-title">Ultimate Sporebot Guide</div>
+      <div class="section-label">Overview</div>
+      <div class="section-title">Sporebot — Two Ways to Play</div>
     </div>
 
-    <!-- Getting Started cards -->
-    <div class="info-grid reveal">
-      <div class="info-card">
-        <div class="info-card-icon">🌱</div>
-        <div class="info-card-title">Starting Out</div>
-        <div class="info-card-body">
-          Verify in <strong>#verify</strong>, then use <code>!start</code> in <strong>#farming</strong> to receive <strong>1,000 SHROOMS</strong>. Use <code>!plant 1000</code> to plant them and start your Mushroom Farm.
-        </div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">💧</div>
-        <div class="info-card-title">Faucet / Sprout</div>
-        <div class="info-card-body">New Reddit users can claim a one-time bonus of <strong>1,000 SHROOMS</strong> and <strong>100,000 SPORES</strong> via <code>!sprout</code>.</div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">🔗</div>
-        <div class="info-card-title">Wallet Linking</div>
-        <div class="info-card-body">Link Reddit to Discord and verify your Polygon wallet via <code>!register 0xYourAddress</code> to earn a one-time bonus of <strong>5,000 SHROOMS</strong> + <strong>500,000 SPORES</strong>.</div>
-      </div>
-    </div>
-
-    <div class="glow-divider"></div>
-
-    <!-- Daily Commands -->
+    <!-- Discord block -->
     <div class="guide-card reveal">
-      <h3>📅 Daily Commands</h3>
-      <p>Daily commands reset once per day and are used in <strong>#daily-forage</strong>. Hourly commands can be used multiple times and go in <strong>#hourly-tasks</strong>.</p>
+      <h3>🎮 Sporebot on Discord</h3>
+      <p>The full Sporebot experience lives on Discord — farming, brewing, staking, digging, governance, and more. Verify first, then use <code>!start</code> in <strong>#farming</strong> to receive <strong>1,000 SHROOMS</strong> and begin planting.</p>
 
-      <h4>Daily (once per day)</h4>
+      <h4>Getting Started</h4>
       <ul>
-        <li><code>!forage</code> — Earn SHROOMS based on your streak (up to 6,874/day at Day 420+)</li>
-        <li><code>!mist</code> &amp; <code>!fan</code> — Earn random SHROOMS and maintain your farm</li>
-        <li><code>!explore</code> — Discover scrolls, artifacts, secret gardens, and recipes</li>
-        <li><code>!visit</code> — Visit Wimblecap daily to earn rewards and learn about your items</li>
-        <li><code>!dig</code> — Find SHROOMS, SPORES, crypto, NFTs, or a Golden Chest</li>
-        <li><code>!toss</code> — Earn various rewards including the rare Sporulation Jackpot</li>
+        <li>Verify in <strong>#verify</strong> (powered by Double Counter — checks for VPNs and alt accounts)</li>
+        <li>Use <code>!start</code> in <strong>#farming</strong> to claim your <strong>1,000 SHROOMS</strong></li>
+        <li>Use <code>!plant 1000</code> to start your Mushroom Farm and begin earning SPORES passively</li>
+        <li>Register your Polygon wallet in <strong>#wallet-web3</strong> with <code>!register 0xYourAddress</code></li>
       </ul>
 
-      <h4>Hourly (multiple times per day)</h4>
+      <h4>Key Commands</h4>
       <ul>
-        <li><code>!gather</code> — Collect herbs to use in brewing potions</li>
-        <li><code>!cave</code> — Navigate the cave puzzle for gemstones</li>
-        <li><code>!feed</code> — Feed forest animals (requires Wildtongue Gemstone)</li>
+        <li><strong>Daily:</strong> <code>!forage</code> <code>!mist</code> <code>!fan</code> <code>!explore</code> <code>!visit</code> <code>!dig</code> <code>!toss</code></li>
+        <li><strong>Hourly:</strong> <code>!gather</code> <code>!cave</code> <code>!feed</code></li>
+        <li><strong>Farm:</strong> <code>!farm</code> <code>!home</code> <code>!plant</code> <code>!harvest</code> <code>!freeze</code></li>
+        <li><strong>Tokens:</strong> <code>!withdraw</code> <code>!transfer</code> <code>!convert</code> <code>!stake</code></li>
+        <li><strong>Brewing:</strong> <code>!brew</code> <code>!potion</code> <code>!shop</code></li>
+        <li><strong>Info:</strong> <code>!sporebots</code> <code>/balance</code> <code>!nft</code></li>
       </ul>
-
-      <h4>Other Useful Commands</h4>
-      <ul>
-        <li><code>!plant [amount]</code> — Plant SHROOMS into your farm</li>
-        <li><code>!farm</code> — View your farm details and SGR</li>
-        <li><code>!home</code> — View cooldowns, items, stats, and more</li>
-        <li><code>!sporebots</code> — View your in-game Sporebot and NFT Sporebot helper</li>
-        <li><code>!convert [amount]</code> — Convert at 100:1 ratio (100 SPORES = 1 SHROOM)</li>
-        <li><code>!transfer [amt] [token]</code> — Transfer from Reddit to your Discord wallet</li>
-        <li><code>!shop</code> — Sell gemstones, buy herbs, craft ingredients</li>
-        <li><code>!freeze</code> — Freeze your farm to protect your forage streak (SGR stops)</li>
-        <li><code>!brew</code> — Overview of brewing and detailed instructions</li>
-        <li><code>!stake</code> — View your stake or get started staking SPORES</li>
-        <li><code>/balance</code> — View Farm, Discord, Reddit and on-chain balances plus NFTs</li>
-      </ul>
+      <p style="margin-top:0.75rem;">Switch to the <strong>Discord</strong> tab above for the full Discord guide including rules, verification details, and what unlocks.</p>
     </div>
 
-    <!-- Forage Streaks -->
+    <!-- Reddit block -->
     <div class="guide-card reveal">
-      <h3>🔥 Daily Forage Streak</h3>
-      <p>Comment <code>!forage</code> every day to grow your streak. Rewards scale continuously — miss a day and your streak resets unless you have a <strong>Vacation Day</strong> saved up (earned automatically every 7 consecutive forage days).</p>
+      <h3>🌿 Sporebot on Reddit</h3>
+      <p>A fresh <strong>Daily Forage Thread</strong> is posted automatically every day at <strong>7:20 EST</strong> on <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">r/MushroomPlanet</a> and stays open for 24 hours. Build your streak daily for bigger rewards.</p>
 
-      <div class="streak-grid">
-        <div class="sg-head">Streak Range</div>
-        <div class="sg-head">SHROOMS / day</div>
-        <div class="sg-head">SPORES / day</div>
-
-        <div class="sg-cell"><strong>Day 1</strong></div>
-        <div class="sg-cell">1,000</div>
-        <div class="sg-cell">100,000</div>
-
-        <div class="sg-cell"><strong>Days 2-100</strong></div>
-        <div class="sg-cell">+15 per day</div>
-        <div class="sg-cell">Scales 100x SHROOM</div>
-
-        <div class="sg-cell"><strong>Day 101</strong></div>
-        <div class="sg-cell">2,500 base</div>
-        <div class="sg-cell">250,000</div>
-
-        <div class="sg-cell"><strong>Days 102-400</strong></div>
-        <div class="sg-cell">+10 per day</div>
-        <div class="sg-cell">Scales 100x SHROOM</div>
-
-        <div class="sg-cell"><strong>Day 401</strong></div>
-        <div class="sg-cell">5,490 base</div>
-        <div class="sg-cell">549,000</div>
-
-        <div class="sg-cell"><strong>Days 402-419</strong></div>
-        <div class="sg-cell">+69 per day</div>
-        <div class="sg-cell">Scales 100x SHROOM</div>
-
-        <div class="sg-cell"><strong>Day 420+</strong></div>
-        <div class="sg-cell"><strong>6,874 MAX</strong></div>
-        <div class="sg-cell"><strong>687,400 MAX</strong></div>
-      </div>
-
-      <h4>Forage Streak Milestone Unlocks</h4>
+      <h4>Key Reddit Commands</h4>
       <ul>
-        <li><strong>Day 7</strong>: Golden Shovel — enables treasure finds in <code>!dig</code></li>
-        <li><strong>Day 21</strong>: Queen Totem — chance for bonus SPORES from <code>!mist</code></li>
-        <li><strong>Day 42</strong>: King Totem — chance for bonus SPORES from <code>!fan</code></li>
-        <li><strong>Day 69</strong>: Kid Totem — additional SPORE bonus</li>
-        <li><strong>Day 100</strong>: Gold Totem — chance at an extra <code>!toss</code></li>
+        <li><code>!forage</code> — Earn SHROOMS and SPORES based on your streak (max 6,874 SHROOMS at Day 420+)</li>
+        <li><code>!sprout</code> — One-time new-user bonus: <strong>1,000 SHROOMS</strong> + <strong>100,000 SPORES</strong> + <strong>1 GS Token</strong></li>
+        <li><code>!feed</code> — Feed forest animals (costs 42-420 SHROOMS, 1-hour cooldown)</li>
+        <li><code>!tip [amount] [token]</code> — Tip SHROOMS or SPORES to another user</li>
+        <li><code>!gs</code> — Give a Goodshroom Token to a community member</li>
+        <li><code>!airdrop</code> / <code>!raffle</code> — Distribute tokens or pick random winners</li>
+        <li><code>!balance</code> — View your Reddit balances</li>
+        <li><code>!profile</code> — View your Reddit stats and XP rank</li>
       </ul>
-
-      <h4>Flair Bonuses on Forage</h4>
-      <ul>
-        <li><strong>Bronze</strong>: +5% | <strong>Silver</strong>: +10% | <strong>Gold</strong>: +23%</li>
-        <li><strong>Emerald</strong>: +42% | <strong>Diamond</strong>: +69% | <strong>Master</strong>: +85% | <strong>Grandmaster</strong>: +100%</li>
-      </ul>
+      <p style="margin-top:0.75rem;">Switch to the <strong>Reddit</strong> tab above for the full Reddit guide including flair ranks, jackpot info, and community rules.</p>
     </div>
 
-    <!-- Farm System -->
+    <!-- Linking block -->
     <div class="guide-card reveal">
-      <h3>🌾 Farm System &amp; SGR</h3>
-      <p>Plant SHROOMS to passively generate SPORES based on your <strong>Spore Generation Rate (SGR)</strong>. Your farm advances through growth stages over a 42-day cycle, each increasing your SGR.</p>
+      <h3>🔗 Linking Reddit + Discord</h3>
+      <p>Connect your Reddit and Discord accounts to unlock cross-platform rewards and transfer tokens between both ecosystems.</p>
 
-      <h4>Growth Stages</h4>
-      <div class="streak-grid">
-        <div class="sg-head">Stage</div>
-        <div class="sg-head">Day Reached</div>
-        <div class="sg-head">SGR Bonus</div>
-        <div class="sg-cell">Spore</div><div class="sg-cell">Day 1</div><div class="sg-cell">4%</div>
-        <div class="sg-cell">Germination</div><div class="sg-cell">Day 5</div><div class="sg-cell">8%</div>
-        <div class="sg-cell">Mycelium</div><div class="sg-cell">Day 15</div><div class="sg-cell">12%</div>
-        <div class="sg-cell">Fruiting</div><div class="sg-cell">Day 25</div><div class="sg-cell">16%</div>
-        <div class="sg-cell">Sporulation</div><div class="sg-cell">Day 42</div><div class="sg-cell">20%</div>
-        <div class="sg-cell">Golden Sporulation <span class="badge">Legend Only</span></div><div class="sg-cell">Day 294</div><div class="sg-cell">25%</div>
+      <h4>How to Link</h4>
+      <ul>
+        <li>In the Reddit Daily Thread, comment <code>!register 0xYourWalletAddress</code> to register your wallet</li>
+        <li>Then comment <code>!link</code> — you'll receive a DM from Pixie on Discord asking you to confirm</li>
+        <li>Once confirmed you receive a one-time bonus of <strong>20,000 SHROOMS</strong> + <strong>2,000,000 SPORES</strong></li>
+      </ul>
+
+      <h4>After Linking</h4>
+      <ul>
+        <li>Use <code>!transfer</code> in Discord to move your Reddit SHROOMS and SPORES to your Discord wallet</li>
+        <li>Use <code>!plant [amount]</code> to plant transferred SHROOMS into your Discord farm</li>
+        <li>Reddit earning and Discord farming work independently — linking merges your balances on demand</li>
+        <li>You also earn <strong>1 GS Token</strong> for every 5-day forage streak milestone (5, 10, 15...)</li>
+      </ul>
+
+      <div class="cta-row" style="margin-top:1.5rem;">
+        <a class="btn btn-yellow" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">Join Discord</a>
+        <a class="btn btn-blue" href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">Visit Subreddit</a>
       </div>
-
-      <h4>Farm Ranks (unlock by harvesting at Sporulation)</h4>
-      <div class="rank-grid">
-        <div class="sg-head">Rank</div>
-        <div class="sg-head">Yield Bonus</div>
-        <div class="sg-head">Plant Limit</div>
-        <div class="sg-cell">Bronze</div><div class="sg-cell">0%</div><div class="sg-cell">2,000,000</div>
-        <div class="sg-cell">Silver</div><div class="sg-cell">+3%</div><div class="sg-cell">2,500,000</div>
-        <div class="sg-cell">Gold</div><div class="sg-cell">+6%</div><div class="sg-cell">3,000,000</div>
-        <div class="sg-cell">Emerald</div><div class="sg-cell">+9%</div><div class="sg-cell">3,500,000</div>
-        <div class="sg-cell">Diamond</div><div class="sg-cell">+12%</div><div class="sg-cell">4,200,000</div>
-        <div class="sg-cell">Master</div><div class="sg-cell">+15%</div><div class="sg-cell">4,500,000</div>
-        <div class="sg-cell">Grandmaster</div><div class="sg-cell">+20%</div><div class="sg-cell">5,000,000</div>
-        <div class="sg-cell">Legend</div><div class="sg-cell">+25%</div><div class="sg-cell">6,874,000</div>
-      </div>
-      <p style="margin-top:0.75rem;">After harvesting, replant all your SHROOMS to resume earning.</p>
-
-      <h4>All SGR Sources (in-game cap: 100%)</h4>
-      <ul>
-        <li><strong>Farm Rank</strong>: up to 25% (BRONZE 0% through LEGEND 25%)</li>
-        <li><strong>Farm Stage</strong>: up to 20% (Sporulation)</li>
-        <li><strong>Potion Brew</strong>: up to 10% (Spore Yield stat)</li>
-        <li><strong>5 Gemstones</strong>: up to 25% (5% each — Wildtongue, Feather, Rootsong, Sunspore, Spirit Gemstone)</li>
-        <li><strong>In-Game Sporebot Bonus</strong>: up to 25% (5 activity categories, 5% each)</li>
-      </ul>
-      <p>Additional SGR from on-chain support:</p>
-      <ul>
-        <li><strong>Liquidity Provider (LP)</strong>: SHROOM/WETH or SPORE/WETH V2 pools</li>
-        <li><strong>Guwoo NFT</strong>: +5%</li>
-        <li><strong>Sporebot NFT</strong>: +1% to +5% (based on Spore Yield trait rarity)</li>
-        <li><strong>LP NFTs</strong> (King Mooshie Pool / Mooshie Family Portrait): +2% to +10%</li>
-      </ul>
-    </div>
-
-    <!-- In-Game Sporebot Bonus -->
-    <div class="guide-card reveal">
-      <h3>🤖 In-Game Sporebot Bonus (up to 25% SGR)</h3>
-      <p>Your community activity unlocks up to <strong>25% additional SGR</strong>. Each of 5 categories contributes up to 5%:</p>
-      <ul>
-        <li><strong>SHROOMS Given</strong>: 1% per 1M SHROOMS tipped/raffled/airdropped (max 5M)</li>
-        <li><strong>SPORES Given</strong>: 1% per 100M SPORES given (max 500M)</li>
-        <li><strong>Pixie Level</strong>: scales to 5% at Level 420</li>
-        <li><strong>Message XP</strong>: scales to 5% at 500,000 Message XP</li>
-        <li><strong>Goodshrooms Received</strong>: scales to 5% at 100 GS tokens received</li>
-      </ul>
-      <p>Use <code>!sporebots</code> to view your current breakdown.</p>
-    </div>
-
-    <!-- Spore Staking -->
-    <div class="guide-card reveal">
-      <h3>🌀 SPORE Staking &amp; MVP</h3>
-      <p>Stake SPORES to earn passive rewards and build <strong>Mycelium Voting Power (MVP)</strong> for governance. Use <code>!stake</code> to get started.</p>
-
-      <h4>Staking Rate</h4>
-      <ul>
-        <li><strong>20% APR</strong> flat rate for all stakers</li>
-        <li>Every <strong>100M SPORES</strong> staked = 1 Mycelium Node</li>
-        <li>Each node runs a <strong>90-day cycle</strong> — every 90 days = +1 MVP per node</li>
-        <li>MVP accumulates infinitely (180 days = 2 MVP per node)</li>
-      </ul>
-
-      <h4>Unstaking Options</h4>
-      <ul>
-        <li><strong>Fast Unstake (7 days)</strong>: Lose ALL MVP, get SPORES back faster</li>
-        <li><strong>Slow Unstake (42 days)</strong>: Keep ALL MVP, longer wait</li>
-      </ul>
-      <p>SGR stops immediately when you unstake (either option).</p>
-
-      <h4>What MVP Is Used For</h4>
-      <ul>
-        <li>Governance voting weight on proposals</li>
-        <li>Influencing Sporebot decisions</li>
-        <li>Higher MVP = more influence</li>
-      </ul>
-    </div>
-
-    <!-- Dig + Toss + Cave -->
-    <div class="info-grid reveal">
-      <div class="info-card">
-        <div class="info-card-icon">⛏️</div>
-        <div class="info-card-title">Dig System</div>
-        <div class="info-card-body">
-          Use <code>!dig</code> daily to treasure hunt from a community-funded pool.<br><br>
-          <strong>Common</strong>: 420 - 2,420 SHROOMS<br>
-          <strong>Bronze chest</strong>: 25,000 SHROOMS<br>
-          <strong>Silver chest</strong>: 50,000 SHROOMS<br>
-          <strong>Golden chest</strong>: 1,000,000 SHROOMS<br>
-          <strong>Crypto/NFT</strong>: 10% of pool balance
-        </div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">🪙</div>
-        <div class="info-card-title">Toss a Coin</div>
-        <div class="info-card-body">
-          Use <code>!toss</code> once per day. Possible outcomes:<br><br>
-          <strong>Farm advance</strong>: Skip 1-3 days (most common, 70%)<br>
-          <strong>Vacation Day</strong>: Streak protection (10%)<br>
-          <strong>SHROOMS</strong>: 100 - 2,420 (5%)<br>
-          <strong>Miner Helmet</strong>: dig bonus item (0.5%)<br>
-          <strong>Sporulation Jackpot</strong>: 100M SPORES — one winner/month (0.1%)
-        </div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">🕳️</div>
-        <div class="info-card-title">Cave System</div>
-        <div class="info-card-body">
-          Use <code>!cave</code> for a path puzzle. Entry costs <strong>10,000 SPORES</strong>. Find gemstones:<br><br>
-          <strong>Shroomstone Quartz</strong>: 10,000 SP (common)<br>
-          <strong>Shroomcap Ruby</strong>: 50,000 SP<br>
-          <strong>Sporelight Sapphire</strong>: 100,000 SP<br>
-          <strong>Moonglow Amethyst</strong>: 150,000 SP<br>
-          <strong>Prismcap Diamond</strong>: 420,000 SP (ultra rare)
-        </div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">🧪</div>
-        <div class="info-card-title">Potions &amp; Brewing</div>
-        <div class="info-card-body">
-          Brew potions with <code>!brew</code> to boost SGR and farm stats. Ingredient slots by rank:<br><br>
-          <strong>Bronze</strong>: 2 ingredients<br>
-          <strong>Silver / Gold</strong>: 3 ingredients<br>
-          <strong>Emerald+</strong>: 4 ingredients<br>
-          <strong>Mythic (Voidspore)</strong>: adds a 4th stat<br><br>
-          Higher rank and brewing level = better stat rolls.
-        </div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">🔐</div>
-        <div class="info-card-title">NFT Rewards</div>
-        <div class="info-card-body">
-          Verified NFT holders earn rewards:<br><br>
-          <strong>King / Queen / Mooshie House</strong>: 200,000 SPORES/NFT/day<br>
-          <strong>Kid Shroom</strong>: 20,000 SHROOMS + 1,500,000 SPORES/month (18-month program, Feb 2025)<br>
-          <strong>Gold Mooshie</strong>: 15,000 SHROOMS + 2,000,000 SPORES/month (36-month program, Nov 2025)<br><br>
-          Use <code>!nft</code> in <strong>#wallet-web3</strong> to verify ownership.
-        </div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">🚜</div>
-        <div class="info-card-title">Farm Boost NFT</div>
-        <div class="info-card-body">
-          Each Farm Boost NFT permanently plants <strong>1,000,000 SHROOMS</strong> in your farm. These SHROOMS can never be withdrawn (locked in the NFT) but all earned SPORES are withdrawable. If you sell the NFT, the 1M planted SHROOMS transfer to the buyer.
-        </div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">🤖</div>
-        <div class="info-card-title">Sporebot NFT</div>
-        <div class="info-card-body">
-          Each Sporebot has unique traits that boost your farm. Only 1 can be active at a time.<br><br>
-          <strong>Spore Yield</strong>: +1% (Common) to +5% (Super Rare)<br>
-          Other traits: Harvest Bonus, Plant Limit, Totem Chances, Herb bonuses<br><br>
-          Use <code>!sporebots</code> to activate and view your bonuses.
-        </div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">🧙</div>
-        <div class="info-card-title">Visit System</div>
-        <div class="info-card-body">
-          Use <code>!visit</code> daily to visit Wimblecap. Milestones reward SHROOMS and items:<br><br>
-          <strong>50th visit</strong>: Elder Pipe — <code>!pipe</code> resets all daily cooldowns (14-day cooldown)<br>
-          <strong>100, 150, 200, 250, 300, 420 visits</strong>: Milestone SHROOM rewards<br><br>
-          Also browse your Artifacts, Scrolls, and Items from the visit menu.
-        </div>
-      </div>
-    </div>
-
-    <!-- Free Trial -->
-    <div class="guide-card reveal">
-      <h3>⏳ Free Trial &amp; Minimum Requirements</h3>
-      <p>New users get a <strong>42-day free trial</strong> to explore Sporebot without needing a wallet or NFTs. Once the trial ends, meet <strong>ONE</strong> of the following to keep farming:</p>
-      <ul>
-        <li><strong>Option 1 — On-chain holdings</strong>: Hold <strong>500,000+ SHROOM-equivalent</strong> on-chain for at least 3 consecutive farming days (1 SHROOM = 100 SPORES for equivalency)</li>
-        <li><strong>Option 2 — NFT holdings</strong>: Hold 2 Sporebots OR any 1 Mooshie NFT (House, King, Queen, Gold, Kid Shroom) — must be held for 3+ days</li>
-        <li><strong>Option 3 — Liquidity Provider</strong>: Earn an LP Bonus of 0.1 or higher by providing liquidity to SHROOM/WETH or SPORE/WETH V2 pools — LP holders qualify immediately</li>
-      </ul>
-    </div>
-
-    <!-- Withdrawals -->
-    <div class="guide-card reveal">
-      <h3>💸 Blockchain &amp; Withdrawals</h3>
-      <p>Register your Polygon wallet in <strong>#wallet-web3</strong> with <code>!register 0xYourAddress</code>, then withdraw anytime:</p>
-      <ul>
-        <li><code>!withdraw [amount] shrooms</code> — send SHROOMS to your wallet</li>
-        <li><code>!withdraw [amount] spores</code> — send SPORES to your wallet</li>
-      </ul>
-      <p><strong>Daily withdrawal limits:</strong> 1,000,000 SHROOMS and 100,000,000 SPORES per day.</p>
-    </div>
-
-    <!-- Social / Community -->
-    <div class="guide-card reveal">
-      <h3>🌐 Social &amp; Community Features</h3>
-
-      <h4>Tipping</h4>
-      <ul>
-        <li><code>!tip [amount] [shrooms/spores] @username</code></li>
-        <li>Reply to a message and use <code>!tip [amount] [shrooms/spores]</code> (no @ needed)</li>
-        <li>Tag multiple users to split the tip evenly</li>
-        <li>Minimum: <strong>100 SPORES</strong> per person | No minimum for SHROOMS</li>
-        <li>Earn 1 XP per SHROOM tipped, 1 XP per 100 SPORES tipped</li>
-      </ul>
-
-      <h4>Airdrops &amp; Raffles</h4>
-      <ul>
-        <li><code>!airdrop [amount] [shrooms/spores] [hours]</code> — distribute to multiple users</li>
-        <li><code>!raffle [amount] [shrooms/spores] [hours]</code> — host a raffle in #giveaways</li>
-      </ul>
-
-      <h4>Goodshroom Tokens (GS)</h4>
-      <p>Earn GS tokens by leveling up your Pixie. Gift them to outstanding community members — each GS token delivers <strong>6,874 SPORES</strong> to the recipient.</p>
-      <ul>
-        <li><code>!goodshroom @username</code> or <code>!gs @username</code></li>
-        <li>Reply to a message and use <code>!gs</code> (no @ needed)</li>
-      </ul>
-    </div>
-
-    <div class="cta-row reveal">
-      <a class="btn btn-yellow" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">
-        Start Farming in Discord
-      </a>
     </div>
 
   </section>
@@ -741,18 +440,18 @@
 
       <div class="contract-row">
         <img src="/images/shroom.png" alt="SHROOM" />
-        <span>Shroom ($HROOM)</span>
-        <a href="https://polygonscan.com/address/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer">View Contract</a>
+        <a href="https://polygonscan.com/address/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" class="contract-name">Shroom ($HROOM)</a>
+        <button class="copy-btn" onclick="copyAddress(this, '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1')">Copy Address</button>
       </div>
       <div class="contract-row">
         <img src="/images/spore.png" alt="SPORE" />
-        <span>Spore (SPR)</span>
-        <a href="https://polygonscan.com/address/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer">View Contract</a>
+        <a href="https://polygonscan.com/address/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" class="contract-name">Spore (SPR)</a>
+        <button class="copy-btn" onclick="copyAddress(this, '0x089582AC20ea563c69408a79E1061de594b61bED')">Copy Address</button>
       </div>
       <div class="contract-row">
         <img src="/images/eth.png" alt="WETH" />
-        <span>Wrapped ETH (WETH)</span>
-        <a href="https://polygonscan.com/address/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" rel="noopener noreferrer">View Contract</a>
+        <a href="https://polygonscan.com/address/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" rel="noopener noreferrer" class="contract-name">Wrapped ETH (WETH)</a>
+        <button class="copy-btn" onclick="copyAddress(this, '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61')">Copy Address</button>
       </div>
     </div>
 
@@ -788,63 +487,120 @@
 
     <div class="guide-card reveal">
       <h3>✅ Verification</h3>
-      <p>Before accessing the ecosystem you need to verify. Powered by <strong>Double Counter</strong> — checks for VPNs, alt accounts, and bots.</p>
+      <p>Before accessing the ecosystem you need to verify in <strong>#verify</strong>. Powered by <strong>Double Counter</strong> — checks for VPNs, alt accounts, and bots. Do not spam the button; multiple clicks may cause a temporary lockout.</p>
       <ul>
-        <li>Join the Discord server and navigate to <code>#verify</code>.</li>
-        <li>Click the <strong>VERIFY</strong> button — do not spam it.</li>
-        <li>For help, visit <code>#ask-questions</code> or open a ticket in <code>#support-ticket</code>.</li>
+        <li>Join the Discord and go to <code>#verify</code></li>
+        <li>Click the <strong>VERIFY</strong> button once</li>
+        <li>For help visit <code>#ask-questions</code> or open a ticket in <code>#support-ticket</code></li>
       </ul>
-    </div>
 
-    <div class="guide-card reveal">
-      <h3>✨ What Verification Unlocks</h3>
+      <h4>What Verification Unlocks</h4>
       <div class="info-grid" style="margin-top:0.75rem;">
         <div class="info-card">
-          <div class="info-card-icon">🎮</div>
-          <div class="info-card-title">Sporebot Farming</div>
-          <div class="info-card-body">Access the full farming, foraging, and reward system.</div>
+          <div class="info-card-icon">🌾</div>
+          <div class="info-card-title">Full Farming System</div>
+          <div class="info-card-body">Access all Sporebot commands — farming, brewing, digging, staking, and more.</div>
         </div>
         <div class="info-card">
           <div class="info-card-icon">💸</div>
           <div class="info-card-title">Token Rewards</div>
-          <div class="info-card-body">Earn SHROOM and SPORE through activity and milestones.</div>
+          <div class="info-card-body">Earn SHROOMS and SPORES daily through activities, streaks, and community contributions.</div>
         </div>
         <div class="info-card">
           <div class="info-card-icon">🖼️</div>
           <div class="info-card-title">NFT Perks</div>
-          <div class="info-card-body">Mooshie NFT holder benefits and daily SPORE rewards.</div>
+          <div class="info-card-body">Verify Mooshie NFT ownership with <code>!nft</code> to unlock daily SPORE rewards and farm bonuses.</div>
         </div>
         <div class="info-card">
           <div class="info-card-icon">🗳️</div>
           <div class="info-card-title">Governance</div>
-          <div class="info-card-body">Vote on proposals and shape the ecosystem's future.</div>
+          <div class="info-card-body">Build MVP through staking and vote on proposals that shape the ecosystem.</div>
         </div>
       </div>
     </div>
 
     <div class="guide-card reveal">
+      <h3>🌾 Farm System Overview</h3>
+      <p>Your planted SHROOMS passively earn SPORES based on your <strong>Spore Generation Rate (SGR)</strong>. The farm advances through 5 stages over 42 days. Harvest at Sporulation to rank up and increase your plant limit permanently.</p>
+
+      <h4>Farm Ranks &amp; Plant Limits</h4>
+      <ul>
+        <li><strong>Bronze</strong>: 0% SGR | 2,000,000 plant limit</li>
+        <li><strong>Silver</strong>: +3% SGR | 2,500,000 plant limit</li>
+        <li><strong>Gold</strong>: +6% SGR | 3,000,000 plant limit</li>
+        <li><strong>Emerald</strong>: +9% SGR | 3,500,000 plant limit</li>
+        <li><strong>Diamond</strong>: +12% SGR | 4,200,000 plant limit</li>
+        <li><strong>Master</strong>: +15% SGR | 4,500,000 plant limit</li>
+        <li><strong>Grandmaster</strong>: +20% SGR | 5,000,000 plant limit</li>
+        <li><strong>Legend</strong>: +25% SGR | 6,874,000 plant limit</li>
+      </ul>
+
+      <h4>Total SGR Sources (in-game cap: 100%)</h4>
+      <ul>
+        <li><strong>Farm Rank</strong>: up to 25%</li>
+        <li><strong>Farm Stage</strong>: up to 20% (Sporulation)</li>
+        <li><strong>Potion Brew</strong>: up to 10%</li>
+        <li><strong>5 Gemstones</strong>: up to 25% (5% each)</li>
+        <li><strong>In-Game Sporebot Bonus</strong>: up to 25% (community activity, 5 categories)</li>
+        <li><strong>LP / Guwoo NFT / Sporebot NFT / LP NFTs</strong>: additional on-chain bonuses</li>
+      </ul>
+      <p style="margin-top:0.5rem;">After every harvest, remember to <strong>replant all your SHROOMS</strong> to resume earning.</p>
+    </div>
+
+    <div class="guide-card reveal">
+      <h3>🌀 SPORE Staking &amp; MVP</h3>
+      <p>Stake SPORES to earn passive rewards at <strong>20% APR</strong> and accumulate <strong>Mycelium Voting Power (MVP)</strong> for governance. Use <code>!stake</code> to get started.</p>
+      <ul>
+        <li>Every <strong>100M SPORES</strong> staked = 1 Mycelium Node</li>
+        <li>Each node runs a <strong>90-day cycle</strong> — every 90 days = +1 MVP per node</li>
+        <li>MVP rolls over infinitely (180 days = 2 MVP per node)</li>
+        <li><strong>Fast Unstake (7 days)</strong>: lose ALL MVP</li>
+        <li><strong>Slow Unstake (42 days)</strong>: keep ALL MVP</li>
+      </ul>
+    </div>
+
+    <div class="guide-card reveal">
+      <h3>⛓️ Blockchain &amp; Withdrawals</h3>
+      <p>Connect your Polygon wallet in <strong>#wallet-web3</strong> to unlock withdrawals and NFT verification.</p>
+      <ul>
+        <li><code>!register 0xYourAddress</code> — link your Polygon wallet</li>
+        <li><code>!nft</code> — scan your wallet and verify NFT ownership</li>
+        <li><code>!withdraw [amount] shrooms</code> or <code>!withdraw [amount] spores</code></li>
+        <li>Daily limits: <strong>1,000,000 SHROOMS</strong> and <strong>100,000,000 SPORES</strong></li>
+      </ul>
+    </div>
+
+    <div class="guide-card reveal">
+      <h3>🧪 Free Trial &amp; Requirements</h3>
+      <p>New users get a <strong>42-day free trial</strong>. After that, meet ONE of the following to keep farming:</p>
+      <ul>
+        <li><strong>Option 1</strong>: Hold <strong>500,000+ SHROOM-equivalent</strong> on-chain for 3+ consecutive farming days</li>
+        <li><strong>Option 2</strong>: Hold 2 Sporebots OR any 1 Mooshie NFT (House, King, Queen, Gold, Kid Shroom) — 3+ days</li>
+        <li><strong>Option 3</strong>: Provide liquidity (LP Bonus of 0.1 or higher) — qualifies immediately</li>
+      </ul>
+    </div>
+
+    <div class="guide-card reveal">
       <h3>📜 Spore of Conduct</h3>
       <ul>
-        <li><strong>Spore of Respect</strong>: Be kind, patient, and inclusive. No harassment or hate speech.</li>
+        <li><strong>Spore of Respect</strong>: Be kind and inclusive. No harassment or hate speech.</li>
         <li><strong>Wholesome Fungi</strong>: Family-friendly space. No NSFW or offensive content.</li>
-        <li><strong>Artist's Appreciation</strong>: Credit original creators. Don't claim others' work.</li>
-        <li><strong>Nourishing Feedback</strong>: Constructive over destructive. Help others grow.</li>
+        <li><strong>Artist's Appreciation</strong>: Credit original creators.</li>
+        <li><strong>Nourishing Feedback</strong>: Constructive over destructive.</li>
         <li><strong>Secrets of the Underground</strong>: No doxxing or privacy violations.</li>
-        <li><strong>Chill Vibes Only</strong>: Leave drama at the edge of the forest.</li>
+        <li><strong>Chill Vibes Only</strong>: Leave drama at the forest edge.</li>
         <li><strong>No Invasive Species</strong>: No spam, bots, raids, or scams.</li>
-        <li><strong>Warning</strong>: Accounts banned from Discord or Reddit permanently forfeit all stored SHROOMS and SPORES.</li>
+        <li><strong>Warning</strong>: Bans from Discord or Reddit permanently forfeit all stored SHROOMS and SPORES.</li>
       </ul>
     </div>
 
     <div class="cta-row reveal">
-      <a class="btn btn-yellow" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">
-        Join Discord
-      </a>
+      <a class="btn btn-yellow" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">Join Discord</a>
     </div>
 
   </section>
 
-  <!-- ============================================================
+    <!-- ============================================================
        REDDIT GUIDE
        ============================================================ -->
   <section id="guide-reddit" class="guide-section">
@@ -855,40 +611,104 @@
     </div>
 
     <div class="guide-card reveal">
-      <h3>🌲 Daily Forage on Reddit</h3>
-      <p>A new <strong>Daily Forage Thread</strong> is automatically posted every day on <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">r/MushroomPlanet</a>. Comment <code>!forage</code> once per day to earn rewards and grow your streak.</p>
+      <h3>🌿 Daily Forage</h3>
+      <p>Every day at <strong>7:20 EST</strong> a fresh forage thread is pinned to the top of <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">r/MushroomPlanet</a>. You have <strong>24 hours</strong> to participate before it locks automatically.</p>
       <ul>
-        <li>Rewards scale continuously with streak — max is <strong>6,874 SHROOMS</strong> and <strong>687,400 SPORES</strong> per day at Day 420+.</li>
-        <li>Missing a day resets your streak. Vacation Days (earned every 7 consecutive forage days) protect it automatically.</li>
-        <li>Use <code>!sprout</code> for a one-time new-user bonus: <strong>1,000 SHROOMS</strong> + <strong>100,000 SPORES</strong>.</li>
-        <li>Use <code>!link 0xYourWallet</code> to link your Polygon wallet and earn a bonus of <strong>5,000 SHROOMS</strong> + <strong>500,000 SPORES</strong>.</li>
+        <li>Comment <code>!forage</code> once per day to earn SHROOMS and SPORES based on your streak</li>
+        <li>Come back daily — missing a day resets your streak to 0</li>
+        <li>Protect your streak with <strong>Vacation Days</strong> (earned every 7-day consecutive streak)</li>
+        <li>Any <code>!forage</code> has a <strong>1-in-3000 chance</strong> to win the current Jackpot</li>
+      </ul>
+
+      <h4>Streak Reward Scale</h4>
+      <ul>
+        <li><strong>Day 1</strong>: 1,000 SHROOMS | 100,000 SPORES</li>
+        <li>Scales continuously with streak — max <strong>6,874 SHROOMS</strong> and <strong>687,400 SPORES</strong> at Day 420+</li>
       </ul>
     </div>
 
     <div class="guide-card reveal">
-      <h3>🤖 Sporebot vs. CCBot</h3>
-      <p><strong>Sporebot</strong> handles <code>!forage</code>, <code>!faucet</code>, and <code>!link</code> inside the r/MushroomPlanet Daily Thread and connects to Discord rewards.</p>
-      <p><strong>CCBot</strong> (CommunityCurrency) handles wallet management and tips across Reddit broadly.</p>
-
-      <h4>CCBot Commands</h4>
+      <h3>🌱 Sprout &amp; GS Tokens</h3>
       <ul>
-        <li><code>!register 0xYourWallet</code> — Register your Polygon address</li>
-        <li><code>!tip 100</code> or <code>!tip 100 SHROOM</code> — Tip a user (minimum 10 SHROOM)</li>
-        <li><code>!withdraw 100 SHROOM</code> — Withdraw to your wallet</li>
-        <li><code>!balance</code> — Check your CCBot balance</li>
+        <li>New Shroomies can comment <code>!sprout</code> for a one-time gift: <strong>1,000 SHROOMS</strong> + <strong>100,000 SPORES</strong> + <strong>1 GS Token</strong></li>
+        <li>Earn <strong>1 GS Token</strong> for every <strong>5-day forage streak</strong> milestone (5, 10, 15, 20...)</li>
+        <li>Use <code>!gs</code> on any post or comment to gift a GS Token to someone — each delivers <strong>6,874 SPORES</strong></li>
       </ul>
-      <p style="margin-top:0.75rem;"><a href="https://www.reddit.com/r/communitycurrency/comments/1auwybs/guide_commands_and_post2earn_mining/" target="_blank" rel="noopener noreferrer">View the full CCBot guide</a></p>
     </div>
 
     <div class="guide-card reveal">
-      <h3>🎁 Tipping & Raffle Policy</h3>
+      <h3>🐾 Feed the Animals</h3>
       <ul>
-        <li>Only <strong>1 tipping OR raffle post per user per week</strong>, unless total tips exceed 50K SHROOMS.</li>
-        <li>Posts must use the correct flair: <strong>"Don't Mind Tipping"</strong> or <strong>"Raffle"</strong>.</li>
-        <li>Minimum tip per comment: <strong>420 SHROOMS</strong> from OP.</li>
-        <li>Post must total at least <strong>5,000 SHROOMS</strong> in tips from OP to others.</li>
-        <li>NFT raffles and auctions are exempt from the weekly limit.</li>
-        <li>Non-compliant posts will be demonetized.</li>
+        <li>Comment <code>!feed</code> to feed the forest creatures — costs <strong>42-420 SHROOMS</strong> per feed</li>
+        <li>Has a <strong>1-hour cooldown</strong></li>
+        <li>Every <strong>6,874 SHROOMS fed</strong> increases your Forage Bonus</li>
+        <li>The community Jackpot grows with every <code>!feed</code> until a winner is picked via <code>!forage</code></li>
+      </ul>
+    </div>
+
+    <div class="guide-card reveal">
+      <h3>💸 Tipping, Airdrops &amp; Raffles</h3>
+      <ul>
+        <li><code>!tip [amount] [token]</code> — tip on a post or comment</li>
+        <li><code>!tip [amount] [token] u/username</code> — tip someone directly</li>
+        <li><code>!gs</code> — give a Goodshroom Token (reply to a post or comment)</li>
+        <li><code>!airdrop [shrooms/spores]</code> — send equal tips to all commenters on your post</li>
+        <li><code>!raffle [# of winners]</code> — pick random winner(s) from your post's comments</li>
+      </ul>
+
+      <h4>Tipping &amp; Raffle Post Policy</h4>
+      <ul>
+        <li>Only <strong>1 tipping OR raffle post per user per week</strong>, unless total tips exceed 50,000 SHROOMS</li>
+        <li>Posts must use flair: <strong>"Don't Mind Tipping"</strong> or <strong>"Raffle"</strong></li>
+        <li>Minimum tip per comment: <strong>420 SHROOMS</strong> from OP</li>
+        <li>Post must total at least <strong>5,000 SHROOMS</strong> in tips from OP to others</li>
+        <li>NFT raffles and auctions are exempt from the weekly limit</li>
+        <li>Non-compliant posts will be demonetized</li>
+      </ul>
+    </div>
+
+    <div class="guide-card reveal">
+      <h3>💎 Flair Ranks &amp; XP</h3>
+      <p>Your flair shows your XP Rank, off-chain balance, and GS Tokens received. Higher rank = bigger forage bonus.</p>
+
+      <div class="streak-grid">
+        <div class="sg-head">Rank</div>
+        <div class="sg-head">XP Required</div>
+        <div class="sg-head">Forage Bonus</div>
+        <div class="sg-cell">🌱 Sprout</div><div class="sg-cell">0</div><div class="sg-cell">0%</div>
+        <div class="sg-cell">🟤 Bronze</div><div class="sg-cell">100,000</div><div class="sg-cell">+5%</div>
+        <div class="sg-cell">⚪ Silver</div><div class="sg-cell">250,000</div><div class="sg-cell">+10%</div>
+        <div class="sg-cell">🟡 Gold</div><div class="sg-cell">500,000</div><div class="sg-cell">+23%</div>
+        <div class="sg-cell">🟢 Emerald</div><div class="sg-cell">750,000</div><div class="sg-cell">+42%</div>
+        <div class="sg-cell">💎 Diamond</div><div class="sg-cell">1,000,000</div><div class="sg-cell">+69%</div>
+        <div class="sg-cell">🟣 Master</div><div class="sg-cell">2,000,000</div><div class="sg-cell">+90%</div>
+        <div class="sg-cell">🔴 Grandmaster</div><div class="sg-cell">4,206,874</div><div class="sg-cell">+100%</div>
+      </div>
+
+      <h4>XP Sources</h4>
+      <ul>
+        <li>Post upvotes: <strong>500 SHROOMS + 50,000 SPORES each</strong></li>
+        <li>Comment upvotes: <strong>200 SHROOMS + 20,000 SPORES each</strong></li>
+        <li>Streaks, tips given, foraging, feeding, and daily quests</li>
+        <li>Max daily base reward: <strong>6,874 SHROOMS</strong> (before flair bonus)</li>
+      </ul>
+    </div>
+
+    <div class="guide-card reveal">
+      <h3>🛠️ Reddit Commands</h3>
+      <ul>
+        <li><code>!sprout</code> — One-time new-user bonus</li>
+        <li><code>!forage</code> — Daily streak reward (in the forage thread)</li>
+        <li><code>!feed</code> — Feed forest animals (forage thread)</li>
+        <li><code>!balance</code> — View your Reddit and Discord balances</li>
+        <li><code>!register 0xYourWallet</code> — Register your Polygon wallet</li>
+        <li><code>!gas</code> — Receive a small amount of POL for gas fees (once per user)</li>
+        <li><code>!link</code> — Connect your Reddit account to your Discord account</li>
+        <li><code>!withdraw [amount] [token]</code> — Send tokens to your wallet</li>
+        <li><code>!profile</code> — View your Reddit stats</li>
+        <li><code>!xp</code> — View your XP and progress toward your next flair rank</li>
+        <li><code>!tip [amount] [token]</code> — Tip SHROOMS or SPORES</li>
+        <li><code>!gs</code> — Gift a Goodshroom Token</li>
       </ul>
     </div>
 
@@ -904,42 +724,48 @@
         <li><strong>No Invasive Species</strong>: No spam or scams.</li>
         <li><strong>Nourishing Feedback</strong>: Critique should help others grow.</li>
         <li><strong>Secrets of the Underground</strong>: No doxxing or privacy violations.</li>
-        <li><strong>Discord Mushroom Farming</strong>: Bans forfeit all SHROOMS and SPORES permanently.</li>
+        <li><strong>Warning</strong>: Bans forfeit all SHROOMS and SPORES permanently.</li>
       </ul>
     </div>
 
     <div class="cta-row reveal">
-      <a class="btn btn-yellow" href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">
-        Visit Subreddit
-      </a>
+      <a class="btn btn-yellow" href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">Visit Subreddit</a>
     </div>
 
   </section>
+
 
   <!-- FOOTER -->
   <footer style="position:relative;z-index:1;background:var(--dark2);border-top:1px solid rgba(255,255,225,0.06);color:rgba(255,255,225,0.3);padding:2rem 0;text-align:center;font-family:'Syne Mono',monospace;font-size:0.7rem;letter-spacing:0.05em;">
     &copy; 2025 Mushroom Planet. All rights reserved.
   </footer>
 
-  <!-- PWA NAV -->
-  <nav class="pwa-nav">
-    <a href="/profile.html" class="pwa-tab" data-page="profile" id="pwa-profile-tab">
-      <span id="pwa-avatar-wrap"><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;border:1px solid rgba(255,255,225,0.2);" onerror="this.style.display='none'"></span>
-      <span>Profile</span>
-    </a>
-    <a href="/vote.html" class="pwa-tab" data-page="vote">
-      <span><img src="/images/vote.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-      <span>Vote</span>
-    </a>
-    <a href="/convert.html" class="pwa-tab" data-page="convert">
-      <span><img src="/images/swaps.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-      <span>Convert</span>
-    </a>
-    <a href="/treasury.html" class="pwa-tab" data-page="treasury">
-      <span><img src="/images/treasury.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-      <span>Treasury</span>
-    </a>
-  </nav>
+<nav class="pwa-nav" style="
+  position:fixed; bottom:0; left:0; right:0; height:65px;
+  background:#111; border-top:1px solid rgba(255,255,225,0.08);
+  align-items:stretch; z-index:999;
+  padding-bottom:env(safe-area-inset-bottom);
+">
+  <a href="/profile.html" class="pwa-tab" data-page="profile" id="pwa-profile-tab">
+    <span id="pwa-avatar-wrap"><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;border:1px solid rgba(255,255,225,0.2);" onerror="this.style.display='none'"></span>
+    <span>Profile</span>
+  </a>
+  <a href="/vote.html" class="pwa-tab" data-page="vote">
+    <span><img src="/images/vote.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Vote</span>
+  </a>
+  <a href="/convert.html" class="pwa-tab" data-page="convert">
+    <span><img src="/images/swaps.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Convert</span>
+  <a href="/treasury.html" class="pwa-tab" data-page="treasury">
+    <span><img src="/images/treasury.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Treasury</span>
+  </a>
+  <a href="/guides.html" class="pwa-tab" data-page="guide">
+    <span><img src="/images/guide.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Guide</span>
+  </a>
+</nav>
 
   <!-- SCRIPTS -->
   <script type="module">
@@ -989,6 +815,22 @@
     }
     window.showGuide = showGuide;
 
+    // Copy contract address to clipboard
+    function copyAddress(btn, address) {
+      navigator.clipboard.writeText(address).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy Address';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        btn.textContent = 'Error';
+        setTimeout(function() { btn.textContent = 'Copy Address'; }, 2000);
+      });
+    }
+    window.copyAddress = copyAddress;
+
     // PWA tab active state
     (function() {
       const page = window.location.pathname.split('/').pop().replace('.html', '') || 'guides';
@@ -1006,23 +848,5 @@
     })();
   </script>
 
-  <script type="module">
-    async function updateTokenPrices() {
-      try {
-        const sporeRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0xc373382eec590374278534494109a0cdae1fbbc8');
-        const sporeData = await sporeRes.json();
-        document.getElementById('spore-price').textContent = '$' + parseFloat(sporeData.data.attributes.base_token_price_usd).toFixed(9);
-
-        const shroomRes = await fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28');
-        const shroomData = await shroomRes.json();
-        document.getElementById('shroom-price').textContent = '$' + parseFloat(shroomData.data.attributes.base_token_price_usd).toFixed(7);
-      } catch(e) {
-        document.getElementById('spore-price').textContent = '--';
-        document.getElementById('shroom-price').textContent = '--';
-      }
-    }
-    updateTokenPrices();
-  </script>
 
 </body>
-</html>
