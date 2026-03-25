@@ -10,6 +10,10 @@
 
   <style>
     body { padding-top: 100px !important; }
+    @media(display-mode: standalone) {
+      body { padding-top: 0 !important; }
+      header { display: none !important; }
+    }
     :root {
       --cream: #ffffe1;
       --yellow: #c084fc;
@@ -50,7 +54,7 @@
     /* ---- HERO ---- */
     .vote-hero {
       position: relative; z-index: 1; text-align: center;
-      padding: 3rem 1rem 1rem;
+      padding: 5rem 0.75rem 1.5rem;
       background: radial-gradient(ellipse at 50% 0%, rgba(253,70,79,0.12) 0%, transparent 70%);
     }
     @media(max-width:768px){
