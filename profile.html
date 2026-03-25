@@ -240,7 +240,15 @@
 
     /* ---- TABS ---- */
     .tab-bar {
-      display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem; margin-bottom: 1.5rem;
+    }
+    @media(min-width: 600px) {
+      .tab-bar { grid-template-columns: repeat(7, 1fr); }
+    }
+    @media(display-mode: standalone) {
+      .tab-bar { grid-template-columns: repeat(3, 1fr); }
     }
     .tab {
       font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem;
