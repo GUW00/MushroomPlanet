@@ -756,11 +756,10 @@
   }
 
   async function checkExistingSession() {
-    const stored = localStorage.getItem('vote_user');
+    const stored = localStorage.getItem('vote_user') || localStorage.getItem('mp_profile_user');
     if (!stored) return;
     try {
       const user = JSON.parse(stored);
-      // Refresh MVP from server
       const res = await fetch(`${window.API_BASE}/api/vote/user/${user.discord_id}`);
       const data = await res.json();
       if (data.ok) {
