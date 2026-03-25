@@ -17,6 +17,13 @@
   <script type="module" src="config.js?v=2"></script>
 
   <style>
+    @media(max-width: 600px), (display-mode: standalone) {
+      #mega-slots-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        flex: unset !important;
+        width: 100%;
+      }
+    }
     .header-icons { display: none; }
     @media (max-width: 768px) {
       .header-icons { display: flex; gap: 0.75rem; align-items: center; }
@@ -253,8 +260,15 @@
     }
     .tab-bar::-webkit-scrollbar { display: none; }
     .tab-bar .tab { flex-shrink: 0; }
+    @media(max-width: 600px) {
+      .tab-bar { flex-wrap: wrap; overflow-x: visible; }
+      .tab-bar .tab { flex: 1 1 calc(25% - 0.4rem); min-width: 0; justify-content: center; flex-direction: column; align-items: center; padding: 0.5em 0.2em; font-size: 0.58rem; gap: 0.2rem; }
+      .tab-bar .tab img { width: 14px !important; height: 14px !important; margin-right: 0 !important; }
+    }
     @media(display-mode: standalone) {
-      .tab-bar { flex-wrap: nowrap; }
+      .tab-bar { flex-wrap: wrap; overflow-x: visible; }
+      .tab-bar .tab { flex: 1 1 calc(25% - 0.4rem); min-width: 0; justify-content: center; flex-direction: column; align-items: center; padding: 0.5em 0.2em; font-size: 0.58rem; gap: 0.2rem; }
+      .tab-bar .tab img { width: 14px !important; height: 14px !important; margin-right: 0 !important; }
     }
     .tab {
       font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem;
@@ -753,9 +767,10 @@
             <span style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);margin-left:0.5rem;">Equip up to 12 Sporebots</span>
           </div>
 
-          <!-- Builder grid: preview + slots -->
+          <!-- Row 1: Mosaic preview + buttons (desktop side-by-side, mobile stacked) -->
           <div style="display:flex;gap:1.25rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:1rem;">
-            <!-- Mega bot preview -->
+
+            <!-- Mosaic preview -->
             <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;flex-shrink:0;">
               <div id="mega-mosaic" style="width:108px;height:144px;border-radius:12px;border:2px solid rgba(255,255,225,0.15);overflow:hidden;background:rgba(255,255,255,0.04);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:1px;position:relative;">
                 <div id="mega-mosaic-empty" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;">
@@ -770,11 +785,11 @@
               </div>
             </div>
 
-            <!-- Trait slots grid -->
+            <!-- Trait slots: desktop uses auto-fill, mobile overridden below -->
             <div id="mega-slots-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:0.5rem;flex:1;min-width:0;"></div>
           </div>
 
-          <!-- Total stats output -->
+          <!-- Combined bonuses -->
           <div id="mega-total-stats" style="display:none;">
             <div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.5rem;padding-top:0.5rem;border-top:1px solid rgba(255,255,225,0.07);">COMBINED BONUSES</div>
             <div id="mega-stats-rows" class="data-grid" style="grid-template-columns:1fr 1fr;"></div>
