@@ -1492,7 +1492,12 @@ async function loadSporebotTotals() {
 .pwa-tab.active{color:#fece00;}
 @media(display-mode:standalone){header{display:none!important;}#global-menu{display:none!important;}html body{padding-top:0!important;}.treasury-hero{padding-top:1.5rem!important;}}
 </style>
-<nav class="pwa-nav">
+<nav class="pwa-nav" style="
+  position:fixed; bottom:0; left:0; right:0; height:65px;
+  background:#111; border-top:1px solid rgba(255,255,225,0.08);
+  align-items:stretch; z-index:999;
+  padding-bottom:env(safe-area-inset-bottom);
+">
   <a href="/profile.html" class="pwa-tab" data-page="profile" id="pwa-profile-tab">
     <span id="pwa-avatar-wrap"><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;border:1px solid rgba(255,255,225,0.2);" onerror="this.style.display='none'"></span>
     <span>Profile</span>
@@ -1504,8 +1509,7 @@ async function loadSporebotTotals() {
   <a href="/convert.html" class="pwa-tab" data-page="convert">
     <span><img src="/images/swaps.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
     <span>Convert</span>
-  </a>
-    <a href="/treasury.html" class="pwa-tab" data-page="treasury">
+  <a href="/treasury.html" class="pwa-tab" data-page="treasury">
     <span><img src="/images/treasury.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
     <span>Treasury</span>
   </a>
