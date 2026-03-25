@@ -221,7 +221,7 @@
 
     /* ---- TABS ---- */
     .tab-bar {
-      display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+      display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.5rem;
     }
     .tab {
       font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem;
@@ -229,7 +229,17 @@
       border: 1px solid rgba(255,255,225,0.15);
       background: rgba(255,255,255,0.03); color: rgba(255,255,225,0.6);
       cursor: pointer; transition: all 0.2s; letter-spacing: 0.04em;
-      font-weight: 600;
+      font-weight: 600; display: flex; align-items: center;
+    }
+    @media(display-mode:standalone) {
+      .tab-bar { gap: 0.25rem; }
+      .tab { flex: 1; justify-content: center; padding: 0.5em 0.4em; font-size: 0.65rem; min-width: 0; }
+      .tab img { width: 11px; height: 11px; margin-right: 3px; }
+    }
+    @media(max-width: 480px) {
+      .tab-bar { gap: 0.25rem; }
+      .tab { flex: 1; justify-content: center; padding: 0.5em 0.4em; font-size: 0.65rem; min-width: 0; }
+      .tab img { width: 11px; height: 11px; margin-right: 3px; }
     }
     .tab.active {
       border-color: var(--yellow); color: var(--yellow);
