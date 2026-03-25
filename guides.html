@@ -68,6 +68,17 @@
 
 
     /* TAB SELECTOR */
+    .dual-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .dual-grid {
+        grid-template-columns: 1fr;
+      }
+    }
     .guide-tabs {
       position: relative; z-index: 1;
       display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;
@@ -333,49 +344,30 @@
       <div class="section-title">Sporebot — Two Ways to Play</div>
     </div>
 
-    <!-- Discord block -->
-    <div class="guide-card reveal">
+    <div class="dual-grid reveal">
+
+    <!-- Discord -->
+    <div class="guide-card">
       <h3>🎮 Sporebot on Discord</h3>
-      <p>The full Sporebot experience lives on Discord — farming, brewing, staking, digging, governance, and more. Verify first, then use <code>!start</code> in <strong>#farming</strong> to receive <strong>1,000 SHROOMS</strong> and begin planting.</p>
-
-      <h4>Getting Started</h4>
-      <ul>
-        <li>Verify in <strong>#verify</strong> (powered by Double Counter — checks for VPNs and alt accounts)</li>
-        <li>Use <code>!start</code> in <strong>#farming</strong> to claim your <strong>1,000 SHROOMS</strong></li>
-        <li>Use <code>!plant 1000</code> to start your Mushroom Farm and begin earning SPORES passively</li>
-        <li>Register your Polygon wallet in <strong>#wallet-web3</strong> with <code>!register 0xYourAddress</code></li>
-      </ul>
-
-      <h4>Key Commands</h4>
-      <ul>
-        <li><strong>Daily:</strong> <code>!forage</code> <code>!mist</code> <code>!fan</code> <code>!explore</code> <code>!visit</code> <code>!dig</code> <code>!toss</code></li>
-        <li><strong>Hourly:</strong> <code>!gather</code> <code>!cave</code> <code>!feed</code></li>
-        <li><strong>Farm:</strong> <code>!farm</code> <code>!home</code> <code>!plant</code> <code>!harvest</code> <code>!freeze</code></li>
-        <li><strong>Tokens:</strong> <code>!withdraw</code> <code>!transfer</code> <code>!convert</code> <code>!stake</code></li>
-        <li><strong>Brewing:</strong> <code>!brew</code> <code>!potion</code> <code>!shop</code></li>
-        <li><strong>Info:</strong> <code>!sporebots</code> <code>/balance</code> <code>!nft</code></li>
-      </ul>
-      <p style="margin-top:0.75rem;">Switch to the <strong>Discord</strong> tab above for the full Discord guide including rules, verification details, and what unlocks.</p>
+      <p>
+        The full Sporebot experience lives on Discord — farming, brewing, staking,
+        digging, governance, and more. Verify first, then use <code>!start</code>
+        in <strong>#farming</strong> to receive <strong>1,000 SHROOMS</strong>
+        and begin planting.
+      </p>
     </div>
 
-    <!-- Reddit block -->
-    <div class="guide-card reveal">
+    <!-- Reddit -->
+    <div class="guide-card">
       <h3>🌿 Sporebot on Reddit</h3>
-      <p>A fresh <strong>Daily Forage Thread</strong> is posted automatically every day at <strong>7:20 EST</strong> on <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">r/MushroomPlanet</a> and stays open for 24 hours. Build your streak daily for bigger rewards.</p>
-
-      <h4>Key Reddit Commands</h4>
-      <ul>
-        <li><code>!forage</code> — Earn SHROOMS and SPORES based on your streak (max 6,874 SHROOMS at Day 420+)</li>
-        <li><code>!sprout</code> — One-time new-user bonus: <strong>1,000 SHROOMS</strong> + <strong>100,000 SPORES</strong> + <strong>1 GS Token</strong></li>
-        <li><code>!feed</code> — Feed forest animals (costs 42-420 SHROOMS, 1-hour cooldown)</li>
-        <li><code>!tip [amount] [token]</code> — Tip SHROOMS or SPORES to another user</li>
-        <li><code>!gs</code> — Give a Goodshroom Token to a community member</li>
-        <li><code>!airdrop</code> / <code>!raffle</code> — Distribute tokens or pick random winners</li>
-        <li><code>!balance</code> — View your Reddit balances</li>
-        <li><code>!profile</code> — View your Reddit stats and XP rank</li>
-      </ul>
-      <p style="margin-top:0.75rem;">Switch to the <strong>Reddit</strong> tab above for the full Reddit guide including flair ranks, jackpot info, and community rules.</p>
+      <p>
+        A fresh <strong>Daily Forage Thread</strong> is posted automatically every
+        day at <strong>7:20 EST</strong> and stays open for 24 hours. Build your
+        streak daily for bigger rewards.
+      </p>
     </div>
+
+  </div>
 
     <!-- Linking block -->
     <div class="guide-card reveal">
@@ -401,6 +393,43 @@
         <a class="btn btn-yellow" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">Join Discord</a>
         <a class="btn btn-blue" href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">Visit Subreddit</a>
       </div>
+    </div>
+
+    <div class="guide-card reveal">
+      <h3>🧪 Free Trial & Requirements</h3>
+      <p>New users get a <strong>42-day free trial</strong>. After that, meet ONE of the following to keep farming:</p>
+      <ul>
+        <li><strong>Option 1</strong>: Hold <strong>500,000+ SHROOM-equivalent</strong> on-chain for 3+ consecutive farming days</li>
+        <li><strong>Option 2</strong>: Hold 2 Sporebots OR any 1 Mooshie NFT — 3+ days</li>
+        <li><strong>Option 3</strong>: Provide liquidity (LP Bonus of 0.1 or higher)</li>
+      </ul>
+    </div>
+
+    <div class="guide-card reveal">
+      <h3>📜 Spore of Conduct</h3>
+      <ul>
+        <li><strong>Spore of Respect</strong>: Be kind and inclusive. No harassment, bullying, or discrimination.</li>
+
+        <li><strong>Wholesome Fungi</strong>: Keep it family-friendly. No NSFW, explicit, or offensive content.</li>
+
+        <li><strong>Mycelium Content Only</strong>: Keep discussions relevant to mushrooms, the ecosystem, and community topics.</li>
+
+        <li><strong>Legal Cap</strong>: No illegal substance discussions or promotion of unlawful activity.</li>
+
+        <li><strong>Mature Mushrooms Only</strong>: This is an 18+ community due to tokenized systems and financial elements.</li>
+
+        <li><strong>Artist’s Appreciation</strong>: Always credit original creators when sharing content.</li>
+
+        <li><strong>Nourishing Feedback</strong>: Be constructive — help others grow instead of tearing them down.</li>
+
+        <li><strong>Secrets of the Underground</strong>: No doxxing, privacy violations, or sharing personal information.</li>
+
+        <li><strong>Chill Vibes Only</strong>: Leave drama at the forest edge. Keep the community positive.</li>
+
+        <li><strong>No Invasive Species</strong>: No spam, bots, raids, scams, or malicious behavior.</li>
+
+        <li><strong>⚠️ Enforcement</strong>: Bans from Discord or Reddit permanently forfeit all stored SHROOMS and SPORES.</li>
+      </ul>
     </div>
 
   </section>
@@ -520,6 +549,29 @@
     </div>
 
     <div class="guide-card reveal">
+      <h3>🌿 Getting Started</h3>
+      <ul>
+        <li>Visit the daily forage thread on <strong>r/MushroomPlanet</strong></li>
+        <li>Comment <code>!forage</code> once per day to start your streak</li>
+        <li>New users can use <code>!sprout</code> for a starter bonus</li>
+        <li>Return daily — missing a day resets your streak</li>
+      </ul>
+
+      <h4>Core Commands</h4>
+      <ul>
+        <li><code>!forage</code> — Daily reward based on streak</li>
+        <li><code>!sprout</code> — One-time starter bonus</li>
+        <li><code>!feed</code> — Feed animals (1-hour cooldown)</li>
+        <li><code>!tip [amount] [token]</code> — Tip users</li>
+        <li><code>!gs</code> — Give Goodshroom token</li>
+        <li><code>!airdrop</code> — Tip all commenters</li>
+        <li><code>!raffle</code> — Pick random winners</li>
+        <li><code>!balance</code> — View balances</li>
+        <li><code>!profile</code> — View stats and XP</li>
+      </ul>
+    </div>
+
+    <div class="guide-card reveal">
       <h3>🌾 Farm System Overview</h3>
       <p>Your planted SHROOMS passively earn SPORES based on your <strong>Spore Generation Rate (SGR)</strong>. The farm advances through 5 stages over 42 days. Harvest at Sporulation to rank up and increase your plant limit permanently.</p>
 
@@ -577,20 +629,6 @@
         <li><strong>Option 1</strong>: Hold <strong>500,000+ SHROOM-equivalent</strong> on-chain for 3+ consecutive farming days</li>
         <li><strong>Option 2</strong>: Hold 2 Sporebots OR any 1 Mooshie NFT (House, King, Queen, Gold, Kid Shroom) — 3+ days</li>
         <li><strong>Option 3</strong>: Provide liquidity (LP Bonus of 0.1 or higher) — qualifies immediately</li>
-      </ul>
-    </div>
-
-    <div class="guide-card reveal">
-      <h3>📜 Spore of Conduct</h3>
-      <ul>
-        <li><strong>Spore of Respect</strong>: Be kind and inclusive. No harassment or hate speech.</li>
-        <li><strong>Wholesome Fungi</strong>: Family-friendly space. No NSFW or offensive content.</li>
-        <li><strong>Artist's Appreciation</strong>: Credit original creators.</li>
-        <li><strong>Nourishing Feedback</strong>: Constructive over destructive.</li>
-        <li><strong>Secrets of the Underground</strong>: No doxxing or privacy violations.</li>
-        <li><strong>Chill Vibes Only</strong>: Leave drama at the forest edge.</li>
-        <li><strong>No Invasive Species</strong>: No spam, bots, raids, or scams.</li>
-        <li><strong>Warning</strong>: Bans from Discord or Reddit permanently forfeit all stored SHROOMS and SPORES.</li>
       </ul>
     </div>
 
@@ -709,22 +747,6 @@
         <li><code>!xp</code> — View your XP and progress toward your next flair rank</li>
         <li><code>!tip [amount] [token]</code> — Tip SHROOMS or SPORES</li>
         <li><code>!gs</code> — Gift a Goodshroom Token</li>
-      </ul>
-    </div>
-
-    <div class="guide-card reveal">
-      <h3>📜 Subreddit Rules — Spore of Conduct</h3>
-      <ul>
-        <li><strong>Spore of Respect</strong>: No bullying or discrimination.</li>
-        <li><strong>Mycelium Content Only</strong>: Keep posts mushroom-related.</li>
-        <li><strong>Legal Cap</strong>: No illegal substance discussions.</li>
-        <li><strong>Mature Mushrooms Only</strong>: 18+ community due to token systems.</li>
-        <li><strong>Wholesome Fungi</strong>: No NSFW or explicit content.</li>
-        <li><strong>Artist's Sporespread</strong>: Credit original creators.</li>
-        <li><strong>No Invasive Species</strong>: No spam or scams.</li>
-        <li><strong>Nourishing Feedback</strong>: Critique should help others grow.</li>
-        <li><strong>Secrets of the Underground</strong>: No doxxing or privacy violations.</li>
-        <li><strong>Warning</strong>: Bans forfeit all SHROOMS and SPORES permanently.</li>
       </ul>
     </div>
 
