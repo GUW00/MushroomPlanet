@@ -378,6 +378,17 @@
       .dir-toggle { padding: 0.2rem; gap: 0.2rem; }
       .token-dot { width: 6px; height: 6px; }
     }
+    @media(display-mode:standalone){
+      header { display: none !important; }
+      #global-menu { display: none !important; }
+      html body { padding-top: 0 !important; }
+      .hero { padding: 1.25rem 1rem 0.5rem !important; }
+      .hero h1 { font-size: 1.75rem !important; margin-bottom: 0.35rem !important; }
+      .hero p { font-size: 0.8rem !important; margin-bottom: 0.5rem !important; }
+      .hero .eyebrow { margin-bottom: 0.35rem !important; }
+      .rate-strip { padding: 0 1rem 0.75rem !important; }
+      .page-section { padding-top: 0 !important; }
+    }
   </style>
 </head>
 <body>
@@ -1171,7 +1182,7 @@ window.disconnectWallet = async function() {
 .pwa-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.2rem;text-decoration:none;color:rgba(255,255,225,0.35);font-family:'Syne Mono',monospace;font-size:0.55rem;letter-spacing:0.05em;transition:color 0.2s;}
 .pwa-tab span:first-child{font-size:1.3rem;display:flex;align-items:center;justify-content:center;}
 .pwa-tab.active{color:#fece00;}
-@media(display-mode:standalone){header{display:none!important;}#global-menu{display:none!important;}html body{padding-top:0!important;}.vote-hero{padding-top:1.5rem!important;}}
+@media(display-mode:standalone){.pwa-nav{display:flex;}body{padding-bottom:80px!important;}}
 </style>
 <nav class="pwa-nav">
   <a href="/profile.html" class="pwa-tab" data-page="profile" id="pwa-profile-tab">
