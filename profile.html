@@ -190,7 +190,7 @@
     }
     .profile-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.25rem; }
     .profile-sub {
-      font-family: 'Syne Mono', monospace; font-size: 0.65rem;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem;
       color: rgba(255,255,225,0.35); display: flex; gap: 0.75rem; flex-wrap: wrap;
     }
     .profile-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
@@ -1290,7 +1290,22 @@ function renderHeader(s, p) {
   const name = misc.username || wallet.username || currentUser?.username || 'Unknown Farmer';
   setEl('prof-username', name);
   const did = currentUser?.discord_id || '';
-  setEl('prof-discord-tag', 'Discord: ' + (did ? did.slice(0,6) + '...' + did.slice(-4) : ''));
+  const discordTagEl = document.getElementById('prof-discord-tag');
+  if (discordTagEl) {
+    discordTagEl.textContent = did || '';
+    discordTagEl.style.cssText = 'cursor:pointer;transition:color 0.2s;';
+    discordTagEl.title = 'Click to copy Discord ID';
+    discordTagEl.onclick = function() {
+      navigator.clipboard.writeText(did).then(function() {
+        discordTagEl.textContent = 'Copied!';
+        discordTagEl.style.color = 'var(--green)';
+        setTimeout(function() {
+          discordTagEl.textContent = did;
+          discordTagEl.style.color = '';
+        }, 1500);
+      });
+    };
+  }
   setEl('prof-joined', 'Joined: ' + safe(p.Misc?.created_at || misc.created_at, 'Unknown'));
   setEl('prof-mvp', (currentUser?.mvp || 0).toFixed(1));
 
