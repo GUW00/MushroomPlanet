@@ -1857,9 +1857,8 @@ function renderActiveSporebotCard(active, s) {
   infoRows += '<div class="data-row"><span class="dr-label">Name</span><span class="dr-val y">' + title + (tokenId ? ' <span style="color:rgba(255,255,225,0.3);font-size:0.7rem;">#' + tokenId + '</span>' : '') + '</span></div>';
   if (rScore != null) infoRows += '<div class="data-row"><span class="dr-label">Rarity Score</span><span class="dr-val" style="color:' + rarityColor + ';">' + rScore + ' <span style="font-size:0.7rem;opacity:0.7;">(' + rarityLabel + ')</span></span></div>';
   if (dateAdded) infoRows += '<div class="data-row"><span class="dr-label">Equipped</span><span class="dr-val" style="font-size:0.75rem;">' + dateAdded + '</span></div>';
-  if (source)    infoRows += '<div class="data-row"><span class="dr-label">Source</span><span class="dr-val" style="text-transform:capitalize;">' + source + '</span></div>';
   if (wallet)    infoRows += '<div class="data-row"><span class="dr-label">Wallet</span><span class="dr-val" style="font-family:Syne Mono,monospace;font-size:0.65rem;cursor:pointer;" onclick="navigator.clipboard.writeText(\'' + wallet + '\')" title="Click to copy">' + wallet.slice(0,6) + '...' + wallet.slice(-4) + '</span></div>';
-  if (farmBonus) infoRows += '<div class="data-row"><span class="dr-label">SGR Bonus</span><span class="dr-val g">+' + farmBonus + '%</span></div>';
+
 
   var bonusEntries = Object.entries(bonuses).filter(function(e) { return e[1] > 0; });
   var bonusHtml = '';
@@ -2333,18 +2332,71 @@ function megaSave() {
   try {
     var uid = (currentUser && currentUser.discord_id) || 'guest';
     localStorage.setItem('mega_build_' + uid, JSON.stringify(_megaAssigned));
-    var btn = document.getElementById('mega-save-btn');
-    if (btn) { btn.textContent = 'Saved!'; btn.style.background = 'var(--yellow)'; btn.style.borderColor = 'var(--yellow)'; setTimeout(function() { btn.textContent = 'Save Build'; btn.style.background = 'var(--green)'; btn.style.borderColor = 'var(--green)'; }, 1800); }
   } catch(e) {}
+
+  var btn = document.getElementById('mega-save-btn');
+
+  if (!currentUser || !currentUser.discord_id) {
+    if (btn) { btn.textContent = 'Saved!'; btn.style.background = 'var(--yellow)'; btn.style.borderColor = 'var(--yellow)'; setTimeout(function() { btn.textContent = 'Save Build'; btn.style.background = 'var(--green)'; btn.style.borderColor = 'var(--green)'; }, 1800); }
+    return;
+  }
+
+  if (btn) { btn.textContent = 'Saving...'; btn.style.background = 'rgba(255,255,225,0.15)'; btn.style.borderColor = 'rgba(255,255,225,0.3)'; btn.disabled = true; }
+
+  fetch(window.API_BASE + '/api/user/' + currentUser.discord_id + '/megabot', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ megabot: _megaAssigned }),
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (btn) {
+      if (data.success) {
+        btn.textContent = 'Saved!';
+        btn.style.background = 'var(--yellow)';
+        btn.style.borderColor = 'var(--yellow)';
+      } else {
+        btn.textContent = 'Error';
+        btn.style.background = 'var(--red)';
+        btn.style.borderColor = 'var(--red)';
+      }
+      btn.disabled = false;
+      setTimeout(function() { btn.textContent = 'Save Build'; btn.style.background = 'var(--green)'; btn.style.borderColor = 'var(--green)'; }, 2000);
+    }
+  })
+  .catch(function() {
+    if (btn) {
+      btn.textContent = 'Error';
+      btn.style.background = 'var(--red)';
+      btn.style.borderColor = 'var(--red)';
+      btn.disabled = false;
+      setTimeout(function() { btn.textContent = 'Save Build'; btn.style.background = 'var(--green)'; btn.style.borderColor = 'var(--green)'; }, 2000);
+    }
+  });
 }
 window.megaSave = megaSave;
 
 function megaLoadSave() {
+  var uid = (currentUser && currentUser.discord_id) || 'guest';
   try {
-    var uid = (currentUser && currentUser.discord_id) || 'guest';
     var saved = localStorage.getItem('mega_build_' + uid);
     if (saved) _megaAssigned = JSON.parse(saved);
   } catch(e) { _megaAssigned = {}; }
+
+  if (!currentUser || !currentUser.discord_id) return;
+
+  fetch(window.API_BASE + '/api/user/' + currentUser.discord_id + '/megabot')
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data.megabot && Object.keys(data.megabot).length) {
+        _megaAssigned = data.megabot;
+        try {
+          localStorage.setItem('mega_build_' + uid, JSON.stringify(_megaAssigned));
+        } catch(e) {}
+        megaRenderSlots();
+      }
+    })
+    .catch(function() {});
 }
 
 function megaReset() {

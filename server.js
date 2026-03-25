@@ -1187,6 +1187,42 @@ app.post('/api/rpc/polygon', async (req, res) => {
   }
 });
 // ----------------------------------------------------------------
+// POST /api/user/:id/megabot
+// ----------------------------------------------------------------
+app.post('/api/user/:id/megabot', async (req, res) => {
+  const discord_id = req.params.id;
+  const { megabot } = req.body;
+
+  if (!discord_id || !megabot) {
+    return res.status(400).json({ success: false, message: 'Missing data' });
+  }
+
+  try {
+    await db.ref(`Sporebot/Users/${discord_id}/Megabot`).update({
+      build: megabot,
+      saved_at: new Date().toISOString(),
+    });
+    console.log('[MEGABOT] Saved for', discord_id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[MEGABOT] Save error:', err);
+    res.status(500).json({ success: false, message: 'Failed to save' });
+  }
+});
+// ----------------------------------------------------------------
+// GET /api/user/:id/megabot
+// ----------------------------------------------------------------
+app.get('/api/user/:id/megabot', async (req, res) => {
+  const discord_id = req.params.id;
+  try {
+    const snap = await db.ref(`Sporebot/Users/${discord_id}/Megabot/build`).get();
+    res.json({ megabot: snap.exists() ? snap.val() : null });
+  } catch (err) {
+    console.error('[MEGABOT] Load error:', err);
+    res.status(500).json({ megabot: null });
+  }
+});
+// ----------------------------------------------------------------
 // GET /api/reddit-user/:username
 // Returns Reddit/Users/{username} data by discord_id lookup
 // ----------------------------------------------------------------
