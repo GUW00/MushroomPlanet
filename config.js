@@ -61,14 +61,17 @@ const config = {
       <div class="main-menu desktop-only">
         <a href="index.html">Home</a>
         <a href="profile.html">Sporebot</a>
-        <a href="treasury.html">Token</a>
-        <a href="rewards.html">Rewards</a>
+        <a href="convert.html">Convert</a>
+        <a href="vote.html">Goverance</a>
+        <a href="treasury.html">Treasury</a>
         <a href="guides.html">Guides</a>
       </div>
 
       <div class="mobile-menu mobile-only">
         <a href="index.html">Home</a>
         <a href="profile.html">Sporebot</a>
+        <a href="convert.html">Convert</a>
+        <a href="vote.html">Goverance</a>
         <a href="treasury.html">Treasury</a>
         <a href="guides.html">Guides</a>
         </a>
