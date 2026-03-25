@@ -1369,6 +1369,14 @@
   window.removeOption        = removeOption;
   </script>
   <style>
+    .header-icons { display: none; }
+    .header-icons img { width: 22px !important; height: 22px !important; object-fit: contain !important; border-radius: 0 !important; border: none !important; margin: 0 !important; opacity: 0.85; }
+    @media (max-width: 768px) {
+      .header-icons { display: flex; gap: 0.75rem; align-items: center; }
+    }
+    @media (display-mode: standalone) {
+      .header-icons { display: none !important; }
+    }
 .pwa-nav{position:fixed;bottom:0;left:0;right:0;height:65px;background:#111;border-top:1px solid rgba(255,255,225,0.08);display:none;align-items:stretch;z-index:999;padding-bottom:env(safe-area-inset-bottom);}
 @media(display-mode:standalone){.pwa-nav{display:flex;}body{padding-bottom:80px!important;}}
 .pwa-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.2rem;text-decoration:none;color:rgba(255,255,225,0.35);font-family:'Syne Mono',monospace;font-size:0.55rem;letter-spacing:0.05em;transition:color 0.2s;}

@@ -46,6 +46,14 @@ async function loadSporebotTotals() {
   <script type="module" src="config.js"></script>
 
   <style>
+    .header-icons { display: none; }
+    .header-icons img { width: 22px !important; height: 22px !important; object-fit: contain !important; border-radius: 0 !important; border: none !important; margin: 0 !important; opacity: 0.85; }
+    @media (max-width: 768px) {
+      .header-icons { display: flex; gap: 0.75rem; align-items: center; }
+    }
+    @media (display-mode: standalone) {
+      .header-icons { display: none !important; }
+    }
     :root {
       --cream: #ffffe1;
       --yellow: #fece00;
@@ -727,7 +735,7 @@ async function loadSporebotTotals() {
 
   <script>
 
-  window.USE_LOCAL = true;
+  window.USE_LOCAL = false;
   window.API_BASE  = window.USE_LOCAL ? 'http://localhost:3001' : 'https://api.mushroomplanet.earth';
 
   // ─────────────────────────────────────────────────────────────────
