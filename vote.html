@@ -410,6 +410,11 @@
         <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
         <li><a href="/profile.html">PROFILE</a></li>
       </ul>
+      <div class="header-icons">
+        <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank"><img src="/images/reddit1.png" alt="Reddit"></a>
+        <a href="https://discord.com/invite/ECauU2KSSt" target="_blank"><img src="/images/discord.png" alt="Discord"></a>
+        <a href="/profile.html"><img src="/images/profile1.png" alt="Profile"></a>
+      </div>
     </nav>
   </header>
 
@@ -468,7 +473,25 @@
       </div>
     </div>
 
-    <!-- HOW IT WORKS -->
+    <!-- PROPOSALS LIST -->
+    <div class="reveal">
+      <div class="section-label">Active Governance</div>
+      <div class="section-title">Proposals</div>
+    </div>
+
+    <div class="tab-bar reveal">
+      <button class="tab active" onclick="switchTab('all',this)">All <span class="tab-count" id="count-all">0</span></button>
+      <button class="tab" onclick="switchTab('vote',this)">Official Votes <span class="tab-count" id="count-vote">0</span></button>
+      <button class="tab" onclick="switchTab('proposal',this)">Official Proposals <span class="tab-count" id="count-proposal">0</span></button>
+      <button class="tab" onclick="switchTab('passed',this)">Passed <span class="tab-count" id="count-passed">0</span></button>
+      <button class="tab" onclick="switchTab('failed',this)">Failed <span class="tab-count" id="count-failed">0</span></button>
+    </div>
+
+    <div id="proposals-list" class="reveal">
+      <div class="loading-state">Loading proposals...</div>
+    </div>
+
+        <!-- HOW IT WORKS -->
     <div class="glow-divider"></div>
     <div class="reveal">
       <div class="section-label">How It Works</div>
@@ -534,24 +557,6 @@
 
     <div class="glow-divider"></div>
 
-    <!-- PROPOSALS LIST -->
-    <div class="reveal">
-      <div class="section-label">Active Governance</div>
-      <div class="section-title">Proposals</div>
-    </div>
-
-    <div class="tab-bar reveal">
-      <button class="tab active" onclick="switchTab('all',this)">All <span class="tab-count" id="count-all">0</span></button>
-      <button class="tab" onclick="switchTab('vote',this)">Official Votes <span class="tab-count" id="count-vote">0</span></button>
-      <button class="tab" onclick="switchTab('proposal',this)">Official Proposals <span class="tab-count" id="count-proposal">0</span></button>
-      <button class="tab" onclick="switchTab('passed',this)">Passed <span class="tab-count" id="count-passed">0</span></button>
-      <button class="tab" onclick="switchTab('failed',this)">Failed <span class="tab-count" id="count-failed">0</span></button>
-    </div>
-
-    <div id="proposals-list" class="reveal">
-      <div class="loading-state">Loading proposals...</div>
-    </div>
-
   </div><!-- /vote-section -->
 
   <!-- ============================================================
@@ -603,19 +608,18 @@
         </select>
       </div>
       <div class="form-field">
-        <label class="form-label">Vote Options <span style="color:rgba(255,255,225,0.3);">(2–4 options)</span></label>
-        <div class="options-list" id="create-options">
-          <div class="option-row">
-            <input type="text" class="form-input" placeholder="Option A" />
-            <button class="btn btn-ghost" style="flex-shrink:0;border-radius:0.5rem;" disabled>—</button>
+        <label class="form-label">Vote Options</label>
+        <div style="display:flex;gap:0.75rem;">
+          <div style="flex:1;display:flex;align-items:center;gap:0.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.75rem 1rem;">
+            <img src="/images/yes.png" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display='none'">
+            <span style="font-family:Syne Mono,monospace;font-size:0.85rem;color:var(--green);font-weight:600;">YES</span>
           </div>
-          <div class="option-row">
-            <input type="text" class="form-input" placeholder="Option B" />
-            <button class="btn btn-ghost" style="flex-shrink:0;border-radius:0.5rem;" onclick="removeOption(this)">✕</button>
+          <div style="flex:1;display:flex;align-items:center;gap:0.5rem;background:rgba(253,70,79,0.06);border:1px solid rgba(253,70,79,0.2);border-radius:0.875rem;padding:0.75rem 1rem;">
+            <img src="/images/no.png" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display='none'">
+            <span style="font-family:Syne Mono,monospace;font-size:0.85rem;color:var(--red);font-weight:600;">NO</span>
           </div>
         </div>
-        <button class="btn btn-ghost" style="margin-top:0.5rem;border-radius:0.5rem;" onclick="addOption()" id="btn-add-option">+ Add option</button>
-        <div class="form-hint">Option A and B are required. Max 4 options.</div>
+        <div class="form-hint">Official proposals always use Yes / No voting.</div>
       </div>
       <div class="form-field">
         <label class="form-label">Pre-Proposal Discord Link <span style="color:rgba(255,255,225,0.3);">(optional)</span></label>
@@ -786,6 +790,8 @@
     const logoutBtn = document.getElementById('btn-logout');
     const newPropBtn = document.getElementById('btn-new-proposal');
 
+    const MOD_IDS = ['1233612802883719261'];
+    const isMod = currentUser && MOD_IDS.includes(currentUser.discord_id);
     if (currentUser) {
       const avatar = currentUser.avatar
         ? `<img src="https://cdn.discordapp.com/avatars/${currentUser.discord_id}/${currentUser.avatar}.png" class="auth-avatar" alt="avatar">`
@@ -799,6 +805,18 @@
       loginBtn.style.display  = 'none';
       logoutBtn.style.display = 'inline-flex';
       newPropBtn.style.display = 'inline-flex';
+      // Mod-only: Official Vote button with custom options
+      let modBtn = document.getElementById('btn-mod-vote');
+      if (isMod && !modBtn) {
+        modBtn = document.createElement('button');
+        modBtn.id = 'btn-mod-vote';
+        modBtn.className = 'btn btn-purple';
+        modBtn.style.cssText = 'color:var(--purple);background:rgba(192,132,252,0.08);border-color:rgba(192,132,252,0.25);';
+        modBtn.innerHTML = '⚡ New Official Vote';
+        modBtn.onclick = openModVoteModal;
+        document.getElementById('auth-actions').insertBefore(modBtn, logoutBtn);
+      }
+      if (modBtn) modBtn.style.display = isMod ? 'inline-flex' : 'none';
     } else {
       statusEl.innerHTML = `<div class="auth-avatar-placeholder">👤</div>
         <div>
@@ -1187,12 +1205,10 @@
     const desc     = document.getElementById('create-desc').value.trim();
     const category = document.getElementById('create-category').value;
     const discordLink = document.getElementById('create-discord-link').value.trim();
-    const optInputs   = document.querySelectorAll('#create-options .option-row input');
-    const options     = Array.from(optInputs).map(i => i.value.trim()).filter(Boolean);
+    const options = ['Yes', 'No'];
 
     if (!title || title.length < 10) { showToast('Title too short (min 10 chars)', 'error'); return; }
     if (!desc  || desc.length  < 50) { showToast('Description too short (min 50 chars)', 'error'); return; }
-    if (options.length < 2)          { showToast('Need at least 2 vote options', 'error'); return; }
 
     const btn = document.getElementById('btn-submit-proposal');
     btn.disabled = true; btn.textContent = 'Submitting...';
@@ -1276,6 +1292,67 @@
     await checkExistingSession();
     await loadProposals();
   })();
+
+  function openModVoteModal() {
+    document.getElementById('modal-mod-vote')?.remove();
+    const modal = document.createElement('div');
+    modal.id = 'modal-mod-vote';
+    modal.className = 'gov-modal-overlay open';
+    modal.innerHTML = `<div class="gov-modal">
+      <button class="gov-modal-close" onclick="document.getElementById('modal-mod-vote').remove();document.body.style.overflow='';">✕</button>
+      <div class="gov-modal-title">New Official Vote</div>
+      <div class="modal-sub" style="color:rgba(192,132,252,0.7);">Mod only — MVP weighted vote</div>
+      <div class="form-field"><label class="form-label">Title</label><input type="text" class="form-input" id="mv-title" placeholder="Vote title..." maxlength="120"/></div>
+      <div class="form-field"><label class="form-label">Description</label><textarea class="form-textarea" id="mv-desc" placeholder="Describe what is being voted on..."></textarea></div>
+      <div class="form-field"><label class="form-label">Category</label><select class="form-select" id="mv-category"><option value="ecosystem">Ecosystem</option><option value="tokenomics">Tokenomics</option><option value="rewards">Rewards</option><option value="governance">Governance</option><option value="partnerships">Partnerships</option><option value="technical">Technical</option><option value="other">Other</option></select></div>
+      <div class="form-field">
+        <label class="form-label">Vote Options</label>
+        <div class="options-list" id="mv-options">
+          <div class="option-row"><input type="text" class="form-input" placeholder="Option A" value="Yes"/><button class="btn btn-ghost" style="flex-shrink:0;border-radius:0.5rem;" disabled>—</button></div>
+          <div class="option-row"><input type="text" class="form-input" placeholder="Option B" value="No"/><button class="btn btn-ghost" style="flex-shrink:0;border-radius:0.5rem;" onclick="this.closest('.option-row').remove()">✕</button></div>
+        </div>
+        <button class="btn btn-ghost" style="margin-top:0.5rem;border-radius:0.5rem;" onclick="
+          const list=document.getElementById('mv-options');
+          if(list.children.length>=4){return;}
+          const row=document.createElement('div');row.className='option-row';
+          const l=String.fromCharCode(65+list.children.length);
+          row.innerHTML='<input type=text class=form-input placeholder=Option+'+l+'><button class=btn+btn-ghost style=flex-shrink:0;border-radius:0.5rem; onclick=this.closest(.option-row).remove()>✕</button>';
+          list.appendChild(row);">+ Add option</button>
+      </div>
+      <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+        <button class="btn btn-ghost" onclick="document.getElementById('modal-mod-vote').remove();document.body.style.overflow='';">Cancel</button>
+        <button class="btn" style="color:var(--purple);background:rgba(192,132,252,0.08);border-color:rgba(192,132,252,0.25);" onclick="submitModVote()">⚡ Create Vote</button>
+      </div>
+    </div>`;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    modal.onclick = e => { if(e.target===modal){modal.remove();document.body.style.overflow='';} };
+  }
+
+  async function submitModVote() {
+    const title    = document.getElementById('mv-title')?.value.trim();
+    const desc     = document.getElementById('mv-desc')?.value.trim();
+    const category = document.getElementById('mv-category')?.value;
+    const optInputs = document.querySelectorAll('#mv-options .option-row input');
+    const options  = Array.from(optInputs).map(i => i.value.trim()).filter(Boolean);
+    if (!title || title.length < 5)  { showToast('Title too short', 'error'); return; }
+    if (!desc  || desc.length  < 20) { showToast('Description too short', 'error'); return; }
+    if (options.length < 2)          { showToast('Need at least 2 options', 'error'); return; }
+    try {
+      const res = await fetch(`${window.API_BASE}/api/proposals/create`, {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+        body: JSON.stringify({ discord_id: currentUser.discord_id, title, description: desc, category, options, stage: 'vote' }),
+      });
+      const data = await res.json();
+      if (!data.ok) { showToast(data.message || 'Failed', 'error'); return; }
+      showToast('Official Vote created!', 'success');
+      document.getElementById('modal-mod-vote').remove();
+      document.body.style.overflow = '';
+      await loadProposals();
+    } catch { showToast('Error creating vote', 'error'); }
+  }
+  window.submitModVote = submitModVote;
 
   // expose for inline onclick
   window.openProposal        = openProposal;
