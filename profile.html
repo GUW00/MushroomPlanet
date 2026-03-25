@@ -25,6 +25,8 @@
       .hero h1 { font-size: 1.75rem !important; margin-bottom: 0.35rem !important; }
       .hero p { font-size: 0.8rem !important; margin-bottom: 0 !important; }
       .hero .eyebrow { margin-bottom: 0.35rem !important; }
+      body.pwa-logged-out .hero { display: none !important; }
+      body.pwa-logged-out .page-section { padding-top: 2rem !important; }
     }
     .pwa-tab {
       flex: 1; display: flex; flex-direction: column;
@@ -488,7 +490,7 @@
 
   <!-- AUTH GATE (shown when logged out) -->
   <div id="auth-gate" class="auth-gate reveal" style="display:none;">
-    <div class="auth-gate-icon">🍄</div>
+    <div class="auth-gate-icon"><img src="/images/sporebot.png" style="width:64px;height:64px;object-fit:contain;" onerror="this.style.display='none'"></div>
     <h3>Connect Your Discord</h3>
     <p>Sign in with Discord to view your full Mushroom Planet profile, farm stats, wallet balances, NFTs, and more.</p>
     <a href="#" class="btn-discord" id="btn-login" onclick="startDiscordOAuth(event)">
@@ -1157,6 +1159,7 @@ function showState(state) {
   document.getElementById('auth-gate').style.display       = state === 'gate'    ? 'block' : 'none';
   document.getElementById('loading-state').style.display   = state === 'loading' ? 'block' : 'none';
   document.getElementById('profile-content').style.display = state === 'profile' ? 'block' : 'none';
+  document.body.classList.toggle('pwa-logged-out', state === 'gate');
   if (state === 'gate' || state === 'profile') {
     setTimeout(() => {
       document.querySelectorAll('.reveal').forEach(el => {
