@@ -69,7 +69,9 @@
     }
     .hero { background-image: none !important; }
     .hero::before { display: none !important; }
-    body { padding-top: 120px !important; }
+    @media not all and (display-mode: standalone) {
+      body { padding-top: 120px !important; }
+    }
     :root {
       --cream: #ffffe1;
       --yellow: #fece00;
