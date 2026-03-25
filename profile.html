@@ -242,15 +242,19 @@
 
     /* ---- TABS ---- */
     .tab-bar {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.4rem; margin-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 2px;
     }
-    @media(min-width: 600px) {
-      .tab-bar { grid-template-columns: repeat(7, 1fr); }
-    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab-bar .tab { flex-shrink: 0; }
     @media(display-mode: standalone) {
-      .tab-bar { grid-template-columns: repeat(3, 1fr); }
+      .tab-bar { flex-wrap: nowrap; }
     }
     .tab {
       font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem;
@@ -638,6 +642,7 @@
         <button class="tab active" onclick="switchTab('farm',this)"><img src="/images/shroomfarm.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Farm</button>
         <button class="tab" onclick="switchTab('staking',this)"><img src="/images/spore.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Staking</button>
         <button class="tab" onclick="switchTab('nfts',this)"><img src="/images/nft.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">NFTs</button>
+        <button class="tab" onclick="switchTab('sporebots',this)"><img src="/images/sporebot_helper.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SporeBots</button>
         <button class="tab" onclick="switchTab('companion',this)"><img src="/images/animals.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Companion</button>
         <button class="tab" onclick="switchTab('inventory',this)"><img src="/images/backpack1.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Inventory</button>
         <button class="tab" onclick="switchTab('brewing',this)"><img src="/images/potionrecipe.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Brewing</button>
@@ -716,6 +721,78 @@
         <div class="info-card">
           <div class="card-title"><span class="live-dot"></span> Your NFTs</div>
           <div id="nft-content"><div class="empty-hint">No NFTs found. Run !nft in Discord to sync.</div></div>
+        </div>
+      </div>
+
+      <!-- SPOREBOTS TAB -->
+      <div class="tab-panel reveal" id="tab-sporebots">
+        <!-- Active Sporebot Card -->
+        <div class="info-card">
+          <div class="card-title"><img src="/images/sporebot_helper.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Active Sporebot</div>
+          <div id="active-sporebot-content"><div class="empty-hint">No active Sporebot. Use !sporebots in Discord.</div></div>
+        </div>
+        <!-- Sporebot NFT Collection -->
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><img src="/images/sporebot_helper.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Sporebot NFTs
+            <span id="sb-nft-count" style="font-family:Syne Mono,monospace;font-size:0.65rem;color:rgba(255,255,225,0.35);margin-left:0.5rem;"></span>
+          </div>
+          <div id="sb-nft-grid"><div class="empty-hint">No Sporebot NFTs found. Run !nft in Discord to sync.</div></div>
+          <!-- Pagination -->
+          <div id="sb-pagination" style="display:none;align-items:center;justify-content:center;gap:0.75rem;margin-top:1rem;">
+            <button id="sb-prev" onclick="sbPage(-1)" style="background:rgba(255,255,225,0.07);border:1px solid rgba(255,255,225,0.12);color:var(--cream);font-family:Syne Mono,monospace;font-size:0.7rem;padding:0.3rem 0.75rem;border-radius:6px;cursor:pointer;">Prev</button>
+            <span id="sb-page-label" style="font-family:Syne Mono,monospace;font-size:0.7rem;color:rgba(255,255,225,0.45);"></span>
+            <button id="sb-next" onclick="sbPage(1)" style="background:rgba(255,255,225,0.07);border:1px solid rgba(255,255,225,0.12);color:var(--cream);font-family:Syne Mono,monospace;font-size:0.7rem;padding:0.3rem 0.75rem;border-radius:6px;cursor:pointer;">Next</button>
+          </div>
+        </div>
+
+        <!-- MEGA SPOREBOT BUILDER -->
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title">
+            <img src="/images/sporebot.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'">
+            Mega Sporebot Builder
+            <span style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);margin-left:0.5rem;">Equip up to 12 Sporebots</span>
+          </div>
+
+          <!-- Builder grid: preview + slots -->
+          <div style="display:flex;gap:1.25rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:1rem;">
+            <!-- Mega bot preview -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;flex-shrink:0;">
+              <div id="mega-mosaic" style="width:108px;height:108px;border-radius:12px;border:2px solid rgba(255,255,225,0.15);overflow:hidden;background:rgba(255,255,255,0.04);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:1px;position:relative;">
+                <div id="mega-mosaic-empty" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;">
+                  <div style="font-size:1.8rem;opacity:0.2;">🤖</div>
+                  <div style="font-family:Syne Mono,monospace;font-size:0.5rem;color:rgba(255,255,225,0.2);text-align:center;">assign bots<br>to preview</div>
+                </div>
+              </div>
+              <div style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);text-align:center;">MEGA BOT</div>
+              <div style="display:flex;gap:0.4rem;">
+                <button onclick="megaReset()" style="font-family:Syne Mono,monospace;font-size:0.6rem;color:var(--red);background:none;border:1px solid var(--red);padding:0.2rem 0.6rem;border-radius:5px;cursor:pointer;opacity:0.7;" title="Clear all slots">Reset</button>
+                <button id="mega-save-btn" onclick="megaSave()" style="font-family:Syne Mono,monospace;font-size:0.6rem;color:var(--green);background:none;border:1px solid var(--green);padding:0.2rem 0.6rem;border-radius:5px;cursor:pointer;opacity:0.85;" title="Save current build">Save Build</button>
+              </div>
+            </div>
+
+            <!-- Trait slots grid -->
+            <div id="mega-slots-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:0.5rem;flex:1;min-width:0;"></div>
+          </div>
+
+          <!-- Total stats output -->
+          <div id="mega-total-stats" style="display:none;">
+            <div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.5rem;padding-top:0.5rem;border-top:1px solid rgba(255,255,225,0.07);">COMBINED BONUSES</div>
+            <div id="mega-stats-rows" class="data-grid" style="grid-template-columns:1fr 1fr;"></div>
+          </div>
+        </div>
+
+        <!-- MEGA SLOT PICKER MODAL -->
+        <div id="mega-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999;align-items:center;justify-content:center;padding:1rem;" onclick="megaModalClose(event)">
+          <div style="background:var(--surface,#1a1f1e);border:1px solid rgba(255,255,225,0.1);border-radius:14px;max-width:480px;width:100%;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;">
+            <div style="padding:1rem 1.25rem 0.75rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,225,0.08);">
+              <div>
+                <div id="mega-modal-slot-name" style="font-family:Syne Mono,monospace;font-size:0.75rem;color:var(--cream);letter-spacing:0.1em;"></div>
+                <div id="mega-modal-stat-name" style="font-family:Syne Mono,monospace;font-size:0.6rem;color:var(--green);margin-top:0.2rem;"></div>
+              </div>
+              <button onclick="document.getElementById('mega-modal-overlay').style.display='none';" style="background:none;border:none;color:rgba(255,255,225,0.5);font-size:1.2rem;cursor:pointer;line-height:1;">x</button>
+            </div>
+            <div id="mega-modal-body" style="padding:1rem;overflow-y:auto;flex:1;"></div>
+          </div>
         </div>
       </div>
 
@@ -1271,6 +1348,7 @@ function renderProfile() {
   renderWallet(s, p);
   renderStaking(s, p);
   renderNFTs(p);
+  renderSporebots(s, p);
   renderCompanion(s);
   renderInventory(s);
   renderBrewing(s);
@@ -1669,22 +1747,659 @@ function openSporebotModal(tokenId, imageUrl, traits) {
   overlay.classList.add('open');
 }
 window.openSporebotModal = openSporebotModal;
-function renderWalletPanel() {
-  if(!profileData) return;
-  const s = profileData.sporebot || {}, p = profileData.pixie || {};
-  renderWallet(s, p);
-  fetchUserLPPositions(p);
-  // Reddit wallet
-  const r = profileData.reddit, rwEl = document.getElementById('wallet-reddit-content');
-  if(r && profileData.redditName) {
-    const bal = r.Balance || {};
-    const img = (src) => '<img src="/images/' + src + '" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">';
-    rwEl.innerHTML = '<div class="data-row"><span class="dr-label">' + img('profile.png') + 'Username</span><span class="dr-val">u/' + profileData.redditName + '</span></div>'
-      + '<div class="data-row"><span class="dr-label">' + img('shroom.png') + 'SHROOM</span><span class="dr-val r">' + fmt(bal.reddit_shrooms) + '</span></div>'
-      + '<div class="data-row"><span class="dr-label">' + img('spore.png') + 'SPORE</span><span class="dr-val b">' + fmt(bal.reddit_spores) + '</span></div>';
-  } else {
-    rwEl.innerHTML = '<div class="empty-hint">No Reddit wallet linked.</div>';
+
+// ================================================================
+// SPOREBOTS TAB
+// ================================================================
+var _sbNfts = [];
+var _sbCurrentPage = 0;
+var SB_PER_PAGE = 9; // 3 rows of 3
+
+function renderSporebots(s, p) {
+  var wallet  = (p && p.Wallet) || {};
+  var nftWallet = wallet.NFT || {};
+  var active = s.Active_Sporebot || s.Sporebot || null;
+
+  // Active Sporebot card
+  renderActiveSporebotCard(active, s);
+
+  // Build sporebot NFT list from same source as NFTs tab
+  var keys = Object.keys(nftWallet).filter(function(k) { return k !== 'total_nft'; });
+  var bots = [];
+  keys.forEach(function(k) {
+    var entry = nftWallet[k];
+    var displayName = k.replace(/ ID\d+$/, '');
+    var tokenMatch  = k.match(/ ID(\d+)$/);
+    var tokenId     = tokenMatch ? tokenMatch[1] : null;
+    var isBot = displayName.includes('SporeBots') || displayName.includes('Sporebot');
+    if (!isBot || !tokenId) return;
+    var image = entry.image || null;
+    if (!image && tokenId) {
+      image = 'https://alchemy.mypinata.cloud/ipfs/QmYh9hwJZNTDy192auvCq1jnpvhmLhAFW4qRRcXSraNntL/' + tokenId + '.png';
+    }
+    bots.push({ tokenId: tokenId, image: image, traits: entry.traits || {}, label: 'Sporebot #' + tokenId, count: parseInt(entry.count || 1) });
+  });
+
+  bots.sort(function(a, b) {
+    return parseInt(a.tokenId) - parseInt(b.tokenId);
+  });
+
+  _sbNfts = bots;
+  _sbCurrentPage = 0;
+
+  var countEl = document.getElementById('sb-nft-count');
+  if (countEl) countEl.textContent = bots.length ? '(' + bots.length + ')' : '';
+
+  sbRenderPage();
+}
+
+function calcSporebotBonuses(traits) {
+  var bonuses = {};
+  function addB(stat, val) { if (!stat) return; bonuses[stat] = (bonuses[stat] || 0) + val; }
+  if (!traits || typeof traits !== 'object') return bonuses;
+  for (var slot in TRAIT_SLOT_STAT) {
+    var stat = TRAIT_SLOT_STAT[slot];
+    var traitVal = traits[slot];
+    if (!traitVal) continue;
+    var rarity = 'Common';
+    if (traitVal.includes('Legendary')) rarity = 'Legendary';
+    else if (traitVal.includes('Super-Rare') || traitVal.includes('Super Rare')) rarity = 'Super Rare';
+    else if (traitVal.includes('Rare')) rarity = 'Rare';
+    else if (traitVal.includes('Blue') || traitVal.includes('Pink') || traitVal.includes('Uncommon')) rarity = 'Uncommon';
+    if (rarity === 'Common') continue;
+    var val = STAT_VALS[rarity] || 0;
+    if (stat === 'Plant Limit') val = PLANT_LIMIT_VALS[rarity] || 0;
+    else if (stat === 'Herb Find Rate' || stat === 'Rare Herb Chance') val = HERB_VALS[rarity] || 0;
+    else if (stat === 'Double Herb Chance') val = DOUBLE_HERB_VALS[rarity] || 0;
+    addB(stat, val);
   }
+  var item = traits['Item'];
+  if (item && ITEM_BONUSES[item]) addB(ITEM_BONUSES[item][0], ITEM_BONUSES[item][1]);
+  var mouth = traits['Mouth'];
+  if (mouth && MOUTH_BONUSES[mouth]) addB(MOUTH_BONUSES[mouth][0], MOUTH_BONUSES[mouth][1]);
+  return bonuses;
+}
+
+function fmtBonus(stat, val) {
+  if (stat === 'Plant Limit') return '+' + (val/1000000).toFixed(1) + 'M limit';
+  return '+' + val + (stat.includes('Chance') || stat.includes('Rate') || stat.includes('Bonus') || stat.includes('Yield') ? '%' : '');
+}
+
+function renderActiveSporebotCard(active, s) {
+  var el = document.getElementById('active-sporebot-content');
+  if (!el) return;
+
+  if (!active) {
+    el.innerHTML = '<div class="empty-hint">No active Sporebot. Use !sporebots in Discord to equip one.</div>';
+    return;
+  }
+
+  var title    = active.title    || 'Unknown';
+  var tokenId  = active.token_id || null;
+  var image    = active.image    || (tokenId ? fixIpfs('https://ipfs.io/ipfs/QmYh9hwJZNTDy192auvCq1jnpvhmLhAFW4qRRcXSraNntL/' + tokenId + '.png') : null);
+  var rScore   = active.rarity_score || null;
+  var dateAdded = active.Date_Added ? active.Date_Added.replace('T',' ').replace('Z','').slice(0,16) + ' UTC' : null;
+  var source   = active.Date_Source || null;
+  var wallet   = active.wallet   || null;
+  var traits   = active.traits   || {};
+  var farmBonus = (s && s.Farm && s.Farm.APY_Breakdown) ? (s.Farm.APY_Breakdown.ingame_sporebot_bonus || 0) : 0;
+  var bonuses  = calcSporebotBonuses(traits);
+
+  // Rarity label from score
+  var rarityLabel = rScore >= 350 ? 'Legendary' : rScore >= 200 ? 'Super Rare' : rScore >= 100 ? 'Rare' : rScore >= 50 ? 'Uncommon' : 'Common';
+  var rarityColor = rarityLabel === 'Legendary' ? 'var(--yellow)' : rarityLabel === 'Super Rare' ? 'var(--purple)' : rarityLabel === 'Rare' ? 'var(--red)' : rarityLabel === 'Uncommon' ? 'var(--blue)' : 'rgba(255,255,225,0.5)';
+
+  var imgHtml = image
+    ? '<img src="' + image + '" alt="' + title + '" loading="lazy" onerror="this.style.display=\'none\'" style="width:90px;height:90px;border-radius:10px;object-fit:cover;flex-shrink:0;border:2px solid rgba(255,255,225,0.1);">'
+    : '<div style="width:90px;height:90px;border-radius:10px;background:rgba(255,255,225,0.05);display:flex;align-items:center;justify-content:center;font-size:2.5rem;flex-shrink:0;">🤖</div>';
+
+  var infoRows = '';
+  infoRows += '<div class="data-row"><span class="dr-label">Name</span><span class="dr-val y">' + title + (tokenId ? ' <span style="color:rgba(255,255,225,0.3);font-size:0.7rem;">#' + tokenId + '</span>' : '') + '</span></div>';
+  if (rScore != null) infoRows += '<div class="data-row"><span class="dr-label">Rarity Score</span><span class="dr-val" style="color:' + rarityColor + ';">' + rScore + ' <span style="font-size:0.7rem;opacity:0.7;">(' + rarityLabel + ')</span></span></div>';
+  if (dateAdded) infoRows += '<div class="data-row"><span class="dr-label">Equipped</span><span class="dr-val" style="font-size:0.75rem;">' + dateAdded + '</span></div>';
+  if (source)    infoRows += '<div class="data-row"><span class="dr-label">Source</span><span class="dr-val" style="text-transform:capitalize;">' + source + '</span></div>';
+  if (wallet)    infoRows += '<div class="data-row"><span class="dr-label">Wallet</span><span class="dr-val" style="font-family:Syne Mono,monospace;font-size:0.65rem;cursor:pointer;" onclick="navigator.clipboard.writeText(\'' + wallet + '\')" title="Click to copy">' + wallet.slice(0,6) + '...' + wallet.slice(-4) + '</span></div>';
+  if (farmBonus) infoRows += '<div class="data-row"><span class="dr-label">SGR Bonus</span><span class="dr-val g">+' + farmBonus + '%</span></div>';
+
+  var bonusEntries = Object.entries(bonuses).filter(function(e) { return e[1] > 0; });
+  var bonusHtml = '';
+  if (bonusEntries.length) {
+    bonusHtml = '<div style="margin-top:0.75rem;">'
+      + '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.4rem;">NFT BONUSES</div>'
+      + bonusEntries.map(function(e) {
+          return '<div class="data-row"><span class="dr-label">' + (STAT_EMOJI[e[0]]||'') + e[0] + '</span><span class="dr-val g">' + fmtBonus(e[0], e[1]) + '</span></div>';
+        }).join('')
+      + '</div>';
+  }
+
+  // Trait pills
+  var traitSlots = ['Background','Cap','Eyes','Face','Spots','Arms','Hands','Legs','Shoes','Pixie','Item','Mouth'];
+  var traitPills = traitSlots.filter(function(sl) { return traits[sl]; }).map(function(sl) {
+    var tv = traits[sl];
+    var isRare = tv.includes('Legendary') || tv.includes('Rare') || tv.includes('Blue') || tv.includes('Pink');
+    var tc = tv.includes('Legendary') ? 'var(--yellow)' : tv.includes('Super') ? 'var(--purple)' : tv.includes('Rare') ? 'var(--red)' : (tv.includes('Blue')||tv.includes('Pink')) ? 'var(--blue)' : 'rgba(255,255,225,0.25)';
+    return '<span style="display:inline-flex;align-items:center;gap:0.25rem;font-family:Syne Mono,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:999px;border:1px solid ' + tc + ';color:' + tc + ';opacity:' + (isRare?'1':'0.45') + ';">'
+      + '<span style="font-size:0.55rem;opacity:0.6;">' + sl + '</span> ' + tv
+      + '</span>';
+  }).join('');
+
+  el.innerHTML = '<div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;">'
+    + imgHtml
+    + '<div style="flex:1;min-width:180px;">' + infoRows + bonusHtml + '</div>'
+    + '</div>'
+    + (traitPills ? '<div style="margin-top:0.85rem;display:flex;flex-wrap:wrap;gap:0.35rem;">' + traitPills + '</div>' : '');
+}
+
+function sbRenderPage() {
+  var el = document.getElementById('sb-nft-grid');
+  var pag = document.getElementById('sb-pagination');
+  var lbl = document.getElementById('sb-page-label');
+  var prevBtn = document.getElementById('sb-prev');
+  var nextBtn = document.getElementById('sb-next');
+  if (!el) return;
+
+  if (!_sbNfts.length) {
+    el.innerHTML = '<div class="empty-hint">No Sporebot NFTs found. Run !nft in Discord to sync.</div>';
+    if (pag) pag.style.display = 'none';
+    return;
+  }
+
+  var totalPages = Math.ceil(_sbNfts.length / SB_PER_PAGE);
+  if (_sbCurrentPage >= totalPages) _sbCurrentPage = totalPages - 1;
+  if (_sbCurrentPage < 0) _sbCurrentPage = 0;
+
+  var start = _sbCurrentPage * SB_PER_PAGE;
+  var slice = _sbNfts.slice(start, start + SB_PER_PAGE);
+
+  var html = '<div class="nft-grid">';
+  slice.forEach(function(item) {
+    var safeId = 'sbp_' + item.tokenId;
+    window._sporebotCache = window._sporebotCache || {};
+    window._sporebotCache[safeId] = { tokenId: item.tokenId, image: item.image || '', traits: item.traits || {} };
+    html += '<div class="nft-card" style="cursor:pointer;" onclick="openSporebotModal(window._sporebotCache[\'' + safeId + '\'].tokenId,window._sporebotCache[\'' + safeId + '\'].image,window._sporebotCache[\'' + safeId + '\'].traits)">';
+    if (item.image) {
+      html += '<img src="' + fixIpfs(item.image) + '" alt="' + item.label + '" loading="lazy" onerror="this.style.display=\'none\'">';
+    } else {
+      html += '<div class="nft-card-placeholder">🤖</div>';
+    }
+    html += '<div class="nft-card-name">' + item.label + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+
+  if (pag) {
+    if (totalPages > 1) {
+      pag.style.display = 'flex';
+      if (lbl) lbl.textContent = 'Page ' + (_sbCurrentPage + 1) + ' / ' + totalPages;
+      if (prevBtn) prevBtn.disabled = _sbCurrentPage === 0;
+      if (nextBtn) nextBtn.disabled = _sbCurrentPage === totalPages - 1;
+      if (prevBtn) prevBtn.style.opacity = _sbCurrentPage === 0 ? '0.35' : '1';
+      if (nextBtn) nextBtn.style.opacity = _sbCurrentPage === totalPages - 1 ? '0.35' : '1';
+    } else {
+      pag.style.display = 'none';
+    }
+  }
+}
+
+function sbPage(dir) {
+  _sbCurrentPage += dir;
+  sbRenderPage();
+}
+window.sbPage = sbPage;
+
+// ================================================================
+// MEGA SPOREBOT BUILDER
+// ================================================================
+var MEGA_SLOTS = ['Background','Cap','Eyes','Face','Spots','Arms','Hands','Legs','Shoes','Pixie','Item','Mouth'];
+var MEGA_SLOT_STAT = {
+  Background:'Plant Limit', Cap:'Kid Totem Chance', Eyes:'Queen Totem Chance',
+  Face:'King Totem Chance', Spots:'Gold Totem Chance', Arms:'Harvest Bonus',
+  Hands:'Rare Herb Chance', Legs:'Double Herb Chance', Shoes:'Herb Find Rate',
+  Pixie:'Spore Yield', Item:'Item Bonus', Mouth:'Mouth Bonus'
+};
+// assigned: { slotName: { tokenId, label, image, bonus:{stat,val} } }
+var _megaAssigned = {};
+
+// ================================================================
+// SPOREBOT SVG COMPOSER
+// ================================================================
+var SB_COLORS = {
+  'White':'#FFFFFF','Yellow':'#FECE00','Purple':'#C084FC','Blue':'#4FA8FD',
+  'Green':'#22C55E','Pink':'#F472B6','Red':'#FD464F','Orange':'#FB923C',
+  'Teal':'#2DD4BF','Gold':'#F59E0B','Black':'#374151','Gray':'#9CA3AF',
+  'Brown':'#92400E','Cyan':'#22D3EE','Lime':'#A3E635','Violet':'#7C3AED',
+};
+function sbColor(name, fallback) {
+  if (!name) return fallback || '#E5E7EB';
+  var n = (name + '').split('-')[0].split('(')[0].trim();
+  n = n.charAt(0).toUpperCase() + n.slice(1).toLowerCase();
+  return SB_COLORS[n] || SB_COLORS[name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()] || fallback || '#E5E7EB';
+}
+function darken(hex, amt) {
+  amt = amt || 40;
+  var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  r = Math.max(0,r-amt); g = Math.max(0,g-amt); b = Math.max(0,b-amt);
+  return '#'+[r,g,b].map(function(x){return x.toString(16).padStart(2,'0');}).join('');
+}
+
+function buildSporebotSVG(traits, size) {
+  size = size || 120;
+  traits = traits || {};
+
+  var bgColor    = sbColor(traits.Background, '#F3F4F6');
+  var bodyColor  = sbColor(traits.Cap,        '#FFFFFF');
+  var eyeColor   = sbColor(traits.Eyes,       '#FFFFFF');
+  var faceColor  = sbColor(traits.Face,       '#FFFFFF');
+  var armsColor  = sbColor(traits.Arms,       '#FFFFFF');
+  var handsColor = sbColor(traits.Hands,      '#FFFFFF');
+  var legsColor  = sbColor(traits.Legs,       '#FFFFFF');
+  var shoesColor = sbColor(traits.Shoes,      '#FFFFFF');
+  var spotsColor = sbColor(traits.Spots,      '#FFFFFF');
+  var pixieColor = sbColor(traits.Pixie,      '#FFFFFF');
+  var mouthStyle = (traits.Mouth || 'Basic').toLowerCase();
+  var itemName   = traits.Item || null;
+
+  var s = size;
+  var cx = s/2; // center x
+
+  // outline stroke
+  var ol = darken(bodyColor === '#FFFFFF' ? '#D1D5DB' : bodyColor, 30);
+
+  var mouthSvg = '';
+  if (mouthStyle.includes('happy') || mouthStyle.includes('excited')) {
+    mouthSvg = '<path d="M' + (cx-8) + ' ' + (s*0.57) + ' Q' + cx + ' ' + (s*0.63) + ' ' + (cx+8) + ' ' + (s*0.57) + '" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round"/>';
+  } else if (mouthStyle.includes('upset') || mouthStyle.includes('evil')) {
+    mouthSvg = '<path d="M' + (cx-8) + ' ' + (s*0.62) + ' Q' + cx + ' ' + (s*0.56) + ' ' + (cx+8) + ' ' + (s*0.62) + '" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round"/>';
+  } else if (mouthStyle.includes('meh')) {
+    mouthSvg = '<line x1="' + (cx-7) + '" y1="' + (s*0.59) + '" x2="' + (cx+7) + '" y2="' + (s*0.59) + '" stroke="#374151" stroke-width="2" stroke-linecap="round"/>';
+  } else if (mouthStyle.includes('mustache')) {
+    mouthSvg = '<path d="M' + (cx-9) + ' ' + (s*0.58) + ' Q' + (cx-5) + ' ' + (s*0.62) + ' ' + cx + ' ' + (s*0.58) + ' Q' + (cx+5) + ' ' + (s*0.62) + ' ' + (cx+9) + ' ' + (s*0.58) + '" fill="none" stroke="#374151" stroke-width="1.5" stroke-linecap="round"/>';
+  } else if (mouthStyle.includes('lips')) {
+    mouthSvg = '<path d="M' + (cx-8) + ' ' + (s*0.58) + ' Q' + cx + ' ' + (s*0.56) + ' ' + (cx+8) + ' ' + (s*0.58) + ' Q' + cx + ' ' + (s*0.65) + ' Z" fill="#F472B6" stroke="#D85A7E" stroke-width="0.5"/>';
+  } else if (mouthStyle.includes('bot')) {
+    mouthSvg = '<rect x="' + (cx-7) + '" y="' + (s*0.565) + '" width="14" height="6" rx="2" fill="#4FA8FD" stroke="#185FA5" stroke-width="0.5"/>'
+      + '<line x1="' + (cx-3) + '" y1="' + (s*0.565) + '" x2="' + (cx-3) + '" y2="' + (s*0.625) + '" stroke="#185FA5" stroke-width="0.5"/>'
+      + '<line x1="' + (cx+3) + '" y1="' + (s*0.565) + '" x2="' + (cx+3) + '" y2="' + (s*0.625) + '" stroke="#185FA5" stroke-width="0.5"/>';
+  } else if (mouthStyle.includes('gold')) {
+    mouthSvg = '<path d="M' + (cx-8) + ' ' + (s*0.57) + ' Q' + cx + ' ' + (s*0.63) + ' ' + (cx+8) + ' ' + (s*0.57) + '" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>';
+  } else {
+    mouthSvg = '<line x1="' + (cx-6) + '" y1="' + (s*0.59) + '" x2="' + (cx+6) + '" y2="' + (s*0.59) + '" stroke="#374151" stroke-width="1.5" stroke-linecap="round"/>';
+  }
+
+  // Item indicator (small badge top-right)
+  var itemSvg = '';
+  if (itemName && itemName !== 'null') {
+    var ic = itemName.includes('Gold') ? '#F59E0B' : itemName.includes('Red') ? '#FD464F' : itemName.includes('Blue') ? '#4FA8FD' : itemName.includes('Pipe') ? '#9CA3AF' : '#22C55E';
+    itemSvg = '<circle cx="' + (s*0.82) + '" cy="' + (s*0.18) + '" r="' + (s*0.09) + '" fill="' + ic + '" stroke="' + darken(ic,30) + '" stroke-width="1"/>'
+      + '<text x="' + (s*0.82) + '" y="' + (s*0.185) + '" text-anchor="middle" dominant-baseline="central" style="font-size:' + Math.round(s*0.1) + 'px;fill:#fff;font-weight:700;">'
+      + (itemName.includes('Shovel') ? 'S' : itemName.includes('Potion') ? 'P' : itemName.includes('Spores') ? 'sp' : itemName.includes('Shroom') ? 'sh' : itemName.includes('Pipe') ? 'pp' : 'i')
+      + '</text>';
+  }
+
+  // Pixie companion (small star/dot top-left if not white)
+  var pixieSvg = '';
+  if (traits.Pixie && traits.Pixie !== 'White') {
+    pixieSvg = '<circle cx="' + (s*0.2) + '" cy="' + (s*0.22) + '" r="' + (s*0.06) + '" fill="' + pixieColor + '" stroke="' + darken(pixieColor,25) + '" stroke-width="1" opacity="0.9"/>';
+  }
+
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="' + s + '" height="' + s + '" viewBox="0 0 ' + s + ' ' + s + '">'
+    // Background circle
+    + '<circle cx="' + cx + '" cy="' + cx + '" r="' + (s*0.48) + '" fill="' + bgColor + '"/>'
+    // Body (main rounded rect)
+    + '<rect x="' + (s*0.2) + '" y="' + (s*0.25) + '" width="' + (s*0.6) + '" height="' + (s*0.55) + '" rx="' + (s*0.12) + '" fill="' + bodyColor + '" stroke="' + ol + '" stroke-width="1.5"/>'
+    // Head
+    + '<rect x="' + (s*0.25) + '" y="' + (s*0.08) + '" width="' + (s*0.5) + '" height="' + (s*0.38) + '" rx="' + (s*0.1) + '" fill="' + faceColor + '" stroke="' + darken(faceColor===bodyColor?faceColor:faceColor,20) + '" stroke-width="1.5"/>'
+    // Cap / hat brim
+    + '<rect x="' + (s*0.18) + '" y="' + (s*0.1) + '" width="' + (s*0.64) + '" height="' + (s*0.07) + '" rx="' + (s*0.03) + '" fill="' + bodyColor + '" stroke="' + ol + '" stroke-width="1"/>'
+    // Eyes
+    + '<circle cx="' + (cx-s*0.1) + '" cy="' + (s*0.245) + '" r="' + (s*0.07) + '" fill="' + eyeColor + '" stroke="#374151" stroke-width="1"/>'
+    + '<circle cx="' + (cx+s*0.1) + '" cy="' + (s*0.245) + '" r="' + (s*0.07) + '" fill="' + eyeColor + '" stroke="#374151" stroke-width="1"/>'
+    + '<circle cx="' + (cx-s*0.1) + '" cy="' + (s*0.245) + '" r="' + (s*0.03) + '" fill="#374151"/>'
+    + '<circle cx="' + (cx+s*0.1) + '" cy="' + (s*0.245) + '" r="' + (s*0.03) + '" fill="#374151"/>'
+    // Spots on body
+    + (spotsColor !== '#E5E7EB' && spotsColor !== '#FFFFFF' ? '<circle cx="' + (cx-s*0.12) + '" cy="' + (s*0.58) + '" r="' + (s*0.055) + '" fill="' + spotsColor + '" opacity="0.7"/>'
+      + '<circle cx="' + (cx+s*0.12) + '" cy="' + (s*0.58) + '" r="' + (s*0.055) + '" fill="' + spotsColor + '" opacity="0.7"/>'
+      + '<circle cx="' + cx + '" cy="' + (s*0.66) + '" r="' + (s*0.04) + '" fill="' + spotsColor + '" opacity="0.6"/>' : '')
+    // Arms
+    + '<rect x="' + (s*0.04) + '" y="' + (s*0.35) + '" width="' + (s*0.17) + '" height="' + (s*0.12) + '" rx="' + (s*0.05) + '" fill="' + armsColor + '" stroke="' + darken(armsColor,20) + '" stroke-width="1"/>'
+    + '<rect x="' + (s*0.79) + '" y="' + (s*0.35) + '" width="' + (s*0.17) + '" height="' + (s*0.12) + '" rx="' + (s*0.05) + '" fill="' + armsColor + '" stroke="' + darken(armsColor,20) + '" stroke-width="1"/>'
+    // Hands
+    + '<circle cx="' + (s*0.1) + '" cy="' + (s*0.5) + '" r="' + (s*0.07) + '" fill="' + handsColor + '" stroke="' + darken(handsColor,20) + '" stroke-width="1"/>'
+    + '<circle cx="' + (s*0.9) + '" cy="' + (s*0.5) + '" r="' + (s*0.07) + '" fill="' + handsColor + '" stroke="' + darken(handsColor,20) + '" stroke-width="1"/>'
+    // Legs
+    + '<rect x="' + (cx-s*0.22) + '" y="' + (s*0.76) + '" width="' + (s*0.16) + '" height="' + (s*0.14) + '" rx="' + (s*0.04) + '" fill="' + legsColor + '" stroke="' + darken(legsColor,20) + '" stroke-width="1"/>'
+    + '<rect x="' + (cx+s*0.06) + '" y="' + (s*0.76) + '" width="' + (s*0.16) + '" height="' + (s*0.14) + '" rx="' + (s*0.04) + '" fill="' + legsColor + '" stroke="' + darken(legsColor,20) + '" stroke-width="1"/>'
+    // Shoes
+    + '<ellipse cx="' + (cx-s*0.14) + '" cy="' + (s*0.91) + '" rx="' + (s*0.11) + '" ry="' + (s*0.05) + '" fill="' + shoesColor + '" stroke="' + darken(shoesColor,20) + '" stroke-width="1"/>'
+    + '<ellipse cx="' + (cx+s*0.14) + '" cy="' + (s*0.91) + '" rx="' + (s*0.11) + '" ry="' + (s*0.05) + '" fill="' + shoesColor + '" stroke="' + darken(shoesColor,20) + '" stroke-width="1"/>'
+    // Mouth
+    + mouthSvg
+    // Pixie companion dot
+    + pixieSvg
+    // Item badge
+    + itemSvg
+    + '</svg>';
+}
+window.buildSporebotSVG = buildSporebotSVG;
+var _megaPickingSlot = null;
+
+function megaGetBonusForSlot(slotName, traits) {
+  if (!traits) return null;
+  if (slotName === 'Item') {
+    var item = traits['Item'];
+    if (item && ITEM_BONUSES[item]) return { stat: ITEM_BONUSES[item][0], val: ITEM_BONUSES[item][1] };
+    return null;
+  }
+  if (slotName === 'Mouth') {
+    var mouth = traits['Mouth'];
+    if (mouth && MOUTH_BONUSES[mouth]) return { stat: MOUTH_BONUSES[mouth][0], val: MOUTH_BONUSES[mouth][1] };
+    return null;
+  }
+  var stat = TRAIT_SLOT_STAT[slotName];
+  if (!stat) return null;
+  var traitVal = traits[slotName];
+  if (!traitVal) return null;
+  var rarity = 'Common';
+  if (traitVal.includes('Legendary')) rarity = 'Legendary';
+  else if (traitVal.includes('Super-Rare') || traitVal.includes('Super Rare')) rarity = 'Super Rare';
+  else if (traitVal.includes('Rare')) rarity = 'Rare';
+  else if (traitVal.includes('Blue') || traitVal.includes('Pink') || traitVal.includes('Uncommon')) rarity = 'Uncommon';
+  if (rarity === 'Common') return null;
+  var val = STAT_VALS[rarity] || 0;
+  if (stat === 'Plant Limit') val = PLANT_LIMIT_VALS[rarity] || 0;
+  else if (stat === 'Herb Find Rate' || stat === 'Rare Herb Chance') val = HERB_VALS[rarity] || 0;
+  else if (stat === 'Double Herb Chance') val = DOUBLE_HERB_VALS[rarity] || 0;
+  return val > 0 ? { stat: stat, val: val } : null;
+}
+
+function megaRenderSlots() {
+  var grid = document.getElementById('mega-slots-grid');
+  if (!grid) return;
+  var usedIds = {};
+  Object.values(_megaAssigned).forEach(function(a) { usedIds[a.tokenId] = true; });
+
+  grid.innerHTML = MEGA_SLOTS.map(function(slot) {
+    var assigned = _megaAssigned[slot];
+    var statLabel = slot === 'Item' ? 'Item' : slot === 'Mouth' ? 'Mouth' : (MEGA_SLOT_STAT[slot] || slot);
+    var borderCol = assigned ? 'var(--green)' : 'rgba(255,255,225,0.1)';
+    var inner = '';
+    if (assigned) {
+      inner = '<img src="' + fixIpfs(assigned.image) + '" alt="' + assigned.label + '" style="width:52px;height:52px;border-radius:6px;object-fit:cover;display:block;margin:0 auto 0.3rem;" onerror="this.style.opacity=\'0.2\'">'
+        + '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:var(--cream);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + assigned.label + '</div>'
+        + (assigned.bonus ? '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:var(--green);text-align:center;">' + fmtBonus(assigned.bonus.stat, assigned.bonus.val) + '</div>' : '<div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.25);text-align:center;">no bonus</div>')
+        + '<button onclick="event.stopPropagation();megaRemoveSlot(\'' + slot + '\')" style="display:block;margin:0.3rem auto 0;font-family:Syne Mono,monospace;font-size:0.55rem;color:var(--red);background:none;border:none;cursor:pointer;opacity:0.7;" title="Remove">x remove</button>';
+    } else {
+      inner = '<div style="width:52px;height:52px;border-radius:6px;background:rgba(255,255,255,0.06);margin:0 auto 0.35rem;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">+</div>'
+        + '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.5);text-align:center;">' + slot + '</div>'
+        + '<div style="font-family:Syne Mono,monospace;font-size:0.55rem;color:rgba(255,255,225,0.25);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + statLabel + '</div>';
+    }
+    return '<div onclick="megaOpenSlotPicker(\'' + slot + '\')" style="background:rgba(255,255,255,0.03);border:1px solid ' + borderCol + ';border-radius:10px;padding:0.6rem 0.4rem;cursor:pointer;transition:border-color 0.2s;min-width:0;">' + inner + '</div>';
+  }).join('');
+
+  megaUpdatePreview();
+  megaRenderMosaic();
+  megaRenderTotals();
+}
+
+function megaUpdatePreview() {
+  var el = document.getElementById('mega-svg-preview');
+  if (!el) return;
+
+  // Build combined traits from all assigned bots
+  // Later slots override earlier for each trait key (last assigned wins per slot)
+  var combined = {};
+  var SLOT_ORDER = ['Background','Cap','Eyes','Face','Spots','Arms','Hands','Legs','Shoes','Pixie','Item','Mouth'];
+  SLOT_ORDER.forEach(function(slot) {
+    if (_megaAssigned[slot] && _megaAssigned[slot].traits) {
+      var t = _megaAssigned[slot].traits;
+      // Each bot contributes its OWN trait for this slot only
+      if (t[slot] !== undefined) combined[slot] = t[slot];
+    }
+  });
+
+  var assignedCount = Object.keys(_megaAssigned).length;
+  if (!assignedCount) {
+    // Default all-white bot
+    el.innerHTML = buildSporebotSVG({}, 104);
+    el.style.boxShadow = 'none';
+    return;
+  }
+
+  // Pick a glow color from the most recently assigned bot's background
+  var lastSlot = SLOT_ORDER.filter(function(s) { return _megaAssigned[s]; }).pop();
+  var glowColor = lastSlot && combined.Background ? sbColor(combined.Background, '#4FA8FD') : '#4FA8FD';
+  el.style.boxShadow = '0 0 14px 2px ' + glowColor + '55';
+  el.innerHTML = buildSporebotSVG(combined, 104);
+}
+
+function megaRenderMosaic() {
+  var mosaic = document.getElementById('mega-mosaic');
+  var emptyMsg = document.getElementById('mega-mosaic-empty');
+  if (!mosaic) return;
+
+  var assigned = Object.values(_megaAssigned);
+  // Remove old img tiles (keep the empty placeholder)
+  Array.from(mosaic.querySelectorAll('.mega-tile')).forEach(function(t) { t.remove(); });
+
+  if (!assigned.length) {
+    if (emptyMsg) emptyMsg.style.display = 'flex';
+    return;
+  }
+  if (emptyMsg) emptyMsg.style.display = 'none';
+
+  // Show up to 9 tiles in a 3x3 grid
+  var slots = assigned.slice(0, 9);
+  // Fill remaining with faded placeholders if < 9
+  var total = 9;
+  for (var i = 0; i < total; i++) {
+    var tile = document.createElement('div');
+    tile.className = 'mega-tile';
+    tile.style.cssText = 'overflow:hidden;background:rgba(255,255,255,0.03);position:relative;';
+    if (slots[i]) {
+      var img = document.createElement('img');
+      img.src = slots[i].image || '';
+      img.alt = slots[i].label || '';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+      img.onerror = function() { this.style.opacity = '0.1'; };
+      // Green dot if has bonus
+      if (slots[i].bonus && slots[i].bonus.val > 0) {
+        var dot = document.createElement('div');
+        dot.style.cssText = 'position:absolute;bottom:2px;right:2px;width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 4px var(--green);';
+        tile.appendChild(dot);
+      }
+      tile.appendChild(img);
+    } else {
+      tile.style.opacity = '0.15';
+      tile.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:rgba(255,255,225,0.3);">+</div>';
+    }
+    mosaic.appendChild(tile);
+  }
+
+  // If more than 9 assigned, show a count badge
+  var extra = assigned.length - 9;
+  if (extra > 0) {
+    var badge = document.createElement('div');
+    badge.className = 'mega-tile';
+    badge.style.cssText = 'position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.7);border-radius:4px;font-family:Syne Mono,monospace;font-size:0.55rem;color:var(--yellow);padding:1px 4px;pointer-events:none;';
+    badge.textContent = '+' + extra;
+    mosaic.appendChild(badge);
+  }
+}
+
+function megaRenderTotals() {
+  var totals = {};
+  Object.values(_megaAssigned).forEach(function(a) {
+    if (a.bonus && a.bonus.stat && a.bonus.val > 0) {
+      totals[a.bonus.stat] = (totals[a.bonus.stat] || 0) + a.bonus.val;
+    }
+  });
+  var entries = Object.entries(totals).filter(function(e) { return e[1] > 0; });
+  var el = document.getElementById('mega-total-stats');
+  var rows = document.getElementById('mega-stats-rows');
+  if (!el || !rows) return;
+  if (!entries.length) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  // Split into 2 columns
+  var half = Math.ceil(entries.length / 2);
+  var col1 = entries.slice(0, half);
+  var col2 = entries.slice(half);
+  var mkRows = function(arr) {
+    return '<div>' + arr.map(function(e) {
+      return '<div class="data-row"><span class="dr-label">' + (STAT_EMOJI[e[0]]||'') + e[0] + '</span><span class="dr-val g">' + fmtBonus(e[0], e[1]) + '</span></div>';
+    }).join('') + '</div>';
+  };
+  rows.innerHTML = mkRows(col1) + mkRows(col2);
+}
+
+function megaOpenSlotPicker(slot) {
+  _megaPickingSlot = slot;
+  var stat = MEGA_SLOT_STAT[slot] || slot;
+  document.getElementById('mega-modal-slot-name').textContent = slot.toUpperCase() + ' SLOT';
+  document.getElementById('mega-modal-stat-name').textContent = 'Looking for: ' + stat;
+  var body = document.getElementById('mega-modal-body');
+  var usedIds = {};
+  Object.entries(_megaAssigned).forEach(function(pair) {
+    if (pair[0] !== slot) usedIds[pair[1].tokenId] = true;
+  });
+
+  var candidates = _sbNfts.filter(function(bot) {
+    if (usedIds[bot.tokenId]) return false;
+    var bonus = megaGetBonusForSlot(slot, bot.traits);
+    return bonus !== null;
+  });
+
+  // Also include bots with no bonus for this slot (user can assign any bot, just won't give bonus)
+  var noBonusBots = _sbNfts.filter(function(bot) {
+    if (usedIds[bot.tokenId]) return false;
+    var bonus = megaGetBonusForSlot(slot, bot.traits);
+    return bonus === null;
+  });
+
+  if (!_sbNfts.length) {
+    body.innerHTML = '<div class="empty-hint">No Sporebot NFTs synced. Run !nft in Discord.</div>';
+    document.getElementById('mega-modal-overlay').style.display = 'flex';
+    return;
+  }
+
+  var mkCard = function(bot, bonus) {
+    var bonusHtml = bonus
+      ? '<div style="font-family:Syne Mono,monospace;font-size:0.65rem;color:var(--green);margin-top:0.25rem;">' + fmtBonus(bonus.stat, bonus.val) + ' ' + bonus.stat + '</div>'
+      : '<div style="font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.2);margin-top:0.25rem;">no bonus for this slot</div>';
+    return '<div onclick="megaAssignSlot(\'' + bot.tokenId + '\')" style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem;border-radius:8px;border:1px solid rgba(255,255,225,0.08);background:rgba(255,255,255,0.02);cursor:pointer;margin-bottom:0.4rem;transition:border-color 0.15s;" onmouseover="this.style.borderColor=\'rgba(255,255,225,0.25)\'" onmouseout="this.style.borderColor=\'rgba(255,255,225,0.08)\'">'
+      + '<img src="' + fixIpfs(bot.image) + '" alt="' + bot.label + '" style="width:44px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0;" onerror="this.style.opacity=\'0.2\'">'
+      + '<div style="flex:1;min-width:0;">'
+      + '<div style="font-family:Syne Mono,monospace;font-size:0.7rem;color:var(--cream);">' + bot.label + '</div>'
+      + bonusHtml
+      + '</div>'
+      + (bonus ? '<div style="font-family:Syne Mono,monospace;font-size:0.65rem;color:var(--green);flex-shrink:0;">Select</div>' : '')
+      + '</div>';
+  };
+
+  var html = '';
+  if (candidates.length) {
+    html += '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.12em;color:var(--green);margin-bottom:0.5rem;">HAS BONUS FOR ' + slot.toUpperCase() + '</div>';
+    html += candidates.map(function(bot) { return mkCard(bot, megaGetBonusForSlot(slot, bot.traits)); }).join('');
+  }
+  if (noBonusBots.length) {
+    html += '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.25);margin:0.75rem 0 0.5rem;">NO BONUS (still assignable)</div>';
+    html += noBonusBots.map(function(bot) { return mkCard(bot, null); }).join('');
+  }
+  if (!html) html = '<div class="empty-hint">All your Sporebots are already assigned to other slots.</div>';
+
+  body.innerHTML = html;
+  document.getElementById('mega-modal-overlay').style.display = 'flex';
+}
+
+function megaAssignSlot(tokenId) {
+  if (!_megaPickingSlot) return;
+  var bot = _sbNfts.find(function(b) { return b.tokenId === tokenId; });
+  if (!bot) return;
+  var bonus = megaGetBonusForSlot(_megaPickingSlot, bot.traits);
+  _megaAssigned[_megaPickingSlot] = { tokenId: tokenId, label: bot.label, image: fixIpfs(bot.image), bonus: bonus };
+  document.getElementById('mega-modal-overlay').style.display = 'none';
+  _megaPickingSlot = null;
+  megaRenderSlots();
+  megaSave();
+}
+
+function megaRemoveSlot(slot) {
+  delete _megaAssigned[slot];
+  megaRenderSlots();
+  megaSave();
+}
+
+function megaSave() {
+  try {
+    var uid = (currentUser && currentUser.discord_id) || 'guest';
+    localStorage.setItem('mega_build_' + uid, JSON.stringify(_megaAssigned));
+    var btn = document.getElementById('mega-save-btn');
+    if (btn) { btn.textContent = 'Saved!'; btn.style.color = 'var(--green)'; btn.style.borderColor = 'var(--green)'; setTimeout(function() { btn.textContent = 'Save Build'; btn.style.color = ''; btn.style.borderColor = ''; }, 1800); }
+  } catch(e) {}
+}
+window.megaSave = megaSave;
+
+function megaLoadSave() {
+  try {
+    var uid = (currentUser && currentUser.discord_id) || 'guest';
+    var saved = localStorage.getItem('mega_build_' + uid);
+    if (saved) _megaAssigned = JSON.parse(saved);
+  } catch(e) { _megaAssigned = {}; }
+}
+
+function megaReset() {
+  _megaAssigned = {};
+  try {
+    var uid = (currentUser && currentUser.discord_id) || 'guest';
+    localStorage.removeItem('mega_build_' + uid);
+  } catch(e) {}
+  megaRenderSlots();
+  var btn = document.getElementById('mega-save-btn');
+  if (btn) { btn.textContent = 'Save Build'; btn.style.color = ''; btn.style.borderColor = ''; }
+}
+window.megaReset = megaReset;
+
+function megaModalClose(e) {
+  if (e.target === document.getElementById('mega-modal-overlay')) {
+    document.getElementById('mega-modal-overlay').style.display = 'none';
+  }
+}
+window.megaModalClose = megaModalClose;
+
+function renderSporebots(s, p) {
+  var wallet    = (p && p.Wallet) || {};
+  var nftWallet = wallet.NFT || {};
+  var active    = (s && s.Inventory && s.Inventory.Active_Sporebot) || s.Active_Sporebot || null;
+
+  renderActiveSporebotCard(active, s);
+
+  var keys = Object.keys(nftWallet).filter(function(k) { return k !== 'total_nft'; });
+  var bots = [];
+  keys.forEach(function(k) {
+    var entry = nftWallet[k];
+    var displayName = k.replace(/ ID\d+$/, '');
+    var tokenMatch  = k.match(/ ID(\d+)$/);
+    var tokenId     = tokenMatch ? tokenMatch[1] : null;
+    var isBot = displayName.includes('SporeBots') || displayName.includes('Sporebot');
+    if (!isBot || !tokenId) return;
+    var image = entry.image || null;
+    if (!image && tokenId) {
+      image = 'https://alchemy.mypinata.cloud/ipfs/QmYh9hwJZNTDy192auvCq1jnpvhmLhAFW4qRRcXSraNntL/' + tokenId + '.png';
+    }
+    bots.push({ tokenId: tokenId, image: fixIpfs(image), traits: entry.traits || {}, label: 'Sporebot #' + tokenId, count: parseInt(entry.count || 1) });
+  });
+
+  bots.sort(function(a, b) { return parseInt(a.tokenId) - parseInt(b.tokenId); });
+
+  _sbNfts = bots;
+  _sbCurrentPage = 0;
+
+  var countEl = document.getElementById('sb-nft-count');
+  if (countEl) countEl.textContent = bots.length ? '(' + bots.length + ')' : '';
+
+  sbRenderPage();
+  megaLoadSave();
+  megaRenderSlots();
 }
 
 async function fetchUserLPPositions(p) {
