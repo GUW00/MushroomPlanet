@@ -1,6 +1,6 @@
 {
   "name": "Mushroom Planet",
-  "short_name": "MushPlanet",
+  "short_name": "Sporebot",
   "description": "Farm dashboard, treasury, governance and token tools",
   "start_url": "/profile.html",
   "display": "standalone",
