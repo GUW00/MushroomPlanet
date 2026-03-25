@@ -478,7 +478,7 @@
     @media(display-mode:standalone) {
       .profile-header {
         flex-direction: row; align-items: center;
-        padding: 1.25rem; gap: 1rem;
+        padding: 1.25rem; gap: 1rem; position: relative;
       }
       .profile-identity { gap: 0.875rem; }
       .profile-avatar { width: 52px; height: 52px; }
@@ -487,7 +487,7 @@
       .profile-sub { font-size: 0.58rem; flex-direction: column; gap: 0.2rem; }
       .profile-badges { gap: 0.3rem; margin-top: 0.3rem; }
       .badge { font-size: 0.52rem; padding: 0.15em 0.5em; }
-      .btn-sm { font-size: 0.55rem; padding: 0.25em 0.65em; }
+      .btn-sm { font-size: 0.55rem; padding: 0.25em 0.65em; position: absolute; top: 0.75rem; right: 0.75rem; }
     }
     @media(min-width: 601px) {
       .ing-grid { grid-template-columns: repeat(4, 1fr) !important; }
