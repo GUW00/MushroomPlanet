@@ -757,7 +757,7 @@
           <div style="display:flex;gap:1.25rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:1rem;">
             <!-- Mega bot preview -->
             <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;flex-shrink:0;">
-              <div id="mega-mosaic" style="width:108px;height:108px;border-radius:12px;border:2px solid rgba(255,255,225,0.15);overflow:hidden;background:rgba(255,255,255,0.04);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:1px;position:relative;">
+              <div id="mega-mosaic" style="width:108px;height:144px;border-radius:12px;border:2px solid rgba(255,255,225,0.15);overflow:hidden;background:rgba(255,255,255,0.04);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:1px;position:relative;">
                 <div id="mega-mosaic-empty" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;">
                   <div style="font-size:1.8rem;opacity:0.2;">🤖</div>
                   <div style="font-family:Syne Mono,monospace;font-size:0.5rem;color:rgba(255,255,225,0.2);text-align:center;">assign bots<br>to preview</div>
@@ -766,7 +766,7 @@
               <div style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);text-align:center;">MEGA BOT</div>
               <div style="display:flex;gap:0.4rem;">
                 <button onclick="megaReset()" style="font-family:Syne Mono,monospace;font-size:0.6rem;color:var(--red);background:none;border:1px solid var(--red);padding:0.2rem 0.6rem;border-radius:5px;cursor:pointer;opacity:0.7;" title="Clear all slots">Reset</button>
-                <button id="mega-save-btn" onclick="megaSave()" style="font-family:Syne Mono,monospace;font-size:0.6rem;color:var(--green);background:none;border:1px solid var(--green);padding:0.2rem 0.6rem;border-radius:5px;cursor:pointer;opacity:0.85;" title="Save current build">Save Build</button>
+                <button id="mega-save-btn" onclick="megaSave()" style="font-family:Syne Mono,monospace;font-size:0.6rem;color:#0f0f0f;background:var(--green);border:1px solid var(--green);padding:0.2rem 0.6rem;border-radius:5px;cursor:pointer;font-weight:700;" title="Save current build">Save Build</button>
               </div>
             </div>
 
@@ -2191,7 +2191,7 @@ function megaRenderMosaic() {
   // Show up to 9 tiles in a 3x3 grid
   var slots = assigned.slice(0, 9);
   // Fill remaining with faded placeholders if < 9
-  var total = 9;
+  var total = 12;
   for (var i = 0; i < total; i++) {
     var tile = document.createElement('div');
     tile.className = 'mega-tile';
@@ -2217,7 +2217,7 @@ function megaRenderMosaic() {
   }
 
   // If more than 9 assigned, show a count badge
-  var extra = assigned.length - 9;
+  var extra = assigned.length - 12;
   if (extra > 0) {
     var badge = document.createElement('div');
     badge.className = 'mega-tile';
@@ -2334,7 +2334,7 @@ function megaSave() {
     var uid = (currentUser && currentUser.discord_id) || 'guest';
     localStorage.setItem('mega_build_' + uid, JSON.stringify(_megaAssigned));
     var btn = document.getElementById('mega-save-btn');
-    if (btn) { btn.textContent = 'Saved!'; btn.style.color = 'var(--green)'; btn.style.borderColor = 'var(--green)'; setTimeout(function() { btn.textContent = 'Save Build'; btn.style.color = ''; btn.style.borderColor = ''; }, 1800); }
+    if (btn) { btn.textContent = 'Saved!'; btn.style.background = 'var(--yellow)'; btn.style.borderColor = 'var(--yellow)'; setTimeout(function() { btn.textContent = 'Save Build'; btn.style.background = 'var(--green)'; btn.style.borderColor = 'var(--green)'; }, 1800); }
   } catch(e) {}
 }
 window.megaSave = megaSave;
