@@ -262,12 +262,12 @@
     .tab-bar .tab { flex-shrink: 0; }
     @media(max-width: 600px) {
       .tab-bar { flex-wrap: wrap; overflow-x: visible; }
-      .tab-bar .tab { flex: 1 1 calc(25% - 0.4rem); min-width: 0; justify-content: center; flex-direction: column; align-items: center; padding: 0.5em 0.2em; font-size: 0.58rem; gap: 0.2rem; }
+      .tab-bar .tab { flex: 1 1 calc(33.333% - 0.4rem); min-width: 0; justify-content: center; flex-direction: column; align-items: center; padding: 0.5em 0.2em; font-size: 0.58rem; gap: 0.2rem; }
       .tab-bar .tab img { width: 14px !important; height: 14px !important; margin-right: 0 !important; }
     }
     @media(display-mode: standalone) {
       .tab-bar { flex-wrap: wrap; overflow-x: visible; }
-      .tab-bar .tab { flex: 1 1 calc(25% - 0.4rem); min-width: 0; justify-content: center; flex-direction: column; align-items: center; padding: 0.5em 0.2em; font-size: 0.58rem; gap: 0.2rem; }
+      .tab-bar .tab { flex: 1 1 calc(33.333% - 0.4rem); min-width: 0; justify-content: center; flex-direction: column; align-items: center; padding: 0.5em 0.2em; font-size: 0.58rem; gap: 0.2rem; }
       .tab-bar .tab img { width: 14px !important; height: 14px !important; margin-right: 0 !important; }
     }
     .tab {
@@ -661,6 +661,7 @@
         <button class="tab" onclick="switchTab('inventory',this)"><img src="/images/backpack1.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Inventory</button>
         <button class="tab" onclick="switchTab('brewing',this)"><img src="/images/potionrecipe.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Brewing</button>
         <button class="tab" onclick="switchTab('pixie',this)"><img src="/images/pixie.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Pixie XP</button>
+        <button class="tab" onclick="switchTab('stats',this)"><img src="/images/apy1.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Stats</button>
       </div>
 
       <!-- FARM TAB -->
@@ -852,6 +853,10 @@
           <div class="card-title"><img src="/images/herbs.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Ingredients</div>
           <div id="brew-ingredients-content"><div class="empty-hint">No ingredients.</div></div>
         </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><img src="/images/gemstones.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Shop Quest Progress</div>
+          <div id="brew-shop-quests"><div class="empty-hint">Loading...</div></div>
+        </div>
       </div>
       <div class="tab-panel reveal" id="tab-pixie">
         <div class="info-card">
@@ -893,6 +898,21 @@
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/badge.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Achievements</div>
           <div id="achievements-content"><div class="empty-hint">No achievements yet.</div></div>
+        </div>
+      </div>
+    <!-- STATS TAB -->
+      <div class="tab-panel reveal" id="tab-stats">
+        <div class="info-card">
+          <div class="card-title"><img src="/images/shroomfarm.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Farm Bonuses</div>
+          <div id="stats-farm-content"><div class="empty-hint">Loading...</div></div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><img src="/images/herbs.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Skills</div>
+          <div id="stats-skills-content"><div class="empty-hint">Loading...</div></div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><img src="/images/spore.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Wallet Overview</div>
+          <div id="stats-wallet-content"><div class="empty-hint">Loading...</div></div>
         </div>
       </div>
     </div><!-- /panel-discord -->
@@ -1367,6 +1387,8 @@ function renderProfile() {
   renderCompanion(s);
   renderInventory(s);
   renderBrewing(s);
+  renderShopQuests(s, p);
+  renderStats(s, p);
   renderPixie(p);
   renderReddit(s, p);
 }
@@ -3067,6 +3089,176 @@ function renderBrewing(s) {
   } else { ingEl.innerHTML = '<div class="empty-hint">No ingredients. Use !gather or !cave.</div>'; }
 }
 
+function renderShopQuests(s, p) {
+  const el = document.getElementById('brew-shop-quests');
+  if (!el) return;
+  const rhizo  = s.Rhizo  || {};
+  const mycelia = s.Mycelia || {};
+  const items  = (s.Inventory || {}).Items || {};
+  const skills = s.Skills || {};
+  const herbLvl = skills.Herbology?.Level || skills.Herbology?.level || 1;
+
+  const RHIZO_GOAL = 4200000;
+  const rhizoSold   = rhizo.total_spores_value_sold || 0;
+  const hasRootSong = rhizo.has_rootsong_gemstone || items.rootsong_gemstone || false;
+  const hasSunspore = items.sunspore_gemstone || false;
+  const hasSpirit   = items.spirit_gemstone || false;
+
+  const potions = (s.Inventory || {}).Potions || {};
+  let bestScore = 0;
+  for (let i = 1; i <= 5; i++) {
+    const slot = potions['Potion_' + i];
+    if (slot && typeof slot === 'object') {
+      const sc = slot['Potion Score'] || 0;
+      if (sc > bestScore) bestScore = sc;
+    }
+  }
+
+  const img = (src) => '<img src="/images/' + src + '" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;margin-right:5px;" onerror="this.style.display=\'none\'">';
+
+  const questBlock = (icon, title, desc, pct, color, done) => {
+    const barColor = done ? 'var(--green)' : (color || 'var(--yellow)');
+    const statusBadge = done
+      ? '<span style="font-family:Syne Mono,monospace;font-size:0.6rem;color:var(--green);padding:0.1em 0.5em;border:1px solid rgba(34,197,94,0.3);border-radius:999px;flex-shrink:0;">COMPLETE</span>'
+      : '';
+    return '<div style="padding:0.75rem 0;border-bottom:1px solid rgba(255,255,225,0.05);">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem;">'
+      + '<span style="font-size:0.82rem;font-weight:600;display:flex;align-items:center;color:' + (done ? 'rgba(255,255,225,0.5)' : 'var(--cream)') + ';">' + icon + title + '</span>'
+      + statusBadge
+      + '</div>'
+      + '<div style="font-family:Syne Mono,monospace;font-size:0.65rem;color:rgba(255,255,225,0.4);margin-bottom:0.4rem;">' + desc + '</div>'
+      + '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
+      + '<div style="height:100%;width:' + Math.min(100, Math.round(pct)) + '%;background:' + barColor + ';border-radius:999px;transition:width 1s ease;"></div>'
+      + '</div></div>';
+  };
+
+  const rhizoPct  = hasRootSong ? 100 : Math.min(100, (rhizoSold / RHIZO_GOAL) * 100);
+  const herbPct   = Math.min(100, (herbLvl / 100) * 100);
+  const spiritPct = hasSpirit ? 100 : Math.min(100, (bestScore / 10) * 100);
+
+  el.innerHTML = '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.75rem;">Complete shop challenges to earn +5% SGR gemstones</div>'
+    + questBlock(img('rootsong_gemstone.png'), "Rhizo's Rootsong",
+        hasRootSong ? 'Gemstone owned - Rhizo now pays SPORES for gems!' : rhizoSold.toLocaleString() + ' / ' + RHIZO_GOAL.toLocaleString() + ' SPORES worth of gems sold',
+        rhizoPct, 'var(--green)', hasRootSong)
+    + questBlock(img('sunspore_gemstone.png'), 'Sunspore Gemstone',
+        hasSunspore ? 'Gemstone owned (+5% SGR)' : 'Herbology Level ' + herbLvl + ' / 100 - reach Lv.100 to unlock',
+        herbPct, 'var(--yellow)', hasSunspore)
+    + questBlock(img('spirit_gemstone.png'), 'Spirit Gemstone',
+        hasSpirit ? 'Gemstone owned (+5% SGR)' : 'Best stored potion score: ' + bestScore.toFixed(1) + ' / 10',
+        spiritPct, 'var(--purple)', hasSpirit);
+}
+
+function renderStats(s, p) {
+  const farm    = s.Farm    || {};
+  const inv     = s.Inventory || {};
+  const potions = inv.Potions || {};
+  const active  = (inv.Active_Sporebot) || s.Active_Sporebot || null;
+  const wallet  = p.Wallet || {};
+  const nftWallet = wallet.NFT || {};
+
+  const farmEl    = document.getElementById('stats-farm-content');
+  const skillsEl  = document.getElementById('stats-skills-content');
+  const walletEl  = document.getElementById('stats-wallet-content');
+
+  const img = (src) => '<img src="/images/' + src + '" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;margin-right:5px;" onerror="this.style.display=\'none\'">';
+  const row = (label, val, color) =>
+    '<div class="data-row"><span class="dr-label">' + label + '</span><span class="dr-val' + (color ? ' ' + color : '') + '">' + val + '</span></div>';
+
+  // ---- 1. COMBINED BONUS GRID (from active sporebot NFT traits + potion) ----
+  // Mirrors the !home bonus display exactly
+  const BONUS_STATS = [
+    { key: 'Spore Yield',        img: 'spore.png' },
+    { key: 'Harvest Bonus',      img: 'shroomfarm.png' },
+    { key: 'Queen Totem Chance', img: 'queen.png' },
+    { key: 'King Totem Chance',  img: 'king.png' },
+    { key: 'Kid Totem Chance',   img: 'kidshroom.png' },
+    { key: 'Gold Totem Chance',  img: 'gold_totem.png' },
+    { key: 'Scroll Find Rate',   img: 'scroll.png' },
+    { key: 'Artifact Discovery', img: 'artifact.png' },
+    { key: 'Rare Herb Chance',   img: 'clover.png' },
+    { key: 'Double Herb Chance', img: 'boost.png' },
+    { key: 'Herb Find Rate',     img: 'herbs.png' },
+    { key: 'Extra Brews',        img: 'potion2.png' },
+    { key: 'Plant Limit',        img: 'shroomfarm.png' },
+  ];
+
+  // Accumulate bonuses from active sporebot traits
+  const totals = {};
+  const addB = (stat, val) => { if (!stat || !val) return; totals[stat] = (totals[stat] || 0) + val; };
+
+  // Add potion bonus stats (Active_Potion fields)
+  const activePotion = potions.Active_Potion;
+  let potionHtml = '';
+  if (activePotion && typeof activePotion === 'object') {
+    const potionId = (activePotion.emoji||'').match(/:potion(\d+):/)?.[1] || (activePotion.emoji||'').match(/:(\d+)>/)?.[1];
+    const potionSrc = potionId ? '/images/potion' + potionId + '.png' : '/images/potion2.png';
+    const score = activePotion['Potion Score'];
+    const cleanName = String(activePotion.name||'').replace(/<:[^:]+:\d+>/g,'').trim();
+    const potionStats = Object.entries(activePotion)
+      .filter(([k]) => !['name','emoji','Potion Score','Potion_Score'].includes(k))
+      .map(([k, v]) => {
+        const statLabel = k.replace(/_/g,' ');
+        return '<div class="data-row"><span class="dr-label">' + (STAT_EMOJI[statLabel]||img('spore.png')) + statLabel + '</span><span class="dr-val g">+' + (typeof v==='number'?v+'%':v) + '</span></div>';
+      }).join('');
+    potionHtml = '<div style="margin-bottom:0.75rem;padding:0.75rem;background:rgba(192,132,252,0.06);border:1px solid rgba(192,132,252,0.2);border-radius:0.75rem;">'
+      + '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">'
+      + '<img src="' + potionSrc + '" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+      + '<span style="font-family:Syne Mono,monospace;font-size:0.65rem;color:var(--purple);letter-spacing:0.1em;">YOUR ACTIVE POTION</span>'
+      + '</div>'
+      + '<div style="font-size:0.82rem;font-weight:600;color:var(--cream);margin-bottom:0.5rem;">' + cleanName + (score ? ' (' + Number(score).toFixed(1) + '/10)' : '') + '</div>'
+      + potionStats
+      + '</div>';
+  }
+
+  // Active sporebot card
+  let sporebotHtml = '';
+  if (active && active.token_id) {
+    const traits = active.traits || {};
+    const traitSlots = ['Arms','Background','Cap','Item','Pixie','Mouth','Eyes','Face','Spots','Hands','Legs','Shoes'];
+    const traitPills = traitSlots.filter(sl => traits[sl] && traits[sl] !== 'Common').map(sl => {
+      const tv = traits[sl];
+      const isRare = tv.includes('Legendary') || tv.includes('Rare') || tv.includes('Blue') || tv.includes('Pink');
+      if (!isRare) return '';
+      const tc = tv.includes('Legendary') ? 'var(--yellow)' : tv.includes('Super') ? 'var(--purple)' : tv.includes('Rare') ? 'var(--red)' : 'var(--blue)';
+      const bonus = megaGetBonusForSlot(sl, traits);
+      return '<div style="display:flex;flex-direction:column;gap:0.1rem;padding:0.4rem 0.6rem;border-radius:0.5rem;background:rgba(255,255,255,0.03);border:1px solid ' + tc + '22;">'
+        + '<span style="font-family:Syne Mono,monospace;font-size:0.6rem;color:' + tc + ';">' + sl + ': ' + tv + '</span>'
+        + (bonus ? '<span style="font-family:Syne Mono,monospace;font-size:0.62rem;color:var(--green);">+' + (bonus.stat === 'Plant Limit' ? (bonus.val/1000000).toFixed(1)+'M limit' : bonus.val + (bonus.stat.includes('Chance')||bonus.stat.includes('Rate')||bonus.stat.includes('Bonus')||bonus.stat.includes('Yield')?'%':'')) + ' ' + bonus.stat + '</span>' : '')
+        + '</div>';
+    }).filter(Boolean).join('');
+
+    sporebotHtml = '<div style="margin-bottom:0.75rem;padding:0.75rem;background:rgba(79,168,253,0.06);border:1px solid rgba(79,168,253,0.2);border-radius:0.75rem;">'
+      + '<div style="font-family:Syne Mono,monospace;font-size:0.65rem;color:var(--blue);letter-spacing:0.1em;margin-bottom:0.5rem;">'
+      + img('sporebot_helper.png') + 'YOUR ACTIVE SPOREBOT (' + (active.title || 'Sporebot #' + active.token_id) + ')'
+      + '</div>'
+      + (traitPills ? '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;">' + traitPills + '</div>' : '<div class="empty-hint" style="padding:0.5rem 0;font-size:0.65rem;">No rare traits on active Sporebot.</div>')
+      + '</div>';
+  }
+
+  // Combined bonus grid — all stats in 3-column grid
+  const bonusEntries = BONUS_STATS.map(b => {
+    const val = totals[b.key] || 0;
+    const fmt2 = b.key === 'Plant Limit'
+      ? '+' + (val/1000000).toFixed(1) + 'M'
+      : (val > 0 ? '+' : '') + val + (b.key.includes('Chance')||b.key.includes('Rate')||b.key.includes('Bonus')||b.key.includes('Yield')?'%':'');
+    const color = val > 0 ? 'var(--green)' : 'rgba(255,255,225,0.2)';
+    return '<div style="padding:0.5rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;">'
+      + '<div style="display:flex;align-items:center;gap:0.3rem;font-size:0.75rem;color:rgba(255,255,225,0.6);margin-bottom:0.2rem;">' + img(b.img) + b.key + '</div>'
+      + '<div style="font-family:Syne Mono,monospace;font-size:0.9rem;font-weight:700;color:' + color + ';">' + fmt2 + '</div>'
+      + '</div>';
+  });
+
+  const bonusGrid = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin-bottom:0.75rem;">' + bonusEntries.join('') + '</div>';
+
+  if (farmEl) {
+    farmEl.innerHTML = '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.75rem;">These are your current bonuses from items and your active potion:</div>'
+      + bonusGrid
+  }
+
+  // Hide the other two cards since we don't need them
+  if (skillsEl) skillsEl.closest('.info-card').style.display = 'none';
+  if (walletEl) walletEl.closest('.info-card').style.display = 'none';
+}
 function renderPixie(p) {
   const pixie  = p.Pixie       || {};
   const msgXp  = p.Message_XP  || {};
