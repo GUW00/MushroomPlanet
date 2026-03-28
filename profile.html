@@ -887,37 +887,83 @@
       <div class="tab-panel reveal" id="tab-pixie">
         <div class="info-card">
           <div class="card-title"><img src="/images/pixie.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Pixie Stats</div>
-          <div class="data-grid" style="grid-template-columns:1fr 1fr;align-items:start;">
-            <div>
-              <div class="data-row"><span class="dr-label">Level</span><span class="dr-val g" id="px-level">—</span></div>
-              <div class="data-row"><span class="dr-label">Total XP</span><span class="dr-val b" id="px-xp">—</span></div>
-              <div class="data-row"><span class="dr-label">Flair Rank</span><span class="dr-val p" id="px-flair">—</span></div>
-              <div class="data-row"><span class="dr-label">GS Tokens</span><span class="dr-val y" id="px-gs-tokens">—</span></div>
-              <div class="data-row"><span class="dr-label">GS Given</span><span class="dr-val y" id="px-gs-given">—</span></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.75rem;">
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Level</div>
+              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--green);" id="px-level">—</div>
             </div>
-            <div>
-              <div class="data-row"><span class="dr-label">Msg Streak</span><span class="dr-val" id="px-streak">—</span></div>
-              <div class="data-row"><span class="dr-label">Max Msg Streak</span><span class="dr-val" id="px-maxstreak">—</span></div>
-              <div class="data-row"><span class="dr-label">Social Butterfly</span><span class="dr-val g" id="px-social">—</span></div>
-              <div class="data-row"><span class="dr-label">Verified</span><span class="dr-val" id="px-verified">—</span></div>
-              <div class="data-row"><span class="dr-label">GS Received</span><span class="dr-val y" id="px-gs-received">—</span></div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Total XP</div>
+              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--blue);" id="px-xp">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Flair Rank</div>
+              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--purple);" id="px-flair">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">GS Tokens</div>
+              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--yellow);" id="px-gs-tokens">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">GS Given</div>
+              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--yellow);" id="px-gs-given">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">GS Received</div>
+              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--yellow);" id="px-gs-received">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Msg Streak</div>
+              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--cream);" id="px-streak">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Max Streak</div>
+              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--cream);" id="px-maxstreak">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Social Butterfly</div>
+              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--green);" id="px-social">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Verified</div>
+              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--cream);" id="px-verified">—</div>
             </div>
           </div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/gift.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Tipping & Community</div>
-          <div class="data-grid" style="grid-template-columns:1fr 1fr;align-items:start;">
-            <div>
-              <div class="data-row"><span class="dr-label">Tips Given</span><span class="dr-val" id="px-tip-given">—</span></div>
-              <div class="data-row"><span class="dr-label">Tips Received</span><span class="dr-val" id="px-tip-recv">—</span></div>
-              <div class="data-row"><span class="dr-label">Raffles Given</span><span class="dr-val" id="px-raf-given">—</span></div>
-              <div class="data-row"><span class="dr-label">Raffles Received</span><span class="dr-val" id="px-raf-recv">—</span></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.75rem;">
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Tips Given</div>
+              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-tip-given">—</div>
             </div>
-            <div>
-              <div class="data-row"><span class="dr-label">Airdrops Given</span><span class="dr-val" id="px-air-given">—</span></div>
-              <div class="data-row"><span class="dr-label">Airdrops Received</span><span class="dr-val" id="px-air-recv">—</span></div>
-              <div class="data-row"><span class="dr-label">Total Given</span><span class="dr-val" id="px-total-given">—</span></div>
-              <div class="data-row"><span class="dr-label">Total Received</span><span class="dr-val" id="px-total-rec">—</span></div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Tips Received</div>
+              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-tip-recv">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Raffles Given</div>
+              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-raf-given">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Raffles Received</div>
+              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-raf-recv">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Airdrops Given</div>
+              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-air-given">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Airdrops Received</div>
+              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-air-recv">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Total Given</div>
+              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-total-given">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Total Received</div>
+              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-total-rec">—</div>
             </div>
           </div>
         </div>
