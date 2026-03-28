@@ -953,6 +953,36 @@
     <div id="panel-wallet" style="display:none;">
       <div class="info-card reveal">
         <div class="card-title">
+          <img src="/images/blockchain.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Token Contracts
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.25rem;">
+          <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:0.75rem;padding:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.5rem;">
+              <img src="/images/shroom.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'">
+              <span style="font-size:0.82rem;font-weight:600;color:var(--red);">SHROOM</span>
+            </div>
+            <div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.45);margin-bottom:0.5rem;word-break:break-all;">0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1</div>
+            <div style="display:flex;gap:0.4rem;">
+              <button onclick="navigator.clipboard.writeText('0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})" style="flex:1;font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:transparent;color:rgba(255,255,225,0.5);cursor:pointer;">Copy</button>
+              <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="flex:1;font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25em 0;border-radius:999px;border:1px solid rgba(253,70,79,0.3);color:var(--red);text-decoration:none;text-align:center;">Polygon ↗</a>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:0.75rem;padding:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.5rem;">
+              <img src="/images/spore.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'">
+              <span style="font-size:0.82rem;font-weight:600;color:var(--blue);">SPORE</span>
+            </div>
+            <div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.45);margin-bottom:0.5rem;word-break:break-all;">0x089582AC20ea563c69408a79E1061de594b61bED</div>
+            <div style="display:flex;gap:0.4rem;">
+              <button onclick="navigator.clipboard.writeText('0x089582AC20ea563c69408a79E1061de594b61bED').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})" style="flex:1;font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:transparent;color:rgba(255,255,225,0.5);cursor:pointer;">Copy</button>
+              <a href="https://polygonscan.com/token/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="flex:1;font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25em 0;border-radius:999px;border:1px solid rgba(79,168,253,0.3);color:var(--blue);text-decoration:none;text-align:center;">Polygon ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-card reveal" style="margin-top:1rem;">
+        <div class="card-title">
           <img src="/images/discord.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
           Discord Wallet
         </div>
@@ -2575,9 +2605,9 @@ async function fetchUserLPPositions(p) {
   lpEl.innerHTML = '<div style="font-family:Space Grotesk,monospace;font-size:0.7rem;color:rgba(255,255,225,0.25);padding:0.5rem 0;">Checking LP positions...</div>';
 
   const LP_POOLS = [
-    { label: 'WETH / SHROOM',  contract: '0x28def03d8dc0d186fabae9c46043e8ef9bffcc28', token0: 'WETH', token1: 'SHROOM',  img0: '/images/eth.png', img1: '/images/shroom.png', color0: '#9b8cff', color1: 'var(--red)' },
-    { label: 'SPORE / WETH',   contract: '0x2a91571238303c6700a9336342c754e159243168', token0: 'SPORE',  token1: 'WETH',  img0: '/images/spore.png',  img1: '/images/eth.png',   color0: 'var(--blue)', color1: '#9b8cff' },
-    { label: 'SPORE / SHROOM', contract: '0xc373382eec590374278534494109a0cdae1fbbc8', token0: 'SPORE',  token1: 'SHROOM',img0: '/images/spore.png',  img1: '/images/shroom.png',color0: 'var(--blue)', color1: 'var(--red)' },
+    { label: 'WETH / SHROOM',  contract: '0x28def03d8dc0d186fabae9c46043e8ef9bffcc28', token0: 'WETH', token1: 'SHROOM',  img0: '/images/eth.png', img1: '/images/shroom.png', color0: '#9b8cff', color1: 'var(--red)',  url: 'https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1', scan: 'https://polygonscan.com/token/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28#balances' },
+    { label: 'SPORE / WETH',   contract: '0x2a91571238303c6700a9336342c754e159243168', token0: 'SPORE',  token1: 'WETH',  img0: '/images/spore.png',  img1: '/images/eth.png',   color0: 'var(--blue)', color1: '#9b8cff', url: 'https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED', scan: 'https://polygonscan.com/token/0x2a91571238303c6700a9336342c754e159243168#balances' },
+    { label: 'SPORE / SHROOM', contract: '0xc373382eec590374278534494109a0cdae1fbbc8', token0: 'SPORE',  token1: 'SHROOM',img0: '/images/spore.png',  img1: '/images/shroom.png',color0: 'var(--blue)', color1: 'var(--red)', url: 'https://dapp.quickswap.exchange/swap/best/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1/0x089582AC20ea563c69408a79E1061de594b61bED', scan: 'https://polygonscan.com/token/0xc373382eec590374278534494109a0cdae1fbbc8#balances' },
   ];
 
   const balOf = '0x70a08231';
@@ -2639,12 +2669,13 @@ async function fetchUserLPPositions(p) {
   lpEl.innerHTML = results.map(({ pool, sharePct, token0Bal, token1Bal, fmtV }) =>
     '<div class="data-row" style="flex-direction:column;align-items:flex-start;gap:0.35rem;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,225,0.05);">'
     + '<div style="display:flex;align-items:center;justify-content:space-between;width:100%;">'
-    + '<span style="font-family:Space Grotesk,monospace;font-size:0.72rem;">'
+    + '<a href="' + pool.url + '" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.72rem;text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;">'
     + '<span style="color:' + pool.color0 + ';">' + pool.token0 + '</span>'
-    + '<span style="color:rgba(255,255,225,0.25);margin:0 0.3rem;">/</span>'
+    + '<span style="color:rgba(255,255,225,0.25);">/</span>'
     + '<span style="color:' + pool.color1 + ';">' + pool.token1 + '</span>'
-    + '</span>'
-    + '<span style="font-family:Space Grotesk,monospace;font-size:0.72rem;color:var(--yellow);">' + sharePct + '% of pool</span>'
+    + '<span style="color:rgba(255,255,225,0.2);font-size:0.6rem;">↗</span>'
+    + '</a>'
+    + '<a href="' + pool.scan + '" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.72rem;color:var(--yellow);text-decoration:none;">' + sharePct + '% of pool ↗</a>'
     + '</div>'
     + (token0Bal !== null
         ? '<div style="display:flex;gap:1.5rem;font-family:Space Grotesk,monospace;font-size:0.75rem;">'
