@@ -887,81 +887,39 @@
       <div class="tab-panel reveal" id="tab-pixie">
         <div class="info-card">
           <div class="card-title"><img src="/images/pixie.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Pixie Stats</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.75rem;">
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Level</div>
-              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--green);" id="px-level">—</div>
+          <div class="data-grid" style="grid-template-columns:1fr 1fr;">
+            <div>
+              <div class="data-row"><span class="dr-label">Level</span><span class="dr-val g" id="px-level">—</span></div>
+              <div class="data-row"><span class="dr-label">Total XP</span><span class="dr-val b" id="px-xp">—</span></div>
+              <div class="data-row"><span class="dr-label">Flair Rank</span><span class="dr-val p" id="px-flair">—</span></div>
+              <div class="data-row"><span class="dr-label">GS Tokens</span><span class="dr-val y" id="px-gs-tokens">—</span></div>
+              <div class="data-row"><span class="dr-label">GS Given</span><span class="dr-val y" id="px-gs-given">—</span></div>
             </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Total XP</div>
-              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--blue);" id="px-xp">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Flair Rank</div>
-              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--purple);" id="px-flair">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">GS Tokens</div>
-              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--yellow);" id="px-gs-tokens">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">GS Given</div>
-              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--yellow);" id="px-gs-given">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">GS Received</div>
-              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--yellow);" id="px-gs-received">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Msg Streak</div>
-              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--cream);" id="px-streak">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Max Streak</div>
-              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--cream);" id="px-maxstreak">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Social Butterfly</div>
-              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--green);" id="px-social">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Verified</div>
-              <div style="font-family:Syne Mono,monospace;font-size:1rem;font-weight:700;color:var(--cream);" id="px-verified">—</div>
+            <div>
+              <div class="data-row"><span class="dr-label">Msg Streak</span><span class="dr-val" id="px-streak">—</span></div>
+              <div class="data-row"><span class="dr-label">Max Streak</span><span class="dr-val" id="px-maxstreak">—</span></div>
+              <div class="data-row"><span class="dr-label">Social Butterfly</span><span class="dr-val g" id="px-social">—</span></div>
+              <div class="data-row"><span class="dr-label">Verified</span><span class="dr-val" id="px-verified">—</span></div>
+              <div class="data-row"><span class="dr-label">GS Received</span><span class="dr-val y" id="px-gs-received">—</span></div>
             </div>
           </div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/gift.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Tipping & Community</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.75rem;">
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Tips Given</div>
-              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-tip-given">—</div>
+          <div class="data-grid" style="grid-template-columns:1fr 1fr;align-items:start;">
+            <div>
+              <div class="data-row"><span class="dr-label">Tips Given</span><span class="dr-val" id="px-tip-given">—</span></div>
+              <div class="data-row"><span class="dr-label">Tips Received</span><span class="dr-val" id="px-tip-recv">—</span></div>
+              <div class="data-row"><span class="dr-label">Raffles Given</span><span class="dr-val" id="px-raf-given">—</span></div>
+              <div class="data-row"><span class="dr-label">Raffles Received</span><span class="dr-val" id="px-raf-recv">—</span></div>
             </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Tips Received</div>
-              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-tip-recv">—</div>
+            <div>
+              <div class="data-row"><span class="dr-label">Airdrops Given</span><span class="dr-val" id="px-air-given">—</span></div>
+              <div class="data-row"><span class="dr-label">Airdrops Received</span><span class="dr-val" id="px-air-recv">—</span></div>
+              <div class="data-row"><span class="dr-label">Total Given</span><span class="dr-val" id="px-total-given">—</span></div>
+              <div class="data-row"><span class="dr-label">Total Received</span><span class="dr-val" id="px-total-rec">—</span></div>
             </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Raffles Given</div>
-              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-raf-given">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Raffles Received</div>
-              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-raf-recv">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Airdrops Given</div>
-              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-air-given">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Airdrops Received</div>
-              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-air-recv">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
-              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Total Given</div>
-              <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-total-given">—</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.625rem;padding:0.6rem 0.75rem;">
+          </div>
               <div style="font-family:Syne Mono,monospace;font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Total Received</div>
               <div style="font-family:Syne Mono,monospace;font-size:0.85rem;font-weight:700;" id="px-total-rec">—</div>
             </div>
@@ -2029,8 +1987,8 @@ function renderActiveSporebotCard(active, s) {
     var tv = traits[sl];
     var isRare = tv.includes('Legendary') || tv.includes('Rare') || tv.includes('Blue') || tv.includes('Pink');
     var tc = tv.includes('Legendary') ? 'var(--yellow)' : tv.includes('Super') ? 'var(--purple)' : tv.includes('Rare') ? 'var(--red)' : (tv.includes('Blue')||tv.includes('Pink')) ? 'var(--blue)' : 'rgba(255,255,225,0.25)';
-    return '<span style="display:inline-flex;align-items:center;gap:0.25rem;font-family:Syne Mono,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:999px;border:1px solid ' + tc + ';color:' + tc + ';opacity:' + (isRare?'1':'0.45') + ';">'
-      + '<span style="font-size:0.55rem;opacity:0.6;">' + sl + '</span> ' + tv
+    return '<span style="display:inline-flex;align-items:center;gap:0.25rem;font-family:Space Grotesk,sans-serif;font-size:0.62rem;padding:0.2rem 0.5rem;border-radius:999px;border:1px solid ' + tc + ';color:' + tc + ';opacity:' + (isRare?'1':'0.45') + ';">'
+      + '<span style="font-size:0.58rem;color:rgba(255,255,225,0.65);font-family:Space Grotesk,sans-serif;">' + sl + '</span> ' + tv
       + '</span>';
   }).join('');
 
@@ -3095,7 +3053,7 @@ function renderItemsOrganized(s) {
 
   // ---- SECTION HEADER ----
   function secHdr(label, imgSrc) {
-    return '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.3);margin:1rem 0 0.5rem;display:flex;align-items:center;gap:0.4rem;">'
+    return '<div style="font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,225,0.6);margin:1rem 0 0.5rem;display:flex;align-items:center;gap:0.4rem;">'
       + img(imgSrc, 12) + label + '</div>';
   }
 
@@ -3108,7 +3066,7 @@ function renderItemsOrganized(s) {
       + '<img src="/images/' + imgSrc + '" style="width:18px;height:18px;object-fit:contain;flex-shrink:0;margin-top:1px;opacity:' + (owned?'1':'0.35') + ';" onerror="this.style.display=\'none\'">'
       + '<div>'
       + '<div style="font-size:0.82rem;font-weight:600;color:' + lblCol + ';">' + label + '</div>'
-      + '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);margin-top:0.1rem;line-height:1.5;">' + earnText + '</div>'
+      + '<div style="font-family:Space Grotesk,sans-serif;font-size:0.68rem;color:rgba(255,255,225,0.5);margin-top:0.15rem;line-height:1.5;">' + earnText + '</div>'
       + '</div></div>'
       + '<span style="font-family:Syne Mono,monospace;font-size:0.65rem;font-weight:700;color:' + (owned ? (color||'var(--green)') : 'rgba(255,255,225,0.15)') + ';flex-shrink:0;margin-left:0.5rem;margin-top:2px;">' + (owned ? 'Owned' : 'Locked') + '</span>'
       + '</div>';
