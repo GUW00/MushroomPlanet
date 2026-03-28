@@ -3380,7 +3380,7 @@ function renderDig(s) {
   });
 
   html += '<div style="margin-top:0.75rem;padding:0.75rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:0.75rem;font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(255,255,225,0.4);line-height:1.7;">'
-    + 'You can only dig <b style="color:var(--cream);">once per day</b>. Requires a Golden Shovel (earned at 7-day forage streak).<br>'
+    + 'You can only dig <b style="color:var(--cream);">You can use !dig once per day</b>. Requires a Golden Shovel (earned at 7-day forage streak).<br>'
     + 'The Golden Chest resets on the <b style="color:var(--cream);">1st of each month</b> and can only be won once per month.<br>'
     + 'Coin rewards = 10% of a randomly chosen token from the community reward pool.'
     + '</div>';
@@ -3683,10 +3683,11 @@ function renderStats(s, p) {
       const items2 = (s.Inventory || {}).Items || {};
       const hasFeather2 = !!(items2.Feather);
       const hasShovel2  = !!(items2.Golden_Shovel);
-      const mul = hasFeather2 ? 2 : 1;
-      const bW = 10*mul, sW = 5*mul, gW = 1*mul, tot = 978*mul + 5*mul + 1*mul + bW + sW + gW;
+      const hasAnimalGem2 = !!(items2.animal_gemstone);
+      const mul = (hasFeather2 || hasAnimalGem2) ? 2 : 1;
+      const bW = 10*mul, sW = 5*mul, gW = 1*mul, tot = 978 + 5 + 1 + bW + sW + gW;
       const pct2 = (w) => ((w/tot)*100);
-      const fmtPct = (w) => pct2(w) < 1 ? pct2(w).toFixed(2)+'%' : Math.round(pct2(w))+'%';
+      const fmtPct = (w) => pct2(w) < 0.5 ? pct2(w).toFixed(2)+'%' : Math.round(pct2(w))+'%';
       const img2 = (src) => '<img src="/images/'+src+'" style="width:16px;height:16px;object-fit:contain;margin-right:6px;vertical-align:middle;" onerror="this.style.display=\'none\'">';
       const chests = [
         { img:'bronzetreasure.png', label:'Bronze Chest',  detail:'10,000 SHROOMS',                       w:bW, color:'#CD7F32' },
@@ -3699,9 +3700,11 @@ function renderStats(s, p) {
           + img2('shovel.png') + 'Requires a <b>Golden Shovel</b> - earned at 7-day !forage streak'
           + '</div>';
       }
-      if (hasFeather2) {
+      if (hasFeather2 || hasAnimalGem2) {
+        const doubleSource = hasFeather2 ? 'Mystical Feather' : 'Mystical Gemstone';
+        const doubleImg = hasFeather2 ? 'feather.png' : 'mystical_gemstone.png';
         html += '<div style="background:rgba(254,206,0,0.07);border:1px solid rgba(254,206,0,0.25);border-radius:0.625rem;padding:0.6rem 0.875rem;margin-bottom:0.75rem;font-family:Space Grotesk,monospace;font-size:0.65rem;color:var(--yellow);display:flex;align-items:center;gap:0.5rem;">'
-          + img2('feather.png') + '<b>Mystical Feather Active</b> - Chest odds doubled!'
+          + img2(doubleImg) + '<b>' + doubleSource + ' Active</b> - Chest odds doubled!'
           + '</div>';
       }
       chests.forEach(function(c) {
@@ -3713,7 +3716,7 @@ function renderStats(s, p) {
           + '</div></div>';
       });
       html += '<div style="margin-top:0.75rem;padding:0.75rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:0.625rem;font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);line-height:1.7;">'
-        + 'Once per day. Golden Chest resets on the <b style="color:var(--cream);">1st of each month</b> and can only be won once per month.'
+        + 'Use !dig once per day. The 1 Million Shroom Golden Chest resets on the <b style="color:var(--cream);">1st of each month</b> and can only be won once per month.'
         + '</div>';
     } else if (!sources.length) {
       var normKeyOuter2 = statKey.replace(/ /g,'_');
@@ -3803,7 +3806,8 @@ function renderStats(s, p) {
         const digItems = (s.Inventory || {}).Items || {};
         let displayVal;
         if (isDig) {
-          displayVal = digItems.Golden_Shovel ? (digItems.Feather ? '2x odds' : 'Unlocked') : 'Locked';
+          const hasDigDouble = digItems.Feather || digItems.animal_gemstone;
+          displayVal = digItems.Golden_Shovel ? (hasDigDouble ? '2x odds' : 'Unlocked') : 'Locked';
         } else if (isLimit) {
           const onchainBal2 = parseInt((p.Wallet?.Onchain?.shroom_balance) || 0);
           const onchainB2 = Math.floor(onchainBal2 / 100000) * 100000;
