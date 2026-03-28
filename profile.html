@@ -849,7 +849,7 @@
       <!-- INVENTORY TAB -->
       <div class="tab-panel reveal" id="tab-inventory">
         <div class="info-card">
-          <div class="card-title"><img src="/images/backpacks.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Items</div>
+          <div class="card-title"><img src="/images/backpack1.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Items</div>
           <div id="items-content"><div class="empty-hint">No items yet.</div></div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
@@ -857,7 +857,7 @@
           <div class="gem-row" id="gems-content"></div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><img src="/images/artifact.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Artifacts & Scrolls <img src="/images/scroll.png" style="width:14px;height:14px;object-fit:contain;margin-left:2px;" onerror="this.style.display='none'"></div>
+          <div class="card-title"><img src="/images/artifacts.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Artifacts & Scrolls <img src="/images/scroll.png" style="width:14px;height:14px;object-fit:contain;margin-left:2px;" onerror="this.style.display='none'"></div>
           <div id="artifacts-content"><div class="empty-hint">None found yet. Use !explore to discover.</div></div>
         </div>
       </div>
@@ -1065,15 +1065,14 @@
           <div class="data-grid">
             <div>
               <div class="data-row"><span class="dr-label"><img src="/images/shroom.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total Fed</span><span class="dr-val g" id="r-total-fed">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/streak.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Feed Milestone</span><span class="dr-val y" id="r-feed-milestone">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Spore Bags Earned</span><span class="dr-val b" id="r-spore-bags">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/animals.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total Feeds</span><span class="dr-val" id="r-total-feeds">—</span></div>
             </div>
             <div>
-              <div class="data-row"><span class="dr-label"><img src="/images/animals.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total Feeds</span><span class="dr-val" id="r-total-feeds">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/cooldown.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Feed Cooldown</span><span class="dr-val" id="r-feed-cd">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/gemstones.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Gemstone Unlocked</span><span class="dr-val g" id="r-gemstone">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/boost.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Forage Boost</span><span class="dr-val g" id="r-feed-boost-stat">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Spore Bags Earned</span><span class="dr-val b" id="r-spore-bags">—</span></div>
             </div>
           </div>
+          <div id="r-feed-milestone-bar" style="margin-top:0.75rem;"></div>
         </div>
         <div class="info-card reveal" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/gift.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Tipping & Community</div>
@@ -1392,7 +1391,20 @@ function setPlatform(plat) {
   document.getElementById('panel-discord').style.display = plat === 'discord' ? 'block' : 'none';
   document.getElementById('panel-reddit').style.display  = plat === 'reddit'  ? 'block' : 'none';
   document.getElementById('panel-wallet').style.display  = plat === 'wallet'  ? 'block' : 'none';
-  if(plat === 'wallet') renderWalletPanel();
+  if(plat === 'wallet') {
+    renderWallet(profileData.sporebot || {}, profileData.pixie || {});
+    fetchUserLPPositions(profileData.pixie || {});
+    const rw = document.getElementById('wallet-reddit-content');
+    if (rw) {
+      const rbal = (profileData.reddit || {}).Balance || {};
+      if (rbal.reddit_shrooms != null || rbal.reddit_spores != null) {
+        rw.innerHTML = '<div class="data-row"><span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;">SHROOM</span><span class="dr-val r">' + fmt(rbal.reddit_shrooms) + '</span></div>'
+          + '<div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;">SPORE</span><span class="dr-val b">' + fmt(rbal.reddit_spores) + '</span></div>';
+      } else {
+        rw.innerHTML = '<div class="empty-hint">No Reddit wallet linked.</div>';
+      }
+    }
+  }
 }
 window.setPlatform = setPlatform;
 
@@ -3764,7 +3776,7 @@ function renderStats(s, p) {
     { key: 'Kid_Totem_Chance',   label: 'Kid Totem',          img: 'kidshroom.png' },
     { key: 'Gold_Totem_Chance',  label: 'Gold Totem',         img: 'gold_totem.png' },
     { key: 'Scroll_Find_Rate',   label: 'Scroll Find',        img: 'scroll.png' },
-    { key: 'Artifact_Discovery', label: 'Artifact Find',      img: 'artifact.png' },
+    { key: 'Artifact_Discovery', label: 'Artifact Find',      img: 'artifacts.png' },
     { key: 'Rare_Herb_Chance',   label: 'Rare Herb',          img: 'clover.png' },
     { key: 'Double_Herb_Chance', label: 'Double Herb',        img: 'boost.png' },
     { key: 'Herb_Find_Rate',     label: 'Herb Rate',          img: 'herbs.png' },
@@ -4060,11 +4072,63 @@ function renderReddit(s, p) {
   const feedReady = feedCooldown === 'Ready';
 
   setEl('r-total-fed',      fmt(feed.total_fed) + ' SHROOM');
-  setEl('r-feed-milestone', (feed.milestone || 0) + ' / 10');
-  setEl('r-spore-bags',     (feed.spore_bag_counter || 0).toString());
   setEl('r-total-feeds',    fmt(feed.Total_Feeds));
+  setEl('r-spore-bags',     (feed.spore_bag_counter || 0).toString());
   setEl('r-feed-cd',        feedReady ? 'Ready' : feedCooldown);
   setEl('r-gemstone',       feed.gemstone_unlocked ? 'Yes' : 'No');
+
+  const milestone = feed.milestone || 0;
+  const totalFedAmt = feed.total_fed || 0;
+  const MILESTONE_SHROOMS = 6874;
+  const feedBoostPct = milestone * 10;
+  setEl('r-feed-boost-stat', '+' + feedBoostPct + '%');
+  setEl('r-feed-milestone',  milestone + ' / 10');
+
+  // Milestone progress bar
+  const mBarEl = document.getElementById('r-feed-milestone-bar');
+  if (mBarEl) {
+    let barPctFeed, barLabel, barDetail, nextRewardLabel;
+    if (milestone < 10) {
+      const base = milestone * MILESTONE_SHROOMS;
+      const progress = Math.max(0, totalFedAmt - base);
+      barPctFeed = Math.min(100, Math.round((progress / MILESTONE_SHROOMS) * 100));
+      barLabel = 'Milestone ' + milestone + ' / 10';
+      barDetail = fmt(progress) + ' / ' + fmt(MILESTONE_SHROOMS) + ' SHROOM';
+      nextRewardLabel = milestone < 1 ? '+10% Forage Boost + Gemstone Unlock'
+                      : milestone < 5 ? '+10% Forage Boost'
+                      : milestone < 10 ? '+10% Forage Boost' + (milestone === 4 ? ' + Animal Speech' : '') + (milestone === 9 ? ' + Spore Bags' : '')
+                      : 'Max milestone';
+    } else {
+      const fedSince10 = Math.max(0, totalFedAmt - (10 * MILESTONE_SHROOMS));
+      const progress = fedSince10 % 6874;
+      barPctFeed = Math.min(100, Math.round((progress / 6874) * 100));
+      barLabel = 'Spore Bag Progress';
+      barDetail = fmt(progress) + ' / 6,874 SHROOM';
+      nextRewardLabel = 'Next Spore Bag (' + (feed.spore_bag_counter || 0) + ' earned so far)';
+    }
+    const milestoneUnlocks = [
+      { m:1,  label:'Gemstone Unlocked',   img:'gemstones.png',      color:'var(--green)' },
+      { m:5,  label:'Animal Speech',        img:'animals.png',        color:'var(--purple)' },
+      { m:10, label:'Spore Bags Active',    img:'spore.png',          color:'var(--blue)' },
+    ];
+    const unlocksHtml = milestoneUnlocks.map(u => {
+      const done = milestone >= u.m;
+      return '<div style="display:flex;align-items:center;gap:0.4rem;font-family:Syne Mono,monospace;font-size:0.62rem;color:' + (done ? 'var(--green)' : 'rgba(255,255,225,0.2)') + ';">'
+        + '<img src="/images/' + u.img + '" style="width:12px;height:12px;object-fit:contain;opacity:' + (done ? '1' : '0.3') + ';" onerror="this.style.display=\'none\'">'
+        + (done ? '✓' : '○') + ' ' + u.label
+        + (done && u.m === 1 ? ' <span style="color:rgba(255,255,225,0.35);">(' + feedBoostPct + '% boost)</span>' : '')
+        + '</div>';
+    }).join('');
+    mBarEl.innerHTML = '<div style="margin-bottom:0.5rem;">'
+      + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.62rem;color:rgba(255,255,225,0.4);margin-bottom:0.3rem;">'
+      + '<span>' + barLabel + '</span><span>' + barPctFeed + '%</span></div>'
+      + '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;margin-bottom:0.3rem;">'
+      + '<div style="height:100%;width:' + barPctFeed + '%;background:linear-gradient(90deg,#ff6314,#ff9a14);border-radius:999px;transition:width 1s ease;"></div>'
+      + '</div>'
+      + '<div style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);margin-bottom:0.75rem;">' + barDetail + ' &nbsp;|&nbsp; Next: ' + nextRewardLabel + '</div>'
+      + '</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:0.6rem;">' + unlocksHtml + '</div>';
+  }
 
   const ACTIONS = [
     { label: 'Forage',  img:'shroom.png',      done: forageDone, cadence: 'Daily' },
