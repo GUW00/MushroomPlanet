@@ -791,25 +791,28 @@
             <span style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);margin-left:0.5rem;">Equip up to 12 Sporebots</span>
           </div>
 
-          <!-- Row 1: Mosaic preview + buttons (desktop side-by-side, mobile stacked) -->
+          <!-- Row 1: Mosaic preview + slots -->
           <div style="display:flex;gap:1.25rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:1rem;">
 
             <!-- Mosaic preview -->
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;flex-shrink:0;">
-              <div id="mega-mosaic" style="width:108px;height:144px;border-radius:12px;border:2px solid rgba(255,255,225,0.15);overflow:hidden;background:rgba(255,255,255,0.04);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:1px;position:relative;">
-                <div id="mega-mosaic-empty" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;">
-                  <div style="font-size:1.8rem;opacity:0.2;">🤖</div>
-                  <div style="font-family:Syne Mono,monospace;font-size:0.5rem;color:rgba(255,255,225,0.2);text-align:center;">assign bots<br>to preview</div>
+            <div style="display:flex;flex-direction:row;align-items:flex-start;gap:0.75rem;flex-shrink:0;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;">
+                <div id="mega-mosaic" style="width:108px;height:144px;border-radius:12px;border:2px solid rgba(255,255,225,0.15);overflow:hidden;background:rgba(255,255,255,0.04);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:1px;position:relative;">
+                  <div id="mega-mosaic-empty" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;">
+                    <div style="font-size:1.8rem;opacity:0.2;">🤖</div>
+                    <div style="font-family:Syne Mono,monospace;font-size:0.5rem;color:rgba(255,255,225,0.2);text-align:center;">assign bots<br>to preview</div>
+                  </div>
                 </div>
+                <div style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);text-align:center;">MEGA BOT</div>
               </div>
-              <div style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);text-align:center;">MEGA BOT</div>
-              <div style="display:flex;gap:0.4rem;">
-                <button onclick="megaReset()" style="font-family:Syne Mono,monospace;font-size:0.6rem;color:var(--red);background:none;border:1px solid var(--red);padding:0.2rem 0.6rem;border-radius:5px;cursor:pointer;opacity:0.7;" title="Clear all slots">Reset</button>
-                <button id="mega-save-btn" onclick="megaSave()" style="font-family:Syne Mono,monospace;font-size:0.6rem;color:#0f0f0f;background:var(--green);border:1px solid var(--green);padding:0.2rem 0.6rem;border-radius:5px;cursor:pointer;font-weight:700;" title="Save current build">Save Build</button>
+              <!-- Buttons stacked to the right of mosaic on mobile -->
+              <div style="display:flex;flex-direction:column;gap:0.5rem;justify-content:flex-end;padding-bottom:0.25rem;align-self:flex-end;">
+                <button onclick="megaReset()" style="font-family:Syne Mono,monospace;font-size:0.6rem;color:var(--red);background:none;border:1px solid var(--red);padding:0.35rem 0.75rem;border-radius:6px;cursor:pointer;opacity:0.7;white-space:nowrap;" title="Clear all slots">Reset</button>
+                <button id="mega-save-btn" onclick="megaSave()" style="font-family:Syne Mono,monospace;font-size:0.6rem;color:#0f0f0f;background:var(--green);border:1px solid var(--green);padding:0.35rem 0.75rem;border-radius:6px;cursor:pointer;font-weight:700;white-space:nowrap;" title="Save current build">Save Build</button>
               </div>
             </div>
 
-            <!-- Trait slots: desktop uses auto-fill, mobile overridden below -->
+            <!-- Trait slots -->
             <div id="mega-slots-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:0.5rem;flex:1;min-width:0;"></div>
           </div>
 
