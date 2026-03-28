@@ -262,7 +262,12 @@
     .tab-bar .tab { flex-shrink: 0; min-width: fit-content; }
     @media(min-width: 601px) {
       .tab-bar { flex-wrap: wrap; overflow-x: visible; }
-      .tab-bar .tab { flex-shrink: 0; }
+      .tab-bar .tab { flex-shrink: 0; flex: 1 1 calc(33.333% - 0.4rem); justify-content: center; }
+    }
+    @media(max-width: 600px) {
+      .tab-bar { flex-wrap: nowrap; overflow-x: auto; }
+      .tab-bar .tab { flex: 0 0 auto; flex-direction: row; font-size: 0.75rem; padding: 0.5em 1.1em; }
+      .tab-bar .tab img { width: 13px !important; height: 13px !important; margin-right: 4px !important; }
     }
     @media(max-width: 600px) {
       .tab-bar { flex-wrap: wrap; overflow-x: visible; }
@@ -671,14 +676,14 @@
     <div id="panel-discord">
       <div class="tab-bar">
         <button class="tab active" onclick="switchTab('farm',this)"><img src="/images/shroomfarm.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Farm</button>
+        <button class="tab" onclick="switchTab('stats',this)"><img src="/images/apy1.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Stats</button>
+        <button class="tab" onclick="switchTab('brewing',this)"><img src="/images/potionrecipe.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Brewing</button>
         <button class="tab" onclick="switchTab('staking',this)"><img src="/images/spore.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Staking</button>
         <button class="tab" onclick="switchTab('nfts',this)"><img src="/images/nft.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">NFTs</button>
         <button class="tab" onclick="switchTab('sporebots',this)"><img src="/images/sporebot_helper.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SporeBots</button>
         <button class="tab" onclick="switchTab('companion',this)"><img src="/images/animals.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Companion</button>
         <button class="tab" onclick="switchTab('inventory',this)"><img src="/images/backpack1.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Inventory</button>
-        <button class="tab" onclick="switchTab('brewing',this)"><img src="/images/potionrecipe.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Brewing</button>
         <button class="tab" onclick="switchTab('pixie',this)"><img src="/images/pixie.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Pixie XP</button>
-        <button class="tab" onclick="switchTab('stats',this)"><img src="/images/apy1.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Stats</button>
         
       </div>
 
@@ -1016,14 +1021,12 @@
           </div>
           <div class="data-grid">
             <div>
-              <div class="data-row"><span class="dr-label">Username</span><span class="dr-val" id="r-username">—</span></div>
-              <div class="data-row"><span class="dr-label">Flair Rank</span><span class="dr-val" id="r-flair">—</span></div>
-              <div class="data-row"><span class="dr-label">Total XP</span><span class="dr-val b" id="r-xp">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/reddit.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Username</span><span class="dr-val" id="r-username">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/apy1.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Flair Rank</span><span class="dr-val p" id="r-flair">—</span></div>
             </div>
             <div>
-              <div class="data-row"><span class="dr-label">Discord Linked</span><span class="dr-val g" id="r-linked">—</span></div>
-              <div class="data-row"><span class="dr-label">GS Tokens</span><span class="dr-val y" id="r-gs-tokens">—</span></div>
-              <div class="data-row"><span class="dr-label">GS Given / Recv</span><span class="dr-val" id="r-gs-stat">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/discord.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Discord Linked</span><span class="dr-val g" id="r-linked">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/goodshroom.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">GS Tokens</span><span class="dr-val y" id="r-gs-tokens">—</span></div>
             </div>
           </div>
         </div>
@@ -1042,67 +1045,71 @@
           </div>
           <div class="data-grid">
             <div>
-              <div class="data-row"><span class="dr-label">Streak</span><span class="dr-val y" id="r-streak">—</span></div>
-              <div class="data-row"><span class="dr-label">Record Streak</span><span class="dr-val" id="r-maxstreak">—</span></div>
-              <div class="data-row"><span class="dr-label">Total Forages</span><span class="dr-val" id="r-total-forages">—</span></div>
-              <div class="data-row"><span class="dr-label">Vacation Days</span><span class="dr-val g" id="r-vacation">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/streak.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Streak</span><span class="dr-val y" id="r-streak">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/streak.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Record Streak</span><span class="dr-val" id="r-maxstreak">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/forage.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total Forages</span><span class="dr-val" id="r-total-forages">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/vacation.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Vacation Days</span><span class="dr-val g" id="r-vacation">—</span></div>
             </div>
             <div>
-              <div class="data-row"><span class="dr-label">Feed Boost</span><span class="dr-val g" id="r-feed-boost">—</span></div>
-              <div class="data-row"><span class="dr-label">NFT Forage Bonus</span><span class="dr-val p" id="r-nft-bonus">—</span></div>
-              <div class="data-row"><span class="dr-label">Flair Forage Bonus</span><span class="dr-val y" id="r-flair-bonus">—</span></div>
-              <div class="data-row"><span class="dr-label">Total Forage Bonus</span><span class="dr-val g" id="r-total-bonus">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/shroomfarm.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Feed Boost</span><span class="dr-val g" id="r-feed-boost">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/nft.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">NFT Forage Bonus</span><span class="dr-val p" id="r-nft-bonus">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/apy1.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Flair Forage Bonus</span><span class="dr-val y" id="r-flair-bonus">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/boost.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total Forage Bonus</span><span class="dr-val g" id="r-total-bonus">—</span></div>
             </div>
           </div>
         </div>
 
         <!-- Feed Stats -->
         <div class="info-card reveal" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">🐾</span> Feed Stats</div>
+          <div class="card-title"><img src="/images/shroomfarm.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Feed Stats</div>
           <div class="data-grid">
             <div>
-              <div class="data-row"><span class="dr-label">Total Fed</span><span class="dr-val g" id="r-total-fed">—</span></div>
-              <div class="data-row"><span class="dr-label">Feed Milestone</span><span class="dr-val y" id="r-feed-milestone">—</span></div>
-              <div class="data-row"><span class="dr-label">Spore Bags Earned</span><span class="dr-val b" id="r-spore-bags">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/shroom.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total Fed</span><span class="dr-val g" id="r-total-fed">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/streak.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Feed Milestone</span><span class="dr-val y" id="r-feed-milestone">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Spore Bags Earned</span><span class="dr-val b" id="r-spore-bags">—</span></div>
             </div>
             <div>
-              <div class="data-row"><span class="dr-label">Total Feeds</span><span class="dr-val" id="r-total-feeds">—</span></div>
-              <div class="data-row"><span class="dr-label">Feed Cooldown</span><span class="dr-val" id="r-feed-cd">—</span></div>
-              <div class="data-row"><span class="dr-label">Gemstone Unlocked</span><span class="dr-val g" id="r-gemstone">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/animals.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total Feeds</span><span class="dr-val" id="r-total-feeds">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/cooldown.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Feed Cooldown</span><span class="dr-val" id="r-feed-cd">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/gemstones.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Gemstone Unlocked</span><span class="dr-val g" id="r-gemstone">—</span></div>
             </div>
           </div>
         </div>
         <div class="info-card reveal" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">🤝</span> Tipping & Community</div>
-          <div class="data-grid">
+          <div class="card-title"><img src="/images/gift.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Tipping & Community</div>
+          <div class="data-grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));">
             <div>
-              <div class="data-row"><span class="dr-label"><img src="/images/shroom.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">SHROOM Given</span><span class="dr-val r" id="r-shroom-given">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/shroom.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">SHROOM Received</span><span class="dr-val r" id="r-shroom-recv">—</span></div>
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;letter-spacing:0.1em;color:rgba(255,255,225,0.3);padding:0.3rem 0 0.4rem;">GIVEN</div>
+              <div class="data-row"><span class="dr-label"><img src="/images/shroom.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">SHROOM</span><span class="dr-val r" id="r-shroom-given">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">SPORE</span><span class="dr-val b" id="r-spore-given">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/goodshroom.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">GS</span><span class="dr-val y" id="r-gs-given-tip">—</span></div>
             </div>
             <div>
-              <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">SPORE Given</span><span class="dr-val b" id="r-spore-given">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">SPORE Received</span><span class="dr-val b" id="r-spore-recv">—</span></div>
+              <div style="font-family:Syne Mono,monospace;font-size:0.58rem;letter-spacing:0.1em;color:rgba(255,255,225,0.3);padding:0.3rem 0 0.4rem;">RECEIVED</div>
+              <div class="data-row"><span class="dr-label"><img src="/images/shroom.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">SHROOM</span><span class="dr-val r" id="r-shroom-recv">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">SPORE</span><span class="dr-val b" id="r-spore-recv">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/goodshroom.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'">GS</span><span class="dr-val y" id="r-gs-recv-tip">—</span></div>
             </div>
           </div>
         </div>
       </div>
       <!-- XP Breakdown -->
         <div class="info-card reveal" style="margin-top:1rem;">
-          <div class="card-title"><span class="card-title-accent" style="color:#ff6314;">📊</span> XP Breakdown</div>
+          <div class="card-title"><img src="/images/xp.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> XP Breakdown</div>
           <div class="data-grid">
             <div>
-              <div class="data-row"><span class="dr-label">Total XP</span><span class="dr-val y" id="r-xp-total">—</span></div>
-              <div class="data-row"><span class="dr-label">Next Rank</span><span class="dr-val" id="r-xp-next">—</span></div>
-              <div class="data-row"><span class="dr-label">XP Needed</span><span class="dr-val" id="r-xp-needed">—</span></div>
-              <div class="data-row"><span class="dr-label">Streak XP</span><span class="dr-val b" id="r-xp-streak">—</span></div>
-              <div class="data-row"><span class="dr-label">Forage XP</span><span class="dr-val b" id="r-xp-forage">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/apy1.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total XP</span><span class="dr-val y" id="r-xp-total">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/growing.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Next Rank</span><span class="dr-val" id="r-xp-next">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/time.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">XP Needed</span><span class="dr-val" id="r-xp-needed">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/streak.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Streak XP</span><span class="dr-val b" id="r-xp-streak">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/forage.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Forage XP</span><span class="dr-val b" id="r-xp-forage">—</span></div>
             </div>
             <div>
-              <div class="data-row"><span class="dr-label">Post Upvote XP</span><span class="dr-val b" id="r-xp-posts">—</span></div>
-              <div class="data-row"><span class="dr-label">Comment XP</span><span class="dr-val b" id="r-xp-comments">—</span></div>
-              <div class="data-row"><span class="dr-label">Quest XP</span><span class="dr-val b" id="r-xp-quests">—</span></div>
-              <div class="data-row"><span class="dr-label">GoodBot XP</span><span class="dr-val b" id="r-xp-goodbot">—</span></div>
-              <div class="data-row"><span class="dr-label">Feed XP</span><span class="dr-val b" id="r-xp-feed">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/reddit1.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Post Upvote XP</span><span class="dr-val b" id="r-xp-posts">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/reddit1.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Comment XP</span><span class="dr-val b" id="r-xp-comments">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/scroll.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Quest XP</span><span class="dr-val b" id="r-xp-quests">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/sporebot.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">GoodBot XP</span><span class="dr-val b" id="r-xp-goodbot">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/shroomfarm.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Feed XP</span><span class="dr-val b" id="r-xp-feed">—</span></div>
             </div>
           </div>
         </div>
@@ -3969,6 +3976,8 @@ function renderReddit(s, p) {
   setEl('r-linked',     link.Discord_Link ? 'Yes' : 'No');
   setEl('r-gs-tokens',  gs.Tokens   || 0);
   setEl('r-gs-stat',    (gs.Given || 0) + ' / ' + (gs.Received || 0));
+  setEl('r-gs-given-tip', gs.Given    || 0);
+  setEl('r-gs-recv-tip',  gs.Received || 0);
 
   // Forage
   setEl('r-streak',          (forage.streak || 0) + ' days');
@@ -4058,39 +4067,60 @@ function renderReddit(s, p) {
   setEl('r-gemstone',       feed.gemstone_unlocked ? 'Yes' : 'No');
 
   const ACTIONS = [
-    
-    { label: 'Forage',      cmd: '!forage', done: forageDone, cadence: 'Daily',  required: true,  img: '/images/shroom.png' },
-    { label: 'Feed',        cmd: '!feed',   done: feedReady,  cadence: 'Hourly', required: false, img: '/images/shroomfarm.png', customState: feedReady ? 'READY' : feedCooldown },
-    { label: 'Daily Quest', cmd: '!quest',  done: questDone,  cadence: 'Daily',  required: false, img: '/images/scroll.png' },
+    { label: 'Forage',  img:'shroom.png',      done: forageDone, cadence: 'Daily' },
+    { label: 'Quest',   img:'scroll.png',       done: questDone,  cadence: 'Daily' },
+    { label: 'Feed',    img:'shroomfarm.png',   done: !feedReady, cadence: 'Hourly', cooldown: feedCooldown },
   ];
 
-  const doneCount  = ACTIONS.filter(a => a.done).length;
-  const barPct     = Math.round((doneCount / ACTIONS.length) * 100);
+  const DAILY_ONLY_R = ACTIONS.filter(a => a.cadence !== 'Hourly');
+  const doneCount  = DAILY_ONLY_R.filter(a => a.done).length;
+  const totalCount = DAILY_ONLY_R.length;
+  const barPct     = Math.round((doneCount / totalCount) * 100);
 
-  rdEl.innerHTML = '<div style="margin-bottom:1rem;">'
-    + '<div style="display:flex;justify-content:space-between;font-family:Syne Mono,monospace;font-size:0.92rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;">'
-    + '<span>Daily Progress</span><span>' + doneCount + ' / ' + ACTIONS.length + ' complete</span></div>'
+  rdEl.innerHTML = '<div style="margin-bottom:0.875rem;">'
+    + '<div style="display:flex;justify-content:space-between;font-family:Space Grotesk,sans-serif;font-size:0.75rem;font-weight:600;color:rgba(255,255,225,0.75);margin-bottom:0.4rem;">'
+    + '<span>Daily Cooldowns</span><span style="font-family:Syne Mono,monospace;font-size:0.65rem;color:rgba(255,255,225,0.45);">' + doneCount + ' / ' + totalCount + ' complete</span></div>'
     + '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
     + '<div style="height:100%;width:' + barPct + '%;background:linear-gradient(90deg,#ff6314,#ff9a14);border-radius:999px;transition:width 1s ease;"></div>'
     + '</div></div>'
-    + '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'
+    + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;">'
     + ACTIONS.map(a => {
         const isHourly    = a.cadence === 'Hourly';
-        const onCooldown  = isHourly && !a.done;
-        const hourlyReady = isHourly && a.done;
-        const bg     = !isHourly && a.done ? 'rgba(34,197,94,0.08)' : hourlyReady ? 'rgba(253,70,79,0.08)' : onCooldown ? 'rgba(254,206,0,0.05)' : a.required ? 'rgba(253,70,79,0.05)' : 'rgba(255,255,255,0.02)';
-        const border = !isHourly && a.done ? 'rgba(34,197,94,0.25)' : hourlyReady ? 'rgba(253,70,79,0.3)' : onCooldown ? 'rgba(254,206,0,0.25)' : a.required ? 'rgba(253,70,79,0.2)' : 'rgba(255,255,225,0.07)';
-        const iconCol  = !isHourly && a.done ? '#22c55e' : hourlyReady ? '#fd464f' : onCooldown ? '#fece00' : 'rgba(255,255,225,0.2)';
-        const labelCol = !isHourly && a.done ? '#22c55e' : hourlyReady ? '#fd464f' : onCooldown ? '#fece00' : 'rgba(255,255,225,0.75)';
-        const icon     = !isHourly && a.done ? '✓' : hourlyReady ? '!' : onCooldown ? '◷' : '○';
-        const subText  = a.customState || (hourlyReady ? 'Use Now!' : onCooldown ? a.customState||a.cadence : a.done ? 'Done' : a.cadence);
-        const subCol   = !isHourly && a.done ? 'rgba(34,197,94,0.6)' : hourlyReady ? 'rgba(253,70,79,0.7)' : onCooldown ? 'rgba(254,206,0,0.6)' : 'rgba(255,100,20,0.6)';
-        return '<div style="display:flex;align-items:center;gap:0.45rem;padding:0.45rem 0.8rem;border-radius:0.625rem;border:1px solid ' + border + ';background:' + bg + ';white-space:nowrap;">'
-          + '<span style="font-size:0.75rem;color:' + iconCol + ';font-weight:700;">' + icon + '</span>'
-          + '<div style="display:flex;flex-direction:column;gap:0.05rem;">'
-          + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.75rem;font-weight:600;color:' + labelCol + ';display:flex;align-items:center;gap:0.3rem;"><img src="/images/' + a.img + '" style="width:12px;height:12px;object-fit:contain;" onerror="this.style.display=\'none\'">' + a.label + '</span>'
-          + '<span style="font-family:Syne Mono,monospace;font-size:0.52rem;color:' + subCol + ';">' + subText + '</span>'
-          + '</div></div>';
+        const onCooldown  = isHourly && a.done;
+        const hourlyReady = isHourly && !a.done;
+        const dailyPending = !isHourly && !a.done;
+
+        const bg     = a.done && !isHourly  ? 'rgba(34,197,94,0.1)'
+                     : dailyPending          ? 'rgba(253,70,79,0.08)'
+                     : hourlyReady           ? 'rgba(254,206,0,0.08)'
+                     : onCooldown            ? 'rgba(34,197,94,0.08)'
+                     :                         'rgba(255,255,255,0.02)';
+        const border = a.done && !isHourly  ? 'rgba(34,197,94,0.3)'
+                     : dailyPending          ? 'rgba(253,70,79,0.3)'
+                     : hourlyReady           ? 'rgba(254,206,0,0.35)'
+                     : onCooldown            ? 'rgba(34,197,94,0.25)'
+                     :                         'rgba(255,255,225,0.07)';
+        const labelCol = a.done && !isHourly ? '#22c55e'
+                       : dailyPending         ? '#fd464f'
+                       : hourlyReady          ? '#fece00'
+                       : onCooldown           ? '#22c55e'
+                       :                        'rgba(255,255,225,0.75)';
+        const subText  = a.done && !isHourly ? 'Done'
+                       : dailyPending         ? 'Available'
+                       : hourlyReady          ? (a.cooldown || 'Use Now!')
+                       : onCooldown           ? a.cooldown
+                       :                        a.cadence;
+        const subCol   = a.done && !isHourly ? 'rgba(34,197,94,0.6)'
+                       : dailyPending         ? 'rgba(253,70,79,0.6)'
+                       : hourlyReady          ? 'rgba(254,206,0,0.7)'
+                       : onCooldown           ? 'rgba(34,197,94,0.5)'
+                       :                        'rgba(255,100,20,0.4)';
+
+        return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;padding:0.6rem 0.25rem;border-radius:0.75rem;border:1px solid ' + border + ';background:' + bg + ';text-align:center;min-width:0;">'
+          + '<img src="/images/' + a.img + '" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+          + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.7rem;font-weight:700;color:' + labelCol + ';white-space:nowrap;">' + a.label + '</span>'
+          + '<span style="font-family:Syne Mono,monospace;font-size:0.52rem;color:' + subCol + ';white-space:nowrap;">' + subText + '</span>'
+          + '</div>';
       }).join('')
     + '</div>';
 }
