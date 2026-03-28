@@ -556,6 +556,12 @@
     .nft-modal-name {
       font-size:1rem;font-weight:700;margin-bottom:0.25rem;
     }
+    @media(max-width: 600px), (display-mode: standalone) {
+      #mega-main-row { flex-direction: column; }
+      #mega-left-col { flex-direction: row !important; align-items: flex-start; flex-wrap: wrap; width: 100%; gap: 0.75rem; }
+      #mega-left-col #mega-mosaic { flex-shrink: 0; }
+      #mega-left-col button { width: auto !important; flex: 1; min-width: 100px; }
+    }
     .nft-modal-close {
       position:absolute;top:0.5rem;right:0.5rem;
       background:rgba(0,0,0,0.6);border:none;color:var(--cream);
@@ -795,25 +801,20 @@
             <span style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);margin-left:0.5rem;">Equip up to 12 Sporebots</span>
           </div>
 
-          <!-- Row 1: Mosaic preview + slots -->
-          <div style="display:flex;gap:1.25rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:1rem;">
+          <!-- Row 1: Mosaic + buttons (left) + slots (right) on desktop; mosaic+buttons row then slots on mobile -->
+          <div id="mega-main-row" style="display:flex;gap:1.25rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:1rem;">
 
-            <!-- Mosaic preview -->
-            <div style="display:flex;flex-direction:row;align-items:flex-start;gap:0.75rem;flex-shrink:0;">
-              <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;">
-                <div id="mega-mosaic" style="width:108px;height:144px;border-radius:12px;border:2px solid rgba(255,255,225,0.15);overflow:hidden;background:rgba(255,255,255,0.04);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:1px;position:relative;">
-                  <div id="mega-mosaic-empty" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;">
-                    <div style="font-size:1.8rem;opacity:0.2;">🤖</div>
-                    <div style="font-family:Space Grotesk,monospace;font-size:0.5rem;color:rgba(255,255,225,0.2);text-align:center;">assign bots<br>to preview</div>
-                  </div>
+            <!-- Mosaic + buttons stacked vertically on desktop, side by side on mobile -->
+            <div id="mega-left-col" style="display:flex;flex-direction:column;align-items:center;gap:0.6rem;flex-shrink:0;">
+              <div id="mega-mosaic" style="width:108px;height:144px;border-radius:12px;border:2px solid rgba(255,255,225,0.15);overflow:hidden;background:rgba(255,255,255,0.04);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:1px;position:relative;">
+                <div id="mega-mosaic-empty" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;">
+                  <div style="font-size:1.8rem;opacity:0.2;">🤖</div>
+                  <div style="font-family:Syne Mono,monospace;font-size:0.5rem;color:rgba(255,255,225,0.2);text-align:center;">assign bots<br>to preview</div>
                 </div>
-                <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);text-align:center;">MEGA BOT</div>
               </div>
-              <!-- Buttons stacked to the right of mosaic on mobile -->
-              <div style="display:flex;flex-direction:column;gap:0.6rem;justify-content:center;align-items:center;align-self:center;flex:1;">
-                <button onclick="megaReset()" style="font-family:Space Grotesk,monospace;font-size:0.75rem;color:var(--red);background:none;border:1.5px solid var(--red);padding:0.6rem 1.25rem;border-radius:8px;cursor:pointer;opacity:0.8;white-space:nowrap;width:100%;max-width:140px;" title="Clear all slots">Reset</button>
-                <button id="mega-save-btn" onclick="megaSave()" style="font-family:Space Grotesk,monospace;font-size:0.75rem;color:#0f0f0f;background:var(--green);border:1.5px solid var(--green);padding:0.6rem 1.25rem;border-radius:8px;cursor:pointer;font-weight:700;white-space:nowrap;width:100%;max-width:140px;" title="Save current build">Save Build</button>
-              </div>
+              <div style="font-family:Syne Mono,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);text-align:center;">MEGA BOT</div>
+              <button onclick="megaReset()" style="font-family:Space Grotesk,sans-serif;font-size:0.75rem;color:var(--red);background:none;border:1.5px solid var(--red);padding:0.5rem 1rem;border-radius:8px;cursor:pointer;opacity:0.8;white-space:nowrap;width:108px;" title="Clear all slots">Reset</button>
+              <button id="mega-save-btn" onclick="megaSave()" style="font-family:Space Grotesk,sans-serif;font-size:0.75rem;color:#0f0f0f;background:var(--green);border:1.5px solid var(--green);padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-weight:700;white-space:nowrap;width:108px;" title="Save current build">Save Build</button>
             </div>
 
             <!-- Trait slots -->
@@ -3310,7 +3311,7 @@ function renderShopQuests(s, p) {
   const spiritPct = hasSpirit ? 100 : Math.min(100, (bestScore / 10) * 100);
 
   el.innerHTML = '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.75rem;">Complete shop challenges to earn +5% SGR gemstones</div>'
-    + questBlock(img('rootsong_gemstone.png'), "Rhizo's Rootsong",
+    + questBlock(img('rootsong_gemstone.png'), "Rootsong Gemstone",
         hasRootSong ? 'Gemstone owned - Rhizo now pays SPORES for gems!' : rhizoSold.toLocaleString() + ' / ' + RHIZO_GOAL.toLocaleString() + ' SPORES worth of gems sold',
         rhizoPct, 'var(--green)', hasRootSong)
     + questBlock(img('sunspore_gemstone.png'), 'Sunspore Gemstone',
@@ -4117,7 +4118,7 @@ function renderReddit(s, p) {
       nextRewardLabel = 'Next Spore Bag (' + (feed.spore_bag_counter || 0) + ' earned so far)';
     }
     const milestoneUnlocks = [
-      { m:1,  label:'Gemstone Unlocked',   img:'gemstones.png',      color:'var(--green)' },
+      { m:1,  label:'Gemstone Unlocked',   img:'mooshie_gemstone.png',      color:'var(--green)' },
       { m:5,  label:'Animal Speech',        img:'animals.png',        color:'var(--purple)' },
       { m:10, label:'Spore Bags Active',    img:'spore.png',          color:'var(--blue)' },
     ];
