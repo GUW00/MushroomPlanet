@@ -497,6 +497,7 @@
     }
 
     @media(max-width: 600px) {
+      #tc-grid { grid-template-columns: 1fr !important; }
       .profile-header { flex-direction: column; align-items: flex-start; }
       .mvp-block { align-items: flex-start; }
       .page-section { padding: 0 1rem 3rem; }
@@ -956,27 +957,35 @@
           <img src="/images/blockchain.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
           Token Contracts
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.25rem;">
+        <div id="tc-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.25rem;">
           <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:0.75rem;padding:0.75rem;">
-            <div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.5rem;">
+            <div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.35rem;">
               <img src="/images/shroom.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'">
               <span style="font-size:0.82rem;font-weight:600;color:var(--red);">SHROOM</span>
             </div>
-            <div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.45);margin-bottom:0.5rem;word-break:break-all;">0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1</div>
-            <div style="display:flex;gap:0.4rem;">
-              <button onclick="navigator.clipboard.writeText('0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})" style="flex:1;font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:transparent;color:rgba(255,255,225,0.5);cursor:pointer;">Copy</button>
-              <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="flex:1;font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25em 0;border-radius:999px;border:1px solid rgba(253,70,79,0.3);color:var(--red);text-decoration:none;text-align:center;">Polygon ↗</a>
+            <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;word-break:break-all;">0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1</div>
+            <div style="margin-bottom:0.5rem;">
+              <span style="font-family:Space Grotesk,monospace;font-size:1rem;font-weight:700;color:var(--red);" id="tc-shroom-price">...</span>
+              <span style="font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-left:0.4rem;" id="tc-shroom-1m">1M = ...</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.4rem;">
+              <button onclick="navigator.clipboard.writeText('0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.3em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:transparent;color:rgba(255,255,225,0.5);cursor:pointer;">Copy</button>
+              <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.3em 0;border-radius:999px;border:1px solid rgba(253,70,79,0.3);color:var(--red);text-decoration:none;text-align:center;">Polygon ↗</a>
             </div>
           </div>
           <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:0.75rem;padding:0.75rem;">
-            <div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.5rem;">
+            <div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.35rem;">
               <img src="/images/spore.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'">
               <span style="font-size:0.82rem;font-weight:600;color:var(--blue);">SPORE</span>
             </div>
-            <div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.45);margin-bottom:0.5rem;word-break:break-all;">0x089582AC20ea563c69408a79E1061de594b61bED</div>
-            <div style="display:flex;gap:0.4rem;">
-              <button onclick="navigator.clipboard.writeText('0x089582AC20ea563c69408a79E1061de594b61bED').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})" style="flex:1;font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:transparent;color:rgba(255,255,225,0.5);cursor:pointer;">Copy</button>
-              <a href="https://polygonscan.com/token/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="flex:1;font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25em 0;border-radius:999px;border:1px solid rgba(79,168,253,0.3);color:var(--blue);text-decoration:none;text-align:center;">Polygon ↗</a>
+            <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;word-break:break-all;">0x089582AC20ea563c69408a79E1061de594b61bED</div>
+            <div style="margin-bottom:0.5rem;">
+              <span style="font-family:Space Grotesk,monospace;font-size:1rem;font-weight:700;color:var(--blue);" id="tc-spore-price">...</span>
+              <span style="font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-left:0.4rem;" id="tc-spore-100m">100M = ...</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.4rem;">
+              <button onclick="navigator.clipboard.writeText('0x089582AC20ea563c69408a79E1061de594b61bED').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.3em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:transparent;color:rgba(255,255,225,0.5);cursor:pointer;">Copy</button>
+              <a href="https://polygonscan.com/token/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.3em 0;border-radius:999px;border:1px solid rgba(79,168,253,0.3);color:var(--blue);text-decoration:none;text-align:center;">Polygon ↗</a>
             </div>
           </div>
         </div>
@@ -1431,6 +1440,7 @@ function setPlatform(plat) {
   if(plat === 'wallet') {
     renderWallet(profileData.sporebot || {}, profileData.pixie || {});
     fetchUserLPPositions(profileData.pixie || {});
+    fetchTokenPrices();
     const rw = document.getElementById('wallet-reddit-content');
     if (rw) {
       const rbal = (profileData.reddit || {}).Balance || {};
@@ -2594,6 +2604,30 @@ function renderSporebots(s, p) {
   sbRenderPage();
   megaLoadSave();
   megaRenderSlots();
+}
+
+async function fetchTokenPrices() {
+  try {
+    const [shroomRes, sporeRes] = await Promise.all([
+      fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/tokens/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1'),
+      fetch('https://api.geckoterminal.com/api/v2/networks/polygon_pos/tokens/0x089582AC20ea563c69408a79E1061de594b61bED'),
+    ]);
+    const shroomData = await shroomRes.json();
+    const sporeData  = await sporeRes.json();
+    const shroomPrice = parseFloat(shroomData?.data?.attributes?.price_usd || 0);
+    const sporePrice  = parseFloat(sporeData?.data?.attributes?.price_usd  || 0);
+    const fmtUsd = v => v >= 0.01 ? '$' + v.toFixed(4) : v >= 0.0001 ? '$' + v.toFixed(6) : v >= 0.000001 ? '$' + v.toFixed(8) : '$' + v.toFixed(10);
+    const fmtBig = v => v >= 1000000 ? '$' + (v/1000000).toFixed(2) + 'M' : v >= 1000 ? '$' + (v/1000).toFixed(2) + 'K' : '$' + v.toFixed(2);
+    const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    el('tc-shroom-price', shroomPrice > 0 ? fmtUsd(shroomPrice) : '—');
+    el('tc-shroom-1m',    shroomPrice > 0 ? '1M = ' + fmtBig(shroomPrice * 1_000_000) : '1M = —');
+    el('tc-spore-price',  sporePrice  > 0 ? fmtUsd(sporePrice)  : '—');
+    el('tc-spore-100m',   sporePrice  > 0 ? '100M = ' + fmtBig(sporePrice * 100_000_000) : '100M = —');
+  } catch(e) {
+    ['tc-shroom-price','tc-shroom-1m','tc-spore-price','tc-spore-100m'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = '—';
+    });
+  }
 }
 
 async function fetchUserLPPositions(p) {
