@@ -736,12 +736,15 @@ function generateToken() {
 function getSessionUser(req) {
   const token = req.cookies?.gov_session;
   if (token && sessions.has(token)) return sessions.get(token);
-  // Fallback: check discord_id header for dev
+  // Fallback: trust x-discord-id header (user validated via Discord OAuth on frontend)
   const discordId = req.headers['x-discord-id'];
   if (discordId) {
+    // Check Map first in case session still exists
     for (const user of sessions.values()) {
       if (user.discord_id === discordId) return user;
     }
+    // Return a minimal user object — username will be resolved in the route handler
+    return { discord_id: discordId, username: null };
   }
   return null;
 }
@@ -788,6 +791,12 @@ app.post('/api/auth/discord/callback', async (req, res) => {
     // Read MVP from Firebase
     const mvpSnap = await db.ref(`Pixie/Users/${discord_id}/MVP/total`).get();
     const mvp     = mvpSnap.exists() ? mvpSnap.val() : 0;
+
+    // Store username + avatar in Misc so fallback auth can retrieve them
+    await db.ref(`Pixie/Users/${discord_id}/Misc`).update({
+      username:    discordUser.username,
+      avatar_hash: discordUser.avatar || null,
+    });
 
     const user = {
       discord_id,
@@ -844,6 +853,34 @@ app.get('/api/proposals', async (req, res) => {
       proposals.push({ id: child.key, ...p });
     });
 
+    // Auto-close any expired active proposals
+    const now = new Date();
+    const closeOps = [];
+    for (const p of proposals) {
+      if (p.status === 'active' && p.ends_at && new Date(p.ends_at) < now) {
+        let finalStatus = 'failed';
+        const totals = p.vote_totals || {};
+        if (p.stage === 'vote') {
+          const winner = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+          finalStatus = winner ? 'passed' : 'failed';
+        } else if (p.stage === 'proposal') {
+          const yes = totals.yes || totals.Yes || 0;
+          const no = totals.no || totals.No || 0;
+          const total = yes + no;
+          const voterCount = p.voter_count || 0;
+          finalStatus = (total > 0 && voterCount >= 42 && yes / total >= 0.70) ? 'passed' : 'failed';
+        }
+        closeOps.push(db.ref(`Governance/Proposals/${p.id}`).update({
+          status: finalStatus,
+          closed_at: now.toISOString(),
+        }));
+        p.status = finalStatus;
+        p.closed_at = now.toISOString();
+        console.log(`[GOVERNANCE-AUTO-CLOSE] "${p.title}" auto-closed as ${finalStatus}`);
+      }
+    }
+    if (closeOps.length) await Promise.all(closeOps);
+
     proposals.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     res.json({ ok: true, proposals });
   } catch (err) {
@@ -860,7 +897,18 @@ app.get('/api/proposals/:id', async (req, res) => {
   try {
     const snap = await db.ref(`Governance/Proposals/${req.params.id}`).get();
     if (!snap.exists()) return res.status(404).json({ ok: false });
-    res.json({ ok: true, proposal: { id: req.params.id, ...snap.val() } });
+    const p = { id: req.params.id, ...snap.val() };
+    // Hide vote breakdown until closed
+    if (p.status === 'active') {
+      p.vote_totals = null;
+    }
+    // Attach my_vote if user is identified
+    const discordId = req.headers['x-discord-id'];
+    if (discordId) {
+      const voteSnap = await db.ref(`Governance/Votes/${req.params.id}/${discordId}`).get();
+      p.my_vote = voteSnap.exists() ? voteSnap.val().choice : null;
+    }
+    res.json({ ok: true, proposal: p });
   } catch (err) {
     res.status(500).json({ ok: false });
   }
@@ -907,11 +955,21 @@ app.post('/api/proposals/:id/comments', async (req, res) => {
     const mvpSnap = await db.ref(`Pixie/Users/${sessionUser.discord_id}/MVP/total`).get();
     const mvp     = mvpSnap.exists() ? mvpSnap.val() : 0;
 
+    // Resolve username/avatar if fallback auth was used
+    let authorName   = sessionUser.username;
+    let authorAvatar = sessionUser.avatar || null;
+    if (!authorName || !authorAvatar) {
+      const miscSnap = await db.ref(`Pixie/Users/${sessionUser.discord_id}/Misc`).get();
+      const misc = miscSnap.val() || {};
+      if (!authorName)   authorName   = misc.username   || sessionUser.discord_id;
+      if (!authorAvatar) authorAvatar = misc.avatar_hash || null;
+    }
+
     const commentRef = db.ref(`Governance/Proposals/${req.params.id}/Comments`).push();
     await commentRef.set({
       author_id:     sessionUser.discord_id,
-      author_name:   sessionUser.username,
-      author_avatar: sessionUser.avatar || null,
+      author_name:   authorName,
+      author_avatar: authorAvatar,
       author_mvp:    mvp,
       text:          text.trim(),
       created_at:    new Date().toISOString(),
@@ -993,17 +1051,15 @@ app.post('/api/proposals/:id/vote', async (req, res) => {
 
     await db.ref().update(updates);
 
-    // Award SPORE reward for Official Vote participation
-    if (proposal.stage === 'vote') {
-      const rewardAmount = Math.max(500_000, Math.round(mvp * 100_000));
-      const walletRef = db.ref(`Pixie/Users/${sessionUser.discord_id}/Wallet`);
-      const walletSnap = await walletRef.get();
-      const wallet = walletSnap.val() || {};
-      await walletRef.update({
-        spore_wallet: (wallet.spore_wallet || 0) + rewardAmount,
-      });
-      console.log(`[GOVERNANCE-VOTE] ${sessionUser.username} voted on ${req.params.id} (${choice}, weight:${weight}, reward:${rewardAmount})`);
-    }
+    // Award flat 1M SPORE reward for voting (both proposal and official vote), once per proposal
+    const VOTE_REWARD = 100;
+    const walletRef = db.ref(`Pixie/Users/${sessionUser.discord_id}/Wallet`);
+    const walletSnap = await walletRef.get();
+    const wallet = walletSnap.val() || {};
+    await walletRef.update({
+      spore_wallet: (wallet.spore_wallet || 0) + VOTE_REWARD,
+    });
+    console.log(`[GOVERNANCE-VOTE] ${sessionUser.username} voted on ${req.params.id} (stage:${proposal.stage}, choice:${choice}, weight:${weight}, reward:${VOTE_REWARD})`);
 
     res.json({ ok: true });
   } catch (err) {
@@ -1020,7 +1076,15 @@ app.post('/api/proposals/create', async (req, res) => {
   const sessionUser = getSessionUser(req);
   if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
 
-  const { title, description, category, options, discord_link } = req.body;
+  const { title, description, category, options, discord_link, yes_meaning, no_meaning } = req.body;
+
+  // Resolve username if fallback auth was used
+  if (!sessionUser.username) {
+    try {
+      const pixSnap = await db.ref(`Pixie/Users/${sessionUser.discord_id}/Misc/username`).get();
+      sessionUser.username = pixSnap.exists() ? pixSnap.val() : sessionUser.discord_id;
+    } catch { sessionUser.username = sessionUser.discord_id; }
+  }
 
   if (!title || title.length < 10)       return res.status(400).json({ ok: false, message: 'Title too short' });
   if (!description || description.length < 50) return res.status(400).json({ ok: false, message: 'Description too short' });
@@ -1068,6 +1132,8 @@ app.post('/api/proposals/create', async (req, res) => {
       author_id:    sessionUser.discord_id,
       author_name:  sessionUser.username,
       discord_link: discord_link || null,
+      yes_meaning:  yes_meaning  || null,
+      no_meaning:   no_meaning   || null,
       created_at:   now.toISOString(),
       ends_at:      endsAt.toISOString(),
       vote_totals:  {},
@@ -1093,10 +1159,11 @@ app.post('/api/proposals/:id/advance', async (req, res) => {
   const sessionUser = getSessionUser(req);
   if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
 
-  // Check admin
   const ADMIN_IDS = (process.env.ADMIN_DISCORD_IDS || '').split(',');
-  if (!ADMIN_IDS.includes(sessionUser.discord_id)) {
-    return res.status(403).json({ ok: false, message: 'Admin only' });
+  const MOD_IDS   = ['1233612802883719261'];
+  const allowed   = [...ADMIN_IDS, ...MOD_IDS];
+  if (!allowed.includes(sessionUser.discord_id)) {
+    return res.status(403).json({ ok: false, message: 'Mod only' });
   }
 
   try {

@@ -16,7 +16,7 @@
     }
     :root {
       --cream: #ffffe1;
-      --yellow: #c084fc;
+      --purple: #c084fc;
       --red: #fd464f;
       --blue: #4fa8fd;
       --dark: #0f0f0f;
@@ -64,7 +64,7 @@
       .vote-hero .eyebrow { margin-bottom: 0.35rem; }
     }
     .vote-hero .eyebrow {
-      font-family: 'Syne Mono', monospace; font-size: 0.75rem;
+      font-family: 'Space Grotesk', monospace; font-size: 0.75rem;
       letter-spacing: 0.3em; color: var(--yellow); text-transform: uppercase;
       margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.2s forwards;
     }
@@ -89,13 +89,13 @@
       display: flex; flex-direction: column; align-items: center;
       gap: 0.4rem; padding: 1rem 2rem;
       background: var(--dark3); border: 1px solid rgba(255,255,225,0.08);
-      font-family: 'Syne Mono', monospace;
+      font-family: 'Space Grotesk', monospace;
       position: relative; min-width: 160px;
     }
     .stage-pill:first-child { border-radius: 1rem 0 0 1rem; }
     .stage-pill:last-child  { border-radius: 0 1rem 1rem 0; }
     .stage-pill + .stage-pill { border-left: none; }
-    .stage-pill.active { background: rgba(254,206,0,0.08); border-color: rgba(254,206,0,0.3); }
+    .stage-pill.active { background: rgba(192,132,252,0.08); border-color: rgba(192,132,252,0.3); }
     .stage-num { font-size: 0.6rem; letter-spacing: 0.2em; color: rgba(255,255,225,0.3); text-transform: uppercase; }
     .stage-name { font-size: 0.78rem; font-weight: 600; color: var(--cream); }
     .stage-sub  { font-size: 0.62rem; color: rgba(255,255,225,0.35); }
@@ -112,7 +112,7 @@
       margin: 0 auto; padding: 0 1.5rem 5rem;
     }
     .section-label {
-      font-family: 'Syne Mono', monospace; font-size: 0.7rem;
+      font-family: 'Space Grotesk', monospace; font-size: 0.7rem;
       letter-spacing: 0.25em; text-transform: uppercase;
       color: var(--yellow); margin-bottom: 0.5rem;
     }
@@ -140,24 +140,24 @@
       font-size: 0.9rem; color: rgba(255,255,225,0.3);
     }
     .auth-name { font-weight: 600; font-size: 0.9rem; }
-    .auth-sub  { font-size: 0.72rem; color: rgba(255,255,225,0.4); font-family: 'Syne Mono', monospace; }
+    .auth-sub  { font-size: 0.72rem; color: rgba(255,255,225,0.4); font-family: 'Space Grotesk', monospace; }
     .mvp-badge {
       display: inline-flex; align-items: center; gap: 0.35rem;
-      background: rgba(254,206,0,0.1); border: 1px solid rgba(254,206,0,0.25);
+      background: rgba(192,132,252,0.1); border: 1px solid rgba(192,132,252,0.25);
       border-radius: 999px; padding: 0.2em 0.7em;
-      font-family: 'Syne Mono', monospace; font-size: 0.65rem; color: var(--yellow);
+      font-family: 'Space Grotesk', monospace; font-size: 0.65rem; color: var(--purple);
     }
     .btn {
       display: inline-flex; align-items: center; gap: 0.4rem;
-      font-family: 'Syne Mono', monospace; font-size: 0.72rem;
+      font-family: 'Space Grotesk', monospace; font-size: 0.72rem;
       padding: 0.5em 1.2em; border-radius: 999px; border: 1px solid;
       cursor: pointer; transition: all 0.2s; text-decoration: none;
       white-space: nowrap; font-weight: 600;
     }
     .btn-discord { color: #5865f2; background: rgba(88,101,242,0.1); border-color: rgba(88,101,242,0.3); }
     .btn-discord:hover { background: rgba(88,101,242,0.2); border-color: rgba(88,101,242,0.6); }
-    .btn-yellow { color: var(--yellow); background: rgba(254,206,0,0.08); border-color: rgba(254,206,0,0.25); }
-    .btn-yellow:hover { background: rgba(254,206,0,0.15); border-color: rgba(254,206,0,0.5); }
+    .btn-yellow { color: var(--purple); background: rgba(192,132,252,0.08); border-color: rgba(192,132,252,0.25); }
+    .btn-yellow:hover { background: rgba(192,132,252,0.15); border-color: rgba(192,132,252,0.5); }
     .btn-red    { color: var(--red); background: rgba(253,70,79,0.08); border-color: rgba(253,70,79,0.25); }
     .btn-red:hover { background: rgba(253,70,79,0.15); border-color: rgba(253,70,79,0.5); }
     .btn-ghost  { color: rgba(255,255,225,0.5); background: transparent; border-color: rgba(255,255,225,0.1); }
@@ -180,13 +180,13 @@
       border-bottom: 1px solid rgba(255,255,225,0.07); padding-bottom: 1rem;
     }
     .tab {
-      font-family: 'Syne Mono', monospace; font-size: 0.72rem;
+      font-family: 'Space Grotesk', monospace; font-size: 0.72rem;
       padding: 0.4em 1em; border-radius: 999px;
       border: 1px solid rgba(255,255,225,0.12);
       background: transparent; color: rgba(255,255,225,0.45);
       cursor: pointer; transition: all 0.2s;
     }
-    .tab.active { border-color: var(--yellow); color: var(--yellow); background: rgba(254,206,0,0.08); }
+    .tab.active { border-color: var(--purple); color: var(--purple); background: rgba(192,132,252,0.08); }
     .tab:hover:not(.active) { border-color: rgba(255,255,225,0.3); color: var(--cream); }
     .tab-count {
       display: inline-block; font-size: 0.6rem; padding: 0.1em 0.45em;
@@ -212,12 +212,12 @@
 
     .proposal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
     .proposal-title  { font-size: 1rem; font-weight: 700; line-height: 1.3; }
-    .proposal-meta   { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; font-size: 0.72rem; color: rgba(255,255,225,0.4); font-family: 'Syne Mono', monospace; }
+    .proposal-meta   { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; font-size: 0.72rem; color: rgba(255,255,225,0.4); font-family: 'Space Grotesk', monospace; }
     .proposal-body   { font-size: 0.82rem; color: rgba(255,255,225,0.65); line-height: 1.6; margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
     .status-badge {
       display: inline-flex; align-items: center; gap: 0.3rem;
-      font-family: 'Syne Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em;
+      font-family: 'Space Grotesk', monospace; font-size: 0.62rem; letter-spacing: 0.08em;
       padding: 0.2em 0.65em; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
     }
     .badge-live    { background: rgba(34,197,94,0.12);  color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
@@ -231,15 +231,15 @@
 
     /* ---- VOTE BAR ---- */
     .vote-bar-wrap { margin-top: 0.75rem; }
-    .vote-bar-labels { display: flex; justify-content: space-between; font-family: 'Syne Mono', monospace; font-size: 0.65rem; color: rgba(255,255,225,0.4); margin-bottom: 0.3rem; }
+    .vote-bar-labels { display: flex; justify-content: space-between; font-family: 'Space Grotesk', monospace; font-size: 0.65rem; color: rgba(255,255,225,0.4); margin-bottom: 0.3rem; }
     .vote-bar-track { height: 6px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; }
     .vote-bar-fill  { height: 100%; border-radius: 999px; transition: width 1s cubic-bezier(0.16,1,0.3,1); }
     .vbf-yes    { background: var(--green); }
-    .vbf-mvp    { background: linear-gradient(90deg, var(--yellow), var(--blue)); }
-    .vote-totals { display: flex; gap: 1rem; margin-top: 0.4rem; font-family: 'Syne Mono', monospace; font-size: 0.65rem; }
+    .vbf-mvp    { background: linear-gradient(90deg, var(--purple), var(--blue)); }
+    .vote-totals { display: flex; gap: 1rem; margin-top: 0.4rem; font-family: 'Space Grotesk', monospace; font-size: 0.65rem; }
     .vt-yes  { color: var(--green); }
     .vt-no   { color: var(--red); }
-    .vt-mvp  { color: var(--yellow); }
+    .vt-mvp  { color: var(--purple); }
 
     /* ---- MODAL ---- */
     .gov-modal-overlay {
@@ -263,7 +263,7 @@
     }
     .gov-modal-close:hover { background: rgba(255,255,255,0.1); color: var(--cream); }
     .gov-modal-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .modal-sub   { font-size: 0.8rem; color: rgba(255,255,225,0.5); margin-bottom: 1.75rem; font-family: 'Syne Mono', monospace; }
+    .modal-sub   { font-size: 0.8rem; color: rgba(255,255,225,0.5); margin-bottom: 1.75rem; font-family: 'Space Grotesk', monospace; }
 
     /* ---- VOTE OPTIONS ---- */
     .vote-options { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
@@ -274,30 +274,30 @@
       cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.02);
     }
     .vote-option:hover { border-color: rgba(255,255,225,0.25); background: rgba(255,255,255,0.04); }
-    .vote-option.selected { border-color: var(--yellow); background: rgba(254,206,0,0.06); }
+    .vote-option.selected { border-color: var(--purple); background: rgba(192,132,252,0.06); }
     .vote-radio {
       width: 18px; height: 18px; border-radius: 50%;
       border: 2px solid rgba(255,255,225,0.25); flex-shrink: 0;
       display: flex; align-items: center; justify-content: center; transition: all 0.2s;
     }
-    .vote-option.selected .vote-radio { border-color: var(--yellow); background: var(--yellow); }
+    .vote-option.selected .vote-radio { border-color: var(--purple); background: var(--purple); }
     .vote-radio-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--dark); opacity: 0; transition: opacity 0.2s; }
     .vote-option.selected .vote-radio-dot { opacity: 1; }
     .vote-option-label { font-size: 0.9rem; font-weight: 600; }
 
     /* ---- COMMENTS ---- */
     .comments-section { margin-top: 2rem; }
-    .comments-title { font-size: 0.8rem; font-family: 'Syne Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,225,0.35); margin-bottom: 1rem; }
+    .comments-title { font-size: 0.8rem; font-family: 'Space Grotesk', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,225,0.35); margin-bottom: 1rem; }
     .comment-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
     .comment {
       background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,225,0.05);
       border-radius: 0.875rem; padding: 0.875rem 1rem;
     }
     .comment-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
-    .comment-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--dark3); flex-shrink: 0; }
+    .comment-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--dark3); flex-shrink: 0; }
     .comment-author { font-size: 0.75rem; font-weight: 600; }
-    .comment-time   { font-size: 0.65rem; color: rgba(255,255,225,0.3); font-family: 'Syne Mono', monospace; margin-left: auto; }
-    .comment-mvp    { font-size: 0.6rem; color: var(--yellow); font-family: 'Syne Mono', monospace; }
+    .comment-time   { font-size: 0.65rem; color: rgba(255,255,225,0.3); font-family: 'Space Grotesk', monospace; margin-left: auto; }
+    .comment-mvp    { font-size: 0.6rem; color: var(--yellow); font-family: 'Space Grotesk', monospace; }
     .comment-body   { font-size: 0.8rem; color: rgba(255,255,225,0.7); line-height: 1.6; }
     .comment-input-wrap { display: flex; gap: 0.75rem; align-items: flex-end; }
     .comment-input {
@@ -311,7 +311,7 @@
 
     /* ---- CREATE PROPOSAL ---- */
     .form-field { margin-bottom: 1.25rem; }
-    .form-label { font-family: 'Syne Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,225,0.4); margin-bottom: 0.5rem; display: block; }
+    .form-label { font-family: 'Space Grotesk', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,225,0.4); margin-bottom: 0.5rem; display: block; }
     .form-input, .form-textarea, .form-select {
       width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,225,0.1);
       border-radius: 0.875rem; padding: 0.75rem 1rem; color: var(--cream);
@@ -322,7 +322,7 @@
     .form-textarea { resize: vertical; min-height: 120px; }
     .form-select { appearance: none; cursor: pointer; }
     .form-select option { background: var(--dark2); }
-    .form-hint { font-size: 0.7rem; color: rgba(255,255,225,0.3); margin-top: 0.35rem; font-family: 'Syne Mono', monospace; }
+    .form-hint { font-size: 0.7rem; color: rgba(255,255,225,0.3); margin-top: 0.35rem; font-family: 'Space Grotesk', monospace; }
     .options-list { display: flex; flex-direction: column; gap: 0.5rem; }
     .option-row { display: flex; gap: 0.5rem; align-items: center; }
     .option-row .form-input { flex: 1; }
@@ -335,7 +335,7 @@
     }
     .burn-notice-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 0.1rem; }
     .burn-notice-text { font-size: 0.78rem; color: rgba(255,255,225,0.7); line-height: 1.6; }
-    .burn-amount { color: var(--red); font-weight: 700; font-family: 'Syne Mono', monospace; }
+    .burn-amount { color: var(--red); font-weight: 700; font-family: 'Space Grotesk', monospace; }
 
     /* ---- INFO CARDS ---- */
     .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 3rem; }
@@ -351,20 +351,20 @@
     /* ---- MISC ---- */
     .glow-divider {
       width: 100%; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+      background: linear-gradient(90deg, transparent, var(--purple), transparent);
       margin: 3rem 0; opacity: 0.2;
     }
     .empty-state {
       text-align: center; padding: 4rem 2rem;
-      color: rgba(255,255,225,0.25); font-family: 'Syne Mono', monospace; font-size: 0.78rem;
+      color: rgba(255,255,225,0.25); font-family: 'Space Grotesk', monospace; font-size: 0.78rem;
     }
     .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; }
     .loading-state {
       text-align: center; padding: 3rem; color: rgba(255,255,225,0.3);
-      font-family: 'Syne Mono', monospace; font-size: 0.78rem;
+      font-family: 'Space Grotesk', monospace; font-size: 0.78rem;
     }
     .tag {
-      display: inline-block; font-family: 'Syne Mono', monospace; font-size: 0.6rem;
+      display: inline-block; font-family: 'Space Grotesk', monospace; font-size: 0.6rem;
       letter-spacing: 0.08em; padding: 0.2em 0.55em; border-radius: 999px;
       background: rgba(255,255,225,0.05); color: rgba(255,255,225,0.35);
       border: 1px solid rgba(255,255,225,0.08); margin-right: 0.3rem;
@@ -382,7 +382,7 @@
     .toast.error   { border-color: rgba(253,70,79,0.3); }
     .progress-bar {
       position: fixed; bottom: 0; left: 0; height: 2px; z-index: 9999;
-      background: linear-gradient(90deg, var(--yellow), var(--red));
+      background: linear-gradient(90deg, var(--purple), var(--red));
       transition: width 0.3s ease; width: 0%;
     }
 
@@ -536,23 +536,23 @@
         <div class="info-card-icon">⚡</div>
         <div class="info-card-title">Mycelium Voting Power</div>
         <div class="info-card-body">
-          <strong>Score: 0 – 100 points</strong><br><br>
+          <strong>Score: 0 – 200 points</strong><br><br>
           Your MVP is calculated across 7 categories. Use <strong>!mvp</strong> in Discord to see your current score and breakdown.<br><br>
-          In Official Votes, your MVP score <strong>is your vote weight</strong>. A voter with 80 MVP carries 80x the weight of someone with 1 MVP.
+          In Official Votes, your MVP score <strong>is your vote weight</strong>.
         </div>
       </div>
       <div class="info-card">
         <div class="info-card-icon">📊</div>
         <div class="info-card-title">How MVP is Calculated</div>
         <div class="info-card-body">
-          <strong>Mycelium Nodes</strong> — 25 pts max (0.5 per node)<br>
-          <strong>Staked SPORE</strong> — 20 pts max (0.1 per 10M)<br>
+          <strong>Mycelium Nodes</strong> — 100 pts max (1 per node)<br><br>
+          <strong>Staked SPORE</strong> — 25 pts max (0.1 per 10M)<br>
+          <strong>Farm Rank</strong> — 15 pts max<br>
           <strong>Planted SHROOM</strong> — 15 pts max (0.1 per 100K)<br>
+          <strong>Pixie XP</strong> — 15 pts max (0.1 per 100K XP)<br>
           <strong>Onchain SPORE</strong> — 10 pts max (0.1 per 10M)<br>
-          <strong>Farm Rank</strong> — 10 pts max<br>
-          <strong>Pixie XP</strong> — 10 pts max (0.1 per 100K XP)<br>
-          <strong>Onchain SHROOM</strong> — 5 pts max<br>
-          <strong>NFTs</strong> — 5 pts max
+          <strong>Onchain SHROOM</strong> — 10 pts max<br>
+          <strong>NFTs</strong> — 10 pts max
         </div>
       </div>
       <div class="info-card">
@@ -560,7 +560,7 @@
         <div class="info-card-title">Why MVP Matters</div>
         <div class="info-card-body">
           The winning option is whichever side accumulates the <strong>highest total MVP sum</strong> — not just the most votes.<br><br>
-          Voters are <strong>rewarded with SPORE</strong> for participating. Higher MVP = larger reward.
+          Regardless of MVP, all voters earn a flat <strong>1,000,000 SPORE</strong> reward for participating in both Official Proposals and Official Votes.
         </div>
       </div>
     </div>
@@ -622,14 +622,24 @@
         <div style="display:flex;gap:0.75rem;">
           <div style="flex:1;display:flex;align-items:center;gap:0.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.75rem 1rem;">
             <img src="/images/yes.png" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display='none'">
-            <span style="font-family:Syne Mono,monospace;font-size:0.85rem;color:var(--green);font-weight:600;">YES</span>
+            <span style="font-family:Space Grotesk,monospace;font-size:0.85rem;color:var(--green);font-weight:600;">YES</span>
           </div>
           <div style="flex:1;display:flex;align-items:center;gap:0.5rem;background:rgba(253,70,79,0.06);border:1px solid rgba(253,70,79,0.2);border-radius:0.875rem;padding:0.75rem 1rem;">
             <img src="/images/no.png" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display='none'">
-            <span style="font-family:Syne Mono,monospace;font-size:0.85rem;color:var(--red);font-weight:600;">NO</span>
+            <span style="font-family:Space Grotesk,monospace;font-size:0.85rem;color:var(--red);font-weight:600;">NO</span>
           </div>
         </div>
-        <div class="form-hint">Official proposals always use Yes / No voting.</div>
+        <div class="form-hint">Official proposals always use Yes / No voting. Explain exactly what each means for your specific proposal.</div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.75rem;">
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <span style="flex-shrink:0;font-family:'Space Grotesk',monospace;font-size:0.78rem;color:var(--green);font-weight:700;width:32px;">YES</span>
+            <input type="text" class="form-input" id="create-yes-meaning" placeholder="What does voting YES mean?" maxlength="120"/>
+          </div>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <span style="flex-shrink:0;font-family:'Space Grotesk',monospace;font-size:0.78rem;color:var(--red);font-weight:700;width:32px;">NO</span>
+            <input type="text" class="form-input" id="create-no-meaning" placeholder="What does voting NO mean?" maxlength="120"/>
+          </div>
+        </div>
       </div>
       <div class="form-field">
         <label class="form-label">Pre-Proposal Discord Link <span style="color:rgba(255,255,225,0.3);">(optional)</span></label>
@@ -925,15 +935,24 @@
         <div class="vote-bar-track"><div class="vote-bar-fill vbf-mvp" style="width:${pct}%"></div></div>
         <div class="vote-totals"><span class="vt-mvp">${fmtMvp(total)} total MVP</span><span style="color:rgba(255,255,225,0.25);">${p.voter_count || 0} voters</span></div>
       </div>`;
-    } else if (isProposal && p.vote_totals) {
-      const yes   = p.vote_totals['yes'] || 0;
-      const total = yes + (p.vote_totals['no'] || 0);
-      const pct   = total > 0 ? ((yes / total) * 100).toFixed(1) : 0;
-      voteBar = `<div class="vote-bar-wrap">
-        <div class="vote-bar-labels"><span>YES</span><span>${pct}% in favor</span></div>
-        <div class="vote-bar-track"><div class="vote-bar-fill vbf-yes" style="width:${pct}%"></div></div>
-        <div class="vote-totals"><span class="vt-yes">${yes} Yes</span><span class="vt-no">${p.vote_totals['no'] || 0} No</span></div>
-      </div>`;
+    } else if (isProposal) {
+      if (p.status === 'active') {
+        const voterCount = p.voter_count || 0;
+        const pct = Math.min(100, Math.round((voterCount / 42) * 100));
+        voteBar = `<div class="vote-bar-wrap">
+          <div class="vote-bar-labels"><span style="color:rgba(255,255,225,0.4);">🔒 Results hidden until voting closes</span><span style="color:rgba(255,255,225,0.35);">${voterCount} / 42 voted</span></div>
+          <div class="vote-bar-track"><div class="vote-bar-fill" style="background:rgba(255,255,225,0.15);width:${pct}%"></div></div>
+        </div>`;
+      } else if (p.vote_totals) {
+        const yes   = p.vote_totals['yes'] || p.vote_totals['Yes'] || 0;
+        const total = yes + (p.vote_totals['no'] || p.vote_totals['No'] || 0);
+        const pct   = total > 0 ? ((yes / total) * 100).toFixed(1) : 0;
+        voteBar = `<div class="vote-bar-wrap">
+          <div class="vote-bar-labels"><span>YES</span><span>${pct}% in favor</span></div>
+          <div class="vote-bar-track"><div class="vote-bar-fill vbf-yes" style="width:${pct}%"></div></div>
+          <div class="vote-totals"><span class="vt-yes">${yes} Yes</span><span class="vt-no">${p.vote_totals['no'] || p.vote_totals['No'] || 0} No</span></div>
+        </div>`;
+      }
     }
 
     const stageLbl = isVote ? 'Official Vote' : isProposal ? 'Official Proposal' : 'Pre-Proposal';
@@ -945,7 +964,7 @@
       </div>
       <div class="proposal-body">${escHtml(p.description)}</div>
       <div class="proposal-meta">
-        <span class="tag">${escHtml(p.category || 'general')}</span>
+        <span class="tag">${escHtml((p.category || 'general').toUpperCase())}</span>
         <span>${stageLbl}</span>
         ${timeLeft ? `<span>· ${escHtml(timeLeft)}</span>` : ''}
         <span>· ${commentCount} comments</span>
@@ -970,7 +989,9 @@
 
     try {
       const [propRes, commentRes] = await Promise.all([
-        fetch(`${window.API_BASE}/api/proposals/${id}`),
+        fetch(`${window.API_BASE}/api/proposals/${id}`, {
+          headers: currentUser ? { 'x-discord-id': currentUser.discord_id } : {},
+        }),
         fetch(`${window.API_BASE}/api/proposals/${id}/comments`),
       ]);
       const prop     = (await propRes.json()).proposal || p;
@@ -1001,9 +1022,9 @@
     if (isVote && canVote && currentUser.mvp > 0) {
       const opts = p.options || ['Option A', 'Option B'];
       voteSection = `<div style="margin-bottom:1.5rem;">
-        <div style="font-family:'Syne Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.75rem;">Cast Your Vote — Your MVP: ${(currentUser.mvp||0).toFixed(1)}</div>
+        <div style="font-family:'Space Grotesk',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.75rem;">Cast Your Vote — Your MVP: ${(currentUser.mvp||0).toFixed(1)}</div>
         <div class="vote-options" id="vote-opts">
-          ${opts.map(o => `<div class="vote-option${myVote===o?' selected':''}" onclick="selectVoteOption(this,'${escAttr(o)}')">
+          ${opts.map(o => `<div class="vote-option${myVote===o?' selected':''}" ${myVote ? 'style="pointer-events:none;opacity:'+(myVote===o?'1':'0.35')+';"' : `onclick="selectVoteOption(this,'${escAttr(o)}')"`}>
             <div class="vote-radio"><div class="vote-radio-dot"></div></div>
             <span class="vote-option-label">${escHtml(o)}</span>
           </div>`).join('')}
@@ -1011,14 +1032,19 @@
         <button class="btn btn-yellow" onclick="castVote('${p.id}','vote')" id="btn-cast-vote"${myVote?' disabled':''}>
           ${myVote ? 'Vote Cast' : 'Cast Vote'}
         </button>
-        ${myVote ? `<div style="font-size:0.72rem;color:rgba(255,255,225,0.35);margin-top:0.5rem;font-family:'Syne Mono',monospace;">You voted: ${escHtml(myVote)}</div>` : ''}
+        ${myVote ? `
+          <div style="margin-top:1rem;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.875rem 1rem;font-size:0.78rem;color:rgba(255,255,225,0.6);line-height:1.6;">
+            ✅ You already voted <strong style="color:var(--cream);">${escHtml(myVote)}</strong> and cannot change your vote.<br>
+            <span style="color:rgba(255,255,225,0.4);font-family:'Space Grotesk',monospace;font-size:0.7rem;">1,000,000 SPORE was already transferred to your Discord wallet as a thank-you for participating.</span>
+          </div>` : `
+          <div id="vote-reward-banner" style="display:none;margin-top:1rem;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.875rem 1rem;font-size:0.78rem;color:rgba(255,255,225,0.7);line-height:1.7;"></div>`}
       </div>`;
     } else if (isProposal && canVote) {
       const propOpts = p.options && p.options.length >= 2 ? p.options : ['Yes', 'No'];
       voteSection = `<div style="margin-bottom:1.5rem;">
-        <div style="font-family:'Syne Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.75rem;">Your Vote · 1 person = 1 vote · 70% yes needed to advance</div>
+        <div style="font-family:'Space Grotesk',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.75rem;">Your Vote · 1 person = 1 vote · 70% yes needed to advance</div>
         <div class="vote-options" id="vote-opts">
-          ${propOpts.map(o => `<div class="vote-option${myVote===o?' selected':''}" onclick="selectVoteOption(this,'${escAttr(o)}')">
+          ${propOpts.map(o => `<div class="vote-option${myVote===o?' selected':''}" ${myVote ? 'style="pointer-events:none;opacity:'+(myVote===o?'1':'0.35')+';"' : `onclick="selectVoteOption(this,'${escAttr(o)}')"`}>
             <div class="vote-radio"><div class="vote-radio-dot"></div></div>
             <span class="vote-option-label">${escHtml(o)}</span>
           </div>`).join('')}
@@ -1026,6 +1052,17 @@
         <button class="btn btn-green" onclick="castVote('${p.id}','proposal')" id="btn-cast-vote"${myVote?' disabled':''}>
           ${myVote ? 'Vote Cast' : 'Submit Vote'}
         </button>
+        ${myVote ? `
+          <div style="margin-top:1rem;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.875rem 1rem;font-size:0.78rem;color:rgba(255,255,225,0.6);line-height:1.6;">
+            ✅ You already voted and cannot change your vote.<br>
+            <span style="color:rgba(255,255,225,0.4);font-family:'Space Grotesk',monospace;font-size:0.7rem;">1,000,000 SPORE was already transferred to your Discord wallet as a thank-you for participating.</span>
+          </div>` : `
+          <div id="vote-reward-banner" style="display:none;margin-top:1rem;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.875rem 1rem;font-size:0.78rem;color:rgba(255,255,225,0.7);line-height:1.7;"></div>`}
+        ${currentUser && ['1233612802883719261'].includes(currentUser.discord_id) ? `
+          <button class="btn" style="color:var(--purple);background:rgba(192,132,252,0.08);border-color:rgba(192,132,252,0.25);margin-left:0.5rem;" onclick="modAdvanceProposal('${p.id}')">
+            ⚡ Push to Vote
+          </button>
+        ` : ''}
       </div>`;
     } else if (isVote && currentUser && currentUser.mvp <= 0) {
       voteSection = `<div style="background:rgba(253,70,79,0.07);border:1px solid rgba(253,70,79,0.2);border-radius:1rem;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:0.78rem;color:rgba(255,255,225,0.6);">
@@ -1039,11 +1076,11 @@
 
     // Results
     let resultsHTML = '';
-    if (p.vote_totals) {
+    if (p.vote_totals && p.status !== 'active') {
       const entries = Object.entries(p.vote_totals);
       const total   = entries.reduce((s, [, v]) => s + v, 0);
       resultsHTML = `<div style="margin-bottom:1.5rem;">
-        <div style="font-family:'Syne Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.75rem;">
+        <div style="font-family:'Space Grotesk',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.75rem;">
           ${isVote ? 'Vote Results (MVP Weight)' : 'Poll Results'}
         </div>
         ${entries.map(([opt, val]) => {
@@ -1052,14 +1089,14 @@
           return `<div style="margin-bottom:0.85rem;">
             <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:0.3rem;">
               <span>${escHtml(opt.charAt(0).toUpperCase() + opt.slice(1))}</span>
-              <span style="font-family:'Syne Mono',monospace;color:${color};">${pct.toFixed(1)}% ${isVote ? `(${fmtMvp(val)} MVP)` : `(${val} votes)`}</span>
+              <span style="font-family:'Space Grotesk',monospace;color:${color};">${pct.toFixed(1)}% ${isVote ? `(${fmtMvp(val)} MVP)` : `(${val} votes)`}</span>
             </div>
             <div class="vote-bar-track" style="height:8px;">
               <div class="vote-bar-fill" style="background:${color};width:0%;transition:width 1s ease;" data-width="${pct.toFixed(1)}"></div>
             </div>
           </div>`;
         }).join('')}
-        <div style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Syne Mono',monospace;margin-top:0.5rem;">
+        <div style="font-size:0.7rem;color:rgba(255,255,225,0.3);font-family:'Space Grotesk',monospace;margin-top:0.5rem;">
           ${isVote ? `${p.voter_count || 0} voters · ${fmtMvp(total)} total MVP cast` : `${p.voter_count || 0} total votes`}
         </div>
       </div>`;
@@ -1070,12 +1107,14 @@
       ? comments.map(c => renderComment(c)).join('')
       : '<div style="font-size:0.78rem;color:rgba(255,255,225,0.25);padding:0.5rem 0;">No comments yet. Be the first!</div>';
 
-    const commentInput = currentUser
-      ? `<div class="comment-input-wrap" style="margin-top:0.75rem;">
-          <textarea class="comment-input" id="comment-text-${p.id}" placeholder="Share your thoughts..."></textarea>
-          <button class="btn btn-yellow" style="border-radius:0.75rem;" onclick="postComment('${p.id}')">Post</button>
-        </div>`
-      : `<div style="font-size:0.75rem;color:rgba(255,255,225,0.3);margin-top:0.5rem;"><a href="#" onclick="startDiscordOAuth(event)" style="color:#5865f2;">Connect Discord</a> to comment.</div>`;
+    const commentInput = isVote
+      ? `<div style="font-size:0.75rem;color:rgba(255,255,225,0.3);margin-top:0.5rem;font-family:'Space Grotesk',monospace;">💬 Comments are disabled during Official Votes. Discuss in Discord.</div>`
+      : currentUser
+        ? `<div class="comment-input-wrap" style="margin-top:0.75rem;">
+            <textarea class="comment-input" id="comment-text-${p.id}" placeholder="Share your thoughts..."></textarea>
+            <button class="btn btn-yellow" style="border-radius:0.75rem;" onclick="postComment('${p.id}')">Post</button>
+          </div>`
+        : `<div style="font-size:0.75rem;color:rgba(255,255,225,0.3);margin-top:0.5rem;"><a href="#" onclick="startDiscordOAuth(event)" style="color:#5865f2;">Connect Discord</a> to comment.</div>`;
 
     const discordLink = p.discord_link
       ? `<a href="${escAttr(p.discord_link)}" target="_blank" class="btn btn-ghost" style="font-size:0.65rem;">View Discord Thread ↗</a>`
@@ -1083,15 +1122,31 @@
 
     return `
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:0.5rem;flex-wrap:wrap;">
-        <span class="tag">${escHtml(p.category || 'general')}</span>
+        <span class="tag">${escHtml((p.category || 'general').toUpperCase())}</span>
         <div style="display:flex;gap:0.5rem;align-items:center;">
           ${discordLink}
-          ${p.status === 'active' ? `<span style="font-family:'Syne Mono',monospace;font-size:0.65rem;color:rgba(255,255,225,0.3);">⏱ ${escHtml(timeLeft)}</span>` : ''}
+          ${p.status === 'active' ? `<span style="font-family:'Space Grotesk',monospace;font-size:0.65rem;color:rgba(255,255,225,0.3);">⏱ ${escHtml(timeLeft)}</span>` : ''}
         </div>
       </div>
       <div class="gov-modal-title" style="font-size:1.4rem;margin-top:0.5rem;">${escHtml(p.title)}</div>
-      <div class="gov-modal-sub">by ${escHtml(p.author_name||'Unknown')} · ${p.stage === 'vote' ? 'Official Vote' : p.stage === 'proposal' ? 'Official Proposal' : 'Pre-Proposal'}</div>
-      <div style="font-size:0.85rem;color:rgba(255,255,225,0.7);line-height:1.7;margin-bottom:1.5rem;white-space:pre-wrap;">${escHtml(p.description)}</div>
+      <div class="gov-modal-sub" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+        <span>by ${escHtml(p.author_name||'Unknown')} · ${p.stage === 'vote' ? 'Official Vote' : p.stage === 'proposal' ? 'Official Proposal' : 'Pre-Proposal'}</span>
+        ${currentUser && ['1233612802883719261'].includes(currentUser.discord_id) && isProposal && isActive ? `
+          <button class="btn btn-yellow" style="font-size:0.65rem;" onclick="modAdvanceProposal('${p.id}')">⚡ Push to Official Vote</button>
+        ` : ''}
+      </div>
+      <div style="font-size:0.85rem;color:rgba(255,255,225,0.7);line-height:1.7;margin-bottom:1rem;white-space:pre-wrap;">${escHtml(p.description)}</div>
+      ${isProposal ? `<div style="background:rgba(255,255,225,0.03);border:1px solid rgba(255,255,225,0.08);border-radius:0.75rem;padding:0.875rem 1rem;margin-bottom:1.5rem;font-size:0.78rem;color:rgba(255,255,225,0.55);line-height:1.7;">
+        If you agree with this proposal, vote <strong style="color:var(--green);">YES</strong> to move it to an Official Vote.<br>
+        If you disagree with this proposal, vote <strong style="color:var(--red);">NO</strong> and we will continue discussions in Discord.
+        <div style="margin-top:0.6rem;padding-top:0.6rem;border-top:1px solid rgba(255,255,225,0.06);color:rgba(255,255,225,0.35);font-size:0.7rem;display:flex;gap:1rem;flex-wrap:wrap;">
+          <span>🗳️ <strong style="color:rgba(255,255,225,0.5);">42 voters</strong> required to pass</span>
+          <span>✅ <strong style="color:rgba(255,255,225,0.5);">70% YES</strong> needed to advance</span>
+        </div>
+        <div style="margin-top:0.6rem;padding-top:0.6rem;border-top:1px solid rgba(255,255,225,0.06);color:rgba(255,255,225,0.35);font-size:0.7rem;">
+          Regardless of what you vote or your MVP, all voters earn <strong style="color:var(--blue);">1,000,000 SPORE</strong> reward for participating.
+        </div>
+      </div>` : ''}
       ${voteSection}
       ${resultsHTML}
       <div class="comments-section">
@@ -1121,6 +1176,14 @@
     btn.disabled = true;
     btn.textContent = 'Submitting...';
 
+    // Fetch balance before vote
+    let balanceBefore = null;
+    try {
+      const bRes = await fetch(`${window.API_BASE}/api/user/${currentUser.discord_id}`);
+      const bData = await bRes.json();
+      balanceBefore = bData?.pixie?.Wallet?.spore_wallet ?? null;
+    } catch {}
+
     try {
       const res = await fetch(`${window.API_BASE}/api/proposals/${proposalId}/vote`, {
         method: 'POST',
@@ -1131,11 +1194,36 @@
       const data = await res.json();
       if (!data.ok) { showToast(data.message || 'Vote failed', 'error'); btn.disabled = false; btn.textContent = 'Cast Vote'; return; }
 
-      showToast('Vote recorded!', 'success');
       btn.textContent = 'Vote Cast';
-      // Refresh proposal data
+
+      // Fetch balance after vote
+      let balanceAfter = null;
+      try {
+        const aRes = await fetch(`${window.API_BASE}/api/user/${currentUser.discord_id}`);
+        const aData = await aRes.json();
+        balanceAfter = aData?.pixie?.Wallet?.spore_wallet ?? null;
+      } catch {}
+
+      // Show reward banner
+      const rewardEl = document.getElementById('vote-reward-banner');
+      if (rewardEl) {
+        const fmtSpore = v => v >= 1_000_000 ? (v/1_000_000).toFixed(2) + 'M' : Number(v).toLocaleString();
+        rewardEl.innerHTML = `
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
+            <span style="font-size:1rem;">🎉</span>
+            <span style="font-weight:700;color:var(--green);">+1,000,000 SPORE added to your Discord Wallet!</span>
+          </div>
+          ${balanceBefore !== null && balanceAfter !== null ? `
+          <div style="display:flex;gap:1.5rem;font-family:'Space Grotesk',monospace;font-size:0.72rem;">
+            <span style="color:rgba(255,255,225,0.4);">Before: <span style="color:var(--cream);">${fmtSpore(balanceBefore)}</span></span>
+            <span style="color:rgba(255,255,225,0.4);">→</span>
+            <span style="color:rgba(255,255,225,0.4);">After: <span style="color:var(--green);">${fmtSpore(balanceAfter)}</span></span>
+          </div>` : ''}`;
+        rewardEl.style.display = 'block';
+      }
+
+      showToast('Vote recorded! +1M SPORE rewarded', 'success');
       await loadProposals();
-      openProposal(proposalId);
     } catch {
       showToast('Error submitting vote', 'error');
       btn.disabled = false; btn.textContent = 'Cast Vote';
@@ -1170,9 +1258,23 @@
   // CREATE PROPOSAL
   // ================================================================
   function renderComment(c) {
-    const avatarHtml = c.author_avatar
-      ? `<img src="https://cdn.discordapp.com/avatars/${escHtml(c.author_id)}/${escHtml(c.author_avatar)}.png" class="comment-avatar" style="object-fit:cover;">`
-      : `<div class="comment-avatar" style="display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:rgba(255,255,225,0.3);">${escHtml((c.author_name||'?').charAt(0).toUpperCase())}</div>`;
+    // Try avatar from comment data first, then fall back to localStorage for known users
+    let avatarHash = c.author_avatar || null;
+    if (!avatarHash) {
+      try {
+        const stored = JSON.parse(localStorage.getItem('mp_profile_user') || '{}');
+        if (stored.discord_id && stored.discord_id === c.author_id && stored.avatar) {
+          avatarHash = stored.avatar;
+        }
+      } catch(e) {}
+    }
+    const avatarUrl = avatarHash
+      ? `https://cdn.discordapp.com/avatars/${escHtml(c.author_id)}/${escHtml(avatarHash)}.png?size=64`
+      : null;
+    const initial = escHtml((c.author_name||'?').charAt(0).toUpperCase());
+    const avatarHtml = avatarUrl
+      ? `<img src="${avatarUrl}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(192,132,252,0.4);" onerror="this.style.display='none'">`
+      : `<div style="width:28px;height:28px;border-radius:50%;background:var(--dark3);border:1.5px solid rgba(255,255,225,0.1);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:rgba(255,255,225,0.4);">${initial}</div>`;
     return `<div class="comment">
       <div class="comment-header">
         ${avatarHtml}
@@ -1215,10 +1317,14 @@
     const desc     = document.getElementById('create-desc').value.trim();
     const category = document.getElementById('create-category').value;
     const discordLink = document.getElementById('create-discord-link').value.trim();
+    const yesMeaning = document.getElementById('create-yes-meaning').value.trim();
+    const noMeaning  = document.getElementById('create-no-meaning').value.trim();
     const options = ['Yes', 'No'];
 
     if (!title || title.length < 10) { showToast('Title too short (min 10 chars)', 'error'); return; }
     if (!desc  || desc.length  < 50) { showToast('Description too short (min 50 chars)', 'error'); return; }
+    if (!yesMeaning) { showToast('Please define what YES means', 'error'); return; }
+    if (!noMeaning)  { showToast('Please define what NO means', 'error'); return; }
 
     const btn = document.getElementById('btn-submit-proposal');
     btn.disabled = true; btn.textContent = 'Submitting...';
@@ -1228,7 +1334,7 @@
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
-        body: JSON.stringify({ discord_id: currentUser.discord_id, title, description: desc, category, options, discord_link: discordLink }),
+        body: JSON.stringify({ discord_id: currentUser.discord_id, title, description: desc, category, options, discord_link: discordLink, yes_meaning: yesMeaning, no_meaning: noMeaning }),
       });
       const data = await res.json();
       if (!data.ok) {
@@ -1362,6 +1468,25 @@
       await loadProposals();
     } catch { showToast('Error creating vote', 'error'); }
   }
+  async function modAdvanceProposal(proposalId) {
+    if (!currentUser) return;
+    if (!confirm('Push this proposal directly to an Official Vote? This bypasses the 42-voter and 70% requirements.')) return;
+    try {
+      const res = await fetch(`${window.API_BASE}/api/proposals/${proposalId}/advance`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+        body: JSON.stringify({ discord_id: currentUser.discord_id }),
+      });
+      const data = await res.json();
+      if (!data.ok) { showToast(data.message || 'Failed to advance', 'error'); return; }
+      showToast('Proposal advanced to Official Vote!', 'success');
+      closeModal('modal-detail');
+      await loadProposals();
+    } catch { showToast('Error advancing proposal', 'error'); }
+  }
+  window.modAdvanceProposal = modAdvanceProposal;
+
   window.submitModVote = submitModVote;
 
   // expose for inline onclick
@@ -1389,7 +1514,7 @@
     }
 .pwa-nav{position:fixed;bottom:0;left:0;right:0;height:65px;background:#111;border-top:1px solid rgba(255,255,225,0.08);display:none;align-items:stretch;z-index:999;padding-bottom:env(safe-area-inset-bottom);}
 @media(display-mode:standalone){.pwa-nav{display:flex;}body{padding-bottom:80px!important;}}
-.pwa-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.2rem;text-decoration:none;color:rgba(255,255,225,0.35);font-family:'Syne Mono',monospace;font-size:0.55rem;letter-spacing:0.05em;transition:color 0.2s;}
+.pwa-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.2rem;text-decoration:none;color:rgba(255,255,225,0.35);font-family:'Space Grotesk',monospace;font-size:0.55rem;letter-spacing:0.05em;transition:color 0.2s;}
 .pwa-tab span:first-child{font-size:1.3rem;display:flex;align-items:center;justify-content:center;}
 .pwa-tab.active{color:#fece00;}
 @media(display-mode:standalone){header{display:none!important;}#global-menu{display:none!important;}html body{padding-top:0!important;}.vote-hero{padding:1.25rem 1rem 0.75rem!important;}.vote-hero h1{font-size:1.75rem!important;margin-bottom:0.35rem!important;}.vote-hero p{font-size:0.8rem!important;margin-bottom:0.5rem!important;}}

@@ -2828,7 +2828,7 @@ function renderNFTs(p) {
   const wallet = p.Wallet || {};
   const nftWallet = wallet.NFT || {};
 
-  const keys = Object.keys(nftWallet).filter(k => k !== 'total_nft');
+  const keys = Object.keys(nftWallet).filter(k => k !== 'total_nft' && k !== '_last_scan');
   const el = document.getElementById('nft-content');
 
   if (!keys.length) {
