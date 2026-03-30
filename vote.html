@@ -391,9 +391,10 @@
     .reveal.visible { opacity: 1; transform: none; }
 
     .vote-footer {
-      position: relative; z-index: 1; text-align: center; padding: 2rem 1rem;
-      font-size: 0.8rem; color: rgba(255,255,225,0.3);
+      position: relative; z-index: 1; text-align: center; padding: 0.75rem 1rem;
+      font-size: 0.7rem; color: rgba(255,255,225,0.3);
       border-top: 1px solid rgba(255,255,225,0.06);
+      font-family: 'Space Grotesk', monospace; letter-spacing: 0.05em;
     }
 
     @media (max-width: 600px) {
@@ -568,6 +569,8 @@
     <div class="glow-divider"></div>
 
   </div><!-- /vote-section -->
+
+  <div class="vote-footer">&copy; 2025 Mushroom Planet. All rights reserved.</div>
 
   <!-- ============================================================
        PROPOSAL DETAIL MODAL
@@ -1513,7 +1516,7 @@
       .header-icons { display: none !important; }
     }
 .pwa-nav{position:fixed;bottom:0;left:0;right:0;height:65px;background:#111;border-top:1px solid rgba(255,255,225,0.08);display:none;align-items:stretch;z-index:999;padding-bottom:env(safe-area-inset-bottom);}
-@media(display-mode:standalone){.pwa-nav{display:flex;}body{padding-bottom:80px!important;}}
+@media(display-mode:standalone){.pwa-nav{display:flex;}body{padding-bottom:65px!important;}}
 .pwa-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.2rem;text-decoration:none;color:rgba(255,255,225,0.35);font-family:'Space Grotesk',monospace;font-size:0.55rem;letter-spacing:0.05em;transition:color 0.2s;}
 .pwa-tab span:first-child{font-size:1.3rem;display:flex;align-items:center;justify-content:center;}
 .pwa-tab.active{color:#fece00;}
