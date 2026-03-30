@@ -1628,8 +1628,8 @@ function renderFarm(s, p) {
     Object.entries(nftW).forEach(([k, v]) => {
       if (!v || typeof v !== 'object') return;
       const cnt = parseInt(v.count || 1);
-      if (k.includes('King Mooshie Pool') || v.token_id == 1) poolCount += cnt;
-      else if (k.includes('Mooshie Family Portrait') || v.token_id == 2) portraitCount += cnt;
+      if (k.includes('King Mooshie Pool')) poolCount += cnt;
+      else if (k.includes('Mooshie Family Portrait')) portraitCount += cnt;
     });
     const mooshieSubRows = [];
     if (poolCount > 0) mooshieSubRows.push({ label: 'King Mooshie Pool x' + poolCount + ' (2% each)', key: '_pool', val: poolCount * 2, emoji: sgrI('pool_nft.png'), color: 'var(--yellow)' });
@@ -3687,7 +3687,7 @@ function renderStats(s, p) {
       Object.entries(nftW3).forEach(([k, v]) => {
         if (!v || typeof v !== 'object') return;
         const c = parseInt(v.count || 1);
-        if (k.includes('King Mooshie Pool') || v.token_id == 1) poolCnt3 += c;
+        if (k.includes('King Mooshie Pool')) poolCnt3 += c;
         else if (k.includes('Mooshie Family Portrait') || v.token_id == 2) portraitCnt3 += c;
       });
       const mooshieSub3 = [];
