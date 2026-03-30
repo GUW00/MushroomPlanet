@@ -125,10 +125,29 @@
     .nft-shop-img img { width: 100%; height: auto; object-fit: contain; display: block; }
     .nft-shop-info { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
     .nft-shop-name { font-size: 0.95rem; font-weight: 700; color: var(--cream); }
+    .nft-shop-name span { font-size: 0.72rem !important; font-weight: 600 !important; color: rgba(255,255,225,0.55) !important; }
     .nft-shop-reward { font-family: 'Space Grotesk', monospace; font-size: 0.68rem; color: var(--blue); font-weight: 600; }
     .nft-shop-desc { font-size: 0.78rem; color: rgba(255,255,225,0.55); line-height: 1.65; flex: 1; }
     @media (max-width: 600px) { .nft-shop-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 400px) { .nft-shop-grid { grid-template-columns: 1fr; } }
+    .shop-intro-card { background: var(--dark2); border: 1px solid rgba(255,255,225,0.07); border-radius: 1.25rem; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+    .shop-intro-card p { font-size: 0.82rem; color: rgba(255,255,225,0.6); line-height: 1.75; margin: 0; }
+    .shop-intro-card p + p { margin-top: 0.5rem; }
+    .shop-filter-row { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .shop-filter-btn { font-family: 'Space Grotesk', monospace; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; padding: 0.4rem 1rem; border-radius: 999px; border: 1.5px solid rgba(255,255,225,0.12); background: transparent; color: rgba(255,255,225,0.45); cursor: pointer; transition: all 0.2s; }
+    .shop-filter-btn.active { border-color: var(--blue); color: var(--blue); background: rgba(79,168,253,0.08); }
+    .shop-filter-btn:hover:not(.active) { border-color: rgba(255,255,225,0.28); color: rgba(255,255,225,0.75); }
+    .nft-shop-meta { font-family: 'Space Grotesk', monospace; font-size: 0.62rem; color: rgba(255,255,225,0.3); line-height: 1.5; margin-bottom: 0.35rem; }
+    .nft-shop-launch { font-size: 0.7rem; color: rgba(255,255,225,0.4); line-height: 1.55; margin-bottom: 0.4rem; }
+    .nft-shop-card[data-avail="secondary"] .nft-shop-name::after { content: ''; }
+    .nft-shop-card[data-avail="available"] { border-color: rgba(79,168,253,0.18); }
+    .shop-avail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 1rem; }
+    @media (max-width: 600px) { .shop-avail-grid { grid-template-columns: 1fr; } }
+    .os-price-badge { display: flex; flex-direction: column; gap: 0.2rem; font-family: 'Space Grotesk', monospace; font-size: 0.68rem; padding: 0.4rem 0.65rem; border-radius: 0.5rem; background: rgba(79,168,253,0.07); border: 1px solid rgba(79,168,253,0.18); margin-top: 0.5rem; }
+    .os-price-row { display: flex; align-items: center; gap: 0.35rem; white-space: nowrap; }
+    .os-price-badge .os-weth { color: var(--blue); font-weight: 600; }
+    .os-price-badge .os-usd { color: rgba(255,255,225,0.4); font-size: 0.62rem; }
+    .os-price-badge .os-label { color: rgba(255,255,225,0.3); font-size: 0.6rem; margin-right: 0.25rem; }
   </style>
 </head>
 <body>
@@ -559,57 +578,73 @@
       <div class="section-title">NFT Shop</div>
     </div>
 
+    <div class="shop-intro-card reveal">
+      <p>All Mushroom Planet NFTs are traded on <strong style="color:var(--cream);">OpenSea</strong> — the largest NFT marketplace. On a secondary market, sellers set their own prices based on supply and demand. There is no fixed price; you negotiate or buy at the listed floor. Prices fluctuate with SHROOM/SPORE market value and collection demand.</p>
+      <p>Every <strong style="color:var(--cream);">Mooshie collection</strong> (House, King, Queen, Gold, Kid Shroom) permanently satisfies the farm free-trial requirement — you never need to hold tokens or provide liquidity as long as you hold any Mooshie NFT.</p>
+    </div>
+
+    <div class="shop-filter-row reveal">
+      <button class="shop-filter-btn active" onclick="filterShop('collection', this)">By Collection</button>
+      <button class="shop-filter-btn" onclick="filterShop('available', this)">Available Now</button>
+      <button class="shop-filter-btn" onclick="filterShop('secondary', this)">Secondary Only</button>
+    </div>
+
     <div class="section-divider reveal">Mooshie NFTs</div>
 
-    <div class="nft-shop-grid reveal">
+    <div class="nft-shop-grid reveal" id="shop-grid-mooshie">
 
-      <div class="nft-shop-card">
+      <div class="nft-shop-card" data-avail="secondary">
         <div class="nft-shop-img"><img src="/images/house_mooshie_nft.png" alt="Mooshie House" onerror="this.parentElement.innerHTML='&#x1F3E0;'"></div>
         <div class="nft-shop-info">
-          <div class="nft-shop-name">Mooshie House</div>
+          <div class="nft-shop-name">Mooshie House <span style="font-size:0.68rem;font-weight:400;color:rgba(255,255,225,0.3);">(100)</span></div>
           <div class="nft-shop-reward">200,000 SPORE/day</div>
-          <div class="nft-shop-desc">The original Mooshie NFT. Earn daily SPORE via Sporebot and satisfy the farm free-trial requirement permanently.</div>
-          <a href="https://opensea.io/collection/mooshies-house" target="_blank" rel="noopener noreferrer" class="btn-link btn-blue" style="margin-top:auto;">View on OpenSea</a>
+          <div class="nft-shop-launch">Launched Oct 2023 - The original Mooshie NFT by Zuko. The spark that started Mushroom Planet.</div>
+          <div class="nft-shop-desc">The original Mooshie NFT by Zuko. The spark that started Mushroom Planet.</div>
+          <a href="https://opensea.io/collection/mooshies-house" target="_blank" rel="noopener noreferrer" class="btn-link btn-blue" style="margin-top:auto;">OpenSea (Secondary)</a>
         </div>
       </div>
 
-      <div class="nft-shop-card">
+      <div class="nft-shop-card" data-avail="secondary">
         <div class="nft-shop-img"><img src="/images/king_mooshie_nft.avif" alt="King Mooshie" onerror="this.parentElement.innerHTML='&#x1F451;'"></div>
         <div class="nft-shop-info">
-          <div class="nft-shop-name">King Mooshie</div>
+          <div class="nft-shop-name">King Mooshie <span style="font-size:0.68rem;font-weight:400;color:rgba(255,255,225,0.3);">(105)</span></div>
           <div class="nft-shop-reward">200,000 SPORE/day</div>
-          <div class="nft-shop-desc">Reddit Collectible Avatar collab by Zuko. Earns daily SPORE and satisfies farm requirements permanently.</div>
-          <a href="https://opensea.io/collection/king-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="btn-link btn-red" style="margin-top:auto;">View on OpenSea</a>
+          <div class="nft-shop-launch">Launched Feb 2024 - The first Reddit Collectible Avatar. King of the Mooshie Kingdom.</div>
+          <div class="nft-shop-desc">The first Reddit Collectible Avatar. King of the Mooshie Kingdom.</div>
+          <a href="https://opensea.io/collection/king-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="btn-link btn-blue" style="margin-top:auto;">OpenSea (Secondary)</a>
         </div>
       </div>
 
-      <div class="nft-shop-card">
+      <div class="nft-shop-card" data-avail="secondary">
         <div class="nft-shop-img"><img src="/images/queen_mooshie_nft.avif" alt="Queen Mooshie" onerror="this.parentElement.innerHTML='&#x1F478;'"></div>
         <div class="nft-shop-info">
-          <div class="nft-shop-name">Queen Mooshie</div>
+          <div class="nft-shop-name">Queen Mooshie <span style="font-size:0.68rem;font-weight:400;color:rgba(255,255,225,0.3);">(228)</span></div>
           <div class="nft-shop-reward">200,000 SPORE/day</div>
-          <div class="nft-shop-desc">Reddit Collectible Avatar collab by Zuko. Earns daily SPORE and satisfies farm requirements permanently.</div>
-          <a href="https://opensea.io/collection/queen-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="btn-link btn-blue" style="margin-top:auto;">View on OpenSea</a>
+          <div class="nft-shop-launch">Launched Mar 2024 - Alongside King and House, completes the Mooshie Kingdom.</div>
+          <div class="nft-shop-desc">Alongside King and House, completes the Mooshie Kingdom.</div>
+          <a href="https://opensea.io/collection/queen-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="btn-link btn-blue" style="margin-top:auto;">OpenSea (Secondary)</a>
         </div>
       </div>
 
-      <div class="nft-shop-card">
+      <div class="nft-shop-card" data-avail="secondary">
         <div class="nft-shop-img"><img src="/images/gold_mooshie_nft.avif" alt="Gold Mooshie" onerror="this.parentElement.innerHTML='&#x1F947;'"></div>
         <div class="nft-shop-info">
-          <div class="nft-shop-name" style="color:var(--gold);">Gold Mooshie</div>
+          <div class="nft-shop-name" style="color:var(--gold);">Gold Mooshie <span style="font-size:0.68rem;font-weight:400;color:rgba(255,255,225,0.3);">(308)</span></div>
           <div class="nft-shop-reward" style="color:var(--gold);">15,000 SHROOM + 2M SPORE/mo</div>
-          <div class="nft-shop-desc">Premium Reddit Collectible Avatar. Monthly on-chain airdrops Nov 2025-Oct 2028, then joins daily 200K SPORE tier.</div>
-          <a href="https://opensea.io/collection/gold-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="btn-link btn-ghost" style="margin-top:auto;color:var(--gold);border-color:rgba(254,206,0,0.3);background:rgba(254,206,0,0.07);">View on OpenSea</a>
+          <div class="nft-shop-launch">Launched Nov 2024 - Monthly on-chain airdrops Nov 2025-Oct 2028, then joins daily 200K SPORE tier.</div>
+          <div class="nft-shop-desc">Reddit Collectible Avatar by Zuko. Monthly airdrops Nov 2025-Oct 2028, then joins daily 200K SPORE tier.</div>
+          <a href="https://opensea.io/collection/gold-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="btn-link btn-blue" style="margin-top:auto;">OpenSea (Secondary)</a>
         </div>
       </div>
 
-      <div class="nft-shop-card">
+      <div class="nft-shop-card" data-avail="secondary">
         <div class="nft-shop-img"><img src="/images/kid_shroom_nft.avif" alt="Kid Shroom" onerror="this.parentElement.innerHTML='&#x1F331;'"></div>
         <div class="nft-shop-info">
-          <div class="nft-shop-name" style="color:#7de89a;">Kid Shroom</div>
+          <div class="nft-shop-name" style="color:#7de89a;">Kid Shroom <span style="font-size:0.68rem;font-weight:400;color:rgba(255,255,225,0.3);">(500)</span></div>
           <div class="nft-shop-reward" style="color:#7de89a;">20,000 SHROOM + 1.5M SPORE/mo</div>
-          <div class="nft-shop-desc">Reddit Collectible Avatar collab. Monthly on-chain airdrops Feb 2025-Jul 2026, then joins daily 200K SPORE tier.</div>
-          <a href="https://opensea.io/collection/kid-shroom-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="btn-link btn-ghost" style="margin-top:auto;color:#7de89a;border-color:rgba(125,232,154,0.3);background:rgba(125,232,154,0.07);">View on OpenSea</a>
+          <div class="nft-shop-launch">Launched Jun 2024 - Sold out. Monthly on-chain airdrops Feb 2025-Jul 2026, then joins daily 200K SPORE tier.</div>
+          <div class="nft-shop-desc">Reddit Collectible Avatar by Zuko. Monthly airdrops Feb 2025-Jul 2026, then joins daily 200K SPORE tier.</div>
+          <a href="https://opensea.io/collection/kid-shroom-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="btn-link btn-blue" style="margin-top:auto;">OpenSea (Secondary)</a>
         </div>
       </div>
 
@@ -617,91 +652,90 @@
 
     <div class="section-divider reveal">Sporebot NFTs</div>
 
-    <div class="nft-shop-grid reveal">
+    <div class="nft-shop-grid reveal" id="shop-grid-sporebot">
 
-      <div class="nft-shop-card">
+      <div class="nft-shop-card" data-avail="available">
         <div class="nft-shop-img"><img src="/images/sporebot_nft.png" alt="SporeBots" onerror="this.parentElement.innerHTML='&#x1F916;'"></div>
         <div class="nft-shop-info">
-          <div class="nft-shop-name">SporeBots</div>
-          <div class="nft-shop-reward">Farm Access (2 = 1 Mooshie)</div>
+          <div class="nft-shop-name">SporeBots <span>(6,874)</span></div>
+          <div class="nft-shop-reward">Farm Access</div>
           <div class="nft-shop-desc">Hold 2 Sporebot NFTs to permanently satisfy the farm free-trial requirement. Each Sporebot looks different and  has unique traits that determine its passive bonuses — different trait combinations provide different SGR boosts, dig bonuses, and farm perks. The rarer the traits, the stronger the bonuses.</div>
-          <a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer" class="btn-link btn-blue" style="margin-top:auto;">Buy Now - 8.5 POL</a>
+          <a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer" class="btn-link btn-green" style="margin-top:auto;">Buy Now - 8.5 POL</a>
         </div>
       </div>
 
-      <div class="nft-shop-card">
+      <div class="nft-shop-card" data-avail="secondary">
         <div class="nft-shop-img"><img src="/images/gen1.webp" alt="Farm Boost Gen 1" onerror="this.parentElement.innerHTML='&#x1F33E;'"></div>
         <div class="nft-shop-info">
-          <div class="nft-shop-name" style="color:var(--green);">Farm Boost (Gen 1)</div>
+          <div class="nft-shop-name" style="color:var(--green);">Farm Boost (Gen 1) <span>(150)</span></div>
           <div class="nft-shop-reward" style="color:var(--green);">+1,000,000 Planted SHROOMS</div>
           <div class="nft-shop-desc">The first generation Farm Boost. Permanently plants 1M SHROOMS in your farm, generating SPORES passively forever. Gen 1 is sold out — available on secondary market only.</div>
-          <a href="https://opensea.io/item/polygon/0x09e80918168de0c5312db1101c77a381c8ca4697/3" target="_blank" rel="noopener noreferrer" class="btn-link btn-ghost" style="margin-top:auto;color:var(--green);border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.07);">Secondary Market</a>
+          <a href="https://opensea.io/item/polygon/0x09e80918168de0c5312db1101c77a381c8ca4697/3" target="_blank" rel="noopener noreferrer" class="btn-link btn-blue" style="margin-top:auto;">OpenSea (Secondary)</a>
         </div>
       </div>
 
-      <div class="nft-shop-card">
+      <div class="nft-shop-card" data-avail="available">
         <div class="nft-shop-img"><img src="/images/gen2_nft.png" alt="Farm Boost Gen 2" onerror="this.parentElement.innerHTML='&#x1F331;'"></div>
         <div class="nft-shop-info">
-          <div class="nft-shop-name" style="color:var(--green);">Farm Boost (Gen 2)</div>
+          <div class="nft-shop-name" style="color:var(--green);">Farm Boost (Gen 2) <span>(100)</span></div>
           <div class="nft-shop-reward" style="color:var(--green);">+1,000,000 Planted SHROOMS</div>
           <div class="nft-shop-desc">The second generation Farm Boost. Same mechanics as Gen 1 — permanently plants 1M SHROOMS and generates SPORES passively. Priced at market value of 1M SHROOMS at launch.</div>
-          <a href="https://opensea.io/item/polygon/0x09e80918168de0c5312db1101c77a381c8ca4697/4" target="_blank" rel="noopener noreferrer" class="btn-link btn-ghost" style="margin-top:auto;color:var(--green);border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.07);">Buy Now - 0.0063 WETH</a>
+          <a href="https://opensea.io/item/polygon/0x09e80918168de0c5312db1101c77a381c8ca4697/4" target="_blank" rel="noopener noreferrer" class="btn-link btn-green" style="margin-top:auto;">Buy Now - 0.0063 WETH</a>
         </div>
       </div>
 
+          <div class="nft-shop-card" data-avail="secondary">
+        <div class="nft-shop-img"><img src="/images/lp_pool_nft.png" alt="King Mooshie Pool" onerror="this.parentElement.innerHTML='&#x1F451;'"></div>
+        <div class="nft-shop-info">
+          <div class="nft-shop-name">King Mooshie Pool <span>(60)</span></div>
+          <div class="nft-shop-reward" style="color:var(--blue);">+2% SGR Bonus</div>
+          <div class="nft-shop-desc">Earned by providing 500k+ SHROOM LP or 50M+ SPORE LP during the Nov 2024 LP promo. Grants +2% Spore Generation Rate. Never minted again — secondary only.</div>
+          <a href="https://opensea.io/item/polygon/0x09e80918168de0c5312db1101c77a381c8ca4697/2" target="_blank" rel="noopener noreferrer" class="btn-link btn-blue" style="margin-top:auto;">OpenSea (Secondary)</a>
+        </div>
+      </div>
+
+      <div class="nft-shop-card" data-avail="secondary">
+        <div class="nft-shop-img"><img src="/images/family_portrait_nft.png" alt="Mooshie Family Portrait" onerror="this.parentElement.innerHTML='&#x1F5BC;&#xFE0F;'"></div>
+        <div class="nft-shop-info">
+          <div class="nft-shop-name">Mooshie Family Portrait <span>(60)</span></div>
+          <div class="nft-shop-reward" style="color:var(--blue);">+3% SGR Bonus</div>
+          <div class="nft-shop-desc">Earned by providing 1M+ SHROOM LP or 100M+ SPORE LP during the Nov 2024 LP promo. Grants +3% Spore Generation Rate. Never minted again — secondary only.</div>
+          <a href="https://opensea.io/item/polygon/0x09e80918168de0c5312db1101c77a381c8ca4697/1" target="_blank" rel="noopener noreferrer" class="btn-link btn-blue" style="margin-top:auto;">OpenSea (Secondary)</a>
+        </div>
+      </div>
     </div>
 
     <div class="section-divider reveal">Community NFTs</div>
 
-    <div class="nft-shop-grid reveal">
+    <div class="nft-shop-grid reveal" id="shop-grid-community">
 
-      <div class="nft-shop-card">
+      <div class="nft-shop-card" data-avail="secondary">
         <div class="nft-shop-img"><img src="/images/guwoo_nft.png" alt="Guwoo" onerror="this.parentElement.innerHTML='&#x1F9DE;'"></div>
         <div class="nft-shop-info">
-          <div class="nft-shop-name">Guwoo</div>
+          <div class="nft-shop-name">Guwoo <span>(50)</span></div>
           <div class="nft-shop-reward">SGR Bonus</div>
           <div class="nft-shop-desc">Guwoo NFTs provide a passive SGR boost to your farm. Verify with <code>!nft</code> in Discord to activate.</div>
-          <a href="https://opensea.io/collection/guwoo-by-rylar-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="btn-link btn-ghost" style="margin-top:auto;">View on OpenSea</a>
+          <a href="https://opensea.io/collection/guwoo-by-rylar-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="btn-link btn-blue" style="margin-top:auto;">OpenSea (Secondary)</a>
         </div>
       </div>
 
-      <div class="nft-shop-card">
-        <div class="nft-shop-img"><img src="/images/lp_pool_nft.png" alt="King Mooshie Pool" onerror="this.parentElement.innerHTML='&#x1F3CA;'"></div>
-        <div class="nft-shop-info">
-          <div class="nft-shop-name">King Mooshie Pool</div>
-          <div class="nft-shop-reward">LP NFT</div>
-          <div class="nft-shop-desc">Community NFT tied to LP positions. Verify with <code>!nft</code> in Discord.</div>
-          <a href="https://opensea.io" target="_blank" rel="noopener noreferrer" class="btn-link btn-ghost" style="margin-top:auto;">View on OpenSea</a>
-        </div>
-      </div>
-
-      <div class="nft-shop-card">
-        <div class="nft-shop-img"><img src="/images/family_portrait_nft.png" alt="Mooshie Family Portrait" onerror="this.parentElement.innerHTML='&#x1F5BC;&#xFE0F;'"></div>
-        <div class="nft-shop-info">
-          <div class="nft-shop-name">Mooshie Family Portrait</div>
-          <div class="nft-shop-reward">Community NFT</div>
-          <div class="nft-shop-desc">A special community collectible celebrating the Mushroom Planet family.</div>
-          <a href="https://opensea.io" target="_blank" rel="noopener noreferrer" class="btn-link btn-ghost" style="margin-top:auto;">View on OpenSea</a>
-        </div>
-      </div>
-
-      <div class="nft-shop-card">
+      <div class="nft-shop-card" data-avail="available">
         <div class="nft-shop-img"><img src="/images/papa_sporewalker.png" alt="Papa Sporewalker" onerror="this.parentElement.innerHTML='&#x1F9D4;'"></div>
         <div class="nft-shop-info">
-          <div class="nft-shop-name">Papa Sporewalker</div>
+          <div class="nft-shop-name">Papa Sporewalker <span>(75)</span></div>
           <div class="nft-shop-reward">Community NFT</div>
           <div class="nft-shop-desc">Community character NFT from the Mushroom Planet universe.</div>
-          <a href="https://mash-it.io/feder" target="_blank" rel="noopener noreferrer" class="btn-link btn-ghost" style="margin-top:auto;">Buy Now - $10 </a>
+          <a href="https://mash-it.io/feder" target="_blank" rel="noopener noreferrer" class="btn-link btn-green" style="margin-top:auto;">Buy Now - $10</a>
         </div>
       </div>
 
-      <div class="nft-shop-card">
+      <div class="nft-shop-card" data-avail="available">
         <div class="nft-shop-img"><img src="/images/elder_shroompa.png" alt="Elder Shroompa" onerror="this.parentElement.innerHTML='&#x1F9D3;'"></div>
         <div class="nft-shop-info">
-          <div class="nft-shop-name">Elder Shroompa</div>
+          <div class="nft-shop-name">Elder Shroompa <span>(100)</span></div>
           <div class="nft-shop-reward">Community NFT</div>
           <div class="nft-shop-desc">Community character NFT from the Mushroom Planet universe.</div>
-          <a href="https://mash-it.io/feder" target="_blank" rel="noopener noreferrer" class="btn-link btn-ghost" style="margin-top:auto;">Buy Now - $5</a>
+          <a href="https://mash-it.io/feder" target="_blank" rel="noopener noreferrer" class="btn-link btn-green" style="margin-top:auto;">Buy Now - $5</a>
         </div>
       </div>
 
@@ -796,6 +830,113 @@
         if (el && avatar) el.src = avatar;
       } catch(e) {}
     }
+    var shopAvailContainer = null;
+
+    var OS_FLOORS = {
+      'mooshies-house': null,
+      'king-mooshie-by-zuko-x-reddit-collectible-avatars': { weth: 0.6874, note: '1 listing' },
+      'queen-mooshie-by-zuko-x-reddit-collectible-avatars': null,
+      'gold-mooshie-by-zuko-x-reddit-collectible-avatars': { weth: 0.0083, note: '1 listing' },
+      'kid-shroom-by-zuko-x-reddit-collectible-avatars': null,
+      'guwoo-by-rylar-x-reddit-collectible-avatars': null
+    };
+    var OS_ITEMS = {
+      '0x09e80918168de0c5312db1101c77a381c8ca4697/3': { weth: 0.04, note: 'last sale 0.0047 WETH' },
+      '0x09e80918168de0c5312db1101c77a381c8ca4697/4': null
+    };
+
+    async function buildAvailView(mode) {
+      var existing = document.getElementById('shop-avail-view');
+      if (existing) existing.remove();
+
+      var section = document.getElementById('tab-shop');
+      var ctaRow = section.querySelector('.cta-row');
+
+      var container = document.createElement('div');
+      container.id = 'shop-avail-view';
+      container.style.cssText = 'max-width:1000px;margin:0 auto;padding:0 1.5rem 1rem;';
+
+      var wethPrice = 0;
+      try {
+        var pr = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd');
+        var pd = await pr.json();
+        wethPrice = pd && pd.weth ? pd.weth.usd : 0;
+      } catch(e) {}
+
+      var allCards = Array.from(document.querySelectorAll('.nft-shop-card[data-avail]'));
+      var cards = allCards.filter(function(c) { return c.dataset.avail === mode; });
+
+      var grid = document.createElement('div');
+      grid.className = 'shop-avail-grid';
+
+      for (var i = 0; i < cards.length; i++) {
+        var clone = cards[i].cloneNode(true);
+        clone.style.display = '';
+        // remove any existing os-price-badge
+        var old = clone.querySelector('.os-price-badge');
+        if (old) old.remove();
+        // find opensea link
+        var link = clone.querySelector('a[href*="opensea.io"]');
+        var slug = null;
+        if (link) {
+          var m = link.href.match(/collection\/([^/?#]+)/);
+          if (m) slug = m[1];
+        }
+        if (mode === 'secondary') {
+          var priceData = null;
+          if (slug && OS_FLOORS.hasOwnProperty(slug)) {
+            priceData = OS_FLOORS[slug];
+          } else if (link) {
+            var itemM = link.href.match(/item\/polygon\/([^?#]+)/);
+            if (itemM && OS_ITEMS.hasOwnProperty(itemM[1])) priceData = OS_ITEMS[itemM[1]];
+          }
+          var info = clone.querySelector('.nft-shop-info');
+          if (info) {
+            var badge = document.createElement('div');
+            badge.className = 'os-price-badge';
+            if (priceData && priceData.weth) {
+              var usd = wethPrice > 0 ? ' (~$' + (priceData.weth * wethPrice).toFixed(0) + ')' : '';
+              
+              var noteHtml = priceData.note ? '<div class="os-price-row"><span class="os-label">' + priceData.note + '</span></div>' : '';
+              badge.innerHTML = '<div class="os-price-row"><span class="os-label">Floor</span><span class="os-weth">' + priceData.weth + ' WETH</span><span class="os-usd">' + usd + '</span></div>' + noteHtml;
+            } else {
+              badge.innerHTML = '<span class="os-label">Floor</span><span class="os-usd">No listings - check OpenSea</span>';
+            }
+            var btn2 = info.querySelector('a');
+            if (btn2) info.insertBefore(badge, btn2);
+          }
+        }
+        grid.appendChild(clone);
+      }
+
+      container.appendChild(grid);
+      section.insertBefore(container, ctaRow);
+    }
+
+    function filterShop(mode, btn) {
+      document.querySelectorAll('.shop-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+
+      var existing = document.getElementById('shop-avail-view');
+      if (existing) existing.remove();
+
+      var grids = document.querySelectorAll('#tab-shop .nft-shop-grid');
+      var dividers = document.querySelectorAll('#tab-shop .section-divider');
+
+      if (mode === 'collection') {
+        grids.forEach(function(g) { g.style.display = ''; });
+        dividers.forEach(function(d) { d.style.display = ''; });
+        grids.forEach(function(g) {
+          g.querySelectorAll('.nft-shop-card').forEach(function(c) { c.style.display = ''; });
+        });
+      } else {
+        grids.forEach(function(g) { g.style.display = 'none'; });
+        dividers.forEach(function(d) { d.style.display = 'none'; });
+        buildAvailView(mode);
+      }
+    }
+    window.filterShop = filterShop;
+
     loadRedditAvatar('ZukoBih', 'avatar-ZukoBih');
     loadRedditAvatar('IveDoneItAtLast', 'avatar-IveDoneItAtLast');
     loadRedditAvatar('Mrmakanakai', 'avatar-Mrmakanakai');
