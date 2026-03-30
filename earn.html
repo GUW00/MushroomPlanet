@@ -71,6 +71,7 @@
 
     .team-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin-top: 0.75rem; }
     .team-card { background: var(--dark3); border: 1px solid rgba(255,255,225,0.06); border-radius: 1rem; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.875rem; transition: border-color 0.3s; }
+    @media (max-width: 480px) { .team-card { flex-direction: column; align-items: flex-start; gap: 0.5rem; } .team-card img { width: 36px; height: 36px; } }
     .team-card:hover { border-color: rgba(255,255,225,0.15); }
     .team-card img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(79,168,253,0.3); flex-shrink: 0; }
     .team-card .t-name { font-size: 0.82rem; font-weight: 700; color: var(--cream); margin-bottom: 0.15rem; }
