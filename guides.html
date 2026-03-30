@@ -306,35 +306,6 @@
     #guide-lp .guide-card code { background: rgba(254,206,0,0.08); color: #fece00; }
 
     @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
-
-    /* SUB-TABS */
-    .sub-tab-bar {
-      display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 0.4rem;
-      margin-bottom: 1.5rem; -webkit-overflow-scrolling: touch;
-      scrollbar-width: none; padding-bottom: 2px;
-    }
-    .sub-tab-bar::-webkit-scrollbar { display: none; }
-    .sub-tab {
-      flex-shrink: 0; font-family: 'Space Grotesk', monospace; font-size: 0.7rem;
-      padding: 0.45em 1.2em; border-radius: 999px;
-      border: 1px solid rgba(255,255,225,0.13);
-      background: transparent; color: rgba(255,255,225,0.45);
-      cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em; font-weight: 600;
-    }
-    .sub-tab:hover { border-color: rgba(255,255,225,0.3); color: var(--cream); }
-    .sub-tab.active { border-color: currentAccent; background: rgba(255,255,255,0.05); }
-    .sub-panel { display: none; }
-    .sub-panel.active { display: block; }
-
-    /* accent per section */
-    #guide-sporebot .sub-tab.active { border-color: #4fa8fd; color: #4fa8fd; background: rgba(79,168,253,0.08); }
-    #guide-discord  .sub-tab.active { border-color: #c084fc; color: #c084fc; background: rgba(192,132,252,0.08); }
-    #guide-reddit   .sub-tab.active { border-color: #fd464f; color: #fd464f; background: rgba(253,70,79,0.08); }
-    #guide-lp       .sub-tab.active { border-color: #fece00; color: #fece00; background: rgba(254,206,0,0.08); }
-
-    @media (max-width: 480px) {
-      .sub-tab { font-size: 0.62rem; padding: 0.4em 0.9em; }
-    }
     .gi { width:16px; height:16px; object-fit:contain; vertical-align:middle; margin-right:5px; display:inline-block; }
     .gi-sm { width:13px; height:13px; object-fit:contain; vertical-align:middle; margin-right:4px; display:inline-block; }
 
@@ -425,15 +396,6 @@
       <div class="section-title">Sporebot — Two Ways to Play</div>
     </div>
 
-    <div class="sub-tab-bar reveal">
-      <button class="sub-tab active" onclick="showSubTab('sporebot','intro',this)">Intro</button>
-      <button class="sub-tab" onclick="showSubTab('sporebot','linking',this)">Linking Accounts</button>
-      <button class="sub-tab" onclick="showSubTab('sporebot','requirements',this)">Requirements</button>
-      <button class="sub-tab" onclick="showSubTab('sporebot','blockchain',this)">Blockchain</button>
-      <button class="sub-tab" onclick="showSubTab('sporebot','conduct',this)">Conduct</button>
-    </div>
-
-    <div id="sporebot-intro" class="sub-panel active">
     <div class="dual-grid reveal">
 
     <!-- Discord -->
@@ -459,10 +421,6 @@
 
   </div>
 
-    </div><!-- /dual-grid -->
-    </div><!-- /sub-panel sporebot-intro -->
-
-    <div id="sporebot-linking" class="sub-panel">
     <div class="section-divider reveal">Linking Accounts</div>
     <div class="guide-card reveal">
       <h3><img src="/images/discord.png" class="gi"><img src="/images/reddit1.png" class="gi"> Linking Reddit + Discord</h3>
@@ -489,9 +447,6 @@
       </div>
     </div>
 
-    </div><!-- /sub-panel sporebot-linking -->
-
-    <div id="sporebot-requirements" class="sub-panel">
     <div class="section-divider reveal">Requirements</div>
     <div class="guide-card reveal">
       <h3><img src="/images/growing.png" class="gi"> Free Trial &amp; Requirements</h3>
@@ -507,9 +462,6 @@
       <p><strong>Option 3</strong> is ideal if you're already providing liquidity — it qualifies you instantly with no waiting period and also earns you weekly LP reward airdrops on top. <a href="https://www.reddit.com/r/MushroomPlanet/comments/1mu9dx0/quickswap_guide_trading_providing_liquidity/" target="_blank" rel="noopener noreferrer">View the full LP guide here.</a></p>
     </div>
 
-    </div><!-- /sub-panel sporebot-requirements -->
-
-    <div id="sporebot-blockchain" class="sub-panel">
     <div class="section-divider reveal">Blockchain</div>
     <div class="guide-card reveal">
       <h3><img src="/images/blockchain.png" class="gi"> Blockchain &amp; Withdrawals</h3>
@@ -524,12 +476,10 @@
       <ul>
         <li><img src="/images/shroom.png" class="gi-sm"><strong>Option 1 — Hold SHROOM:</strong> 500,000+ SHROOM-equivalent on-chain</li>
         <li><img src="/images/nft.png" class="gi-sm"><strong>Option 2 — Hold NFTs:</strong> 2 Sporebots OR any 1 Mooshie NFT</li>
+        <li><img src="/images/growth.png" class="gi-sm"><strong>Option 3 — Provide LP:</strong> 0.1%+ of either SHROOM/WETH or SPORE/WETH pool</li>
       </ul>
     </div>
 
-    </div><!-- /sub-panel sporebot-blockchain -->
-
-    <div id="sporebot-conduct" class="sub-panel">
     <div class="section-divider reveal">Community</div>
     <div class="guide-card reveal">
       <h3><img src="/images/badge.png" class="gi"> Spore of Conduct</h3>
@@ -558,8 +508,6 @@
       </ul>
     </div>
 
-  </div><!-- /sub-panel sporebot-conduct -->
-
   </section>
 
     <!-- ============================================================
@@ -572,16 +520,6 @@
       <div class="section-title">Providing Liquidity on QuickSwap</div>
     </div>
 
-    <div class="sub-tab-bar reveal">
-      <button class="sub-tab active" onclick="showSubTab('lp','basics',this)">Basics</button>
-      <button class="sub-tab" onclick="showSubTab('lp','wallet',this)">Get a Wallet</button>
-      <button class="sub-tab" onclick="showSubTab('lp','trade',this)">Trading</button>
-      <button class="sub-tab" onclick="showSubTab('lp','addlp',this)">Add Liquidity</button>
-      <button class="sub-tab" onclick="showSubTab('lp','il',this)">Imp. Loss</button>
-      <button class="sub-tab" onclick="showSubTab('lp','rewards',this)">Rewards</button>
-    </div>
-
-    <div id="lp-basics" class="sub-panel active">
     <div class="section-divider reveal">On-Chain vs Off-Chain</div>
     <div class="dual-grid reveal">
       <div class="guide-card" style="margin-bottom:0;">
@@ -594,9 +532,6 @@
       </div>
     </div>
 
-    </div><!-- /sub-panel lp-basics -->
-
-    <div id="lp-wallet" class="sub-panel">
     <div class="section-divider reveal">Get a Wallet</div>
     <div class="guide-card reveal">
       <h3><img src="/images/blockchain.png" class="gi"> Getting a Web3 Wallet</h3>
@@ -618,9 +553,6 @@
       <p style="margin-top:0.75rem;font-size:0.78rem;color:rgba(79,168,253,0.8);padding:0.5rem 0.75rem;background:rgba(79,168,253,0.06);border:1px solid rgba(79,168,253,0.15);border-radius:0.6rem;">Once you have a wallet, use <code>!gas</code> in the Reddit Daily Forage Thread to receive <strong>0.01 POL</strong> to cover your first transaction fees — one-time, free.</p>
     </div>
 
-    </div><!-- /sub-panel lp-wallet -->
-
-    <div id="lp-trade" class="sub-panel">
     <div class="section-divider reveal">Trade on QuickSwap</div>
     <div class="guide-card reveal">
       <h3><img src="/images/swaps.png" class="gi"> Swapping SHROOM &amp; SPORE</h3>
@@ -648,9 +580,6 @@
       </div>
     </div>
 
-    </div><!-- /sub-panel lp-trade -->
-
-    <div id="lp-addlp" class="sub-panel">
     <div class="section-divider reveal">Provide Liquidity</div>
     <div class="guide-card reveal">
       <h3><img src="/images/growth.png" class="gi"> Adding Tokens to LP</h3>
@@ -676,9 +605,6 @@
       </ul>
     </div>
 
-    </div><!-- /sub-panel lp-addlp -->
-
-    <div id="lp-il" class="sub-panel">
     <div class="section-divider reveal">Impermanent Loss</div>
     <div class="guide-card reveal">
       <h3><img src="/images/cooldown.png" class="gi"> Understanding Impermanent Loss</h3>
@@ -694,9 +620,6 @@
       <p style="margin-top:0.75rem;">IL is "impermanent" because if prices return to their original ratio, the loss disappears. Weekly LP reward airdrops help offset IL over time.</p>
     </div>
 
-    </div><!-- /sub-panel lp-il -->
-
-    <div id="lp-rewards" class="sub-panel">
     <div class="section-divider reveal">Weekly LP Rewards</div>
     <div class="guide-card reveal">
       <h3><img src="/images/apy1.png" class="gi"> Weekly LP Reward Airdrops</h3>
@@ -712,8 +635,6 @@
         <a href="https://dapp.quickswap.exchange/pool/v2?currency0=0x089582AC20ea563c69408a79E1061de594b61bED&currency1=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;padding:0.45rem 0.6rem;border-radius:0.5rem;font-family:'Space Grotesk',monospace;font-size:0.65rem;font-weight:600;text-decoration:none;color:var(--blue);background:rgba(79,168,253,0.08);border:1px solid rgba(79,168,253,0.25);transition:all 0.2s;">View SPORE/WETH Pool</a>
       </div>
     </div>
-
-    </div><!-- /sub-panel lp-rewards -->
 
     <div class="cta-row reveal">
       <a class="btn btn-blue" href="https://dapp.quickswap.exchange/pool/v2/add?tokens=0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1,0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" rel="noopener noreferrer">
@@ -739,18 +660,6 @@
       <div class="section-title">Discord Guide</div>
     </div>
 
-    <div class="sub-tab-bar reveal">
-      <button class="sub-tab active" onclick="showSubTab('discord','start',this)">Getting Started</button>
-      <button class="sub-tab" onclick="showSubTab('discord','commands',this)">Commands</button>
-      <button class="sub-tab" onclick="showSubTab('discord','farm',this)">Farm System</button>
-      <button class="sub-tab" onclick="showSubTab('discord','sgr',this)">SGR</button>
-      <button class="sub-tab" onclick="showSubTab('discord','staking',this)">Staking</button>
-      <button class="sub-tab" onclick="showSubTab('discord','nft',this)">NFTs</button>
-      <button class="sub-tab" onclick="showSubTab('discord','social',this)">Social</button>
-      <button class="sub-tab" onclick="showSubTab('discord','blockchain',this)">Blockchain</button>
-    </div>
-
-    <div id="discord-start" class="sub-panel active">
     <div class="section-divider reveal">Getting Started</div>
     <div class="guide-card reveal">
       <h3><img src="/images/discord.png" class="gi"> Verification &amp; Start</h3>
@@ -763,9 +672,6 @@
       </ul>
     </div>
 
-    </div><!-- /sub-panel discord-start -->
-
-    <div id="discord-commands" class="sub-panel">
     <div class="section-divider reveal">Daily &amp; Hourly Activities</div>
     <div class="guide-card reveal">
       <h3><img src="/images/forage.png" class="gi"> Daily Activities</h3>
@@ -799,9 +705,6 @@
       </ul>
     </div>
 
-    </div><!-- /sub-panel discord-commands -->
-
-    <div id="discord-farm" class="sub-panel">
     <div class="section-divider reveal">Farm System</div>
     <div class="guide-card reveal">
       <h3><img src="/images/shroomfarm.png" class="gi"> Farm System Overview</h3>
@@ -821,9 +724,6 @@
       <p style="margin-top:0.5rem;">After every harvest, <strong>replant all your SHROOMS</strong> to resume earning.</p>
     </div>
 
-    </div><!-- /sub-panel discord-farm -->
-
-    <div id="discord-sgr" class="sub-panel">
     <div class="section-divider reveal">SGR Sources</div>
     <div class="guide-card reveal">
       <h3><img src="/images/sgr1.webp" class="gi"> Spore Generation Rate (SGR)</h3>
@@ -845,9 +745,6 @@
       </ul>
     </div>
 
-    </div><!-- /sub-panel discord-sgr -->
-
-    <div id="discord-staking" class="sub-panel">
     <div class="section-divider reveal">Staking &amp; MVP</div>
     <div class="guide-card reveal">
       <h3><img src="/images/mvp.png" class="gi"> SPORE Staking &amp; MVP</h3>
@@ -861,9 +758,6 @@
       </ul>
     </div>
 
-    </div><!-- /sub-panel discord-staking -->
-
-    <div id="discord-nft" class="sub-panel">
     <div class="section-divider reveal">Brewing</div>
     <div class="guide-card reveal">
       <h3><img src="/images/potionrecipe.png" class="gi"> Brewing Potions</h3>
@@ -904,9 +798,7 @@
         <li><strong>Farm Boost NFT</strong>: permanently plants 1,000,000 SHROOMS in your farm</li>
       </ul>
     </div>
-    </div><!-- /sub-panel discord-nft -->
 
-    <div id="discord-blockchain" class="sub-panel">
     <div class="section-divider reveal">Blockchain</div>
     <div class="guide-card reveal">
       <h3>&#x26D3;&#xFE0F; Blockchain &amp; Withdrawals</h3>
@@ -918,9 +810,7 @@
         <li>Daily limits: <strong>1,000,000 SHROOMS</strong> and <strong>100,000,000 SPORES</strong></li>
       </ul>
     </div>
-    </div><!-- /sub-panel discord-blockchain -->
 
-    <div id="discord-social" class="sub-panel">
     <div class="section-divider reveal">Social</div>
     <div class="guide-card reveal">
       <h3><img src="/images/goodshroom.png" class="gi"> Social &amp; Community Features</h3>
@@ -948,7 +838,6 @@
     <div class="cta-row reveal">
       <a class="btn btn-yellow" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">Join Discord</a>
     </div>
-    </div><!-- /sub-panel discord-social -->
 
   </section>
 
@@ -962,16 +851,6 @@
       <div class="section-title">Reddit Guide</div>
     </div>
 
-    <div class="sub-tab-bar reveal">
-      <button class="sub-tab active" onclick="showSubTab('reddit','start',this)">Getting Started</button>
-      <button class="sub-tab" onclick="showSubTab('reddit','forage',this)">Daily Forage</button>
-      <button class="sub-tab" onclick="showSubTab('reddit','feed',this)">Feed Animals</button>
-      <button class="sub-tab" onclick="showSubTab('reddit','posts',this)">Post Rewards</button>
-      <button class="sub-tab" onclick="showSubTab('reddit','ranks',this)">Flair Ranks</button>
-      <button class="sub-tab" onclick="showSubTab('reddit','commands',this)">Commands</button>
-    </div>
-
-    <div id="reddit-start" class="sub-panel active">
     <div class="section-divider reveal">Getting Started</div>
     <div class="guide-card reveal">
       <h3><img src="/images/planting.png" class="gi"> Sprout Bonus</h3>
@@ -982,9 +861,6 @@
       </ul>
     </div>
 
-    </div><!-- /sub-panel reddit-start -->
-
-    <div id="reddit-forage" class="sub-panel">
     <div class="section-divider reveal">Daily Forage</div>
     <div class="guide-card reveal">
       <h3><img src="/images/forage.png" class="gi"> How to Forage</h3>
@@ -1007,9 +883,6 @@
       </ul>
     </div>
 
-    </div><!-- /sub-panel reddit-forage -->
-
-    <div id="reddit-feed" class="sub-panel">
     <div class="section-divider reveal">Feed the Animals</div>
     <div class="guide-card reveal">
       <h3><img src="/images/animals.png" class="gi"> Feed the Animals</h3>
@@ -1021,9 +894,6 @@
       </ul>
     </div>
 
-    </div><!-- /sub-panel reddit-feed -->
-
-    <div id="reddit-posts" class="sub-panel">
     <div class="section-divider reveal">Tipping &amp; Rewards</div>
     <div class="guide-card reveal">
       <h3><img src="/images/gift.png" class="gi"> Tipping, Airdrops &amp; Raffles</h3>
@@ -1089,9 +959,6 @@
       </ul>
     </div>
 
-    </div><!-- /sub-panel reddit-posts -->
-
-    <div id="reddit-ranks" class="sub-panel">
     <div class="section-divider reveal">Flair Ranks</div>
     <div class="guide-card reveal">
       <h3><img src="/images/badge.png" class="gi"> Flair Ranks &amp; XP</h3>
@@ -1120,9 +987,6 @@
       </ul>
     </div>
 
-    </div><!-- /sub-panel reddit-ranks -->
-
-    <div id="reddit-commands" class="sub-panel">
     <div class="section-divider reveal">Commands</div>
     <div class="guide-card reveal">
       <h3><img src="/images/reddit1.png" class="gi"> Reddit Commands</h3>
@@ -1146,7 +1010,6 @@
     <div class="cta-row reveal">
       <a class="btn btn-yellow" href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">Visit Subreddit</a>
     </div>
-    </div><!-- /sub-panel reddit-commands -->
 
   </section>
 
@@ -1233,23 +1096,6 @@
       document.querySelectorAll('#guide-' + id + ' .reveal:not(.visible)').forEach(r => observer.observe(r));
     }
     window.showGuide = showGuide;
-
-    function showSubTab(section, tabId, btn) {
-      var prefix = section + '-';
-      document.querySelectorAll('#guide-' + section + ' .sub-panel').forEach(function(p) {
-        p.classList.remove('active');
-      });
-      document.querySelectorAll('#guide-' + section + ' .sub-tab').forEach(function(t) {
-        t.classList.remove('active');
-      });
-      var panel = document.getElementById(prefix + tabId);
-      if (panel) {
-        panel.classList.add('active');
-        panel.querySelectorAll('.reveal:not(.visible)').forEach(function(r) { observer.observe(r); });
-      }
-      if (btn) btn.classList.add('active');
-    }
-    window.showSubTab = showSubTab;
     function gi(f, sm) { return '<img src="/images/' + f + '" class="' + (sm ? 'gi-sm' : 'gi') + '" onerror="this.style.display=\'none\'">'; }
     window.gi = gi;
 
