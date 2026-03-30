@@ -67,7 +67,7 @@
     .pwa-nav { display: none; }
     @media (display-mode: standalone) {
       .pwa-nav { display: flex; }
-      body { padding-bottom: 80px !important; }
+      body { padding-bottom: 65px !important; }
     }
     /* ---- HEADER OVERRIDE (match convert/vote pages) ---- */
     header {
@@ -473,10 +473,12 @@
 
     /* ---- FOOTER ---- */
     .treas-footer {
-      position: relative; z-index: 1; text-align: center; padding: 2rem 1rem;
-      font-size: 0.8rem; color: rgba(255,255,225,0.3);
+      position: relative; z-index: 1; text-align: center; padding: 0.75rem 1rem;
+      font-size: 0.7rem; color: rgba(255,255,225,0.3);
       border-top: 1px solid rgba(255,255,225,0.06);
+      font-family: 'Space Grotesk', monospace; letter-spacing: 0.05em;
     }
+    @media (display-mode: standalone) { .treas-footer { display: none; } }
 
     .glow-divider {
       width: 100%; height: 1px;
@@ -4360,5 +4362,6 @@ document.getElementById('pwa-install-btn').addEventListener('click', () => {
 });
 </script>
 
+<footer class="treas-footer">&copy; 2025 Mushroom Planet. All rights reserved.</footer>
 </body>
 </html>
