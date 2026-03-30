@@ -19,12 +19,12 @@
     .star { position: absolute; border-radius: 50%; background: var(--cream); opacity: 0; animation: twinkle var(--dur) var(--delay) infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: var(--op); transform: scale(1); } }
     .guide-hero { position: relative; z-index: 1; text-align: center; padding: 5rem 1rem 2.5rem; background: radial-gradient(ellipse at 50% 0%, rgba(192,132,252,0.1) 0%, transparent 70%); }
-    .guide-hero .eyebrow { font-family: 'Syne Mono', monospace; font-size: 0.75rem; letter-spacing: 0.3em; color: var(--yellow); text-transform: uppercase; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.2s forwards; }
+    .guide-hero .eyebrow { font-family: 'Space Grotesk', monospace; font-size: 0.75rem; letter-spacing: 0.3em; color: var(--yellow); text-transform: uppercase; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.2s forwards; }
     .guide-hero h1 { font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 700; line-height: 1.1; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.4s forwards; }
     .guide-hero h1 span { color: var(--yellow); }
-    .guide-hero p { font-size: 1.05rem; max-width: 600px; margin: 0 auto 2.5rem; color: rgba(255,255,225,0.65); opacity: 0; animation: fadeUp 0.6s 0.6s forwards; }
+    .guide-hero p { font-size: 1.05rem; max-width: 640px; margin: 0 auto 2.5rem; color: rgba(255,255,225,0.65); opacity: 0; animation: fadeUp 0.6s 0.6s forwards; }
     .guide-tabs { position: relative; z-index: 1; display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; padding: 0 1rem 2.5rem; opacity: 0; animation: fadeUp 0.6s 0.8s forwards; }
-    .guide-tab { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.4rem; border-radius: 999px; border: 1.5px solid rgba(255,255,225,0.12); background: transparent; color: rgba(255,255,225,0.5); font-family: 'Syne Mono', monospace; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.22s; letter-spacing: 0.05em; }
+    .guide-tab { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.4rem; border-radius: 999px; border: 1.5px solid rgba(255,255,225,0.12); background: transparent; color: rgba(255,255,225,0.5); font-family: 'Space Grotesk', monospace; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.22s; letter-spacing: 0.05em; }
     .guide-tab img { width: 18px; height: 18px; object-fit: contain; opacity: 0.6; transition: opacity 0.2s; }
     .guide-tab:hover { border-color: rgba(255,255,225,0.3); color: var(--cream); }
     .guide-tab:hover img { opacity: 1; }
@@ -32,61 +32,27 @@
     .guide-tab.active img { opacity: 1; }
     .guide-section { position: relative; z-index: 1; display: none; max-width: 1000px; margin: 0 auto; padding: 0 1.5rem 5rem; }
     .guide-section.active { display: block; }
-    .section-label { font-family: 'Syne Mono', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.4rem; }
+    .section-label { font-family: 'Space Grotesk', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.4rem; }
     .section-title { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; margin-bottom: 2rem; }
     .guide-card { background: var(--dark2); border: 1px solid rgba(255,255,225,0.07); border-radius: 1.5rem; padding: 2rem; margin-bottom: 1rem; transition: border-color 0.3s; }
     .guide-card:hover { border-color: rgba(255,255,225,0.13); }
     .guide-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-    .guide-card h4 { font-size: 0.88rem; font-weight: 700; color: rgba(255,255,225,0.8); margin: 1.25rem 0 0.5rem; font-family: 'Syne Mono', monospace; letter-spacing: 0.05em; }
+    .guide-card h4 { font-size: 0.88rem; font-weight: 700; color: rgba(255,255,225,0.8); margin: 1.25rem 0 0.5rem; font-family: 'Space Grotesk', monospace; letter-spacing: 0.05em; }
     .guide-card p { font-size: 0.85rem; color: rgba(255,255,225,0.65); line-height: 1.75; margin-bottom: 0.75rem; }
+    .guide-card p:last-child { margin-bottom: 0; }
     .guide-card ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 0.45rem; }
     .guide-card li { font-size: 0.82rem; color: rgba(255,255,225,0.65); line-height: 1.65; padding-left: 1.1rem; position: relative; }
-    .guide-card li::before { content: '-'; position: absolute; left: 0; color: var(--yellow); font-family: 'Syne Mono', monospace; }
+    .guide-card li::before { content: '-'; position: absolute; left: 0; color: var(--yellow); font-family: 'Space Grotesk', monospace; }
     .guide-card li strong { color: var(--cream); }
-    .guide-card code { font-family: 'Syne Mono', monospace; font-size: 0.78rem; background: rgba(255,255,225,0.06); padding: 0.15em 0.45em; border-radius: 0.35rem; color: var(--yellow); }
+    .guide-card code { font-family: 'Space Grotesk', monospace; font-size: 0.78rem; background: rgba(255,255,225,0.06); padding: 0.15em 0.45em; border-radius: 0.35rem; color: var(--yellow); }
     .guide-card a { color: var(--blue); text-decoration: none; }
     .guide-card a:hover { text-decoration: underline; }
     .dual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
     @media (max-width: 768px) { .dual-grid { grid-template-columns: 1fr; } }
-    .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1rem; }
-    .reward-table { font-family: 'Syne Mono', monospace; font-size: 0.68rem; border: 1px solid rgba(255,255,225,0.06); border-radius: 0.75rem; overflow: hidden; margin-top: 0.75rem; }
-    .rt-head { display: grid; padding: 0.4rem 0.75rem; background: rgba(255,255,255,0.05); color: rgba(255,255,225,0.35); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; }
-    .rt-row { display: grid; padding: 0.35rem 0.75rem; border-top: 1px solid rgba(255,255,225,0.04); }
-    .rt-row:nth-child(even) { background: rgba(255,255,255,0.02); }
-    .streak-grid { display: grid; gap: 0; border: 1px solid rgba(255,255,225,0.07); border-radius: 1rem; overflow: hidden; margin-top: 0.75rem; }
-    .sg-head { background: var(--dark3); font-family: 'Syne Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,225,0.35); padding: 0.5rem 0.75rem; }
-    .sg-cell { padding: 0.55rem 0.75rem; font-size: 0.75rem; color: rgba(255,255,225,0.65); border-top: 1px solid rgba(255,255,225,0.05); }
-    .sg-cell strong { color: var(--cream); }
-    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-    .info-card { background: var(--dark3); border: 1px solid rgba(255,255,225,0.06); border-radius: 1.25rem; padding: 1.4rem; }
-    .info-card-icon { font-size: 1.4rem; margin-bottom: 0.6rem; }
-    .info-card-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem; }
-    .info-card-body { font-size: 0.74rem; color: rgba(255,255,225,0.55); line-height: 1.7; }
-    .info-card-body strong { color: var(--cream); }
-    .shop-card-meta { display: flex; flex-direction: column; gap: 0.35rem; }
-    .shop-card-row { display: flex; justify-content: space-between; align-items: center; font-family: 'Syne Mono', monospace; font-size: 0.68rem; padding: 0.35rem 0.6rem; border-radius: 0.5rem; background: rgba(255,255,225,0.03); border: 1px solid rgba(255,255,225,0.05); }
-    .shop-card-row span:first-child { color: rgba(255,255,225,0.4); }
-    .shop-card-img-placeholder { width: 100%; aspect-ratio: 1 / 1; border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; overflow: hidden; }
-    .shop-btn { display: flex; align-items: center; justify-content: center; padding: 0.65rem 1rem; border-radius: 0.85rem; font-family: 'Syne Mono', monospace; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-decoration: none; transition: all 0.2s; border: 1.5px solid; }
-    .shop-btn-blue { color: var(--blue); background: rgba(79,168,253,0.08); border-color: rgba(79,168,253,0.3); }
-    .shop-btn-blue:hover { background: rgba(79,168,253,0.16); border-color: rgba(79,168,253,0.6); }
-    .shop-btn-red { color: var(--red); background: rgba(253,70,79,0.08); border-color: rgba(253,70,79,0.3); }
-    .shop-btn-red:hover { background: rgba(253,70,79,0.16); border-color: rgba(253,70,79,0.6); }
-    .shop-btn-yellow { color: var(--yellow); background: rgba(192,132,252,0.08); border-color: rgba(192,132,252,0.3); }
-    .shop-btn-yellow:hover { background: rgba(192,132,252,0.16); border-color: rgba(192,132,252,0.6); }
-    .shop-btn-green { color: var(--green); background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.3); }
-    .shop-btn-green:hover { background: rgba(34,197,94,0.16); border-color: rgba(34,197,94,0.6); }
-    .shop-btn-gold { color: var(--gold); background: rgba(254,206,0,0.08); border-color: rgba(254,206,0,0.3); }
-    .shop-btn-gold:hover { background: rgba(254,206,0,0.16); border-color: rgba(254,206,0,0.6); }
-    .badge { display: inline-block; font-family: 'Syne Mono', monospace; font-size: 0.58rem; padding: 0.15em 0.55em; border-radius: 999px; background: rgba(192,132,252,0.1); color: var(--yellow); border: 1px solid rgba(192,132,252,0.2); }
-    .badge-blue { background: rgba(79,168,253,0.1); color: var(--blue); border-color: rgba(79,168,253,0.2); }
-    .badge-red { background: rgba(253,70,79,0.1); color: var(--red); border-color: rgba(253,70,79,0.2); }
-    .badge-green { background: rgba(34,197,94,0.1); color: var(--green); border-color: rgba(34,197,94,0.2); }
-    .badge-gold { background: rgba(254,206,0,0.1); color: var(--gold); border-color: rgba(254,206,0,0.2); }
-    .highlight-row { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 1rem; border-radius: 0.75rem; margin-bottom: 0.4rem; font-family: 'Syne Mono', monospace; font-size: 0.72rem; border: 1px solid; transition: all 0.2s; }
-    .section-divider { font-family: 'Syne Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,225,0.35); margin: 1.75rem 0 0.75rem; display: flex; align-items: center; gap: 0.75rem; }
-    .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,225,0.08); }
-    .btn { display: inline-flex; align-items: center; gap: 0.45rem; font-family: 'Syne Mono', monospace; font-size: 0.72rem; font-weight: 600; padding: 0.6em 1.4em; border-radius: 999px; border: 1px solid; cursor: pointer; transition: all 0.2s; text-decoration: none; letter-spacing: 0.05em; }
+    .highlight-row { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 1rem; border-radius: 0.75rem; margin-bottom: 0.4rem; font-family: 'Space Grotesk', monospace; font-size: 0.72rem; border: 1px solid; transition: all 0.2s; }
+    .section-divider { font-family: 'Space Grotesk', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--yellow); margin: 1.75rem 0 0.75rem; display: flex; align-items: center; gap: 0.75rem; }
+    .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(192,132,252,0.35), transparent); }
+    .btn { display: inline-flex; align-items: center; gap: 0.45rem; font-family: 'Space Grotesk', monospace; font-size: 0.72rem; font-weight: 600; padding: 0.6em 1.4em; border-radius: 999px; border: 1px solid; cursor: pointer; transition: all 0.2s; text-decoration: none; letter-spacing: 0.05em; }
     .btn-yellow { color: var(--yellow); background: rgba(192,132,252,0.08); border-color: rgba(192,132,252,0.3); }
     .btn-yellow:hover { background: rgba(192,132,252,0.16); border-color: rgba(192,132,252,0.6); }
     .btn-blue { color: var(--blue); background: rgba(79,168,253,0.08); border-color: rgba(79,168,253,0.3); }
@@ -97,13 +63,27 @@
     .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.65s ease, transform 0.65s ease; }
     .reveal.visible { opacity: 1; transform: none; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-top: 0.75rem; }
+    .team-card { background: var(--dark3); border: 1px solid rgba(255,255,225,0.06); border-radius: 1.25rem; padding: 1.25rem 1rem; text-align: center; transition: border-color 0.3s; }
+    .team-card:hover { border-color: rgba(255,255,225,0.15); }
+    .team-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(192,132,252,0.3); margin-bottom: 0.6rem; }
+    .team-card .t-name { font-size: 0.78rem; font-weight: 700; color: var(--cream); margin-bottom: 0.2rem; }
+    .team-card .t-role { font-size: 0.66rem; font-family: 'Space Grotesk', monospace; color: rgba(255,255,225,0.4); line-height: 1.4; }
+
+    .lore-list { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem; }
+    .lore-item { display: flex; gap: 1rem; align-items: flex-start; }
+    .lore-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--yellow); flex-shrink: 0; margin-top: 0.35rem; }
+    .lore-text { font-size: 0.82rem; color: rgba(255,255,225,0.65); line-height: 1.65; }
+    .lore-text strong { color: var(--cream); }
+
     .header-icons { display: none; }
     .header-icons img { width: 22px !important; height: 22px !important; object-fit: contain !important; border-radius: 0 !important; border: none !important; margin: 0 !important; opacity: 0.85; }
     @media (max-width: 768px) { .header-icons { display: flex; gap: 0.75rem; align-items: center; } }
     @media (display-mode: standalone) { .header-icons { display: none !important; } }
     .pwa-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #111; border-top: 1px solid rgba(255,255,225,0.08); display: none; align-items: stretch; z-index: 999; padding-bottom: env(safe-area-inset-bottom); }
     @media (display-mode: standalone) { .pwa-nav { display: flex; } body { padding-bottom: 80px !important; } }
-    .pwa-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; text-decoration: none; color: rgba(255,255,225,0.35); font-family: 'Syne Mono', monospace; font-size: 0.55rem; letter-spacing: 0.05em; transition: color 0.2s; }
+    .pwa-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; text-decoration: none; color: rgba(255,255,225,0.35); font-family: 'Space Grotesk', monospace; font-size: 0.55rem; letter-spacing: 0.05em; transition: color 0.2s; }
     .pwa-tab span:first-child { font-size: 1.3rem; display: flex; align-items: center; justify-content: center; }
     .pwa-tab.active { color: #c084fc; }
     @media (display-mode: standalone) {
@@ -113,7 +93,22 @@
       .guide-hero h1 { font-size: 1.75rem !important; margin-bottom: 0.35rem !important; }
       .guide-hero p { font-size: 0.8rem !important; margin-bottom: 0.75rem !important; }
     }
-    @media (max-width: 600px) { .guide-tab { padding: 0.5rem 1rem; font-size: 0.65rem; } .guide-card { padding: 1.4rem; } .shop-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) { .guide-tab { padding: 0.5rem 1rem; font-size: 0.65rem; } .guide-card { padding: 1.4rem; } .team-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); } }
+    .reward-table { font-family: 'Space Grotesk', monospace; font-size: 0.68rem; border: 1px solid rgba(255,255,225,0.06); border-radius: 0.75rem; overflow: hidden; margin-top: 0.5rem; }
+    .rt-head { display: grid; padding: 0.4rem 0.75rem; background: rgba(255,255,255,0.05); color: rgba(255,255,225,0.35); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .rt-row { display: grid; padding: 0.35rem 0.75rem; border-top: 1px solid rgba(255,255,225,0.04); }
+    .rt-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+    .btn-link { display: block; text-align: center; padding: 0.45rem 0.6rem; border-radius: 0.5rem; font-family: 'Space Grotesk', monospace; font-size: 0.65rem; font-weight: 600; text-decoration: none; transition: all 0.2s; letter-spacing: 0.04em; }
+    .btn-red { color: var(--red); background: rgba(253,70,79,0.08); border: 1px solid rgba(253,70,79,0.25); }
+    .btn-red:hover { background: rgba(253,70,79,0.16); }
+    .btn-link.btn-blue { color: var(--blue); background: rgba(79,168,253,0.08); border: 1px solid rgba(79,168,253,0.25); }
+    .btn-link.btn-blue:hover { background: rgba(79,168,253,0.16); }
+    .btn-ghost { color: rgba(255,255,225,0.5); background: rgba(255,255,225,0.04); border: 1px solid rgba(255,255,225,0.12); }
+    .btn-ghost:hover { background: rgba(255,255,225,0.08); color: var(--cream); }
+    .support-meta { font-size: 0.78rem; color: rgba(255,255,225,0.6); line-height: 1.7; margin-bottom: 0.75rem; }
+    .support-meta span { font-weight: 600; }
+    .nft-divider { font-family: 'Space Grotesk', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,225,0.35); display: flex; align-items: center; gap: 0.5rem; margin: 0.75rem 0 0.5rem; }
+    .nft-divider::before, .nft-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,225,0.08); }
   </style>
 </head>
 <body>
@@ -136,372 +131,434 @@
   <div id="global-menu"></div>
 
   <div class="guide-hero">
-    <div class="eyebrow">Rewards</div>
-    <h1>How to <span>Earn</span></h1>
-    <p>Every action earns. Forage, farm, stake, provide liquidity, and hold NFTs to grow your SHROOM and SPORE rewards across the entire ecosystem.</p>
+    <div class="eyebrow">Ecosystem</div>
+    <h1>Mushroom <span>Planet</span></h1>
+    <p>A Web3 community on Polygon. Earn SHROOM and SPORE by playing, foraging, and farming — or support the mycelium by providing liquidity and holding NFTs.</p>
   </div>
 
   <div class="guide-tabs">
-    <button class="guide-tab active" onclick="showTab('earn', this)">
-      <img src="/images/sporebot.png" alt="Earn" />
+    <button class="guide-tab active" onclick="showTab('overview', this)">
+      <img src="/images/sporebot.png" alt="Overview" />
+      Overview
+    </button>
+    <button class="guide-tab" onclick="showTab('earn', this)">
+      <img src="/images/earn.png" alt="Earn" />
       Earn
     </button>
-    <button class="guide-tab" onclick="showTab('shop', this)">
-      <img src="/images/nft.png" alt="Shop" />
-      NFT Shop
+    <button class="guide-tab" onclick="showTab('support', this)">
+      <img src="/images/growth.png" alt="Rewards" />
+      Rewards
     </button>
   </div>
 
-  <section id="tab-earn" class="guide-section active">
+  <!-- OVERVIEW -->
+  <section id="tab-overview" class="guide-section active">
+
     <div class="reveal">
-      <div class="section-label">Overview</div>
-      <div class="section-title">Two Ways to Earn</div>
+      <div class="section-label">Introduction</div>
+      <div class="section-title">Welcome to Mushroom Planet</div>
     </div>
-    <div class="info-grid reveal" style="margin-bottom:2rem;">
-  <div class="info-card">
-    <div class="info-card-icon">&#x1F33F;</div>
-    <div class="info-card-title">Sporebot Rewards</div>
-    <div class="info-card-body">
-      Earn SHROOMS and SPORES through <strong>Sporebot</strong> on both Reddit and Discord. Comment
-      <strong>!forage</strong> each day to build your streak, unlock higher daily rewards, and tap into jackpots and
-      streak protections across the ecosystem.
-    </div>
-  </div>
-
-  <div class="info-card">
-    <div class="info-card-icon">&#x1F4DD;</div>
-    <div class="info-card-title">Create and Comment</div>
-    <div class="info-card-body">
-      Write posts and comments in the <strong>r/MushroomPlanet</strong> subreddit to earn XP, SHROOMS, and SPORES.
-      Upvotes, tips, airdrops, and community engagement all contribute to your long‑term rewards while you participate
-      in the content and discussions.
-    </div>
-  </div>
-</div>
 
     <div class="guide-card reveal">
-      <h3>&#x1F3AE; Sporebot Discord Farming</h3>
-      <p>Use <code>!start</code> in <strong>#farming</strong> to receive <strong>1,000 SHROOMS</strong>, then plant them to begin generating SPORES every day. Your farm evolves through 5 stages over a 42-day cycle. Reach Sporulation and harvest to rank up permanently and increase your plant cap.</p>
-      <h4>Farm Stages (42-Day Cycle)</h4>
-      <div class="streak-grid" style="grid-template-columns: 1fr 1fr 1fr;">
-        <div class="sg-head">Stage</div><div class="sg-head">Days</div><div class="sg-head">SGR Boost</div>
-        <div class="sg-cell">Seedling</div><div class="sg-cell">1-6</div><div class="sg-cell">+0%</div>
-        <div class="sg-cell">Mycelium</div><div class="sg-cell">7-14</div><div class="sg-cell">+5%</div>
-        <div class="sg-cell">Fruiting</div><div class="sg-cell">15-27</div><div class="sg-cell">+10%</div>
-        <div class="sg-cell">Pinning</div><div class="sg-cell">28-41</div><div class="sg-cell">+15%</div>
-        <div class="sg-cell"><strong>Sporulation</strong></div><div class="sg-cell">Day 42</div><div class="sg-cell"><strong>+20%</strong></div>
+      <h3>&#x1F30D; The Ecosystem</h3>
+      <p>The Shroom ($HROOM) and Spore (SPR) tokens are the twin currencies of the Mushroom Planet ecosystem, designed to reward creativity, loyalty, and community participation across both <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">Reddit</a> and <a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">Discord</a>.</p>
+      <p>Both tokens run on the <strong>Polygon network</strong>, enabling low fees, fast transactions, and secure on-chain utility. Earn real rewards by posting mushroom content on Reddit, farming in Discord, tipping, airdrops, raffles, or just vibing with the community.</p>
+    </div>
+
+    <div class="guide-card reveal">
+      <h3>&#x1F916; What is Sporebot?</h3>
+      <p>Sporebot is the engine behind Mushroom Planet — a custom bot running on both <strong>Discord</strong> and <strong>Reddit</strong> that handles farming, staking, governance, rewards, and community actions. It tracks your planted SHROOMS, calculates daily SPORE generation, manages staking positions, and distributes NFT rewards automatically.</p>
+      <p>On Discord, Sporebot powers the full game — use commands like <code>!start</code>, <code>!plant</code>, <code>!harvest</code>, <code>!stake</code>, <code>!dig</code>, and dozens more. On Reddit, it runs the daily forage thread and handles tips, airdrops, raffles, and balance tracking. Its companion bot <strong>Pixie</strong> handles XP, companions, and leveling within Discord.</p>
+    </div>
+
+    <div class="section-divider reveal">Lore</div>
+
+    <div class="guide-card reveal">
+      <h3>&#x1F4D6; Origin Story</h3>
+      <div class="lore-list">
+        <div class="lore-item">
+          <div class="lore-dot"></div>
+          <div class="lore-text">Mushroom Planet started with the creation of <strong>Mooshie NFTs</strong> by Zuko on Reddit, sparking the formation of a passionate community around mushroom art and culture.</div>
+        </div>
+        <div class="lore-item">
+          <div class="lore-dot"></div>
+          <div class="lore-text">The growing community led to the creation of the <strong>Mushroom Planet Subreddit</strong> and the official <strong>Discord Server</strong> — both now home to hundreds of active Shroomies.</div>
+        </div>
+        <div class="lore-item">
+          <div class="lore-dot"></div>
+          <div class="lore-text">The launch of the <strong>SHROOM token</strong> on Polygon powered the ecosystem with real on-chain utility, letting community members truly own their rewards.</div>
+        </div>
+        <div class="lore-item">
+          <div class="lore-dot"></div>
+          <div class="lore-text"><strong>Sporebot</strong> was developed, allowing users to farm and earn rewards through daily participation — turning community engagement into self-custodied assets.</div>
+        </div>
+        <div class="lore-item">
+          <div class="lore-dot"></div>
+          <div class="lore-text">With the growing ecosystem, the <strong>SPORE token</strong> was created to enable governance and reward long-term participation. Today, Mushroom Planet thrives as a community-driven platform bridging Web3 technology with true digital ownership — turning your participation into real, self-crypto rewards.</div>
+        </div>
       </div>
-      <h4>Farm Ranks (Permanent After Each Harvest)</h4>
-      <div class="streak-grid" style="grid-template-columns: 1fr 1fr 1fr; margin-top:0.75rem;">
-        <div class="sg-head">Rank</div><div class="sg-head">SGR Bonus</div><div class="sg-head">Plant Cap</div>
-        <div class="sg-cell">Bronze</div><div class="sg-cell">+0%</div><div class="sg-cell">2,000,000</div>
-        <div class="sg-cell">Silver</div><div class="sg-cell">+3%</div><div class="sg-cell">2,500,000</div>
-        <div class="sg-cell">Gold</div><div class="sg-cell">+6%</div><div class="sg-cell">3,000,000</div>
-        <div class="sg-cell">Emerald</div><div class="sg-cell">+9%</div><div class="sg-cell">3,500,000</div>
-        <div class="sg-cell">Diamond</div><div class="sg-cell">+12%</div><div class="sg-cell">4,200,000</div>
-        <div class="sg-cell">Master</div><div class="sg-cell">+15%</div><div class="sg-cell">4,500,000</div>
-        <div class="sg-cell">Grandmaster</div><div class="sg-cell">+20%</div><div class="sg-cell">5,000,000</div>
-        <div class="sg-cell"><strong>Legend</strong></div><div class="sg-cell"><strong>+25%</strong></div><div class="sg-cell"><strong>6,874,000</strong></div>
+    </div>
+
+    <div class="section-divider reveal">Tokenomics</div>
+
+    <div class="dual-grid reveal">
+      <div class="guide-card" style="margin-bottom:0;">
+        <h3>&#x1F344; SHROOM ($HROOM)</h3>
+        <p>An ERC-20 token deployed on the Polygon network. It bridges Web3 technology with true digital ownership, turning your participation into real, self-custodied rewards. No middleman — just you and a basket full of shrooms.</p>
+        <h4>Earn SHROOM By</h4>
+        <ul>
+          <li>Posting mushroom content on Reddit</li>
+          <li>Farming in Sporebot on Discord</li>
+          <li>Joining raffles and airdrops</li>
+          <li>Providing liquidity to the $HROOM/WETH pool</li>
+          <li>Vibing with the community</li>
+        </ul>
       </div>
-      <h4>All SGR Sources (In-Game Cap: 100%)</h4>
+      <div class="guide-card" style="margin-bottom:0;">
+        <h3>&#x1F300; SPORE (SPR)</h3>
+        <p>SPORE exists to give the Mushroom Planet community a true voice. It's the governance counterpart to SHROOM — putting real power into the hands of Shroomies who contribute and care. No gatekeepers, just Shroomies shaping the future together.</p>
+        <h4>Earn SPORE By</h4>
+        <ul>
+          <li>Holding a Kid Shroom or Mooshie NFT</li>
+          <li>Staking in Sporebot</li>
+          <li>Joining raffles and airdrops</li>
+          <li>Providing liquidity to the SPR/WETH pool</li>
+          <li>Vibing with the community</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card reveal" style="margin-top:1rem;">
+      <h3>&#x1F4CA; Treasury</h3>
+      <p>The Mushroom Planet treasury holds on-chain reserves for LP rewards, NFT airdrops, ecosystem development, and community initiatives. All balances and allocations are transparent and viewable in real time.</p>
+      <div style="margin-top:1rem;"><a class="btn btn-blue" href="/treasury.html">View Treasury</a></div>
+    </div>
+
+    <div class="section-divider reveal">Team</div>
+
+    <div class="guide-card reveal">
+      <h3>&#x1F31F; Meet the Team</h3>
+      <div class="team-grid">
+
+        <a href="https://www.reddit.com/user/ZukoBih" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+          <div class="team-card">
+            <img id="avatar-ZukoBih" src="https://www.redditstatic.com/avatars/avatar_default_01_FF4500.png" alt="u/ZukoBih" />
+            <div class="t-name">u/ZukoBih</div>
+            <div class="t-role">Founder &amp; Mooshie Artist</div>
+          </div>
+        </a>
+
+        <a href="https://www.reddit.com/user/IveDoneItAtLast" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+          <div class="team-card">
+            <img id="avatar-IveDoneItAtLast" src="https://www.redditstatic.com/avatars/avatar_default_03_DB0064.png" alt="u/IveDoneItAtLast" />
+            <div class="t-name">u/IveDoneItAtLast</div>
+            <div class="t-role">Security &amp; Guardian</div>
+          </div>
+        </a>
+
+        <a href="https://www.reddit.com/user/Mrmakanakai" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+          <div class="team-card">
+            <img id="avatar-Mrmakanakai" src="https://www.redditstatic.com/avatars/avatar_default_05_5A00E0.png" alt="u/Mrmakanakai" />
+            <div class="t-name">u/Mrmakanakai</div>
+            <div class="t-role">Creative Writer &amp; Guardian</div>
+          </div>
+        </a>
+
+        <a href="https://www.reddit.com/user/PermanentNight_" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+          <div class="team-card">
+            <img id="avatar-PermanentNight_" src="https://www.redditstatic.com/avatars/avatar_default_02_46D160.png" alt="u/PermanentNight_" />
+            <div class="t-name">u/PermanentNight_</div>
+            <div class="t-role">Web3 Engineer &amp; Dev</div>
+          </div>
+        </a>
+
+        <a href="https://www.reddit.com/user/-Anasthesia-" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+          <div class="team-card">
+            <img id="avatar--Anasthesia-" src="https://www.redditstatic.com/avatars/avatar_default_04_A5A4A4.png" alt="u/-Anasthesia-" />
+            <div class="t-name">u/-Anasthesia-</div>
+            <div class="t-role">Smart Contract Architect</div>
+          </div>
+        </a>
+
+        <a href="https://www.reddit.com/user/GUW00" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+          <div class="team-card">
+            <img id="avatar-GUW00" src="https://www.redditstatic.com/avatars/avatar_default_02_46D160.png" alt="u/GUW00" />
+            <div class="t-name">u/GUW00</div>
+            <div class="t-role">Web3 &amp; Sporebot Dev</div>
+          </div>
+        </a>
+
+        <a href="https://www.reddit.com/user/boomerangthrowaway" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+          <div class="team-card">
+            <img id="avatar-boomerangthrowaway" src="https://www.redditstatic.com/avatars/avatar_default_02_46D160.png" alt="u/boomerangthrowaway" />
+            <div class="t-name">u/boomerangthrowaway</div>
+            <div class="t-role">Community Builder</div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <div class="cta-row reveal">
+      <button class="btn btn-yellow" onclick="showTab('earn', document.querySelectorAll('.guide-tab')[1])">How to Earn</button>
+      <button class="btn btn-blue" onclick="showTab('support', document.querySelectorAll('.guide-tab')[2])">Support the Mycelium</button>
+      <a class="btn btn-green" href="/guides.html">Full Guides</a>
+    </div>
+  </section>
+
+  <!-- EARN -->
+  <section id="tab-earn" class="guide-section">
+
+    <div class="reveal">
+      <div class="section-label">All Methods</div>
+      <div class="section-title">Ways to Earn</div>
+    </div>
+
+    <div class="guide-card reveal">
+      <h3>&#x1F33F; Daily Forage — Reddit</h3>
+      <p>The easiest way in — no wallet required. A thread drops every morning at <strong>7:20 AM EST</strong> on <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">r/MushroomPlanet</a>. Comment <code>!forage</code> once to earn. Your streak scales your rewards — miss a day and it resets to 0.</p>
       <ul>
-        <li><strong>Farm Rank</strong>: up to +25%</li>
-        <li><strong>Farm Stage</strong>: up to +20% at Sporulation</li>
-        <li><strong>Brewed Potion</strong>: up to +10%</li>
-        <li><strong>5 Gemstones</strong>: up to +25% (5% each)</li>
-        <li><strong>Sporebot Community Bonus</strong>: up to +25% across 5 activity categories</li>
-        <li><strong>On-Chain Bonuses</strong>: LP, Guwoo NFT, Sporebot NFT, LP NFTs (additional, beyond cap)</li>
+        <li><strong>Day 1</strong>: 1,000 SHROOMS + 100,000 SPORES</li>
+        <li><strong>Day 420+</strong>: 6,874 SHROOMS + 687,400 SPORES (max)</li>
+        <li>Every <code>!forage</code> has a <strong>1-in-3,000</strong> chance to win the community Jackpot</li>
+        <li>Earn a <strong>Vacation Day</strong> every 7-day consecutive streak to protect yourself when life happens</li>
+        <li>New? Comment <code>!sprout</code> for a one-time starter bonus: 1,000 SHROOMS + 100,000 SPORES + 1 GS Token</li>
       </ul>
-      <p style="margin-top:0.75rem;font-size:0.8rem;color:rgba(255,255,225,0.45);">After every harvest, replant all your SHROOMS immediately to resume earning.</p>
     </div>
 
     <div class="guide-card reveal">
-      <h3>&#x1F300; SPORE Staking and Governance</h3>
-      <p>Stake your SPORES with <code>!stake</code> in Discord to earn <strong>20% APR</strong> passively and accumulate <strong>Mycelium Voting Power (MVP)</strong> for ecosystem governance proposals.</p>
+      <h3>&#x1F3AE; Discord Farming</h3>
+      <p>Use <code>!start</code> in <strong>#farming</strong> to receive 1,000 SHROOMS and begin planting. Your farm passively generates SPORES every day based on your <strong>Spore Generation Rate (SGR)</strong>. Advance through 5 stages over 42 days, reach Sporulation, and harvest to rank up permanently.</p>
       <ul>
-        <li>Every <strong>100M SPORES</strong> staked = 1 Mycelium Node</li>
-        <li>Each node runs a <strong>90-day cycle</strong> - every 90 days = +1 MVP per node</li>
-        <li>MVP rolls over infinitely (180 days = 2 MVP per node, and so on)</li>
-        <li><strong>Fast Unstake (7 days)</strong>: lose ALL MVP accumulated</li>
-        <li><strong>Slow Unstake (42 days)</strong>: keep ALL MVP accumulated</li>
+        <li>SGR boosts stack from farm rank, stage, potions, gemstones, and community activity</li>
+        <li>Farm rank increases your plant cap and base generation rate with each harvest</li>
+        <li>New users get a <strong>42-day free trial</strong> — then hold NFTs, LP, or on-chain SHROOM to continue</li>
+        <li>Full rank tables and SGR breakdown on the <a href="/guides.html">Guides page</a></li>
       </ul>
     </div>
 
     <div class="guide-card reveal">
-      <h3>&#x1F33F; Reddit Daily Forage</h3>
-      <p>Every day at <strong>7:20 AM EST</strong> a fresh forage thread is pinned to <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">r/MushroomPlanet</a>. Comment <code>!forage</code> once to earn daily rewards that scale with your streak. Miss a day and it resets to 0.</p>
-      <h4>Streak Scale</h4>
-      <div class="streak-grid" style="grid-template-columns: 1fr 1fr 1fr;">
-        <div class="sg-head">Streak</div><div class="sg-head">SHROOMS</div><div class="sg-head">SPORES</div>
-        <div class="sg-cell">Day 1</div><div class="sg-cell">1,000</div><div class="sg-cell">100,000</div>
-        <div class="sg-cell">Day 7</div><div class="sg-cell">~1,166</div><div class="sg-cell">~116,600</div>
-        <div class="sg-cell">Day 30</div><div class="sg-cell">~1,491</div><div class="sg-cell">~149,100</div>
-        <div class="sg-cell">Day 100</div><div class="sg-cell">~2,635</div><div class="sg-cell">~263,500</div>
-        <div class="sg-cell"><strong>Day 420+</strong></div><div class="sg-cell"><strong>6,874</strong></div><div class="sg-cell"><strong>687,400</strong></div>
-      </div>
-      <h4>Streak Protections and Bonuses</h4>
+      <h3>&#x1F300; Stake SPORES — 20% APR</h3>
+      <p>Use <code>!stake</code> in Discord to earn passive rewards and accumulate <strong>Mycelium Voting Power (MVP)</strong> for governance proposals. Every 100M SPORES staked = 1 Mycelium Node running a 90-day reward cycle.</p>
       <ul>
-        <li>Earn <strong>1 Vacation Day</strong> for every 7-day consecutive streak - use to protect your streak when you miss a day</li>
-        <li>Every <code>!forage</code> has a <strong>1-in-3,000 chance</strong> to win the current community Jackpot</li>
-        <li>Higher <strong>XP Rank (Flair)</strong> applies a forage bonus of up to +100%</li>
+        <li><strong>Slow Unstake (42 days)</strong>: keep all MVP earned</li>
+        <li><strong>Fast Unstake (7 days)</strong>: lose all MVP</li>
+        <li>MVP lets you vote on ecosystem proposals at <a href="/vote.html">vote.html</a></li>
       </ul>
     </div>
 
     <div class="guide-card reveal">
-      <h3>&#x1F48E; Reddit Flair Ranks and XP</h3>
-      <p>Your Reddit flair reflects your XP rank. Higher rank = larger forage bonus on every <code>!forage</code>.</p>
-      <div class="streak-grid" style="grid-template-columns: 1fr 1fr 1fr;">
-        <div class="sg-head">Rank</div><div class="sg-head">XP Required</div><div class="sg-head">Forage Bonus</div>
-        <div class="sg-cell">Sprout</div><div class="sg-cell">0</div><div class="sg-cell">0%</div>
-        <div class="sg-cell">Bronze</div><div class="sg-cell">100,000</div><div class="sg-cell">+5%</div>
-        <div class="sg-cell">Silver</div><div class="sg-cell">250,000</div><div class="sg-cell">+10%</div>
-        <div class="sg-cell">Gold</div><div class="sg-cell">500,000</div><div class="sg-cell">+23%</div>
-        <div class="sg-cell">Emerald</div><div class="sg-cell">750,000</div><div class="sg-cell">+42%</div>
-        <div class="sg-cell">Diamond</div><div class="sg-cell">1,000,000</div><div class="sg-cell">+69%</div>
-        <div class="sg-cell">Master</div><div class="sg-cell">2,000,000</div><div class="sg-cell">+90%</div>
-        <div class="sg-cell"><strong>Grandmaster</strong></div><div class="sg-cell"><strong>4,206,874</strong></div><div class="sg-cell"><strong>+100%</strong></div>
-      </div>
-      <h4>XP Sources</h4>
+      <h3>&#x1F4DD; Post and Comment on Reddit</h3>
+      <p>Every upvote you receive on r/MushroomPlanet rewards you with SHROOMS and SPORES. Accumulate XP to climb flair ranks and unlock a forage bonus of up to +100% on every <code>!forage</code>.</p>
       <ul>
         <li>Post upvotes: <strong>500 SHROOMS + 50,000 SPORES each</strong></li>
         <li>Comment upvotes: <strong>200 SHROOMS + 20,000 SPORES each</strong></li>
-        <li>Daily foraging, feeding, streaks, tips given, and daily quests</li>
+        <li>Flair ranks from Sprout up to Grandmaster (4,206,874 XP required)</li>
       </ul>
     </div>
 
     <div class="guide-card reveal">
-      <h3>&#x1F91D; Community Earn Actions</h3>
-      <div class="dual-grid" style="margin-top:0.5rem;">
+      <h3>&#x1F91D; Community Actions</h3>
+      <div class="dual-grid" style="margin-top:0.5rem;margin-bottom:0;">
         <div>
-          <h4>Feed the Animals</h4>
-          <ul>
-            <li>Comment <code>!feed</code> in the forage thread</li>
-            <li>Costs 42-420 SHROOMS per feed</li>
-            <li>1-hour cooldown between feeds</li>
-            <li>Every <strong>6,874 SHROOMS fed</strong> increases your Forage Bonus</li>
-            <li>Every <code>!feed</code> grows the community Jackpot</li>
-          </ul>
-        </div>
-        <div>
-          <h4>Tip, Airdrop and Raffle</h4>
+          <h4>Give and Receive</h4>
           <ul>
             <li><code>!tip [amount] [token]</code> - tip any post or comment</li>
             <li><code>!gs</code> - give a GS Token (6,874 SPORES to recipient)</li>
-            <li><code>!airdrop</code> - split tips to all commenters on your post</li>
+            <li><code>!feed</code> - feed animals in forage thread, grows Jackpot</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Community Events</h4>
+          <ul>
+            <li><code>!airdrop</code> - split tokens to all commenters on your post</li>
             <li><code>!raffle [# winners]</code> - pick random winners from your post</li>
-            <li>New users: <code>!sprout</code> for 1,000 SHROOMS + 100,000 SPORES + 1 GS Token</li>
+            <li><code>!link</code> on Reddit - one-time bonus of <strong>20,000 SHROOMS + 2,000,000 SPORES</strong></li>
           </ul>
         </div>
       </div>
     </div>
 
     <div class="guide-card reveal">
-      <h3>&#x26D3;&#xFE0F; On-Chain SPORE Rewards</h3>
-      <p>Hold <strong>1M+ SHROOM</strong> on-chain to qualify for weekly SPORE airdrops from the main pool. Snapshots every week - treasury and LP wallets excluded. Total pool: <strong>68.74B SPORE over 10 years</strong>.</p>
-      <div class="reward-table" style="margin-bottom:1rem;">
+      <h3>&#x1F4A7; Liquidity Provider Rewards</h3>
+      <p>Add SHROOM/WETH or SPORE/WETH liquidity on QuickSwap to earn weekly token airdrops proportional to your pool share. Snapshot every Sunday, airdrop sent Monday.</p>
+      <ul>
+        <li><strong>Year 1 SHROOM LP</strong>: 5,000,000 SHROOM/week to all LPs</li>
+        <li><strong>Year 1 SPORE LP</strong>: 500,000,000 SPORE/week to all LPs</li>
+        <li>Tapers annually on May 7th each year</li>
+      </ul>
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1.25rem;">
+        <a class="btn btn-blue" href="https://dapp.quickswap.exchange/pool/v2/add?tokens=0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1,0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" rel="noopener noreferrer">Add SHROOM/WETH LP</a>
+        <a class="btn btn-green" href="https://dapp.quickswap.exchange/pool/v2/add?tokens=0x089582AC20ea563c69408a79E1061de594b61bED,0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" rel="noopener noreferrer">Add SPORE/WETH LP</a>
+      </div>
+    </div>
+
+    <div class="guide-card reveal">
+      <h3>&#x26D3;&#xFE0F; Hold On-Chain for Weekly Airdrops</h3>
+      <p>Hold <strong>1M+ SHROOM</strong> on your Polygon wallet to qualify for weekly SPORE airdrops from the main pool. Snapshots every week — treasury and LP wallets excluded.</p>
+      <ul>
+        <li>Total pool: <strong>68.74B SPORE over 10 years</strong></li>
+        <li><strong>Year 1</strong>: 200M SPORE/week split across all qualifying holders</li>
+        <li>Year 2 starts October 1, 2026</li>
+        <li>Use <code>!register 0xYourAddress</code> in Discord to link your wallet</li>
+      </ul>
+    </div>
+
+    <div class="guide-card reveal">
+      <h3>&#x1F5BC;&#xFE0F; NFT Daily Rewards</h3>
+      <p>Verify Mooshie NFTs with <code>!nft</code> in Discord to unlock automatic daily SPORE rewards. Rewards stack per NFT held.</p>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.75rem;margin-bottom:1rem;">
+        <a href="https://opensea.io/collection/mooshies-house" target="_blank" class="highlight-row" style="color:var(--blue);background:rgba(79,168,253,0.06);border-color:rgba(79,168,253,0.18);text-decoration:none;" onmouseover="this.style.background='rgba(79,168,253,0.12)'" onmouseout="this.style.background='rgba(79,168,253,0.06)'"><span style="font-weight:600;font-family:'Space Grotesk',monospace;">House Mooshie</span><span style="color:var(--blue);font-family:'Space Grotesk',monospace;">200,000 SPORE/day</span></a>
+        <a href="https://opensea.io/collection/king-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" class="highlight-row" style="color:var(--red);background:rgba(253,70,79,0.06);border-color:rgba(253,70,79,0.18);text-decoration:none;" onmouseover="this.style.background='rgba(253,70,79,0.12)'" onmouseout="this.style.background='rgba(253,70,79,0.06)'"><span style="font-weight:600;font-family:'Space Grotesk',monospace;">King Mooshie</span><span style="color:var(--blue);font-family:'Space Grotesk',monospace;">200,000 SPORE/day</span></a>
+        <a href="https://opensea.io/collection/queen-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" class="highlight-row" style="color:var(--purple);background:rgba(192,132,252,0.06);border-color:rgba(192,132,252,0.18);text-decoration:none;" onmouseover="this.style.background='rgba(192,132,252,0.12)'" onmouseout="this.style.background='rgba(192,132,252,0.06)'"><span style="font-weight:600;font-family:'Space Grotesk',monospace;">Queen Mooshie</span><span style="color:var(--blue);font-family:'Space Grotesk',monospace;">200,000 SPORE/day</span></a>
+        <a href="https://opensea.io/collection/kid-shroom-by-zuko-x-reddit-collectible-avatars" target="_blank" class="highlight-row" style="color:#7de89a;background:rgba(125,232,154,0.06);border-color:rgba(125,232,154,0.18);text-decoration:none;" onmouseover="this.style.background='rgba(125,232,154,0.12)'" onmouseout="this.style.background='rgba(125,232,154,0.06)'"><span style="font-weight:600;font-family:'Space Grotesk',monospace;">Kid Shroom <span style="font-size:0.6rem;color:rgba(255,255,225,0.35);">monthly through Jul 2026</span></span><span style="text-align:right;font-family:'Space Grotesk',monospace;font-size:0.68rem;line-height:1.5;"><span style="color:var(--red);display:block;">20,000 SHROOM/mo</span><span style="color:var(--blue);display:block;">1,500,000 SPORE/mo</span></span></a>
+        <a href="https://opensea.io/collection/gold-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" class="highlight-row" style="color:var(--gold);background:rgba(254,206,0,0.06);border-color:rgba(254,206,0,0.18);text-decoration:none;" onmouseover="this.style.background='rgba(254,206,0,0.12)'" onmouseout="this.style.background='rgba(254,206,0,0.06)'"><span style="font-weight:600;font-family:'Space Grotesk',monospace;">Gold Mooshie <span style="font-size:0.6rem;color:rgba(255,255,225,0.35);">monthly through Oct 2028</span></span><span style="text-align:right;font-family:'Space Grotesk',monospace;font-size:0.68rem;line-height:1.5;"><span style="color:var(--red);display:block;">15,000 SHROOM/mo</span><span style="color:var(--blue);display:block;">2,000,000 SPORE/mo</span></span></a>
+      </div>
+      <p style="font-size:0.74rem;color:rgba(255,255,225,0.4);line-height:1.6;">When monthly programs end, all Mooshie NFTs transition to the 200K SPORE/day daily reward automatically.</p>
+    </div>
+
+    <div class="cta-row reveal">
+      <a class="btn btn-yellow" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">Join Discord</a>
+      <a class="btn btn-blue" href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">Visit Subreddit</a>
+      <a class="btn btn-green" href="/guides.html">Full Guides</a>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section id="tab-support" class="guide-section">
+
+    <div class="reveal">
+      <div class="section-label">Calling All Mooshies</div>
+      <div class="section-title">Support the Mycelium</div>
+    </div>
+
+    <div class="rewards-grid reveal">
+
+      <div class="guide-card reveal">
+      <h3>&#x26D3;&#xFE0F; Onchain Rewards</h3>
+      <p>Hold <strong>1M+ SHROOM</strong> on your Polygon wallet to qualify for weekly SPORE airdrops from the main pool. Snapshots every week — treasury and LP wallets excluded.</p>
+      <div class="support-meta">
+        <span style="color:var(--blue);">Eligibility:</span> Any wallet holding 1M+ SHROOM<br>
+        <span style="color:var(--blue);">Total Pool:</span> 68.74B SPORE over 10 years<br>
+        <span style="color:var(--blue);">Snapshot:</span> Weekly - treasury and LP wallets excluded
+      </div>
+      <div class="reward-table">
         <div class="rt-head" style="grid-template-columns:1fr 1fr 1fr;"><span>Year</span><span style="text-align:center;">Weekly SPORE</span><span style="text-align:right;">Yearly SPORE</span></div>
         <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y1</span><span style="color:var(--blue);text-align:center;">200M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">10.40B</span></div>
         <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y2</span><span style="color:var(--blue);text-align:center;">185M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">9.62B</span></div>
         <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y3</span><span style="color:var(--blue);text-align:center;">170M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">8.84B</span></div>
         <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y4</span><span style="color:var(--blue);text-align:center;">155M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">8.06B</span></div>
         <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y5</span><span style="color:var(--blue);text-align:center;">140M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">7.28B</span></div>
-        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y6-10</span><span style="color:var(--blue);text-align:center;">Tapers...</span><span style="color:rgba(255,255,225,0.6);text-align:right;">to 3.22B</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y6</span><span style="color:var(--blue);text-align:center;">125M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">6.50B</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y7</span><span style="color:var(--blue);text-align:center;">110M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">5.72B</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y8</span><span style="color:var(--blue);text-align:center;">95M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">4.94B</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y9</span><span style="color:var(--blue);text-align:center;">80M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">4.16B</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y10</span><span style="color:var(--blue);text-align:center;">62M</span><span style="color:rgba(255,255,225,0.6);text-align:right;">3.22B</span></div>
       </div>
-      <p style="font-size:0.75rem;color:rgba(255,255,225,0.35);font-family:'Syne Mono',monospace;">Year 2 starts October 1, 2026.</p>
-    </div>
-
-    <div class="guide-card reveal">
-      <h3>&#x1F4A7; Liquidity Provider Rewards</h3>
-      <p>Add SHROOM/WETH or SPORE/WETH liquidity on QuickSwap (Polygon) to earn weekly token airdrops proportional to your pool share. Snapshot every Sunday, airdrop sent Monday. Also immediately satisfies the farm free-trial requirement.</p>
-      <div class="dual-grid" style="margin-top:0.5rem;">
-        <div>
-          <h4>SHROOM LP Schedule</h4>
-          <div class="reward-table">
-            <div class="rt-head" style="grid-template-columns:1fr 1fr;"><span>Year</span><span style="text-align:right;">SHROOM/wk</span></div>
-            <div class="rt-row" style="grid-template-columns:1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y1</span><span style="color:var(--red);text-align:right;">5,000,000</span></div>
-            <div class="rt-row" style="grid-template-columns:1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y2</span><span style="color:var(--red);text-align:right;">3,500,000</span></div>
-            <div class="rt-row" style="grid-template-columns:1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y3</span><span style="color:var(--red);text-align:right;">2,500,000</span></div>
-            <div class="rt-row" style="grid-template-columns:1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y4</span><span style="color:var(--red);text-align:right;">2,000,000</span></div>
-            <div class="rt-row" style="grid-template-columns:1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y5+</span><span style="color:var(--red);text-align:right;">Tapers...</span></div>
-          </div>
-        </div>
-        <div>
-          <h4>SPORE LP Schedule</h4>
-          <div class="reward-table">
-            <div class="rt-head" style="grid-template-columns:1fr 1fr;"><span>Year</span><span style="text-align:right;">SPORE/wk</span></div>
-            <div class="rt-row" style="grid-template-columns:1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y1</span><span style="color:var(--blue);text-align:right;">500,000,000</span></div>
-            <div class="rt-row" style="grid-template-columns:1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y2</span><span style="color:var(--blue);text-align:right;">350,000,000</span></div>
-            <div class="rt-row" style="grid-template-columns:1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y3</span><span style="color:var(--blue);text-align:right;">250,000,000</span></div>
-            <div class="rt-row" style="grid-template-columns:1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y4</span><span style="color:var(--blue);text-align:right;">200,000,000</span></div>
-            <div class="rt-row" style="grid-template-columns:1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y5+</span><span style="color:var(--blue);text-align:right;">Tapers...</span></div>
-          </div>
-        </div>
-      </div>
-      <p style="margin-top:0.75rem;font-size:0.78rem;color:rgba(255,255,225,0.5);">Tapers annually on May 7th each year.</p>
-      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1.25rem;">
-        <a class="btn btn-blue" href="https://dapp.quickswap.exchange/pool/v2/add?tokens=0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1,0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" rel="noopener noreferrer">Add SHROOM/WETH LP</a>
-        <a class="btn btn-green" href="https://dapp.quickswap.exchange/pool/v2/add?tokens=0x089582AC20ea563c69408a79E1061de594b61bED,0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" rel="noopener noreferrer">Add SPORE/WETH LP</a>
-        <a class="btn btn-yellow" href="/guides.html">LP Guide</a>
+      <div style="font-size:0.7rem;color:rgba(255,255,225,0.35);font-family:'Space Grotesk',monospace;padding:0.5rem 0.6rem;background:rgba(255,255,255,0.02);border-radius:0.5rem;border:1px solid rgba(255,255,225,0.05);margin-top:0.75rem;">Year 2 starts October 1, 2026</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.75rem;">
+        <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1#balances" target="_blank" class="btn-link btn-red">SHROOM Holders</a>
+        <a href="https://polygonscan.com/token/0x089582ac20ea563c69408a79e1061de594b61bed#balances" target="_blank" class="btn-link btn-blue">SPORE Holders</a>
       </div>
     </div>
 
     <div class="guide-card reveal">
-      <h3>&#x1F5BC;&#xFE0F; NFT Rewards Summary</h3>
-      <p>Verify your NFTs with <code>!nft</code> in Discord to unlock automatic daily SPORE rewards. Rewards stack - hold multiple NFTs to earn more.</p>
-      <div class="section-divider">Offchain Daily via Sporebot</div>
-      <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.25rem;">
-        <a href="https://opensea.io/collection/mooshies-house" target="_blank" class="highlight-row" style="color:var(--blue);background:rgba(79,168,253,0.06);border-color:rgba(79,168,253,0.18);text-decoration:none;" onmouseover="this.style.background='rgba(79,168,253,0.12)'" onmouseout="this.style.background='rgba(79,168,253,0.06)'"><span style="font-weight:600;font-family:'Syne Mono',monospace;">House Mooshie</span><span style="color:var(--blue);font-family:'Syne Mono',monospace;">200,000 SPORE/day</span></a>
-        <a href="https://opensea.io/collection/king-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" class="highlight-row" style="color:var(--red);background:rgba(253,70,79,0.06);border-color:rgba(253,70,79,0.18);text-decoration:none;" onmouseover="this.style.background='rgba(253,70,79,0.12)'" onmouseout="this.style.background='rgba(253,70,79,0.06)'"><span style="font-weight:600;font-family:'Syne Mono',monospace;">King Mooshie</span><span style="color:var(--blue);font-family:'Syne Mono',monospace;">200,000 SPORE/day</span></a>
-        <a href="https://opensea.io/collection/queen-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" class="highlight-row" style="color:var(--purple);background:rgba(192,132,252,0.06);border-color:rgba(192,132,252,0.18);text-decoration:none;" onmouseover="this.style.background='rgba(192,132,252,0.12)'" onmouseout="this.style.background='rgba(192,132,252,0.06)'"><span style="font-weight:600;font-family:'Syne Mono',monospace;">Queen Mooshie</span><span style="color:var(--blue);font-family:'Syne Mono',monospace;">200,000 SPORE/day</span></a>
+      <h3>&#x1F5BC;&#xFE0F; NFT Rewards</h3>
+      <p>Verify Mooshie NFTs with <code>!nft</code> in Discord after purchase. Rewards are per NFT — holding multiples stacks. All collections on OpenSea on Polygon.</p>
+      <div class="nft-divider">Offchain Daily — via Sporebot</div>
+      <div style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.75rem;">
+        <a href="https://opensea.io/collection/mooshies-house" target="_blank" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.65rem;background:rgba(79,168,253,0.06);border:1px solid rgba(79,168,253,0.18);border-radius:0.6rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(79,168,253,0.12)'" onmouseout="this.style.background='rgba(79,168,253,0.06)'">
+          <span style="color:var(--blue);font-size:0.78rem;font-weight:600;font-family:'Space Grotesk',monospace;">House Mooshie</span>
+          <span style="color:var(--blue);font-size:0.72rem;font-family:'Space Grotesk',monospace;">200,000 SPORE/day</span>
+        </a>
+        <a href="https://opensea.io/collection/king-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.65rem;background:rgba(253,70,79,0.06);border:1px solid rgba(253,70,79,0.18);border-radius:0.6rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(253,70,79,0.12)'" onmouseout="this.style.background='rgba(253,70,79,0.06)'">
+          <span style="color:var(--red);font-size:0.78rem;font-weight:600;font-family:'Space Grotesk',monospace;">King Mooshie</span>
+          <span style="color:var(--blue);font-size:0.72rem;font-family:'Space Grotesk',monospace;">200,000 SPORE/day</span>
+        </a>
+        <a href="https://opensea.io/collection/queen-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.65rem;background:rgba(192,132,252,0.06);border:1px solid rgba(192,132,252,0.18);border-radius:0.6rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(192,132,252,0.12)'" onmouseout="this.style.background='rgba(192,132,252,0.06)'">
+          <span style="color:#c084fc;font-size:0.78rem;font-weight:600;font-family:'Space Grotesk',monospace;">Queen Mooshie</span>
+          <span style="color:var(--blue);font-size:0.72rem;font-family:'Space Grotesk',monospace;">200,000 SPORE/day</span>
+        </a>
       </div>
-      <div class="section-divider">Onchain Monthly Airdrop</div>
-      <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;">
-        <a href="https://opensea.io/collection/kid-shroom-by-zuko-x-reddit-collectible-avatars" target="_blank" class="highlight-row" style="color:#7de89a;background:rgba(125,232,154,0.06);border-color:rgba(125,232,154,0.18);text-decoration:none;" onmouseover="this.style.background='rgba(125,232,154,0.12)'" onmouseout="this.style.background='rgba(125,232,154,0.06)'"><span style="font-weight:600;font-family:'Syne Mono',monospace;">Kid Shroom <span style="font-size:0.6rem;color:rgba(255,255,225,0.35);">Feb 2025-Jul 2026</span></span><span style="text-align:right;font-family:'Syne Mono',monospace;font-size:0.68rem;line-height:1.5;"><span style="color:var(--red);display:block;">20,000 SHROOM/mo</span><span style="color:var(--blue);display:block;">1,500,000 SPORE/mo</span></span></a>
-        <a href="https://opensea.io/collection/gold-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" class="highlight-row" style="color:var(--gold);background:rgba(254,206,0,0.06);border-color:rgba(254,206,0,0.18);text-decoration:none;" onmouseover="this.style.background='rgba(254,206,0,0.12)'" onmouseout="this.style.background='rgba(254,206,0,0.06)'"><span style="font-weight:600;font-family:'Syne Mono',monospace;">Gold Mooshie <span style="font-size:0.6rem;color:rgba(255,255,225,0.35);">Nov 2025-Oct 2028</span></span><span style="text-align:right;font-family:'Syne Mono',monospace;font-size:0.68rem;line-height:1.5;"><span style="color:var(--red);display:block;">15,000 SHROOM/mo</span><span style="color:var(--blue);display:block;">2,000,000 SPORE/mo</span></span></a>
+      <div class="nft-divider">Onchain Monthly Airdrop</div>
+      <div style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.75rem;">
+        <a href="https://opensea.io/collection/kid-shroom-by-zuko-x-reddit-collectible-avatars" target="_blank" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.65rem;background:rgba(125,232,154,0.06);border:1px solid rgba(125,232,154,0.18);border-radius:0.6rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(125,232,154,0.12)'" onmouseout="this.style.background='rgba(125,232,154,0.06)'">
+          <span style="color:#7de89a;font-size:0.78rem;font-weight:600;font-family:'Space Grotesk',monospace;">Kid Shroom <span style="font-size:0.6rem;color:rgba(255,255,225,0.3);">Feb 2025-Jul 2026</span></span>
+          <span style="text-align:right;font-family:'Space Grotesk',monospace;font-size:0.68rem;line-height:1.5;"><span style="color:var(--red);display:block;">20,000 SHROOM/mo</span><span style="color:var(--blue);display:block;">1,500,000 SPORE/mo</span></span>
+        </a>
+        <a href="https://opensea.io/collection/gold-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.65rem;background:rgba(254,206,0,0.06);border:1px solid rgba(254,206,0,0.18);border-radius:0.6rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(254,206,0,0.12)'" onmouseout="this.style.background='rgba(254,206,0,0.06)'">
+          <span style="color:#fece00;font-size:0.78rem;font-weight:600;font-family:'Space Grotesk',monospace;">Gold Mooshie <span style="font-size:0.6rem;color:rgba(255,255,225,0.3);">Nov 2025-Oct 2028</span></span>
+          <span style="text-align:right;font-family:'Space Grotesk',monospace;font-size:0.68rem;line-height:1.5;"><span style="color:var(--red);display:block;">15,000 SHROOM/mo</span><span style="color:var(--blue);display:block;">2,000,000 SPORE/mo</span></span>
+        </a>
       </div>
-      <p style="font-size:0.74rem;color:rgba(79,168,253,0.7);padding:0.5rem 0.75rem;background:rgba(79,168,253,0.05);border-radius:0.6rem;border:1px solid rgba(79,168,253,0.12);line-height:1.6;">When monthly airdrops end, Kid Shroom and Gold Mooshie join the daily 200K SPORE reward tier.</p>
-      <div style="margin-top:1.25rem;">
-        <button class="btn btn-yellow" onclick="showTab('shop', document.querySelectorAll('.guide-tab')[1])">Browse NFT Shop</button>
-      </div>
+      <p style="font-size:0.74rem;color:rgba(79,168,253,0.7);padding:0.45rem 0.65rem;background:rgba(79,168,253,0.05);border-radius:0.5rem;border:1px solid rgba(79,168,253,0.12);line-height:1.6;">When monthly airdrops end, Kid Shroom and Gold Mooshie join the daily 200K SPORE reward tier automatically.</p>
     </div>
 
-    <div class="cta-row reveal">
-      <a class="btn btn-yellow" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">Join Discord to Start</a>
-      <a class="btn btn-blue" href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">Visit Subreddit</a>
-    </div>
-  </section>
-
-  <section id="tab-shop" class="guide-section">
-    <div class="reveal">
-      <div class="section-label">NFT Collections</div>
-      <div class="section-title">NFT Shop</div>
-    </div>
-    <div class="guide-card reveal" style="margin-bottom:1.75rem;">
-      <p style="margin-bottom:0;">NFTs unlock daily SPORE rewards, farm bonuses, and monthly airdrops. Verify ownership with <code>!nft</code> in Discord after purchase. All collections live on OpenSea on the Polygon network.</p>
-    </div>
-    <div class="section-divider reveal">Farm Boost NFTs - Daily SPORE Rewards</div>
-    <div class="shop-grid reveal">
-
-      <div style="background:var(--dark2);border:1px solid rgba(79,168,253,0.15);border-radius:1.5rem;padding:1.75rem;display:flex;flex-direction:column;gap:1rem;transition:border-color 0.3s,transform 0.25s;" onmouseover="this.style.borderColor='rgba(79,168,253,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='rgba(79,168,253,0.15)';this.style.transform='none'">
-        <div class="shop-card-img-placeholder" style="background:rgba(79,168,253,0.06);border:1px solid rgba(79,168,253,0.1);"><img src="/images/house_mooshie.png" style="width:100%;height:100%;object-fit:cover;border-radius:1rem;" onerror="this.parentElement.innerHTML='&#x1F3E0;'"></div>
-        <div><div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;"><span style="font-size:1rem;font-weight:700;color:var(--blue);">House Mooshie</span><span class="badge badge-blue">DAILY</span></div><p style="font-size:0.78rem;color:rgba(255,255,225,0.55);line-height:1.65;">The original Mooshie NFT. Earn 200,000 SPORE every day via Sporebot in Discord. Also satisfies the farm free-trial requirement.</p></div>
-        <div class="shop-card-meta">
-          <div class="shop-card-row"><span>Daily Reward</span><span style="color:var(--blue);">200,000 SPORE</span></div>
-          <div class="shop-card-row"><span>Network</span><span style="color:rgba(255,255,225,0.6);">Polygon</span></div>
-          <div class="shop-card-row"><span>Verify via</span><span style="color:rgba(255,255,225,0.6);">!nft in Discord</span></div>
-        </div>
-        <a href="https://opensea.io/collection/mooshies-house" target="_blank" rel="noopener noreferrer" class="shop-btn shop-btn-blue">View on OpenSea</a>
-      </div>
-
-      <div style="background:var(--dark2);border:1px solid rgba(253,70,79,0.15);border-radius:1.5rem;padding:1.75rem;display:flex;flex-direction:column;gap:1rem;transition:border-color 0.3s,transform 0.25s;" onmouseover="this.style.borderColor='rgba(253,70,79,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='rgba(253,70,79,0.15)';this.style.transform='none'">
-        <div class="shop-card-img-placeholder" style="background:rgba(253,70,79,0.06);border:1px solid rgba(253,70,79,0.1);"><img src="/images/king_mooshie.png" style="width:100%;height:100%;object-fit:cover;border-radius:1rem;" onerror="this.parentElement.innerHTML='&#x1F451;'"></div>
-        <div><div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;"><span style="font-size:1rem;font-weight:700;color:var(--red);">King Mooshie</span><span class="badge badge-red">DAILY</span></div><p style="font-size:0.78rem;color:rgba(255,255,225,0.55);line-height:1.65;">Reddit Collectible Avatar collab. Earn 200,000 SPORE daily and satisfy the free-trial farming requirement permanently.</p></div>
-        <div class="shop-card-meta">
-          <div class="shop-card-row"><span>Daily Reward</span><span style="color:var(--blue);">200,000 SPORE</span></div>
-          <div class="shop-card-row"><span>Network</span><span style="color:rgba(255,255,225,0.6);">Polygon</span></div>
-          <div class="shop-card-row"><span>Verify via</span><span style="color:rgba(255,255,225,0.6);">!nft in Discord</span></div>
-        </div>
-        <a href="https://opensea.io/collection/king-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="shop-btn shop-btn-red">View on OpenSea</a>
-      </div>
-
-      <div style="background:var(--dark2);border:1px solid rgba(192,132,252,0.15);border-radius:1.5rem;padding:1.75rem;display:flex;flex-direction:column;gap:1rem;transition:border-color 0.3s,transform 0.25s;" onmouseover="this.style.borderColor='rgba(192,132,252,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='rgba(192,132,252,0.15)';this.style.transform='none'">
-        <div class="shop-card-img-placeholder" style="background:rgba(192,132,252,0.06);border:1px solid rgba(192,132,252,0.1);"><img src="/images/queen_mooshie.png" style="width:100%;height:100%;object-fit:cover;border-radius:1rem;" onerror="this.parentElement.innerHTML='&#x1F478;'"></div>
-        <div><div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;"><span style="font-size:1rem;font-weight:700;color:var(--purple);">Queen Mooshie</span><span class="badge">DAILY</span></div><p style="font-size:0.78rem;color:rgba(255,255,225,0.55);line-height:1.65;">Reddit Collectible Avatar collab. Earn 200,000 SPORE daily and satisfy the free-trial farming requirement permanently.</p></div>
-        <div class="shop-card-meta">
-          <div class="shop-card-row"><span>Daily Reward</span><span style="color:var(--blue);">200,000 SPORE</span></div>
-          <div class="shop-card-row"><span>Network</span><span style="color:rgba(255,255,225,0.6);">Polygon</span></div>
-          <div class="shop-card-row"><span>Verify via</span><span style="color:rgba(255,255,225,0.6);">!nft in Discord</span></div>
-        </div>
-        <a href="https://opensea.io/collection/queen-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="shop-btn shop-btn-yellow">View on OpenSea</a>
-      </div>
-
-    </div>
-    <div class="section-divider reveal">Monthly Airdrop NFTs</div>
-    <div class="shop-grid reveal">
-
-      <div style="background:var(--dark2);border:1px solid rgba(125,232,154,0.15);border-radius:1.5rem;padding:1.75rem;display:flex;flex-direction:column;gap:1rem;transition:border-color 0.3s,transform 0.25s;" onmouseover="this.style.borderColor='rgba(125,232,154,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='rgba(125,232,154,0.15)';this.style.transform='none'">
-        <div class="shop-card-img-placeholder" style="background:rgba(125,232,154,0.06);border:1px solid rgba(125,232,154,0.1);"><img src="/images/kid_shroom.png" style="width:100%;height:100%;object-fit:cover;border-radius:1rem;" onerror="this.parentElement.innerHTML='&#x1F331;'"></div>
-        <div><div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;"><span style="font-size:1rem;font-weight:700;color:#7de89a;">Kid Shroom</span><span class="badge badge-green">MONTHLY</span></div><p style="font-size:0.78rem;color:rgba(255,255,225,0.55);line-height:1.65;">Monthly on-chain airdrops sent directly to your wallet. Program runs Feb 2025 to Jul 2026, then joins the daily SPORE reward tier.</p></div>
-        <div class="shop-card-meta">
-          <div class="shop-card-row"><span>Monthly SHROOM</span><span style="color:var(--red);">20,000</span></div>
-          <div class="shop-card-row"><span>Monthly SPORE</span><span style="color:var(--blue);">1,500,000</span></div>
-          <div class="shop-card-row"><span>Program Ends</span><span style="color:rgba(255,255,225,0.6);">July 2026</span></div>
-          <div class="shop-card-row"><span>After End</span><span style="color:var(--blue);">200,000 SPORE/day</span></div>
-        </div>
-        <a href="https://opensea.io/collection/kid-shroom-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="shop-btn shop-btn-green">View on OpenSea</a>
-      </div>
-
-      <div style="background:var(--dark2);border:1px solid rgba(254,206,0,0.15);border-radius:1.5rem;padding:1.75rem;display:flex;flex-direction:column;gap:1rem;transition:border-color 0.3s,transform 0.25s;" onmouseover="this.style.borderColor='rgba(254,206,0,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='rgba(254,206,0,0.15)';this.style.transform='none'">
-        <div class="shop-card-img-placeholder" style="background:rgba(254,206,0,0.06);border:1px solid rgba(254,206,0,0.1);"><img src="/images/gold_mooshie.png" style="width:100%;height:100%;object-fit:cover;border-radius:1rem;" onerror="this.parentElement.innerHTML='&#x1F947;'"></div>
-        <div><div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;"><span style="font-size:1rem;font-weight:700;color:var(--gold);">Gold Mooshie</span><span class="badge badge-gold">MONTHLY</span></div><p style="font-size:0.78rem;color:rgba(255,255,225,0.55);line-height:1.65;">Premium Reddit Collectible Avatar with the highest monthly airdrop in the ecosystem. 36-month program Nov 2025 through Oct 2028.</p></div>
-        <div class="shop-card-meta">
-          <div class="shop-card-row"><span>Monthly SHROOM</span><span style="color:var(--red);">15,000</span></div>
-          <div class="shop-card-row"><span>Monthly SPORE</span><span style="color:var(--blue);">2,000,000</span></div>
-          <div class="shop-card-row"><span>Program Ends</span><span style="color:rgba(255,255,225,0.6);">October 2028</span></div>
-          <div class="shop-card-row"><span>After End</span><span style="color:var(--blue);">200,000 SPORE/day</span></div>
-        </div>
-        <a href="https://opensea.io/collection/gold-mooshie-by-zuko-x-reddit-collectible-avatars" target="_blank" rel="noopener noreferrer" class="shop-btn shop-btn-gold">View on OpenSea</a>
-      </div>
-
-    </div>
-    <div class="section-divider reveal">Sporebot NFTs - Farm Access</div>
     <div class="guide-card reveal">
-      <h3>&#x1F916; Sporebot NFTs</h3>
-      <p>Hold <strong>2 Sporebot NFTs</strong> to permanently meet the farm free-trial requirement - no on-chain SHROOM balance needed.</p>
-      <ul>
-        <li>2 Sporebots = satisfies the <strong>Option 2</strong> farming requirement permanently</li>
-        <li>Equivalent to holding 1 Mooshie NFT for farming access</li>
-        <li>Verify with <code>!nft</code> in Discord after acquiring</li>
-      </ul>
-      <div style="margin-top:1.25rem;"><a class="btn btn-yellow" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">Ask in Discord</a></div>
+      <h3>&#x1F4A7; LP Rewards</h3>
+      <p>Add SHROOM/WETH or SPORE/WETH liquidity on QuickSwap (Polygon) to earn weekly token airdrops proportional to your pool share. Also immediately satisfies the farm free-trial requirement.</p>
+      <div class="support-meta">
+        <span style="color:var(--red);">Snapshot:</span> Every Sunday - airdrop sent Monday<br>
+        <span style="color:var(--red);">Earn:</span> Based on your % share of the pool<br>
+        <span style="color:var(--red);">Tapers:</span> Annually on May 7th each year
+      </div>
+      <div class="reward-table">
+        <div class="rt-head" style="grid-template-columns:1fr 1fr 1fr;"><span>Year</span><span style="text-align:center;">SHROOM/wk</span><span style="text-align:right;">SPORE/wk</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y1</span><span style="color:var(--red);text-align:center;">5M</span><span style="color:var(--blue);text-align:right;">500M</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y2</span><span style="color:var(--red);text-align:center;">3.5M</span><span style="color:var(--blue);text-align:right;">350M</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y3</span><span style="color:var(--red);text-align:center;">2.5M</span><span style="color:var(--blue);text-align:right;">250M</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y4</span><span style="color:var(--red);text-align:center;">2M</span><span style="color:var(--blue);text-align:right;">200M</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y5</span><span style="color:var(--red);text-align:center;">1.75M</span><span style="color:var(--blue);text-align:right;">175M</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y6</span><span style="color:var(--red);text-align:center;">1.5M</span><span style="color:var(--blue);text-align:right;">150M</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y7</span><span style="color:var(--red);text-align:center;">1.25M</span><span style="color:var(--blue);text-align:right;">125M</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y8</span><span style="color:var(--red);text-align:center;">1M</span><span style="color:var(--blue);text-align:right;">100M</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y9</span><span style="color:var(--red);text-align:center;">0.75M</span><span style="color:var(--blue);text-align:right;">75M</span></div>
+        <div class="rt-row" style="grid-template-columns:1fr 1fr 1fr;"><span style="color:rgba(255,255,225,0.4);">Y10</span><span style="color:var(--red);text-align:center;">0.5M</span><span style="color:var(--blue);text-align:right;">50M</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;margin-top:0.75rem;">
+        <div style="font-size:0.68rem;font-family:'Space Grotesk',monospace;padding:0.5rem 0.6rem;background:rgba(253,70,79,0.08);border-radius:0.5rem;border:1px solid rgba(253,70,79,0.2);line-height:1.5;"><span style="color:var(--red);font-weight:600;">SHROOM</span><br><span style="color:rgba(255,255,225,0.4);">Now in Year 2</span></div>
+        <div style="font-size:0.68rem;font-family:'Space Grotesk',monospace;padding:0.5rem 0.6rem;background:rgba(79,168,253,0.08);border-radius:0.5rem;border:1px solid rgba(79,168,253,0.2);line-height:1.5;"><span style="color:var(--blue);font-weight:600;">SPORE</span><br><span style="color:rgba(255,255,225,0.4);">Now in Year 1</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-top:0.75rem;">
+        <a href="https://dapp.quickswap.exchange/pool/v2/add?tokens=0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1,0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" class="btn-link btn-red">SHROOM/WETH LP</a>
+        <a href="https://dapp.quickswap.exchange/pool/v2/add?tokens=0x089582AC20ea563c69408a79E1061de594b61bED,0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" class="btn-link btn-blue">SPORE/WETH LP</a>
+        <a href="/guides.html" class="btn-link btn-ghost">LP Guide</a>
+      </div>
     </div>
-    <div class="guide-card reveal" style="border-color:rgba(192,132,252,0.12);">
-      <h3>&#x1F4CB; Important Notes</h3>
-      <ul>
-        <li>All NFT rewards require <strong>wallet verification</strong> - use <code>!nft</code> in Discord after purchase</li>
-        <li>NFT rewards are <strong>per NFT</strong> - holding 2 House Mooshies earns 400,000 SPORE/day</li>
-        <li>Monthly airdrop NFTs are sent to your <strong>on-chain wallet</strong>, not your Discord balance</li>
-        <li>After monthly programs end, all Mooshie NFTs transition to the <strong>200,000 SPORE/day</strong> daily reward automatically</li>
-        <li>All collections are on the <strong>Polygon network</strong> - set your wallet to Polygon before purchasing</li>
-        <li>Use <code>!register 0xYourAddress</code> in Discord to link your wallet first</li>
-      </ul>
-    </div>
+
     <div class="cta-row reveal">
       <a class="btn btn-yellow" href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">Join Discord</a>
-      <a class="btn btn-blue" href="/guides.html">Full Guide</a>
+      <a class="btn btn-blue" href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">Join Reddit</a>
+      <a class="btn btn-green" href="/treasury.html">View Treasury</a>
     </div>
   </section>
 
-  <footer style="position:relative;z-index:1;background:var(--dark2);border-top:1px solid rgba(255,255,225,0.06);color:rgba(255,255,225,0.3);padding:2rem 0;text-align:center;font-family:'Syne Mono',monospace;font-size:0.7rem;letter-spacing:0.05em;">
+  <footer style="position:relative;z-index:1;background:var(--dark2);border-top:1px solid rgba(255,255,225,0.06);color:rgba(255,255,225,0.3);padding:2rem 0;text-align:center;font-family:'Space Grotesk',monospace;font-size:0.7rem;letter-spacing:0.05em;">
     &copy; 2025 Mushroom Planet. All rights reserved.
   </footer>
 
-<nav class="pwa-nav" style="
-  position:fixed; bottom:0; left:0; right:0; height:65px;
-  background:#111; border-top:1px solid rgba(255,255,225,0.08);
-  align-items:stretch; z-index:999;
-  padding-bottom:env(safe-area-inset-bottom);
-">
-  <a href="/profile.html" class="pwa-tab" data-page="profile" id="pwa-profile-tab">
-    <span id="pwa-avatar-wrap"><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;border:1px solid rgba(255,255,225,0.2);" onerror="this.style.display='none'"></span>
-    <span>Profile</span>
-  </a>
-  <a href="/vote.html" class="pwa-tab" data-page="vote">
-    <span><img src="/images/vote.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-    <span>Vote</span>
-  </a>
-  <a href="/convert.html" class="pwa-tab" data-page="convert">
-    <span><img src="/images/swaps.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-    <span>Convert</span>
-  <a href="/treasury.html" class="pwa-tab" data-page="treasury">
-    <span><img src="/images/treasury.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-    <span>Treasury</span>
-  </a>
-  <a href="/guides.html" class="pwa-tab" data-page="guide">
-    <span><img src="/images/guide.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-    <span>Guide</span>
-  </a>
-</nav>
+  <nav class="pwa-nav" style="position:fixed;bottom:0;left:0;right:0;height:65px;background:#111;border-top:1px solid rgba(255,255,225,0.08);align-items:stretch;z-index:999;padding-bottom:env(safe-area-inset-bottom);">
+    <a href="/profile.html" class="pwa-tab" data-page="profile" id="pwa-profile-tab">
+      <span id="pwa-avatar-wrap"><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;border:1px solid rgba(255,255,225,0.2);" onerror="this.style.display='none'"></span>
+      <span>Profile</span>
+    </a>
+    <a href="/vote.html" class="pwa-tab" data-page="vote">
+      <span><img src="/images/vote.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+      <span>Vote</span>
+    </a>
+    <a href="/convert.html" class="pwa-tab" data-page="convert">
+      <span><img src="/images/swaps.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+      <span>Convert</span>
+    </a>
+    <a href="/treasury.html" class="pwa-tab" data-page="treasury">
+      <span><img src="/images/treasury.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+      <span>Treasury</span>
+    </a>
+    <a href="/guides.html" class="pwa-tab" data-page="guide">
+      <span><img src="/images/guide.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+      <span>Guide</span>
+    </a>
+  </nav>
 
   <script type="module">
     import config from './config.js';
@@ -545,6 +602,23 @@
       } catch(e) {}
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
     })();
+
+    async function loadRedditAvatar(username, imgId) {
+      try {
+        const res = await fetch('https://www.reddit.com/user/' + username + '/about.json');
+        const data = await res.json();
+        const avatar = data.data.icon_img.split('?')[0];
+        const el = document.getElementById(imgId);
+        if (el && avatar) el.src = avatar;
+      } catch(e) {}
+    }
+    loadRedditAvatar('ZukoBih', 'avatar-ZukoBih');
+    loadRedditAvatar('IveDoneItAtLast', 'avatar-IveDoneItAtLast');
+    loadRedditAvatar('Mrmakanakai', 'avatar-Mrmakanakai');
+    loadRedditAvatar('PermanentNight_', 'avatar-PermanentNight_');
+    loadRedditAvatar('-Anasthesia-', 'avatar--Anasthesia-');
+    loadRedditAvatar('GUW00', 'avatar-GUW00');
+    loadRedditAvatar('boomerangthrowaway', 'avatar-boomerangthrowaway');
   </script>
 </body>
 </html>
