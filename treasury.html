@@ -198,7 +198,7 @@ async function loadSporebotTotals() {
     /* ---- BAR CHART ---- */
     .bar-section {
       background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
-      border-radius: 1.5rem; padding: 2rem; margin-bottom: 4rem;
+      border-radius: 1.5rem; padding: 2rem; margin-bottom: 2rem;
     }
     .bar-chart-title { font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
     .bar-group { display: flex; flex-direction: column; gap: 1rem; }
@@ -238,11 +238,12 @@ async function loadSporebotTotals() {
       font-size: 0.7rem; color: rgba(255,255,225,0.3); border-top: 1px solid rgba(255,255,225,0.06);
       font-family: 'Syne Mono', monospace; letter-spacing: 0.05em;
     }
+    @media (display-mode: standalone) { .treas-footer { display: none; } }
 
     /* ---- TX FEED ---- */
     .tx-section {
       background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
-      border-radius: 1.5rem; padding: 2rem; margin-bottom: 4rem;
+      border-radius: 1.5rem; padding: 2rem; margin-bottom: 2rem;
     }
     .tx-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -581,7 +582,7 @@ async function loadSporebotTotals() {
       <div class="section-title">How Rewards Work</div>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:4rem;" class="reveal">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:1.5rem;" class="reveal">
 
       <!-- ONCHAIN REWARDS -->
       <div class="compare-card" style="display:flex;flex-direction:column;gap:1rem;">
@@ -1486,8 +1487,6 @@ async function loadSporebotTotals() {
     else window.addEventListener('load', loadSporebotTotals);
   });
   loadFeed().then(() => loadHoldings());
-  </script>
-
   </script>
   <style>
     .header-icons { display: none; }
