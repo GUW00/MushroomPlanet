@@ -25,3 +25,6 @@ build/
 
 # Sensitive guides
 sporebot_guide.txt
+
+node_modules/
+package-lock.json
