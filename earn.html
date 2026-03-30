@@ -69,14 +69,12 @@
     .reveal.visible { opacity: 1; transform: none; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
 
-    .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-top: 0.75rem; }
-    @media (max-width: 600px) { .team-grid { grid-template-columns: 1fr; } }
-    @media (display-mode: standalone) { .team-grid { grid-template-columns: 1fr; } }
-    .team-card { background: var(--dark3); border: 1px solid rgba(255,255,225,0.06); border-radius: 1.25rem; padding: 1.25rem 1rem; text-align: center; transition: border-color 0.3s; }
+    .team-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin-top: 0.75rem; }
+    .team-card { background: var(--dark3); border: 1px solid rgba(255,255,225,0.06); border-radius: 1rem; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.875rem; transition: border-color 0.3s; }
     .team-card:hover { border-color: rgba(255,255,225,0.15); }
-    .team-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(79,168,253,0.3); margin-bottom: 0.6rem; }
-    .team-card .t-name { font-size: 0.78rem; font-weight: 700; color: var(--cream); margin-bottom: 0.2rem; }
-    .team-card .t-role { font-size: 0.66rem; font-family: 'Space Grotesk', monospace; color: rgba(255,255,225,0.4); line-height: 1.4; }
+    .team-card img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(79,168,253,0.3); flex-shrink: 0; }
+    .team-card .t-name { font-size: 0.82rem; font-weight: 700; color: var(--cream); margin-bottom: 0.15rem; }
+    .team-card .t-role { font-size: 0.68rem; font-family: 'Space Grotesk', monospace; color: rgba(255,255,225,0.4); line-height: 1.4; }
 
     .lore-list { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem; }
     .lore-item { display: flex; gap: 1rem; align-items: flex-start; }
@@ -329,7 +327,6 @@
 
     <div class="cta-row reveal">
       <button class="btn btn-yellow" onclick="showTab('earn', document.querySelectorAll('.guide-tab')[1])">How to Earn</button>
-      <button class="btn btn-blue" onclick="showTab('support', document.querySelectorAll('.guide-tab')[2])">Support the Mycelium</button>
       <a class="btn btn-green" href="/guides.html">Full Guides</a>
     </div>
   </section>
