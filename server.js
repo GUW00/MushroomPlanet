@@ -214,8 +214,9 @@ app.get('/api/leaderboard', async (req, res) => {
 // ----------------------------------------------------------------
 // GET /api/treasury-holdings
 // ----------------------------------------------------------------
-const TREASURY_HOLDINGS_ADDR = '0x5873002348cd4DF2aBD2624a6FC30E90573019F5';
-const SPOREBOT_WALLET_ADDR   = '0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A';
+const TREASURY_HOLDINGS_ADDR  = '0x5873002348cd4DF2aBD2624a6FC30E90573019F5';
+const TREASURY_HOLDINGS_ADDR2 = '0xc96905CF923Aa75a074b9795D7064Eb295E42ce6';
+const SPOREBOT_WALLET_ADDR    = '0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A';
 const LP_POOL_WETH_SHROOM    = '0x28def03d8dc0d186fabae9c46043e8ef9bffcc28';
 const LP_POOL_SPR_SHROOM     = '0xc373382eec590374278534494109a0cdae1fbbc8';
 const LP_POOL_SPR_WETH       = '0x2a91571238303c6700a9336342c754e159243168';
@@ -251,7 +252,27 @@ app.get('/api/treasury-holdings', async (req, res) => {
     const polJ = await polR.json();
     const polBal = parseInt(polJ.result, 16) / 1e18;
 
-    res.json({ ok: true, balances: [...tokenResults, { symbol: 'POL', balance: polBal }] });
+    // Fetch second treasury wallet (SHROOM + SPORE only, added to discretionary)
+    const wallet2Results = await Promise.all(
+      HOLDINGS_TOKENS_LIST.filter(t => t.symbol === '$HROOM' || t.symbol === 'SPORE').map(async t => {
+        const data2 = '0x70a08231' + TREASURY_HOLDINGS_ADDR2.slice(2).padStart(64, '0');
+        const body2 = JSON.stringify({
+          jsonrpc: '2.0', method: 'eth_call',
+          params: [{ to: t.contract, data: data2 }, 'latest'], id: 1,
+        });
+        const r2 = await fetch(rpcUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body2 });
+        const j2 = await r2.json();
+        return { symbol: t.symbol, balance: parseInt(j2.result, 16) / Math.pow(10, t.decimals) };
+      })
+    );
+
+    // Merge wallet2 into main balances (same symbols, just add the amounts)
+    const mergedBalances = [...tokenResults, { symbol: 'POL', balance: polBal }].map(b => {
+      const w2 = wallet2Results.find(w => w.symbol === b.symbol);
+      return w2 ? { ...b, balance: b.balance + w2.balance, wallet2: w2.balance } : b;
+    });
+
+    res.json({ ok: true, balances: mergedBalances, wallet2_shroom: wallet2Results.find(w => w.symbol === '$HROOM')?.balance || 0, wallet2_spore: wallet2Results.find(w => w.symbol === 'SPORE')?.balance || 0 });
   } catch (err) {
     console.error('[TREASURY-HOLDINGS] Error:', err);
     res.status(500).json({ ok: false, error: 'Failed to fetch holdings' });
