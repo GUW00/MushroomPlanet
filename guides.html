@@ -307,6 +307,14 @@
     #guide-lp .guide-card li::before { color: #fece00; }
     #guide-lp .guide-card code { background: rgba(254,206,0,0.08); color: #fece00; }
 
+    #guide-blockchain .section-label,
+    #guide-blockchain .section-divider { color: #22c55e; }
+    #guide-blockchain .section-divider::before,
+    #guide-blockchain .section-divider::after { background: linear-gradient(90deg, transparent, rgba(34,197,94,0.35), transparent); }
+    #guide-blockchain .guide-card li::before { color: #22c55e; }
+    #guide-blockchain .guide-card code { background: rgba(34,197,94,0.08); color: #22c55e; }
+    .guide-tab[onclick*="blockchain"].active { border-color: #22c55e; color: #22c55e; background: rgba(34,197,94,0.08); }
+
     @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
     .gi { width:16px; height:16px; object-fit:contain; vertical-align:middle; margin-right:5px; display:inline-block; }
     .gi-sm { width:13px; height:13px; object-fit:contain; vertical-align:middle; margin-right:4px; display:inline-block; }
@@ -370,9 +378,13 @@
 
   <!-- TABS -->
   <div class="guide-tabs">
+        <button class="guide-tab" onclick="showGuide('blockchain', this)">
+      <img src="/images/blockchain.png" alt="Blockchain" />
+      Blockchain
+    </button>
     <button class="guide-tab active" onclick="showGuide('sporebot', this)">
       <img src="/images/sporebot.png" alt="Sporebot" />
-      Overview
+      Sporebot
     </button>
     <button class="guide-tab" onclick="showGuide('discord', this)">
       <img src="/images/discord.png" alt="Discord" />
@@ -402,7 +414,7 @@
 
     <!-- Discord -->
     <div class="guide-card">
-      <h3><img src="/images/sporebot.png" class="gi"> Sporebot on Discord</h3>
+      <h3><img src="/images/sporebot.png" class="gi">Sporebot on Discord <img src="/images/discord.png" class="gi"></h3>
       <p>
         The full Sporebot experience lives on Discord — farming, brewing, staking,
         digging, governance, and more. Verify first, then use <code>!start</code>
@@ -413,7 +425,7 @@
 
     <!-- Reddit -->
     <div class="guide-card">
-      <h3>🌿 Sporebot on Reddit</h3>
+      <h3><img src="/images/sporebot.png" class="gi">Sporebot on Reddit <img src="/images/reddit1.png" class="gi"></h3>
       <p>
         A fresh <strong>Daily Forage Thread</strong> is posted automatically every
         day at <strong>7:20 EST</strong> and stays open for 24 hours. Build your
@@ -431,15 +443,15 @@
       <h4>How to Link</h4>
       <ul>
         <li><img src="/images/wallet.png" class="gi-sm"> In the Reddit Daily Thread, comment <code>!register 0xYourWalletAddress</code> to register your wallet</li>
-        <li><img src="/images/reddit1.png" class="gi-sm"> Then comment <code>!link</code> — you'll receive a DM from Pixie on Discord asking you to confirm</li>
+        <li><img src="/images/link.png" class="gi-sm"> Then comment <code>!link</code> — you'll receive a DM from Pixie on Discord asking you to confirm</li>
         <li><img src="/images/shroom.png" class="gi-sm"> Once confirmed you receive a one-time bonus of <strong>20,000 SHROOMS</strong> + <strong>2,000,000 SPORES</strong></li>
       </ul>
 
       <h4>After Linking</h4>
       <ul>
-        <li><img src="/images/swaps.png" class="gi-sm"> Use <code>!transfer</code> in Discord to move your Reddit SHROOMS and SPORES to your Discord wallet</li>
+        <li><img src="/images/transfer1.png" class="gi-sm"> Use <code>!transfer</code> in Discord to move your Reddit SHROOMS and SPORES to your Discord wallet</li>
         <li><img src="/images/planting.png" class="gi-sm"> Use <code>!plant [amount]</code> to plant transferred SHROOMS into your Discord farm</li>
-        <li><img src="/images/discord.png" class="gi-sm"> Reddit earning and Discord farming work independently — linking merges your balances on demand</li>
+        <li><img src="/images/discord.png" class="gi-sm"> Earning on Reddit and Discord farming work independently, linking allows you to merge your balances on demand</li>
         <li><img src="/images/goodshroom.png" class="gi-sm"> You also earn <strong>1 GS Token</strong> for every 5-day forage streak milestone (5, 10, 15...)</li>
       </ul>
 
@@ -452,16 +464,39 @@
     <div class="section-divider reveal">Requirements</div>
     <div class="guide-card reveal">
       <h3><img src="/images/growing.png" class="gi"> Free Trial &amp; Requirements</h3>
-      <p>New users get a <strong>42-day free trial</strong> to farm with no requirements. After that, meet ONE of the following to keep farming:</p>
-      <ul>
-        <li><img src="/images/shroom.png" class="gi-sm"> <strong>Option 1</strong>: Hold <strong>500,000+ SHROOM-equivalent</strong> on-chain for 3+ consecutive farming days</li>
-        <li><img src="/images/nft.png" class="gi-sm"> <strong>Option 2</strong>: Hold 2 Sporebot NFTs or any 1 Mooshie NFT — verified for 3+ days</li>
-        <li><img src="/images/lp.png" class="gi-sm"> <strong>Option 3</strong>: Provide liquidity on QuickSwap (LP Bonus of 0.1 or higher) — qualifies immediately</li>
-      </ul>
-      <h4>Which option is right for you?</h4>
-      <p><strong>Option 1</strong> is the easiest and cheapest for most new users — you just need to hold SHROOM in your wallet. You're not giving anything to Mushroom Planet, just keeping tokens you already own on-chain. Buy a small amount on QuickSwap, hold it, and you're set.</p>
-      <p><strong>Option 2</strong> is best if you want NFT perks alongside farming access. <strong>Sporebots</strong> are the easiest to acquire as they are still available — Mooshie NFTs (House, King, Queen) are sold out from primary and only available on the secondary market via OpenSea.</p>
-      <p><strong>Option 3</strong> is ideal if you're already providing liquidity — it qualifies you instantly with no waiting period and also earns you weekly LP reward airdrops on top. <a href="https://www.reddit.com/r/MushroomPlanet/comments/1mu9dx0/quickswap_guide_trading_providing_liquidity/" target="_blank" rel="noopener noreferrer">View the full LP guide here.</a></p>
+      <p>New users get a <strong>42-day free trial</strong> to farm with no requirements. After that, meet <strong>ONE</strong> of the following to keep farming:</p>
+      <div style="display:flex;flex-direction:column;gap:0.65rem;margin:1rem 0 0.5rem;">
+        <div style="display:flex;gap:0.9rem;align-items:flex-start;background:rgba(79,168,253,0.05);border:1px solid rgba(79,168,253,0.15);border-radius:0.875rem;padding:1rem 1.1rem;">
+          <img src="/images/shroom.png" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;margin-top:2px;">
+          <div>
+            <div style="font-size:0.65rem;font-family:'Space Grotesk',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#4fa8fd;margin-bottom:0.25rem;">Option 1 — Hold SHROOM</div>
+            <div style="font-size:0.83rem;color:var(--cream);font-weight:600;margin-bottom:0.3rem;">500,000+ SHROOM-equivalent on-chain for 3+ consecutive days</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,225,0.55);line-height:1.6;">The easiest path for most users. You're not giving anything up — just hold tokens you already own in your wallet. Buy on QuickSwap and you're set. <b>100 SPORES = 1 SHROOM</b></div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.65rem;">
+              <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:0.35rem;font-family:'Space Grotesk',monospace;font-size:0.65rem;font-weight:600;letter-spacing:0.06em;padding:0.35em 0.95em;border-radius:999px;border:1px solid rgba(79,168,253,0.35);background:rgba(79,168,253,0.08);color:#4fa8fd;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(79,168,253,0.16)';this.style.borderColor='rgba(79,168,253,0.6)'" onmouseout="this.style.background='rgba(79,168,253,0.08)';this.style.borderColor='rgba(79,168,253,0.35)'">Buy SHROOM</a>
+              <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:0.35rem;font-family:'Space Grotesk',monospace;font-size:0.65rem;font-weight:600;letter-spacing:0.06em;padding:0.35em 0.95em;border-radius:999px;border:1px solid rgba(79,168,253,0.35);background:rgba(79,168,253,0.08);color:#4fa8fd;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(79,168,253,0.16)';this.style.borderColor='rgba(79,168,253,0.6)'" onmouseout="this.style.background='rgba(79,168,253,0.08)';this.style.borderColor='rgba(79,168,253,0.35)'">Buy SPORE</a>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.9rem;align-items:flex-start;background:rgba(253,70,79,0.05);border:1px solid rgba(253,70,79,0.15);border-radius:0.875rem;padding:1rem 1.1rem;">
+          <img src="/images/sporebot_helper.png" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;margin-top:2px;">
+          <div>
+            <div style="font-size:0.65rem;font-family:'Space Grotesk',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#fd464f;margin-bottom:0.25rem;">Option 2 — Hold NFTs</div>
+            <div style="font-size:0.83rem;color:var(--cream);font-weight:600;margin-bottom:0.3rem;">2 Sporebot NFTs or any 1 Mooshie NFT — verified for 3+ days</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,225,0.55);line-height:1.6;">Best if you want NFT perks alongside farming access. Sporebots are still available from primary. Mooshie NFTs (House, King, Queen) are sold out — secondary market only via OpenSea.</div>
+            <a href="https://launchmynft.io/collections/0xae42EdC0FC636D1214a6C5D829C37d778398F17b/OmDADyGCGOKTT2NZM0yj" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:0.35rem;margin-top:0.65rem;font-family:'Space Grotesk',monospace;font-size:0.65rem;font-weight:600;letter-spacing:0.06em;padding:0.35em 0.95em;border-radius:999px;border:1px solid rgba(253,70,79,0.35);background:rgba(253,70,79,0.08);color:#fd464f;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(253,70,79,0.16)';this.style.borderColor='rgba(253,70,79,0.6)'" onmouseout="this.style.background='rgba(253,70,79,0.08)';this.style.borderColor='rgba(253,70,79,0.35)'">Buy Sporebots</a>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.9rem;align-items:flex-start;background:rgba(254,206,0,0.05);border:1px solid rgba(254,206,0,0.15);border-radius:0.875rem;padding:1rem 1.1rem;">
+          <img src="/images/lp.png" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;margin-top:2px;">
+          <div>
+            <div style="font-size:0.65rem;font-family:'Space Grotesk',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#fece00;margin-bottom:0.25rem;">Option 3 — Provide Liquidity</div>
+            <div style="font-size:0.83rem;color:var(--cream);font-weight:600;margin-bottom:0.3rem;">LP Bonus of 0.1 or higher on QuickSwap — qualifies immediately</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,225,0.55);line-height:1.6;">No waiting period — instant qualification. Also earns weekly LP reward airdrops on top of farming. Ideal if you're already providing liquidity.</div>
+            <a href="https://www.reddit.com/r/MushroomPlanet/comments/1mu9dx0/quickswap_guide_trading_providing_liquidity/" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:0.35rem;margin-top:0.65rem;font-family:'Space Grotesk',monospace;font-size:0.65rem;font-weight:600;letter-spacing:0.06em;padding:0.35em 0.95em;border-radius:999px;border:1px solid rgba(254,206,0,0.35);background:rgba(254,206,0,0.08);color:#fece00;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(254,206,0,0.16)';this.style.borderColor='rgba(254,206,0,0.6)'" onmouseout="this.style.background='rgba(254,206,0,0.08)';this.style.borderColor='rgba(254,206,0,0.35)'">View LP Guide</a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="section-divider reveal">Blockchain</div>
@@ -469,7 +504,7 @@
       <h3><img src="/images/blockchain.png" class="gi"> Blockchain &amp; Withdrawals</h3>
       <p>Connect your Polygon wallet in <strong>#wallet-web3</strong> to unlock withdrawals and NFT verification.</p>
       <ul>
-        <li><img src="/images/sporebot.png" class="gi-sm"><code>!register 0xYourAddress</code> — link your Polygon wallet</li>
+        <li><img src="/images/blockchain.png" class="gi-sm"><code>!register 0xYourAddress</code> — link your Polygon wallet</li>
         <li><img src="/images/nft.png" class="gi-sm"><code>!nft</code> — scan your wallet and verify NFT ownership</li>
         <li><img src="/images/shroom.png" class="gi-sm"><code>!withdraw [amount] shrooms</code> or <img src="/images/spore.png" class="gi-sm"><code>!withdraw [amount] spores</code> — send tokens on-chain</li>
         <li><img src="/images/time.png" class="gi-sm">Daily limits: <strong>1,000,000 SHROOMS</strong> and <strong>100,000,000 SPORES</strong></li>
@@ -518,39 +553,6 @@
     <div class="reveal">
       <div class="section-label">DeFi</div>
       <div class="section-title">Providing Liquidity on QuickSwap</div>
-    </div>
-
-    <div class="section-divider reveal">On-Chain vs Off-Chain</div>
-    <div class="dual-grid reveal">
-      <div class="guide-card" style="margin-bottom:0;">
-        <h3>&#x1F7E2; On-Chain</h3>
-        <p>Stored directly on the Polygon blockchain. SHROOMS, SPORES, and NFTs in your Web3 wallet are fully decentralized — you own them, you can send, swap, or sell anytime. Costs small POL gas fees for transactions.</p>
-      </div>
-      <div class="guide-card" style="margin-bottom:0;">
-        <h3>&#x1F7E1; Off-Chain</h3>
-        <p>Stored inside the Sporebot game database. SHROOMS and SPORES earned from <code>!forage</code>, <code>!farm</code>, or Reddit upvotes live here. No gas fees, instant rewards — managed by Sporebot until you withdraw.</p>
-      </div>
-    </div>
-
-    <div class="section-divider reveal">Get a Wallet</div>
-    <div class="guide-card reveal">
-      <h3><img src="/images/blockchain.png" class="gi"> Getting a Web3 Wallet</h3>
-      <p>A Web3 wallet is your blockchain address — it stores your SHROOMS, SPORES, and NFTs, and lets you connect to apps like QuickSwap or OpenSea.</p>
-      <h4>Option 1 — Use Your Reddit Vault</h4>
-      <p>If you use Reddit's mobile app, you already have a Vault. Open the Reddit app, tap your Profile, then Vault, then the gear icon to find your Public Address and Recovery Phrase.</p>
-      <ul>
-        <li><img src="/images/wallet.png" class="gi-sm"> Your <strong>Public Address</strong> (0x...) is safe to share — this is what you register with Sporebot</li>
-        <li><img src="/images/blockchain.png" class="gi-sm"> Your <strong>Recovery Phrase</strong> is secret — whoever has it controls the wallet</li>
-        <li><img src="/images/time.png" class="gi-sm"> Never share it, never store it in email, screenshots, or the cloud — write it down</li>
-        <li><img src="/images/swaps.png" class="gi-sm"> You can import your Vault into MetaMask or Trust Wallet using the Recovery Phrase</li>
-      </ul>
-      <h4>Option 2 — Create a New Wallet</h4>
-      <ul>
-        <li><img src="/images/wallets.png" class="gi-sm"> Download <strong>MetaMask</strong> (browser extension or mobile), <strong>Trust Wallet</strong>, or <strong>Coinbase Wallet</strong></li>
-        <li><img src="/images/blockchain.png" class="gi-sm"> Tap <strong>Create a Wallet</strong> and save your 12-word Secret Recovery Phrase securely</li>
-        <li><img src="/images/growth.png" class="gi-sm"> Make sure your wallet is set to the <strong>Polygon Network</strong></li>
-      </ul>
-      <p style="margin-top:0.75rem;font-size:0.78rem;color:rgba(79,168,253,0.8);padding:0.5rem 0.75rem;background:rgba(79,168,253,0.06);border:1px solid rgba(79,168,253,0.15);border-radius:0.6rem;">Once you have a wallet, use <code>!gas</code> in the Reddit Daily Forage Thread to receive <strong>0.01 POL</strong> to cover your first transaction fees — one-time, free.</p>
     </div>
 
     <div class="section-divider reveal">Trade on QuickSwap</div>
@@ -1006,6 +1008,186 @@
 
     <div class="cta-row reveal">
       <a class="btn btn-yellow" href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">Visit Subreddit</a>
+    </div>
+
+  </section>
+
+  <!-- ============================================================
+       BLOCKCHAIN GUIDE
+       ============================================================ -->
+  <section id="guide-blockchain" class="guide-section">
+
+    <div class="reveal">
+      <div class="section-label">Web3</div>
+      <div class="section-title">Blockchain &amp; Crypto Basics</div>
+    </div>
+
+    <div class="section-divider reveal">What is Blockchain?</div>
+    <div class="guide-card reveal">
+      <h3><img src="/images/blockchain.png" class="gi"> Blockchain Explained</h3>
+      <p>A blockchain is a public ledger — a list of every transaction ever made, stored across thousands of computers worldwide simultaneously. No single company or person controls it. Once something is recorded, it cannot be changed or deleted.</p>
+      <div class="info-grid" style="margin-top:1rem;">
+        <div class="info-card">
+          <div class="info-card-icon"><img src="/images/mycelium.png" style="width:28px;height:28px;object-fit:contain;"></div>
+          <div class="info-card-title">Decentralized</div>
+          <div class="info-card-body">No central authority. Thousands of independent nodes validate every transaction simultaneously. No single point of failure, censorship, or control.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon"><img src="/images/scroll.png" style="width:28px;height:28px;object-fit:contain;"></div>
+          <div class="info-card-title">Transparent</div>
+          <div class="info-card-body">Every transaction is publicly visible. Anyone can verify any wallet balance or full transaction history using a block explorer like Polygonscan.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon"><img src="/images/time.png" style="width:28px;height:28px;object-fit:contain;"></div>
+          <div class="info-card-title">Immutable</div>
+          <div class="info-card-body">Once confirmed, transactions are permanent and tamper-proof. Nobody — not even the original developers — can reverse or alter on-chain data.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon"><img src="/images/growth.png" style="width:28px;height:28px;object-fit:contain;"></div>
+          <div class="info-card-title">Permissionless</div>
+          <div class="info-card-body">Anyone with a wallet can participate. No sign-ups, approvals, or banks required. You interact directly with the blockchain as your own custodian.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon"><img src="/images/blockchain.png" style="width:28px;height:28px;object-fit:contain;"></div>
+          <div class="info-card-title">Programmable</div>
+          <div class="info-card-body">Smart contracts are self-executing code stored on-chain. They run automatically when conditions are met. SHROOM, SPORE, and all NFTs are governed by them.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon"><img src="/images/wallet.png" style="width:28px;height:28px;object-fit:contain;"></div>
+          <div class="info-card-title">Self-Custody</div>
+          <div class="info-card-body">Your tokens belong to whoever holds the private key — not a platform or company. Lose your recovery phrase and the funds are gone. Ownership is absolute.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider reveal">Polygon Network</div>
+    <div class="guide-card reveal">
+      <h3><img src="/images/blockchain.png" class="gi"> Why Polygon?</h3>
+      <p>Mushroom Planet is built on <strong>Polygon</strong> — a Layer 2 blockchain that extends Ethereum with faster transactions and near-zero fees. All SHROOM, SPORE, and NFT activity happens here.</p>
+      <ul>
+        <li><img src="/images/growth.png" class="gi-sm"> <strong>Fast</strong>: transactions confirm in seconds, not minutes</li>
+        <li><img src="/images/shroom.png" class="gi-sm"> <strong>Cheap</strong>: gas fees are fractions of a cent (paid in <strong>POL</strong>, Polygon's native token)</li>
+        <li><img src="/images/blockchain.png" class="gi-sm"> <strong>Ethereum-compatible</strong>: same wallets (MetaMask, etc.) and tools work on both chains</li>
+        <li><img src="/images/lp.png" class="gi-sm"> <strong>DeFi ecosystem</strong>: QuickSwap, OpenSea, and most major DeFi apps support Polygon</li>
+      </ul>
+      <p style="margin-top:0.75rem;font-size:0.78rem;color:rgba(34,197,94,0.8);padding:0.5rem 0.75rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:0.6rem;">You need a tiny amount of <strong>POL</strong> in your wallet to pay gas. Use <code>!gas</code> in the Reddit Daily Thread to receive <strong>0.01 POL</strong> free — enough for many transactions.</p>
+    </div>
+
+    <div class="section-divider reveal">On-Chain vs Off-Chain</div>
+    <div class="dual-grid reveal">
+      <div class="guide-card" style="margin-bottom:0;">
+        <h3>&#x1F7E2; On-Chain</h3>
+        <p>Stored directly on the Polygon blockchain. SHROOMS, SPORES, and NFTs in your Web3 wallet are fully decentralized — you own them and can send, swap, or sell anytime. Costs small POL gas fees for transactions.</p>
+      </div>
+      <div class="guide-card" style="margin-bottom:0;">
+        <h3>&#x1F7E1; Off-Chain</h3>
+        <p>Stored inside the Sporebot game database. SHROOMS and SPORES earned from <code>!forage</code>, <code>!farm</code>, or Reddit upvotes live here. No gas fees, instant rewards — managed by Sporebot until you withdraw.</p>
+      </div>
+    </div>
+
+    <div class="section-divider reveal">Get a Wallet</div>
+    <div class="guide-card reveal">
+      <h3><img src="/images/blockchain.png" class="gi"> Getting a Web3 Wallet</h3>
+      <p>A Web3 wallet is your on-chain identity — a unique address starting with <code>0x</code> that holds your SHROOMS, SPORES, and NFTs. It connects to apps like QuickSwap and OpenSea, and only you control it.</p>
+      <h4>Recommended Wallets</h4>
+      <ul>
+        <li><img src="/images/metamask.png" class="gi-sm"> <strong><a href="https://metamask.io/" target="_blank" rel="noopener noreferrer" class="contract-name" style="font-size:0.8rem;">MetaMask</a></strong> — the most widely used Web3 wallet, available as a browser extension and mobile app</li>
+        <li><img src="/images/trustwallet.png" class="gi-sm"> <strong><a href="https://trustwallet.com/" target="_blank" rel="noopener noreferrer" class="contract-name" style="font-size:0.8rem;">Trust Wallet</a></strong> — mobile-first, beginner friendly, supports Polygon natively</li>
+        <li><img src="/images/coinbasewallet.png" class="gi-sm"> <strong><a href="https://wallet.coinbase.com/" target="_blank" rel="noopener noreferrer" class="contract-name" style="font-size:0.8rem;">Coinbase Wallet</a></strong> — separate from the Coinbase exchange app; non-custodial and Polygon-compatible</li>
+      </ul>
+      <h4>Setting Up</h4>
+      <ul>
+        <li><img src="/images/blockchain.png" class="gi-sm"> Download your chosen wallet and select <strong>Create a New Wallet</strong></li>
+        <li><img src="/images/scroll.png" class="gi-sm"> You'll receive a <strong>12-word Secret Recovery Phrase</strong> — write it down on paper and store it somewhere safe</li>
+        <li><img src="/images/growth.png" class="gi-sm"> Set your network to <strong>Polygon</strong> — this is where all Mushroom Planet tokens and NFTs live</li>
+        <li><img src="/images/wallet.png" class="gi-sm"> Your <strong>Public Address</strong> (0x...) is safe to share — use this to register with Sporebot via <code>!register</code></li>
+        <li><img src="/images/time.png" class="gi-sm"> Your <strong>Recovery Phrase</strong> is secret — never share it, never store it digitally. Whoever has it owns the wallet.</li>
+      </ul>
+    </div>
+
+    <div class="section-divider reveal">Tokens</div>
+    <div class="guide-card reveal">
+      <h3><img src="/images/shroom.png" class="gi"><img src="/images/spore.png" class="gi"> SHROOM &amp; SPORE Tokens</h3>
+      <p>Both tokens are <strong>ERC-20</strong> tokens on Polygon — the same standard as USDC, WETH, and most other crypto tokens. They live in your wallet, trade on QuickSwap, and are fully on-chain.</p>
+      <div class="dual-grid" style="margin-top:0.75rem;">
+        <div class="guide-card" style="margin-bottom:0;background:var(--dark3);">
+          <h3><img src="/images/shroom.png" class="gi"> SHROOM ($HROOM)</h3>
+          <p style="margin-bottom:0.5rem;">The primary game token. Earned by farming, foraging, and post rewards. Used to plant your farm, brew potions, tip, and qualify for Sporebot access.</p>
+          <div class="contract-row" style="margin-top:0.5rem;">
+            <img src="/images/shroom.png" alt="SHROOM" />
+            <a href="https://polygonscan.com/address/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" class="contract-name" style="font-size:0.72rem;">0x924B...dEaE1</a>
+            <button class="copy-btn" onclick="copyAddress(this, '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1')">Copy</button>
+          </div>
+        </div>
+        <div class="guide-card" style="margin-bottom:0;background:var(--dark3);">
+          <h3><img src="/images/spore.png" class="gi"> SPORE (SPR)</h3>
+          <p style="margin-bottom:0.5rem;">Earned passively from your farm's SGR. Convertible to SHROOM at 100:1. Used for staking, governance, and on-chain trading. 100 SPORES = 1 SHROOM.</p>
+          <div class="contract-row" style="margin-top:0.5rem;">
+            <img src="/images/spore.png" alt="SPORE" />
+            <a href="https://polygonscan.com/address/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" class="contract-name" style="font-size:0.72rem;">0x0895...61bED</a>
+            <button class="copy-btn" onclick="copyAddress(this, '0x089582AC20ea563c69408a79E1061de594b61bED')">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider reveal">NFTs</div>
+    <div class="guide-card reveal">
+      <h3><img src="/images/nft.png" class="gi"> What are NFTs?</h3>
+      <p>NFT stands for <strong>Non-Fungible Token</strong>. Unlike SHROOM or SPORE where every token is identical, each NFT is unique and provably owned on-chain. Ownership is verifiable by anyone, at any time, on Polygonscan.</p>
+      <ul>
+        <li><img src="/images/nft.png" class="gi-sm"> <strong>ERC-721</strong>: one-of-a-kind NFTs — each token ID is unique (Mooshies, Sporebots)</li>
+        <li><img src="/images/nft.png" class="gi-sm"> <strong>ERC-1155</strong>: multi-edition NFTs — multiple copies of a token can exist (Farm Boosts, LP NFTs)</li>
+        <li><img src="/images/blockchain.png" class="gi-sm"> NFT metadata (traits, images) is stored on IPFS — decentralized file storage</li>
+        <li><img src="/images/sporebot.png" class="gi-sm"> Sporebot reads your wallet to verify ownership and apply bonuses automatically</li>
+      </ul>
+      <h4>Mushroom Planet NFT Collections</h4>
+      <ul>
+        <li><img src="/images/sporebot_helper.png" class="gi-sm"> <strong>Sporebots</strong> — in-game companions with farm trait bonuses, still available from primary</li>
+        <li><img src="/images/king.png" class="gi-sm"> <strong>Mooshies</strong> (House / King / Queen) — earn daily SPORE rewards, sold out on primary</li>
+        <li><img src="/images/guwoo.png" class="gi-sm"> <strong>Shroomies</strong> (Guwoo, LP NFTs, Farm Boosts, Papa Sporewalker, Elder Shroompa)</li>
+      </ul>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;">
+        <a href="https://launchmynft.io/collections/0xae42EdC0FC636D1214a6C5D829C37d778398F17b/OmDADyGCGOKTT2NZM0yj" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:0.35rem;font-family:'Space Grotesk',monospace;font-size:0.65rem;font-weight:600;letter-spacing:0.06em;padding:0.35em 0.95em;border-radius:999px;border:1px solid rgba(253,70,79,0.35);background:rgba(253,70,79,0.08);color:#fd464f;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(253,70,79,0.16)';this.style.borderColor='rgba(253,70,79,0.6)'" onmouseout="this.style.background='rgba(253,70,79,0.08)';this.style.borderColor='rgba(253,70,79,0.35)'">Buy Sporebots</a>
+        <a href="https://opensea.io/collection/mooshienft" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:0.35rem;font-family:'Space Grotesk',monospace;font-size:0.65rem;font-weight:600;letter-spacing:0.06em;padding:0.35em 0.95em;border-radius:999px;border:1px solid rgba(34,197,94,0.35);background:rgba(34,197,94,0.08);color:#22c55e;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(34,197,94,0.16)';this.style.borderColor='rgba(34,197,94,0.6)'" onmouseout="this.style.background='rgba(34,197,94,0.08)';this.style.borderColor='rgba(34,197,94,0.35)'">Mooshies on OpenSea</a>
+      </div>
+    </div>
+
+    <div class="section-divider reveal">Withdrawals</div>
+    <div class="guide-card reveal">
+      <h3><img src="/images/swaps.png" class="gi"> Withdrawing to Your Wallet</h3>
+      <p>Withdrawing moves your off-chain SHROOMS or SPORES from the Sporebot database onto the Polygon blockchain into your wallet. This is a real on-chain transaction — it costs a small POL gas fee and requires you to meet holding requirements.</p>
+      <ul>
+        <li><img src="/images/blockchain.png" class="gi-sm"> <code>!register 0xYourAddress</code> — link your Polygon wallet first</li>
+        <li><img src="/images/nft.png" class="gi-sm"> <code>!nft</code> — verify NFT holdings to unlock eligibility</li>
+        <li><img src="/images/shroom.png" class="gi-sm"> <code>!withdraw [amount] shrooms</code> or <code>!withdraw [amount] spores</code></li>
+        <li><img src="/images/time.png" class="gi-sm"> Daily limits: <strong>1,000,000 SHROOMS</strong> and <strong>100,000,000 SPORES</strong></li>
+      </ul>
+      <h4>Withdraw Requirements (meet ANY ONE for 42+ days)</h4>
+      <ul>
+        <li><img src="/images/shroom.png" class="gi-sm"> <strong>Hold SHROOM:</strong> 500,000+ SHROOM-equivalent on-chain</li>
+        <li><img src="/images/nft.png" class="gi-sm"> <strong>Hold NFTs:</strong> 2 Sporebots OR any 1 Mooshie NFT</li>
+      </ul>
+    </div>
+
+    <div class="section-divider reveal">Safety</div>
+    <div class="guide-card reveal">
+      <h3><img src="/images/badge.png" class="gi"> Staying Safe in Web3</h3>
+      <p>Crypto is irreversible. There are no chargebacks, no support teams that can undo transactions, and no password resets. These rules are non-negotiable.</p>
+      <ul>
+        <li><img src="/images/scroll.png" class="gi-sm"> <strong>Never share your seed phrase / recovery phrase</strong> — not with anyone, ever, for any reason</li>
+        <li><img src="/images/time.png" class="gi-sm"> <strong>Write it down offline</strong> — never store it digitally (no photos, no notes apps, no email)</li>
+        <li><img src="/images/blockchain.png" class="gi-sm"> <strong>Verify contract addresses</strong> before interacting — use the addresses listed here or on Polygonscan</li>
+        <li><img src="/images/badge.png" class="gi-sm"> <strong>Mushroom Planet will never DM you asking for your wallet or keys</strong></li>
+        <li><img src="/images/scroll.png" class="gi-sm"> <strong>Beware of fake links</strong> — always go directly to dapp.quickswap.exchange, not links in DMs</li>
+        <li><img src="/images/growth.png" class="gi-sm"> <strong>Start small</strong> — test with a small amount before doing a large transaction</li>
+      </ul>
+    </div>
+
+    <div class="cta-row reveal">
+      <a class="btn btn-green" href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer">Buy SHROOM</a>
+      <a class="btn btn-blue" href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer">Buy SPORE</a>
+      <a class="btn btn-red" href="https://launchmynft.io/collections/0xae42EdC0FC636D1214a6C5D829C37d778398F17b/OmDADyGCGOKTT2NZM0yj" target="_blank" rel="noopener noreferrer">Buy Sporebots</a>
     </div>
 
   </section>
