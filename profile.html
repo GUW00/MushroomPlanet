@@ -566,6 +566,20 @@
       #mega-left-col #mega-mosaic { flex-shrink: 0; }
       #mega-left-col button { width: auto !important; flex: 1; min-width: 100px; }
     }
+    .action-flip { perspective: 600px; }
+    .action-flip-inner { position:relative; width:100%; height:100%; transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); transform-style:preserve-3d; }
+    .action-flip.flipped .action-flip-inner { transform:rotateY(180deg); }
+    .action-flip-front, .action-flip-back {
+      position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+      border-radius:0.75rem; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:0.6rem 0.25rem; text-align:center; min-width:0;
+    }
+    .action-flip-back {
+      transform:rotateY(180deg);
+      padding:0.5rem 0.4rem;
+      justify-content:flex-start;
+      overflow:hidden;
+    }
     .nft-modal-close {
       position:absolute;top:0.5rem;right:0.5rem;
       background:rgba(0,0,0,0.6);border:none;color:var(--cream);
@@ -703,6 +717,7 @@
 
       <!-- FARM TAB -->
       <div class="tab-panel active reveal" id="tab-farm">
+        <div id="trial-status-card"></div>
         <div class="info-card">
           <div class="card-title"><img src="/images/shroomfarm.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Farm Status</div>
           <div class="stage-bar-wrap">
@@ -1468,6 +1483,7 @@ function renderProfile() {
 
   renderHeader(s, p);
   renderQuickStats(s, p);
+  renderTrialStatus(s, p);
   renderFarm(s, p);
   renderWallet(s, p);
   renderStaking(s, p);
@@ -1679,18 +1695,30 @@ function renderFarm(s, p) {
   const feedCD   = hourlyCooldown(misc.last_hourly_feed);
 
   const DAILY_ACTIONS = [
-    { label: 'Forage',  img:'forage.png',    done: daily.daily_forage  === true, cadence: 'Daily' },
-    { label: 'Mist',    img:'mist.png',      done: daily.daily_mist    === true, cadence: 'Daily' },
-    { label: 'Fan',     img:'fan.png',       done: daily.daily_fan     === true, cadence: 'Daily' },
-    { label: 'Explore', img:'explore.png',   done: daily.daily_explore === true, cadence: 'Daily' },
-    { label: 'Toss',    img:'well.png',      done: daily.daily_toss    === true, cadence: 'Daily' },
-    { label: 'Dig',     img:'shovel.png',    done: daily.daily_dig     === true, cadence: 'Daily' },
-    { label: 'Visit',   img:'wimble.png',    done: daily.daily_visit   === true, cadence: 'Daily' },
-    { label: 'Social',  img:'pixie.png',     done: (p.Message_XP || {}).daily_limit >= 100, cadence: 'Daily' },
-    { label: 'Quest',   img:'scroll.png',    done: (s.Quests || {}).Daily_Quest === true, cadence: 'Daily' },
-    { label: 'Gather',  img:'herbs.png',     done: gatherCD === 'Ready', cadence: 'Hourly', cooldown: gatherCD },
-    { label: 'Cave',    img:'cave.png',      done: caveCD   === 'Ready', cadence: 'Hourly', cooldown: caveCD },
-    { label: 'Feed',    img:'shroomfarm.png',done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD },
+    { label: 'Forage',  img:'forage.png',    done: daily.daily_forage  === true, cadence: 'Daily',
+      info: 'Forage for Shrooms Daily & builds your streak to unlock powerful items.' },
+    { label: 'Mist',    img:'mist.png',      done: daily.daily_mist    === true, cadence: 'Daily',
+      info: 'Mist your farm daily to keep plots healthy. Triggers Kid Shroom if you own the Kid Totem.' },
+    { label: 'Fan',     img:'fan.png',       done: daily.daily_fan     === true, cadence: 'Daily',
+      info: 'Keep the fresh air circulating. Triggers King Mooshie visits if you own the King Totem!' },
+    { label: 'Explore', img:'explore.png',   done: daily.daily_explore === true, cadence: 'Daily',
+      info: 'Explore the mushroom forest once per day. Find Artifactd, Scrolls and much more.' },
+    { label: 'Toss',    img:'well.png',      done: daily.daily_toss    === true, cadence: 'Daily',
+      info: 'Toss a coin in the well once per day. Triggers Gold Totem to toss again' },
+    { label: 'Dig',     img:'shovel.png',    done: daily.daily_dig     === true, cadence: 'Daily',
+      info: 'Dig for treasure once per day. Requires the Golden Shovel (earned at 7-day streak).' },
+    { label: 'Visit',   img:'wimble.png',    done: daily.daily_visit   === true, cadence: 'Daily',
+      info: 'Visit Wimblecap the mushroom NPC daily. Visiting multiple times earns Items and Shrooms.' },
+    { label: 'Social',  img:'pixie.png',     done: (p.Message_XP || {}).daily_limit >= 100, cadence: 'Daily',
+      info: 'Earn 100 Pixie XP by chatting in Discord. XP from messages, reactions, and community participation.' },
+    { label: 'Quest',   img:'scroll.png',    done: (s.Quests || {}).Daily_Quest === true || (profileData.reddit || {}).Quests?.Daily_Quest === true, cadence: 'Daily',
+      info: 'Complete the daily Reddit quest posted in r/MushroomPlanet.' },
+    { label: 'Gather',  img:'herbs.png',     done: gatherCD === 'Ready', cadence: 'Hourly', cooldown: gatherCD,
+      info: 'Gather herbs once per hour. Herbs are used for brewing potions. Higher Herbology skill = better herbs.' },
+    { label: 'Cave',    img:'cave.png',      done: caveCD   === 'Ready', cadence: 'Hourly', cooldown: caveCD,
+      info: 'Explore the cave once per hour for gemstones and rare ingredients. Miner Helmet lets you continue your run' },
+    { label: 'Feed',    img:'shroomfarm.png',done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD,
+      info: 'Feed the farm animals once per hour. Total fed SHROOM unlocks companions, forage boosts, and more.' },
   ];
   const DAILY_ONLY = DAILY_ACTIONS.filter(a => a.cadence !== 'Hourly');
   const doneCount = DAILY_ONLY.filter(a => a.done).length;
@@ -1741,13 +1769,147 @@ function renderFarm(s, p) {
                      : onCooldown           ? 'rgba(34,197,94,0.5)'
                      :                        'rgba(255,255,225,0.2)';
 
-      return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;padding:0.6rem 0.25rem;border-radius:0.75rem;border:1px solid ' + border + ';background:' + bg + ';text-align:center;min-width:0;">'
+      const cardId = 'dac_' + a.label.toLowerCase().replace(/ /g,'_');
+      return '<div class="action-flip" id="' + cardId + '" onclick="this.classList.toggle(\'flipped\')" style="cursor:pointer;min-height:82px;">'
+        + '<div class="action-flip-inner" style="min-height:82px;">'
+        + '<div class="action-flip-front" style="border:1px solid ' + border + ';background:' + bg + ';gap:0.3rem;">'
         + '<img src="/images/' + a.img + '" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display=\'none\'">'
         + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.7rem;font-weight:700;color:' + labelCol + ';white-space:nowrap;">' + a.label + '</span>'
         + '<span style="font-family:Space Grotesk,monospace;font-size:0.52rem;color:' + subCol + ';white-space:nowrap;">' + subText + '</span>'
-        + '</div>';
+        + '</div>'
+        + '<div class="action-flip-back" style="border:1px solid ' + border + ';background:' + bg + ';">'
+        + '<div style="font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:700;color:' + labelCol + ';margin-bottom:0.25rem;white-space:nowrap;">' + a.label + '</div>'
+        + '<div style="font-family:Space Grotesk,monospace;font-size:0.52rem;color:rgba(255,255,225,0.55);line-height:1.5;text-align:left;">' + (a.info || '') + '</div>'
+        + '</div>'
+        + '</div></div>';
     }).join('')
     + '</div>';
+}
+
+function renderTrialStatus(s, p) {
+  const el = document.getElementById('trial-status-card');
+  if (!el) return;
+
+  const misc = s.Misc || {};
+  const createdStr = misc.created_at || misc.created || null;
+  if (!createdStr) { el.innerHTML = ''; return; }
+
+  let createdAt;
+  try {
+    let norm = createdStr.trim();
+    if (/\d{4}-\d{2}-\d{2} \d{1,2}:\d{2} [AP]M/i.test(norm)) {
+      const parts = norm.split(' ');
+      let [h, m] = parts[1].split(':').map(Number);
+      const ampm = parts[2].toUpperCase();
+      if (ampm === 'PM' && h !== 12) h += 12;
+      if (ampm === 'AM' && h === 12) h = 0;
+      norm = parts[0] + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00Z';
+    } else {
+      norm = norm.replace(' ', 'T') + (norm.includes('Z') ? '' : 'Z');
+    }
+    createdAt = new Date(norm);
+    if (isNaN(createdAt.getTime())) { el.innerHTML = ''; return; }
+  } catch(e) { el.innerHTML = ''; return; }
+
+  const ageDays = Math.max(0, Math.floor((Date.now() - createdAt.getTime()) / 86400000));
+
+  // --- Qualification check (mirrors Python check_account_shroom_requirement) ---
+  const wallet = p.Wallet || {};
+  const nftW = wallet.NFT || {};
+  const onchain       = wallet.Onchain || {};
+  const onchainShroom = parseInt(onchain.shroom_balance || 0);
+  const onchainSpore  = parseInt(onchain.spore_balance  || 0);
+  const shroomEquiv   = onchainShroom + Math.floor(onchainSpore / 100);
+  const daysOver500k  = parseInt(onchain.Days_Over_500k || 0);
+  const lpBonus       = parseFloat(wallet.LP_Bonus || wallet.lp_bonus || 0);
+
+  // Count Sporebots and Mooshies
+  let sporebotCount = 0, mooshieCount = 0;
+  const MOOSHIE_NAMES = ['Mooshie','King Mooshie','Queen Mooshie','Gold Mooshie','Kid Shroom','House Mooshie'];
+  Object.entries(nftW).forEach(function([k, v]) {
+    if (k === 'total_nft') return;
+    const name = k.replace(/ ID\d+$/, '');
+    const cnt  = parseInt((v && v.count) || 1);
+    if (name.includes('SporeBots') || name.includes('Sporebot')) sporebotCount += cnt;
+    else if (MOOSHIE_NAMES.some(function(m) { return name.includes(m); })) mooshieCount += cnt;
+  });
+
+  const qualifiesShroom  = shroomEquiv >= 500000 && daysOver500k >= 3;
+  const qualifiesNFT     = sporebotCount >= 2 || mooshieCount >= 1;
+  const qualifiesLP      = lpBonus >= 0.1;
+  const isQualified      = qualifiesShroom || qualifiesNFT || qualifiesLP;
+
+  // If past trial and qualified — show nothing (or a small green pill)
+  if (ageDays >= 42 && isQualified) {
+    el.innerHTML = '<div style="display:flex;align-items:center;gap:0.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.65rem 1rem;margin-bottom:1rem;font-family:Space Grotesk,monospace;font-size:0.7rem;color:var(--green);">'
+      + '<div style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0;"></div>'
+      + 'Farm access active — requirements met'
+      + (function() {
+          const tags = [];
+          if (qualifiesShroom) tags.push('500k+');
+          if (qualifiesNFT)    tags.push('NFT Holder');
+          if (qualifiesLP)     tags.push('LP Provider');
+          return ' <span style="opacity:0.5;">(' + tags.join(' & ') + ')</span>';
+        })()
+      + '</div>';
+    return;
+  }
+
+  // If past trial and NOT qualified
+  if (ageDays >= 42 && !isQualified) {
+    el.innerHTML = '<div style="background:rgba(253,70,79,0.06);border:1px solid rgba(253,70,79,0.2);border-radius:1rem;padding:1.1rem 1.25rem;margin-bottom:1rem;">'
+      + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;letter-spacing:0.12em;color:var(--red);margin-bottom:0.5rem;">FARM ACCESS SUSPENDED</div>'
+      + '<div style="font-size:0.82rem;color:rgba(255,255,225,0.7);margin-bottom:0.75rem;line-height:1.6;">Your 42-day free trial has ended. Meet <b style="color:var(--cream);">ONE</b> of the following to restore access:</div>'
+      + _trialOptionsHtml()
+      + '</div>';
+    return;
+  }
+
+  // In trial
+  const trialPct  = Math.min(100, Math.round((ageDays / 42) * 100));
+  const daysLeft  = 42 - ageDays;
+  const barColor  = daysLeft <= 3 ? 'var(--red)' : daysLeft <= 7 ? '#f97316' : 'var(--yellow)';
+  const urgency   = daysLeft <= 3 ? 'rgba(253,70,79,0.06)' : daysLeft <= 7 ? 'rgba(249,115,22,0.06)' : 'rgba(254,206,0,0.04)';
+  const urgencyBorder = daysLeft <= 3 ? 'rgba(253,70,79,0.2)' : daysLeft <= 7 ? 'rgba(249,115,22,0.2)' : 'rgba(254,206,0,0.15)';
+
+  let statusMsg = isQualified
+    ? '<span style="color:var(--green);">You already meet the requirements - farm access secured!</span>'
+    : daysLeft <= 7
+      ? '<span style="color:' + barColor + ';">Trial ending soon - meet a requirement before Day 42 to keep farming.</span>'
+      : '<span style="color:rgba(255,255,225,0.55);">Enjoy your free trial. Meet any requirement before Day 42 to keep farming.</span>';
+
+  el.innerHTML = '<div style="background:' + urgency + ';border:1px solid ' + urgencyBorder + ';border-radius:1rem;padding:1.1rem 1.25rem;margin-bottom:1rem;">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;letter-spacing:0.12em;color:rgba(255,255,225,0.5);">FREE TRIAL</div>'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.45);">Day ' + ageDays + ' of 42</div>'
+    + '</div>'
+    + '<div style="display:flex;justify-content:space-between;font-family:Space Grotesk,monospace;font-size:0.72rem;font-weight:600;color:rgba(255,255,225,0.75);margin-bottom:0.35rem;">'
+    + '<span>Trial Progress</span>'
+    + '<span style="color:' + barColor + ';">' + daysLeft + ' days left</span>'
+    + '</div>'
+    + '<div style="height:6px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;margin-bottom:0.6rem;">'
+    + '<div style="height:100%;width:' + trialPct + '%;background:' + barColor + ';border-radius:999px;transition:width 1.2s cubic-bezier(0.16,1,0.3,1);"></div>'
+    + '</div>'
+    + '<div style="font-size:0.78rem;margin-bottom:' + (isQualified ? '0' : '0.875rem') + ';">' + statusMsg + '</div>'
+    + (isQualified ? '' : _trialOptionsHtml())
+    + '</div>';
+}
+
+function _trialOptionsHtml() {
+  const opt = function(color, img, title, desc, linkHref, linkLabel, link2Href, link2Label) {
+    return '<div style="display:flex;gap:0.75rem;align-items:flex-start;background:rgba(' + color + ',0.05);border:1px solid rgba(' + color + ',0.15);border-radius:0.75rem;padding:0.75rem 0.9rem;margin-bottom:0.5rem;">'
+      + '<img src="/images/' + img + '" style="width:22px;height:22px;object-fit:contain;flex-shrink:0;margin-top:2px;">'
+      + '<div><div style="font-size:0.65rem;font-family:Space Grotesk,monospace;letter-spacing:0.1em;text-transform:uppercase;color:rgba(' + color + ',1);margin-bottom:0.2rem;">' + title + '</div>'
+      + '<div style="font-size:0.75rem;color:rgba(255,255,225,0.55);line-height:1.5;margin-bottom:0.4rem;">' + desc + '</div>'
+      + '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'
+      + '<a href="' + linkHref + '" target="_blank" rel="noopener noreferrer" style="display:inline-flex;font-family:Space Grotesk,monospace;font-size:0.6rem;font-weight:600;padding:0.25em 0.75em;border-radius:999px;border:1px solid rgba(' + color + ',0.35);background:rgba(' + color + ',0.08);color:rgba(' + color + ',1);text-decoration:none;">' + linkLabel + ' ↗</a>'
+      + (link2Href ? '<a href="' + link2Href + '" target="_blank" rel="noopener noreferrer" style="display:inline-flex;font-family:Space Grotesk,monospace;font-size:0.6rem;font-weight:600;padding:0.25em 0.75em;border-radius:999px;border:1px solid rgba(' + color + ',0.35);background:rgba(' + color + ',0.08);color:rgba(' + color + ',1);text-decoration:none;">' + link2Label + ' ↗</a>' : '')
+      + '</div>'
+      + '</div></div>';
+  };
+  return opt('79,168,253',  'shroom.png',          'Option 1 - Hold SHROOM', 'Hold 500,000+ SHROOM-equivalent on-chain for 3+ days. 100 SPORE = 1 SHROOM.', 'https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1', 'Buy SHROOM', 'https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED', 'Buy SPORE')
+    + opt('253,70,79',      'sporebot_helper.png', 'Option 2 - Hold NFTs',   'Hold 2 Sporebot NFTs or any 1 Mooshie NFT, verified for 3+ days.',              'https://launchmynft.io/collections/0xae42EdC0FC636D1214a6C5D829C37d778398F17b/OmDADyGCGOKTT2NZM0yj', 'Buy Sporebots')
+    + opt('254,206,0',      'lp.png',              'Option 3 - Provide LP',  'LP Bonus of 0.1+ on QuickSwap. Qualifies immediately with no waiting period.',   'https://www.reddit.com/r/MushroomPlanet/comments/1mu9dx0/quickswap_guide_trading_providing_liquidity/', 'LP Guide');
 }
 
 function renderWallet(s, p) {
@@ -3177,9 +3339,15 @@ function renderItemsOrganized(s) {
       earn:'Earned at 69-day !forage streak. Adds +5% Kid Totem Chance on every !mist.' },
     { key:'Gold_Totem',   img:'gold_totem.png',   label:'Gold Totem',   color:'var(--yellow)',
       earn:'Earned at 100-day !forage streak. Adds +5% Gold Totem Chance on every !toss.' },
+    { key:'House_Totem',  img:'housemooshie.png',  label:'House Mooshie Totem', color:'var(--red)',
+      earn:'Earned at 730-day !forage streak (2 years). All the Mooshies gather to present you with this legendary totem. Permanently increases all totem chances by +5%.' },
   ];
   TOTEM_DEFS.forEach(function(t) {
     var owned = !!(items[t.key]);
+    var isHouse = t.key === 'House_Totem';
+    if (isHouse) {
+      html += '<div style="margin:0.5rem 0 0.25rem;border-top:1px solid rgba(253,70,79,0.25);padding-top:0.5rem;"></div>';
+    }
     html += itemRow(t.img, t.label, owned, t.earn, t.color);
   });
 
