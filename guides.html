@@ -1246,102 +1246,154 @@
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">What is Mushroom Planet?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>Mushroom Planet is a Web3 gaming ecosystem built on the Polygon blockchain. It features two tokens (SHROOM and SPORE), NFT collections, a Discord bot called Sporebot that lets you forage, farm, dig, and earn off-chain, and a governance platform for voting on community proposals.</p></div>
+      <div class="qa-a"><p>Mushroom Planet is a Web3 gaming ecosystem built on the Polygon blockchain. It features two tokens (SHROOM and SPORE), NFT collections, a Discord bot called Sporebot that lets you forage, farm, dig, brew, stake, and earn off-chain, and a Reddit bot that runs a daily forage thread. There is also a governance platform for voting on community proposals. Everything bridges into real on-chain tokens you can trade on QuickSwap.</p></div>
     </div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">How do I get started?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>Join the <a href="https://discord.com/invite/ECauU2KSSt" target="_blank">Discord server</a> and use <code>!register 0xYourPolygonAddress</code> to link your wallet. From there you can run <code>!forage</code> daily to start earning SHROOM. You don't need any tokens or NFTs to begin - just a free Discord account.</p></div>
+      <div class="qa-a"><p>There are two entry points. On <strong>Discord</strong>: join the server, verify in <code>#verify</code>, then use <code>!start</code> in <strong>#farming</strong> to receive 1,000 SHROOMS and begin planting. On <strong>Reddit</strong>: join <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank">r/MushroomPlanet</a>, comment <code>!sprout</code> for a new-user bonus of 1,000 SHROOMS + 100,000 SPORES, then comment <code>!forage</code> in the daily thread every day. No wallet required to start on either platform.</p></div>
     </div>
 
     <div class="qa-item reveal">
-      <button class="qa-q" onclick="toggleQA(this)">Do I need a wallet to play?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>You need a wallet to <strong>withdraw</strong> tokens on-chain or to hold NFTs, but you can play the Discord bot game and earn off-chain SHROOM without one. When you're ready to withdraw, register a Polygon-compatible wallet (MetaMask, Rabby, etc.) with <code>!register 0xYourAddress</code>.</p></div>
+      <button class="qa-q" onclick="toggleQA(this)">Do I need a crypto wallet to play?<span class="qa-chevron"></span></button>
+      <div class="qa-a"><p>No. You can earn and spend tokens entirely off-chain inside Sporebot forever with no wallet. A wallet is only needed when you want to <strong>withdraw tokens on-chain</strong>, hold NFTs, or provide liquidity. When you're ready, set up a Polygon-compatible wallet (MetaMask, Trust Wallet, Coinbase Wallet) and register it with <code>!register 0xYourAddress</code> in Discord or Reddit.</p></div>
+    </div>
+
+    <div class="qa-item reveal">
+      <button class="qa-q" onclick="toggleQA(this)">What is the difference between off-chain and on-chain?<span class="qa-chevron"></span></button>
+      <div class="qa-a"><p><strong>Off-chain</strong> means your balance lives inside the Sporebot database. Earning from <code>!forage</code>, <code>!farm</code>, tipping, and Reddit upvotes all happen here. No gas fees, instant rewards. <strong>On-chain</strong> means tokens are on the Polygon blockchain inside your Web3 wallet - truly yours, tradeable on QuickSwap, verifiable by anyone on Polygonscan. You move tokens from off-chain to on-chain by withdrawing.</p></div>
+    </div>
+
+    <div class="qa-item reveal">
+      <button class="qa-q" onclick="toggleQA(this)">Can I play on both Reddit and Discord?<span class="qa-chevron"></span></button>
+      <div class="qa-a"><p>Yes, and you can link both accounts together. Comment <code>!register 0xYourWallet</code> in the Reddit daily thread first, then comment <code>!link</code> - you'll get a DM from Pixie on Discord to confirm. Once linked you receive a one-time bonus of <strong>20,000 SHROOMS + 2,000,000 SPORES</strong>, and you can use <code>!transfer</code> in Discord to move your Reddit balance into your Discord wallet anytime.</p></div>
     </div>
 
     <div class="section-divider reveal">Tokens</div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">What are SHROOM and SPORE?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p><strong>SHROOM</strong> is the primary token of Mushroom Planet, tradeable on QuickSwap on Polygon. <strong>SPORE</strong> is a secondary token used for in-game items, potions, and the shop. They are pegged at a fixed <strong>1 SHROOM = 100 SPORE</strong> conversion rate and can be swapped on the <a href="/convert.html">Convert</a> page.</p></div>
+      <div class="qa-a"><p><strong>SHROOM ($HROOM)</strong> is the primary utility token - earned through farming, foraging, posting on Reddit, and community activity. It's the token you plant, stake, and withdraw. <strong>SPORE (SPR)</strong> is the governance token - earned through NFT rewards, farm generation (SGR), staking, and holding SHROOM on-chain. Both are ERC-20 tokens on Polygon, tradeable on QuickSwap, and pegged at a fixed <strong>1 SHROOM = 100 SPORE</strong> conversion rate.</p></div>
     </div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">How do I convert between SHROOM and SPORE?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>Use the <a href="/convert.html">Convert page</a> on this website, or use <code>!convert [amount] shrooms</code> / <code>!convert [amount] spores</code> in Discord. The rate is always fixed: 1 SHROOM = 100 SPORE. Conversions happen instantly in the off-chain Sporebot system.</p></div>
+      <div class="qa-a"><p>Use the <a href="/convert.html">Convert page</a> on this website, or use <code>!convert [amount] shrooms</code> or <code>!convert [amount] spores</code> in Discord. The rate is always fixed: <strong>100 SPORE = 1 SHROOM</strong>. Conversions are instant and happen within your off-chain balance - no gas fees, no blockchain transaction needed.</p></div>
     </div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">Where can I buy SHROOM or SPORE?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>Both tokens are available on <a href="https://dapp.quickswap.exchange" target="_blank">QuickSwap</a> on the Polygon network. You'll need POL (formerly MATIC) for gas fees. Make sure you're connected to the Polygon network in your wallet before swapping. Always verify the contract addresses listed on the <a href="/guides.html">Guides</a> page before buying.</p></div>
+      <div class="qa-a"><p>Both tokens are available on <a href="https://dapp.quickswap.exchange" target="_blank">QuickSwap</a> on the Polygon network. Make sure you're connected to Polygon and using <strong>Market (V2)</strong> in the Swap tab. You'll need a small amount of POL for gas fees (fractions of a cent). Always use the contract addresses listed in the Blockchain tab of this guide - never buy from addresses sent in DMs. Use <code>!gas</code> in the Reddit daily thread to receive 0.01 POL free if you need gas.</p></div>
     </div>
 
     <div class="section-divider reveal">Earning & Gameplay</div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">How do I earn SHROOM?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>The main ways to earn are: daily <code>!forage</code> (cooldown-based), planting on your <code>!farm</code>, digging with <code>!dig</code>, exploring with <code>!explore</code>, and maintaining a daily streak bonus. NFT holders get multipliers on most earning commands. Check <code>!profile</code> to see your current rates.</p></div>
+      <div class="qa-a"><p>Main ways to earn SHROOM: <strong>Discord</strong> - daily <code>!forage</code>, <code>!mist</code>, <code>!fan</code>, <code>!dig</code>, <code>!explore</code>, <code>!toss</code>, and harvesting your farm at Sporulation. <strong>Reddit</strong> - daily <code>!forage</code> streak (scales up to 6,874 SHROOMS/day at Day 420+), post upvote rewards (500 SHROOMS per upvote on standard posts, up to 5x for original content), and tipping. Tips and airdrops also move SHROOMS between players. The more you contribute, the more you earn.</p></div>
+    </div>
+
+    <div class="qa-item reveal">
+      <button class="qa-q" onclick="toggleQA(this)">How does the farm work?<span class="qa-chevron"></span></button>
+      <div class="qa-a"><p>Use <code>!plant [amount]</code> to plant SHROOMS into your farm. Planted SHROOMS passively generate SPORES every day based on your <strong>Spore Generation Rate (SGR)</strong>. The farm advances through 5 stages over 42 days: Spore, Germination, Mycelium, Fruiting, and Sporulation. When you reach Sporulation, you harvest to rank up and increase your permanent plant limit - then replant to keep earning. Use <code>!farm</code> to see your current farm status and SGR.</p></div>
+    </div>
+
+    <div class="qa-item reveal">
+      <button class="qa-q" onclick="toggleQA(this)">What is SGR and how do I increase it?<span class="qa-chevron"></span></button>
+      <div class="qa-a"><p>SGR (Spore Generation Rate) determines how many SPORES your planted SHROOMS generate per day. The in-game cap is 100%. Sources: Farm Rank (up to +25%), Farm Stage (up to +25%), Potions (up to +20%), 5 Gemstones (up to +25%), Sporebot upgrades (up to +25%). On-chain bonuses stack on top: LP positions, Sporebot NFTs (+1% to +10%), Guwoo NFT (+5%), LP NFTs (+2% to +10%), and your pool share percentage from QuickSwap liquidity.</p></div>
     </div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">What does staking do?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>Staking locks your SHROOM off-chain to earn passive rewards over a 42-day cycle. Use <code>!stake [amount]</code> to stake and <code>!unstake</code> to withdraw. NFT holdings boost your staking APR. Staked SHROOM still counts toward your total balance for withdrawal eligibility.</p></div>
+      <div class="qa-a"><p>Staking locks your <strong>SPORES</strong> off-chain to earn passive rewards at <strong>20% APR</strong> and accumulate <strong>Mycelium Voting Power (MVP)</strong> for governance. Use <code>!stake</code> to get started. Every 100M SPORES staked = 1 Mycelium Node, and each node runs a 90-day cycle - every 90 days earns you +1 additional node. <strong>Fast Unstake (7 days)</strong> loses ALL MVP. <strong>Slow Unstake (42 days)</strong> keeps ALL MVP.</p></div>
     </div>
 
     <div class="qa-item reveal">
-      <button class="qa-q" onclick="toggleQA(this)">What is the farm and how does planting work?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>Your farm has multiple plots that produce SHROOM passively. Use <code>!plant [amount]</code> to plant SHROOM into your farm plots. Planted SHROOM grows over time and can be harvested with <code>!harvest</code>. Farm Boost NFTs increase your yield per plot. Use <code>!farm</code> to check your current farm status.</p></div>
+      <button class="qa-q" onclick="toggleQA(this)">What is the free trial and what happens after 42 days?<span class="qa-chevron"></span></button>
+      <div class="qa-a"><p>New users get a <strong>42-day free trial</strong> to farm with no requirements. After that, you must meet ONE of the following to keep farming: hold <strong>500,000+ SHROOM-equivalent on-chain for 3+ consecutive days</strong> (100 SPORE = 1 SHROOM equivalent), hold <strong>2 Sporebot NFTs or any 1 Mooshie NFT</strong> for 3+ days, or provide <strong>LP with a 0.1%+ pool bonus</strong> on QuickSwap (qualifies immediately, no waiting period). Use <code>!farm</code> to check your current status.</p></div>
+    </div>
+
+    <div class="qa-item reveal">
+      <button class="qa-q" onclick="toggleQA(this)">What is the daily forage on Reddit?<span class="qa-chevron"></span></button>
+      <div class="qa-a"><p>Every day at <strong>7:20 AM EST</strong> a fresh forage thread is pinned to <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank">r/MushroomPlanet</a>. Comment <code>!forage</code> once to build your streak and earn SHROOMS + SPORES. Missing a day resets your streak to 0 - protect it with Vacation Days earned every 7-day consecutive streak. Any forage has a <strong>1-in-3000 chance</strong> to win the current Jackpot. You can also comment <code>!feed</code> to feed the animals - every 6,874 SHROOMS fed grows your Forage Bonus, and the total fed becomes the Jackpot pool.</p></div>
     </div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">What is the Well / Toss system?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>The <code>!toss</code> command lets you throw SHROOM into the community well for a chance at rewards. The well has levels that unlock bigger prize pools as more SHROOM is contributed. It's a community-driven luck mechanic - only toss what you're comfortable risking.</p></div>
+      <div class="qa-a"><p>The <code>!toss</code> command lets you toss tokens into the community well for a chance at various rewards including the rare Sporulation Jackpot. It's a daily luck mechanic - use it once per day in Discord as part of your daily activity routine alongside <code>!forage</code>, <code>!dig</code>, <code>!explore</code>, and <code>!visit</code>.</p></div>
+    </div>
+
+    <div class="qa-item reveal">
+      <button class="qa-q" onclick="toggleQA(this)">How do Reddit post and comment rewards work?<span class="qa-chevron"></span></button>
+      <div class="qa-a"><p><strong>Post rewards</strong>: Every post on r/MushroomPlanet earns <strong>500 SHROOMS + 50,000 SPORES per upvote</strong>. Original content flairs earn 3x or 5x multipliers (e.g. Original Art = 5x). Low-effort flairs earn 0.5x. There's a limit of <strong>15 posts per month</strong> - posts beyond that earn nothing. <strong>Comment rewards</strong>: A monthly pinned thread tracks all your comments across the subreddit - you earn <strong>200 SHROOMS + 20,000 SPORES per upvote</strong>, with only your top comment per post counted. Rewards are distributed when the thread closes each month.</p></div>
     </div>
 
     <div class="section-divider reveal">NFTs</div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">What NFTs are available and what do they do?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>There are several collections: <strong>Mooshies</strong> (House, Kid, Queen, King, Gold) give earn multipliers and withdrawal eligibility. <strong>Sporebots</strong> (6,874 supply) also grant eligibility and bonuses. <strong>Farm Boost Gen 1 &amp; Gen 2</strong> increase farm yield. Community NFTs (Guwoo, Papa Sporewalker, Elder Shroompa) offer unique perks. Run <code>!nft</code> in Discord to see your holdings and active bonuses.</p></div>
+      <div class="qa-a"><p><strong>Mooshies</strong> (House, King, Queen) - 200,000 SPORE/day each via Sporebot. <strong>Kid Shroom</strong> - 20,000 SHROOM + 1.5M SPORE/month on-chain (Feb 2025 - Jul 2026), then joins daily 200K SPORE tier. <strong>Gold Mooshie</strong> - 15,000 SHROOM + 2M SPORE/month on-chain (Nov 2025 - Oct 2028), then daily 200K SPORE tier. <strong>Sporebots</strong> (6,874 supply) - unique trait bonuses plus farm access eligibility. <strong>Farm Boost Gen 1 &amp; Gen 2</strong> - permanently plants 1,000,000 SHROOMS in your farm. <strong>Community NFTs</strong> (Guwoo, LP NFTs, Papa Sporewalker, Elder Shroompa) - SGR and gameplay bonuses. Verify any NFT with <code>!nft</code> in Discord.</p></div>
     </div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">Where can I buy NFTs?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>Sporebots are available on <a href="https://launchmynft.io/collections/0xae42EdC0FC636D1214a6C5D829C37d778398F17b/OmDADyGCGOKTT2NZM0yj" target="_blank">LaunchMyNFT</a>. Mooshies are on <a href="https://opensea.io/collection/mooshienft" target="_blank">OpenSea</a>. Always verify you're on the correct collection page - never buy from unofficial links sent in DMs.</p></div>
+      <div class="qa-a"><p><strong>Available now (primary)</strong>: Sporebots on <a href="https://launchmynft.io/collections/0xae42EdC0FC636D1214a6C5D829C37d778398F17b/OmDADyGCGOKTT2NZM0yj" target="_blank">LaunchMyNFT</a> (8.3 POL), Farm Boost Gen 2 on OpenSea (0.0063 WETH), Papa Sporewalker and Elder Shroompa on mash-it.io. <strong>Secondary only</strong>: All Mooshie collections, Farm Boost Gen 1, LP NFTs, and Guwoo are available on OpenSea. Never buy from addresses or links sent in DMs - always navigate directly from this guide or the official Discord.</p></div>
     </div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">How do I verify my NFTs with Sporebot?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>Make sure your wallet is registered first with <code>!register 0xYourAddress</code>, then run <code>!nft</code> in the Mushroom Planet Discord. Sporebot will check your wallet on-chain and update your profile with any detected NFTs and their bonuses. If your NFTs aren't showing, double-check the registered wallet address with <code>!profile</code>.</p></div>
+      <div class="qa-a"><p>Register your wallet first with <code>!register 0xYourAddress</code> in <strong>#wallet-web3</strong>, then run <code>!nft</code>. Sporebot scans your wallet on-chain and updates your profile with detected NFTs and their active bonuses. If your NFTs aren't showing, double-check your registered address with <code>/balance</code>. Only one Sporebot NFT can be active at a time as your in-game companion - use <code>!sporebot</code> to activate and rename it.</p></div>
+    </div>
+
+    <div class="qa-item reveal">
+      <button class="qa-q" onclick="toggleQA(this)">What does a Farm Boost NFT do exactly?<span class="qa-chevron"></span></button>
+      <div class="qa-a"><p>A Farm Boost permanently plants <strong>1,000,000 SHROOMS</strong> in your farm - those SHROOMS generate SPORES at your current SGR passively forever. The planted SHROOMS cannot be withdrawn - they stay in the farm. If you sell the NFT, the planted SHROOMS transfer to the new owner (you keep all SPORES earned up to that point). Stacking multiple Farm Boosts multiplies your passive SPORE generation. All mint proceeds go to the Sporebot Treasury, which buys SHROOM and SPORE from the open market.</p></div>
     </div>
 
     <div class="section-divider reveal">Withdrawals & Wallets</div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">How do I withdraw tokens to my wallet?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>You must hold the withdrawal requirement for <strong>42+ consecutive days</strong> (either 500k+ SHROOM-equivalent on-chain, 2 Sporebots, or 1 Mooshie). Then use <code>!withdraw [amount] shrooms</code> or <code>!withdraw [amount] spores</code>. Daily limits apply: 1,000,000 SHROOM and 100,000,000 SPORE. A small POL gas fee is required for the on-chain transaction.</p></div>
+      <div class="qa-a"><p>You must meet a holding requirement for <strong>42+ consecutive days</strong>: either hold <strong>500,000+ SHROOM-equivalent on-chain</strong> (LP does not qualify for withdrawals), or hold <strong>2 Sporebot NFTs OR any 1 Mooshie NFT</strong>. Then use <code>!withdraw [amount] shrooms</code> or <code>!withdraw [amount] spores</code> in Discord. Daily limits: <strong>1,000,000 SHROOMS</strong> and <strong>100,000,000 SPORES</strong>. A small POL gas fee is required.</p></div>
     </div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">Why is my withdrawal failing?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>Common reasons: you haven't held the requirement for 42+ days yet, your wallet isn't registered (<code>!register</code>), your NFTs aren't verified (<code>!nft</code>), or you've hit the daily withdrawal limit. Check <code>!profile</code> to see your eligibility status. If everything looks correct, ask in the Discord support channel.</p></div>
+      <div class="qa-a"><p>Common reasons: requirement not held for 42+ consecutive days yet, wallet not registered (<code>!register</code>), NFTs not verified (<code>!nft</code>), daily withdrawal limit already hit, or trying to use LP position to qualify (LP only qualifies for farming, not withdrawals). Use <code>/balance</code> to check your eligibility status and days remaining. If everything looks correct, open a ticket in <code>#support-ticket</code> on Discord.</p></div>
     </div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">Is it safe to register my wallet with Sporebot?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>Yes - registering only saves your <strong>public wallet address</strong> for on-chain lookups and withdrawals. Sporebot never asks for your private key or seed phrase. If anyone (including someone claiming to be staff) ever asks for your seed phrase, it is a scam. <strong>Mushroom Planet will never DM you asking for private keys.</strong></p></div>
+      <div class="qa-a"><p>Yes. Registering only saves your <strong>public wallet address</strong> (0x...) for on-chain lookups and sending withdrawals. Sporebot never asks for your private key or seed phrase. Your public address is safe to share - it's like a bank account number. <strong>Mushroom Planet will never DM you asking for private keys or your seed phrase.</strong> Anyone who does is running a scam.</p></div>
+    </div>
+
+    <div class="qa-item reveal">
+      <button class="qa-q" onclick="toggleQA(this)">How do I get POL for gas fees?<span class="qa-chevron"></span></button>
+      <div class="qa-a"><p>Comment <code>!gas</code> in the Reddit daily forage thread to receive <strong>0.01 POL</strong> free - enough for many transactions. This is a one-time gift per user. You can also buy POL on any major exchange (Coinbase, Binance, Kraken) and send it to your Polygon wallet. Gas fees on Polygon are tiny - typically fractions of a cent per transaction.</p></div>
+    </div>
+
+    <div class="section-divider reveal">Liquidity</div>
+
+    <div class="qa-item reveal">
+      <button class="qa-q" onclick="toggleQA(this)">What are LP rewards and how do I earn them?<span class="qa-chevron"></span></button>
+      <div class="qa-a"><p>Provide <strong>SHROOM/WETH</strong> or <strong>SPORE/WETH</strong> liquidity on QuickSwap (V2) to earn weekly token airdrops proportional to your share of the pool. Snapshot every Sunday, airdrop sent Monday. Current rates: SHROOM pool = <strong>3.5M SHROOMS/week</strong> (Year 2), SPORE pool = <strong>500M SPORES/week</strong> (Year 1). Minimum to qualify: 10,000 SHROOM in the SHROOM pool, or 100,000 SPORE in the SPORE pool. Providing LP also immediately satisfies the farm free-trial requirement with no 3-day wait.</p></div>
+    </div>
+
+    <div class="qa-item reveal">
+      <button class="qa-q" onclick="toggleQA(this)">What is impermanent loss?<span class="qa-chevron"></span></button>
+      <div class="qa-a"><p>Impermanent Loss (IL) happens when token prices change after you deposit into a liquidity pool - the pool auto-rebalances to maintain 50/50 value, so you end up with a different ratio than you deposited. If you had just held the tokens separately, you might have more value. IL is "impermanent" because if prices return to the original ratio, the loss disappears. Weekly LP reward airdrops help offset IL over time. See the Liquidity tab of this guide for a full example.</p></div>
     </div>
 
     <div class="section-divider reveal">Governance</div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">How does voting work?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>Community proposals are posted on the <a href="/vote.html">Vote page</a>. Connect your Discord account to cast a vote. Voting is anonymous - your choice is not publicly linked to your username. Proposals auto-close at their deadline and results are tallied on-chain. SHROOM holdings may affect voting weight depending on the proposal type.</p></div>
+      <div class="qa-a"><p>Community proposals are posted on the <a href="/vote.html">Vote page</a>. Connect your Discord account to cast a vote. Voting is <strong>anonymous</strong> - your choice is not publicly linked to your username until the proposal closes. Proposals auto-close at their deadline with automatic pass/fail evaluation. Mycelium Voting Power (MVP) is accumulated by staking SPORE - the longer you stake and the more SPORE you stake, the more voting nodes you accumulate.</p></div>
     </div>
 
     <div class="qa-item reveal">
       <button class="qa-q" onclick="toggleQA(this)">How do I submit a proposal?<span class="qa-chevron"></span></button>
-      <div class="qa-a"><p>Community proposals are currently submitted through the Discord server. Post your idea in the appropriate channel and the team will review it. If approved, it gets posted to the <a href="/vote.html">Vote page</a> for a community-wide decision. Guardians and moderators help shepherd proposals through the process.</p></div>
+      <div class="qa-a"><p>Post your idea in the appropriate Discord channel. The team and Guardians will review it. If approved, it gets posted to the <a href="/vote.html">Vote page</a> for a community-wide vote. Guardians and moderators shepherd proposals through the process. Mods can push approved community votes to "Official Vote" status.</p></div>
     </div>
 
     <div class="cta-row reveal">
