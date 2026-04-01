@@ -7,7 +7,11 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne+Mono&display=swap" />
   <link rel="stylesheet" href="styles.css" />
   <style>
-    .contract-row { display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;background:var(--dark3);border-radius:0.875rem;margin-bottom:0.5rem;font-size:0.8rem; }
+    .contract-row { display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;background:var(--dark3);border-radius:0.875rem;margin-bottom:0.5rem;font-size:0.8rem;flex-wrap:wrap; }
+    @media(max-width:480px) {
+      .contract-row { flex-direction:column;align-items:flex-start; }
+      .copy-btn { margin-left:0;width:100%;text-align:center; }
+    }
     .contract-row img { width:22px;height:22px;object-fit:contain; }
     .contract-name { color:var(--cream);text-decoration:none;font-weight:600;transition:color 0.2s; }
     .contract-name:hover { color:var(--gold); }
@@ -170,7 +174,7 @@
         <li><a href="/profile.html">PROFILE</a></li>
       </ul>
       <div class="header-icons">
-        <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank"><img src="/images/reddit1.png" alt="Reddit"></a>
+        <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank"><img src="/images/reddit.png" alt="Reddit"></a>
         <a href="https://discord.com/invite/ECauU2KSSt" target="_blank"><img src="/images/discord.png" alt="Discord"></a>
         <a href="/profile.html"><img src="/images/profile1.png" alt="Profile"></a>
       </div>
