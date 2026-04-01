@@ -395,6 +395,8 @@
     .contract-link:hover { color: var(--blue); }
 
     @media(max-width:600px){
+      #how-it-works-list li { flex-wrap: wrap; }
+      #how-it-works-list li strong { display: inline; }
       .swap-card { padding: 1.25rem; }
       .wallet-panel { padding: 1.25rem; }
       .dir-btn { font-size: 0.72rem; padding: 0.5rem 0.4rem; gap: 0.25rem; }
@@ -500,11 +502,11 @@
       <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;"><img src="/images/swaps.png" style="width:20px;height:20px;object-fit:contain;"> MushroomSwap — In-House Token Convert</h3>
       <p style="font-size:0.78rem;color:rgba(255,255,225,0.5);line-height:1.7;margin-bottom:0.75rem;">Mushroom Planet runs its own on-chain swap contract for converting between SHROOM and SPORE at a fixed <strong style="color:var(--cream);">1:100 ratio</strong>. Unlike QuickSwap, there are no swap fees, no price impact, and no slippage — you only pay a tiny POL gas fee.</p>
       <h4 style="font-size:0.82rem;font-weight:700;margin-bottom:0.5rem;">How It Works</h4>
-      <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:0.4rem;">
-        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/blockchain.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;"> The contract holds reserves of both tokens and swaps at a <strong style="color:var(--cream);">fixed 1:100 ratio</strong> written permanently into the contract code</li>
-        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/swaps.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;"> Two wallet confirmations required: one to <strong style="color:var(--cream);">approve</strong> the token spend, one to <strong style="color:var(--cream);">execute</strong> the swap</li>
-        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/shroom.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;"> No swap fee — you only pay the standard Polygon gas fee (fractions of a cent)</li>
-        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/safe.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;"> Contract is owned by the Mushroom Planet <strong style="color:var(--cream);">Safe multisig treasury</strong> — can be paused instantly if needed</li>
+      <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:0.4rem;" id="how-it-works-list">
+        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/blockchain.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;flex-shrink:0;"> <span>The contract holds reserves of both tokens and swaps at a <strong style="color:var(--cream);">fixed 1:100 ratio</strong> written permanently into the contract code</span></li>
+        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/swaps.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;flex-shrink:0;"> <span>Two wallet confirmations required: one to <strong style="color:var(--cream);">approve</strong> the token spend, one to <strong style="color:var(--cream);">execute</strong> the swap</span></li>
+        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/shroom.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;flex-shrink:0;"> <span>No swap fee — you only pay the standard Polygon gas fee (fractions of a cent)</span></li>
+        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/safe.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;flex-shrink:0;"> <span>Contract is owned by the Mushroom Planet <strong style="color:var(--cream);">Safe multisig treasury</strong> — can be paused instantly if needed</span></li>
       </ul>
       <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.75rem;padding:0.6rem 0.9rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,225,0.07);border-radius:0.6rem;">
         <img src="/images/blockchain.png" style="width:16px;height:16px;object-fit:contain;">

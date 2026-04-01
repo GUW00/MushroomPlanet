@@ -7,6 +7,13 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne+Mono&display=swap" />
   <link rel="stylesheet" href="styles.css" />
   <style>
+    .contract-row { display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;background:var(--dark3);border-radius:0.875rem;margin-bottom:0.5rem;font-size:0.8rem; }
+    .contract-row img { width:22px;height:22px;object-fit:contain; }
+    .contract-name { color:var(--cream);text-decoration:none;font-weight:600;transition:color 0.2s; }
+    .contract-name:hover { color:var(--gold); }
+    .copy-btn { margin-left:auto;font-family:'Space Grotesk',monospace;font-size:0.62rem;padding:0.3em 0.85em;border-radius:999px;border:1px solid rgba(79,168,253,0.3);background:rgba(79,168,253,0.08);color:var(--blue);cursor:pointer;transition:all 0.2s;white-space:nowrap;letter-spacing:0.04em; }
+    .copy-btn:hover { background:rgba(79,168,253,0.18);border-color:rgba(79,168,253,0.6); }
+    .copy-btn.copied { color:var(--green);border-color:rgba(34,197,94,0.4);background:rgba(34,197,94,0.08); }
     body { padding-top: 100px !important; }
     :root {
       --cream: #ffffe1; --yellow: #fd464f; --red: #fd464f; --blue: #4fa8fd;
@@ -112,6 +119,7 @@
     .btn-link.btn-blue:hover { background: rgba(79,168,253,0.16); }
     .btn-ghost { color: rgba(255,255,225,0.5); background: rgba(255,255,225,0.04); border: 1px solid rgba(255,255,225,0.12); }
     .btn-ghost:hover { background: rgba(255,255,225,0.08); color: var(--cream); }
+    .gi { width: 16px; height: 16px; object-fit: contain; vertical-align: middle; margin-right: 5px; display: inline-block; }
     .gi-sm { width: 13px; height: 13px; object-fit: contain; vertical-align: middle; margin-right: 4px; display: inline-block; }
     .support-meta { font-size: 0.78rem; color: rgba(255,255,225,0.6); line-height: 1.7; margin-bottom: 0.75rem; }
     .support-meta span { font-weight: 600; }
@@ -238,44 +246,28 @@
       <p>On Discord, Sporebot powers the full game — use commands like <code>!start</code>, <code>!plant</code>, <code>!harvest</code>, <code>!stake</code>, <code>!dig</code>, and dozens more. On Reddit, it runs the daily forage thread and handles tips, airdrops, raffles, and balance tracking. Its companion bot <strong>Pixie</strong> handles XP, companions, and leveling within Discord.</p>
     </div>
 
-    <div class="section-divider reveal">Ecosystem</div>
+    <div class="section-divider reveal">Tokens</div>
 
     <div class="guide-card reveal">
-      <h3><img src="/images/mycelium.png" class="gi-sm" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"> The Mycelium Ecosystem</h3>
-      <p>The Shroom ($HROOM) and Spore (SPR) tokens are the twin currencies of the Mushroom Planet ecosystem, designed to reward creativity, loyalty, and community participation across both <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">Reddit</a> and <a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">Discord</a>.</p>
-      <p>Both tokens run on the <strong>Polygon network</strong>, enabling low fees, fast transactions, and secure on-chain utility. Earn real rewards by posting mushroom content on Reddit, farming in Discord, tipping, airdrops, raffles, or just vibing with the community.</p>
-    </div>
-
-    <div class="section-divider reveal">Tokenomics</div>
-
-    <div class="dual-grid reveal">
-      <div class="guide-card" style="margin-bottom:0;">
-        <h3><img src="/images/shroom.png" class="gi-sm" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"> SHROOM ($HROOM)</h3>
-        <p>An ERC-20 token deployed on the Polygon network. It bridges Web3 technology with true digital ownership, turning your participation into real, self-custodied rewards. No middleman — just you and a basket full of shrooms.</p>
-        <h4>Earn SHROOM By</h4>
-        <ul>
-          <li><img src="/images/blockchain.png" class="gi-sm"> Holding SHROOMS onchain</li>
-          <li><img src="/images/shroomfarm.png" class="gi-sm"> Farming in Sporebot on Discord & Reddit</li>
-          <li><img src="/images/king.png" class="gi-sm"> Holding House, King or Queen Mooshie NFT</li>
-          <li><img src="/images/reddit1.png" class="gi-sm"> Posting mushroom content on Reddit</li>
-          <li><img src="/images/lp.png" class="gi-sm"> Providing liquidity to the $HROOM/WETH pool</li>
-          <li><img src="/images/gift.png" class="gi-sm"> Joining raffles and airdrops</li>
-          <li><img src="/images/goodshroom.png" class="gi-sm"> Vibing with the community</li>
-        </ul>
+      <h3><img src="/images/shroom.png" class="gi"><img src="/images/spore.png" class="gi"> SHROOM &amp; SPORE Tokens</h3>
+      <p>Mushroom Planet runs on two tokens, both <strong>ERC-20</strong> on the <strong>Polygon Network</strong> and are tradable on Quickswap. Blockchain/Web3 bridges the technology with true digital ownership, turning your participation into real, self-custodied rewards. No middleman, just you and a basket full of shrooms!</p>
+      <h4>&#x1F344; SHROOM ($HROOM) The Primary Token</h4>
+      <p><b>Shroom ($HROOM)</b> is the primary utility token within the Mushroom Planet ecosystem, designed to reward creativity, loyalty, and community participation across both Reddit and Discord.
+   <br><b>Earn Shrooms by posting mushroom content on Reddit, farming in Sporebot, joining Raffles/Airdrops in Discord, providing liquidity to the $HROOM/WETH pool, or by vibing with the community.</b></p>
+      <div class="contract-row">
+        <img src="/images/shroom.png" alt="SHROOM" />
+        <a href="https://polygonscan.com/address/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" class="contract-name">Shroom ($HROOM)</a>
+        <button class="copy-btn" onclick="copyAddress(this, '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1')">Copy Address</button>
+        <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" class="copy-btn" style="text-decoration:none;background:rgba(253,70,79,0.08);border-color:rgba(253,70,79,0.3);color:var(--red);">Buy $HROOM</a>
       </div>
-      <div class="guide-card" style="margin-bottom:0;">
-        <h3><img src="/images/spore.png" class="gi-sm" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"> SPORE (SPR)</h3>
-        <p>SPORE exists to give the Mushroom Planet community a true voice. It's the governance counterpart to SHROOM. Real power into the hands of Shroomies who contribute, care and help shape the future together.</p>
-        <h4>Earn SPORE By</h4>
-        <ul>
-          <li><img src="/images/shroomfarm.png" class="gi-sm"> Planting SHROOMS & Staking Spores in Sporebot</li>
-          <li><img src="/images/blockchain.png" class="gi-sm"> Holding SHROOMS On-chain</li>
-          <li><img src="/images/gold_totem.png" class="gi-sm"> Holding a Kid Shroom or Gold Mooshie NFT</li>
-          <li><img src="/images/reddit1.png" class="gi-sm"> Posting mushroom content on Reddit</li>
-          <li><img src="/images/lp.png" class="gi-sm"> Providing liquidity to the SPR/WETH pool</li>
-          <li><img src="/images/gift.png" class="gi-sm"> Joining raffles and airdrops</li>
-          <li><img src="/images/goodshroom.png" class="gi-sm"> Vibing with the community</li>
-        </ul>
+      <h4>&#x1F300; SPORE (SPR) The Governance Token</h4>
+      <p>SPORE (SPR) exists to give the Mushroom Planet community a true voice. It's the governance counterpart to SHROOM ($HROOM), putting real power into the hands of Shroomies who contribute and care. No gatekeepers, just Shroomies shaping the future together.
+   <br><b>Earn Spores by holding NFTs, staking in Sporebot, holding SHROOMS onchain, governance participation, joining Raffles/Airdrops in Discord, providing liquidity to the SPR/WETH pool, or by vibing with the community.</b></p>
+      <div class="contract-row">
+        <img src="/images/spore.png" alt="SPORE" />
+        <a href="https://polygonscan.com/address/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" class="contract-name">Spore (SPR)</a>
+        <button class="copy-btn" onclick="copyAddress(this, '0x089582AC20ea563c69408a79E1061de594b61bED')">Copy Address</button>
+        <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" class="copy-btn" style="text-decoration:none;background:rgba(79,168,253,0.08);border-color:rgba(79,168,253,0.3);color:var(--blue);">Buy SPORE</a>
       </div>
     </div>
 
@@ -381,7 +373,8 @@
       <h3><img src="/images/reddit1.png" class="gi-sm" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"> Earn on Reddit</h3>
       <p>Reddit is where the community lives. Post mushroom content, leave comments, and engage with other Shroomies on <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">r/MushroomPlanet</a> — every upvote you receive earns you SHROOMS, SPORES, and XP toward your flair rank. The more you contribute, the more you earn.</p>
       <p>Sporebot also runs a daily forage thread every morning at <strong>7:20 AM EST</strong>. Comment <code>!forage</code> once per day to build your streak and collect daily rewards — no wallet needed, tokens go straight to your off-chain balance. You can also tip, airdrop, and raffle tokens to other community members.</p>
-      <p>For a full breakdown of commands, streak scaling, flair ranks, and community actions, see the <a href="/guides.html">Guides page</a>.</p>
+      <p>For a full breakdown of commands, streak scaling, flair ranks, and community actions, see the Reddit Guide.</p>
+      <div style="margin-top:1rem;"><a class="btn btn-yellow" href="/guides.html" onclick="sessionStorage.setItem('guideTab','reddit');return true;">Reddit Guide</a></div>
     </div>
 
     <div class="section-divider reveal">Discord</div>
@@ -389,7 +382,8 @@
       <h3><img src="/images/discord.png" class="gi-sm" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"> Earn on Discord</h3>
       <p>Discord is where the full game lives. Use <code>!start</code> in <strong>#farming</strong> to receive 1,000 SHROOMS and begin planting. Your farm passively generates SPORES every day based on your <strong>Spore Generation Rate (SGR)</strong> — influenced by your farm rank, stage, potions, gemstones, and community activity.</p>
       <p>Beyond farming, you can stake SPORES at <strong>20% APR</strong>, dig for gemstones, run cave raids, complete daily quests, level up with Pixie, and participate in governance using your <strong>Mycelium Voting Power (MVP)</strong>. Tips, airdrops, and raffles work cross-platform with Reddit too.</p>
-      <p>For a full breakdown of farm stages, ranks, SGR sources, staking, and all commands, see the <a href="/guides.html">Guides page</a>.</p>
+      <p>For a full breakdown of farm stages, ranks, SGR sources, staking, and all commands, see the Discord Guide.</p>
+      <div style="margin-top:1rem;"><a class="btn btn-blue" href="/guides.html" onclick="sessionStorage.setItem('guideTab','discord');return true;">Discord Guide</a></div>
     </div>
 
     <div class="section-divider reveal">Earn with NFTs</div>
@@ -421,9 +415,9 @@
       <div style="margin-top:1rem;"><a class="btn btn-blue" href="/earn.html" onclick="showTab('shop', document.querySelectorAll('.guide-tab')[3]);return false;">Browse NFT Shop</a></div>
     </div>
 
-    <div class="section-divider reveal">Earn Onchain</div>
+    <div class="section-divider reveal">Hold Onchain</div>
     <div class="guide-card reveal">
-      <h3><img src="/images/blockchain.png" class="gi-sm" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"> Earn Onchain</h3>
+      <h3><img src="/images/blockchain.png" class="gi-sm" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"> Hold SHROOM Onchain</h3>
       <p>Hold tokens directly on your <strong>Polygon wallet</strong> to earn real on-chain SPORE airdrops from the treasury — no bot required. Snapshots are taken weekly and airdrops are sent automatically.</p>
       <h4>Weekly SPORE Airdrop</h4>
       <ul>
@@ -432,17 +426,28 @@
         <li><img src="/images/gift.png" class="gi-sm"> Pool starts at <strong>200M SPORE/week</strong> in Year 1 and tapers annually — 68.74B SPORE total over 10 years</li>
         <li><img src="/images/time.png" class="gi-sm"> Year 2 starts October 1, 2026 — drops to 185M SPORE/week</li>
       </ul>
-      <h4>Weekly LP Rewards</h4>
+      <p style="margin-top:0.75rem;">All on-chain activity is transparent and tracked live in the <a href="/treasury.html">Treasury dashboard</a>.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:1rem;">
+        <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" class="btn-link btn-red">Buy SHROOM</a>
+        <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" class="btn-link btn-blue">Buy SPORE</a>
+      </div>
+    </div>
+
+    <div class="section-divider reveal">Provide Liquidity</div>
+    <div class="guide-card reveal">
+      <h3><img src="/images/lp.png" class="gi-sm" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"> LP Rewards</h3>
+      <p>Provide <strong>SHROOM/WETH</strong> or <strong>SPORE/WETH</strong> liquidity on QuickSwap to earn weekly token airdrops proportional to your pool share. LP also immediately satisfies the farm free-trial requirement — no 42-day wait.</p>
       <ul>
-        <li><img src="/images/lp.png" class="gi-sm"> Provide SHROOM/WETH or SPORE/WETH liquidity on QuickSwap to earn weekly token airdrops proportional to your pool share</li>
         <li><img src="/images/shroom.png" class="gi-sm"> SHROOM pool: currently <strong>3.5M SHROOM/week</strong> (Year 2) — tapers annually to 0.5M by Year 10</li>
         <li><img src="/images/spore.png" class="gi-sm"> SPORE pool: currently <strong>500M SPORE/week</strong> (Year 1) — tapers annually to 50M by Year 10</li>
         <li><img src="/images/time.png" class="gi-sm"> Snapshots every Sunday, airdrop sent Monday</li>
+        <li><img src="/images/growth.png" class="gi-sm"> Also earns trading fees from every swap in the pool</li>
+      </ul>
       <p style="margin-top:0.75rem;">All on-chain activity is transparent and tracked live in the <a href="/treasury.html">Treasury dashboard</a>.</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:1rem;">
-        <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" class="btn-link btn-red">BUY SHROOMS</a>
-        <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" class="btn-link btn-blue">BUY SPOORES</a>
-        <a href="https://dapp.quickswap.exchange/pool/v2/add?tokens=0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1,0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" class="btn-link btn-blue">Add LP</a>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-top:1rem;">
+        <a href="https://dapp.quickswap.exchange/pool/v2/add?tokens=0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1,0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" class="btn-link btn-red">Add SHROOM LP</a>
+        <a href="https://dapp.quickswap.exchange/pool/v2/add?tokens=0x089582AC20ea563c69408a79E1061de594b61bED,0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f61" target="_blank" class="btn-link btn-blue">Add SPORE LP</a>
+        <a href="/guides.html" class="btn-link btn-ghost" onclick="sessionStorage.setItem('guideTab','lp');return true;">LP Guide</a>
       </div>
     </div>
 
@@ -868,6 +873,13 @@
     });
   </script>
   <script>
+    function copyAddress(btn, address) {
+      navigator.clipboard.writeText(address).then(function() {
+        btn.textContent = 'Copied!'; btn.classList.add('copied');
+        setTimeout(function() { btn.textContent = 'Copy Address'; btn.classList.remove('copied'); }, 2000);
+      }).catch(function() { btn.textContent = 'Error'; setTimeout(function() { btn.textContent = 'Copy Address'; }, 2000); });
+    }
+    window.copyAddress = copyAddress;
     (function() {
       const sf = document.getElementById('starfield');
       for (let i = 0; i < 80; i++) {

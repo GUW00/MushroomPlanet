@@ -60,6 +60,7 @@ const config = {
     html: `
       <div class="main-menu desktop-only">
         <a href="profile.html">Sporebot</a>
+        <a href="earn.html">Earn</a>
         <a href="convert.html">Convert</a>
         <a href="vote.html">Goverance</a>
         <a href="treasury.html">Treasury</a>
@@ -68,6 +69,7 @@ const config = {
 
       <div class="mobile-menu mobile-only">
         <a href="profile.html">Sporebot</a>
+        <a href="earn.html">Earn</a>
         <a href="convert.html">Convert</a>
         <a href="vote.html">Goverance</a>
         <a href="treasury.html">Treasury</a>
