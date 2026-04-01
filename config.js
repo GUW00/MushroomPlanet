@@ -59,22 +59,21 @@ const config = {
   menu: {
     html: `
       <div class="main-menu desktop-only">
-        <a href="profile.html">Sporebot</a>
-        <a href="index.html">Earn</a>
-        <a href="convert.html">Convert</a>
-        <a href="vote.html">Goverance</a>
-        <a href="treasury.html">Treasury</a>
-        <a href="guides.html">Guides</a>
+        <a href="/profile">Sporebot</a>
+        <a href="/earn">Earn</a>
+        <a href="/convert">Convert</a>
+        <a href="/vote">Governance</a>
+        <a href="/treasury">Treasury</a>
+        <a href="/guides">Guides</a>
       </div>
 
       <div class="mobile-menu mobile-only">
-        <a href="profile.html">Sporebot</a>
-        <a href="index.html">Earn</a>
-        <a href="convert.html">Convert</a>
-        <a href="vote.html">Vote</a>
-        <a href="treasury.html">Treasury</a>
-        <a href="guides.html">Guides</a>
-        </a>
+        <a href="/profile">Sporebot</a>
+        <a href="/earn">Earn</a>
+        <a href="/convert">Convert</a>
+        <a href="/vote">Vote</a>
+        <a href="/treasury">Treasury</a>
+        <a href="/guides">Guides</a>
       </div>
     `
   }
