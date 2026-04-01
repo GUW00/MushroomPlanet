@@ -1332,10 +1332,115 @@ app.get('/api/reddit-user/:discord_id', async (req, res) => {
 
 app.get('/api/leaderboard/snapshot', async (req, res) => {
   try {
-    const snap = await db.ref('Pixie/Leaderboard').get();
-    if (!snap.exists()) return res.json({ ok: false });
+    const [pixieSnap, sporebotSnap] = await Promise.all([
+      db.ref('Pixie/Users').get(),
+      db.ref('Sporebot/Users').get(),
+    ]);
+
+    const pixie    = { xp: [], nft: [], tip_shroom: [], tip_spore: [], gs: [], msg_streak: [], msg_record: [], msg_xp: [] };
+    const sporebot = { streak: [], streak_record: [], feed: [], shroom_farm: [], apy: [], spore_rate: [] };
+    const staking  = { staked: [], lifetime: [], mvp: [] };
+
+    // Build avatar map from Pixie Misc
+    const pixieAvatarMap = {};
+    if (pixieSnap.exists()) {
+      pixieSnap.forEach(child => {
+        const misc = child.val()?.Misc || {};
+        if (misc.avatar || misc.avatar_hash) pixieAvatarMap[child.key] = misc.avatar || misc.avatar_hash;
+      });
+    }
+
+    if (pixieSnap.exists()) {
+      pixieSnap.forEach(child => {
+        const d      = child.val();
+        const id     = child.key;
+        const misc   = d.Misc || {};
+        const name   = misc.username || id;
+        const avatar = misc.avatar || misc.avatar_hash || null;
+        const px     = d.Pixie || {};
+        const msgXp  = d.Message_XP || {};
+        const tip    = d.Tipping || {};
+        const gs     = d.GoodShroom || {};
+        const wallet = d.Wallet || {};
+        const nft    = wallet.NFT || {};
+        const mvp    = (d.MVP || {}).total || 0;
+
+        const xp      = px.Total_XP || px.XP || 0;
+        const lvl     = px.LvL || 1;
+        const nftTotal = nft.total_nft || Object.keys(nft).filter(k => k !== 'total_nft').length;
+        const tipShroom = (tip.Tipped?.Tipped_Shrooms || 0) + (tip.Airdrop?.SHROOM?.Given || 0) + (tip.Raffle?.Total_Shrooms || 0);
+        const tipSpore  = (tip.Tipped?.Tipped_Spores  || 0) + (tip.Airdrop?.SPORE?.Given  || 0) + (tip.Raffle?.Total_Spores  || 0);
+        const gsGiven   = gs.Given || 0;
+        const msgStreak = msgXp.current_streak || 0;
+        const msgRecord = msgXp.max_streak || 0;
+        const msgXpVal  = msgXp.total_xp || 0;
+
+        const base = { name, discord_id: id, avatar };
+        if (xp > 0)        pixie.xp.push({ ...base, xp, level: lvl });
+        if (nftTotal > 0)  pixie.nft.push({ ...base, nft_total: nftTotal });
+        if (tipShroom > 0) pixie.tip_shroom.push({ ...base, tip_shroom: tipShroom });
+        if (tipSpore > 0)  pixie.tip_spore.push({ ...base, tip_spore: tipSpore });
+        if (gsGiven > 0)   pixie.gs.push({ ...base, gs: gsGiven });
+        if (msgStreak > 0) pixie.msg_streak.push({ ...base, msg_streak: msgStreak });
+        if (msgRecord > 0) pixie.msg_record.push({ ...base, msg_record: msgRecord });
+        if (msgXpVal > 0)  pixie.msg_xp.push({ ...base, msg_xp: msgXpVal });
+        if (mvp > 0)       staking.mvp.push({ ...base, mvp });
+      });
+    }
+
+    if (sporebotSnap.exists()) {
+      sporebotSnap.forEach(child => {
+        const d      = child.val();
+        const id     = child.key;
+        const misc   = d.Misc || {};
+        const name   = misc.username || id;
+        const avatar = pixieAvatarMap[id] || null;
+        const farm   = d.Farm || {};
+        const bal    = d.Balance || {};
+        const sk     = d.Staking || {};
+
+        const shroomFarm = bal.shroom_farm || 0;
+        const streak     = farm.streak || 0;
+        const streakRec  = farm.streak_record || 0;
+        const feed       = misc.total_feed || (d.Feed || {}).total_fed || 0;
+        const apy        = farm.APY || 0;
+        const sporeRate  = farm.spore_generation_rate || 0;
+        const staked     = sk.staked_spores || 0;
+        const lifetime   = sk.lifetime_rewards || 0;
+
+        const base = { name, discord_id: id, avatar };
+        if (shroomFarm > 0) sporebot.shroom_farm.push({ ...base, shroom_farm: shroomFarm });
+        if (streak > 0)     sporebot.streak.push({ ...base, streak });
+        if (streakRec > 0)  sporebot.streak_record.push({ ...base, streak_record: streakRec });
+        if (feed > 0)       sporebot.feed.push({ ...base, feed });
+        if (apy > 0)        sporebot.apy.push({ ...base, apy });
+        if (sporeRate > 0)  sporebot.spore_rate.push({ ...base, spore_rate: sporeRate });
+        if (staked > 0)     staking.staked.push({ ...base, staked });
+        if (lifetime > 0)   staking.lifetime.push({ ...base, lifetime });
+      });
+    }
+
+    const sortBy = (arr, key) => arr.sort((a, b) => b[key] - a[key]).slice(0, 10);
+    pixie.xp           = sortBy(pixie.xp,          'xp');
+    pixie.nft          = sortBy(pixie.nft,          'nft_total');
+    pixie.tip_shroom   = sortBy(pixie.tip_shroom,   'tip_shroom');
+    pixie.tip_spore    = sortBy(pixie.tip_spore,    'tip_spore');
+    pixie.gs           = sortBy(pixie.gs,           'gs');
+    pixie.msg_streak   = sortBy(pixie.msg_streak,   'msg_streak');
+    pixie.msg_record   = sortBy(pixie.msg_record,   'msg_record');
+    pixie.msg_xp       = sortBy(pixie.msg_xp,       'msg_xp');
+    sporebot.shroom_farm    = sortBy(sporebot.shroom_farm,   'shroom_farm');
+    sporebot.streak         = sortBy(sporebot.streak,        'streak');
+    sporebot.streak_record  = sortBy(sporebot.streak_record, 'streak_record');
+    sporebot.feed           = sortBy(sporebot.feed,          'feed');
+    sporebot.apy            = sortBy(sporebot.apy,           'apy');
+    sporebot.spore_rate     = sortBy(sporebot.spore_rate,    'spore_rate');
+    staking.staked   = sortBy(staking.staked,   'staked');
+    staking.lifetime = sortBy(staking.lifetime, 'lifetime');
+    staking.mvp      = sortBy(staking.mvp,      'mvp');
+
     res.set('Cache-Control', 'public, max-age=14400, stale-while-revalidate=3600');
-    res.json({ ok: true, data: snap.val() });
+    res.json({ ok: true, data: { pixie, sporebot, staking } });
   } catch (err) {
     console.error('[LB-SNAPSHOT]', err);
     res.status(500).json({ ok: false });
