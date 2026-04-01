@@ -399,6 +399,44 @@ nav {
   padding: 4rem 0;
 }
 
+#scroll-top-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 1.5rem;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--clr-secondary, #fd464f);
+  border: none;
+  cursor: pointer;
+  z-index: 998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+#scroll-top-btn.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+#scroll-top-btn:hover {
+  transform: translateY(-3px);
+}
+#scroll-top-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+@media (display-mode: standalone) {
+  #scroll-top-btn { bottom: 80px; }
+}
 header {
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
