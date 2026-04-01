@@ -919,14 +919,35 @@
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
     })();
 
+    var DISCORD_AVATARS = {
+      'zukobih-avatar':            '1049123805869658213',
+      'guw00-avatar':              '1233612802883719261',
+      'anasthesia-avatar':         '725500859340947456',
+      'ivedoneit-avatar':          '1128741018192330763',
+      'permanentnight-avatar':     '234465619578191872',
+      'mrmakanakai-avatar':        '403854356773863424',
+      'boomerangthrowaway-avatar': '42797399831216128',
+    };
+
     async function loadRedditAvatar(username, imgId) {
+      const el = document.getElementById(imgId);
+      if (!el) return;
       try {
         const res = await fetch('https://www.reddit.com/user/' + username + '/about.json');
+        if (!res.ok) throw new Error('failed');
         const data = await res.json();
         const avatar = data.data.icon_img.split('?')[0];
-        const el = document.getElementById(imgId);
-        if (el && avatar) el.src = avatar;
-      } catch(e) {}
+        if (avatar) { el.src = avatar; return; }
+        throw new Error('no avatar');
+      } catch(e) {
+        const discordId = DISCORD_AVATARS[imgId];
+        if (!discordId) return;
+        try {
+          const dr = await fetch('https://api.mushroomplanet.earth/api/discord-avatar/' + discordId);
+          const dd = await dr.json();
+          if (dd.avatar) el.src = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + dd.avatar + '.png';
+        } catch(e2) {}
+      }
     }
     var shopAvailContainer = null;
 

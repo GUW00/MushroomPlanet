@@ -1345,3 +1345,15 @@ app.get('/api/leaderboard/snapshot', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+app.get('/api/discord-avatar/:id', async (req, res) => {
+  try {
+    const r = await fetch('https://discord.com/api/v10/users/' + req.params.id, {
+      headers: { Authorization: 'Bot ' + process.env.DISCORD_BOT_TOKEN }
+    });
+    const data = await r.json();
+    res.json({ avatar: data.avatar || null });
+  } catch(e) {
+    res.json({ avatar: null });
+  }
+});
