@@ -445,7 +445,7 @@
     <p>Trustless, on-chain token conversion at a fixed rate. Governed by a Polygon smart contract — permanent and transparent.</p>
   </div>
 
-  <div style="display:flex;justify-content:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.5rem;padding:0 1rem;position:relative;z-index:1;">
+  <div style="display:flex;justify-content:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:1rem;padding:0 1rem;position:relative;z-index:1;">
     <div style="display:flex;align-items:center;gap:0.5rem;background:var(--dark3);border:1px solid rgba(253,70,79,0.2);border-radius:999px;padding:0.45rem 0.9rem;font-family:'Space Grotesk',monospace;font-size:0.72rem;">
       <span style="color:rgba(255,255,225,0.4);">Offchain Rate</span>
       <span style="color:var(--cream);font-weight:600;">100 SPORE = 1 SHROOM</span>
@@ -476,6 +476,18 @@
       </div>
     </a>
   </div>
+  <div style="display:flex;justify-content:center;gap:0.75rem;flex-wrap:wrap;padding:0 1rem 2rem;position:relative;z-index:1;">
+    <div style="display:flex;align-items:center;gap:0.5rem;background:var(--dark3);border:1px solid rgba(253,70,79,0.15);border-radius:999px;padding:0.55rem 1.2rem;font-family:'Space Grotesk',monospace;font-size:0.8rem;">
+      <span class="dot dot-shroom"></span>
+      <span style="color:rgba(255,255,225,0.4);">AVAILABLE</span>
+      <span id="res-shroom" style="color:var(--red);font-weight:700;">Loading...</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.5rem;background:var(--dark3);border:1px solid rgba(79,168,253,0.15);border-radius:999px;padding:0.55rem 1.2rem;font-family:'Space Grotesk',monospace;font-size:0.8rem;">
+      <span class="dot dot-spore"></span>
+      <span style="color:rgba(255,255,225,0.4);">AVAILABLE</span>
+      <span id="res-spore" style="color:var(--blue);font-weight:700;">Loading...</span>
+    </div>
+  </div>
 
   <div class="page-section">
 
@@ -503,11 +515,14 @@
       <p style="font-size:0.78rem;color:rgba(255,255,225,0.5);line-height:1.7;margin-bottom:0.75rem;">Mushroom Planet runs its own on-chain swap contract for converting between SHROOM and SPORE at a fixed <strong style="color:var(--cream);">1:100 ratio</strong>. Unlike QuickSwap, there are no swap fees, no price impact, and no slippage — you only pay a tiny POL gas fee.</p>
       <h4 style="font-size:0.82rem;font-weight:700;margin-bottom:0.5rem;">How It Works</h4>
       <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:0.4rem;" id="how-it-works-list">
-        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/blockchain.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;flex-shrink:0;"> <span>The contract holds reserves of both tokens and swaps at a <strong style="color:var(--cream);">fixed 1:100 ratio</strong> written permanently into the contract code</span></li>
-        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/swaps.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;flex-shrink:0;"> <span>Two wallet confirmations required: one to <strong style="color:var(--cream);">approve</strong> the token spend, one to <strong style="color:var(--cream);">execute</strong> the swap</span></li>
-        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/shroom.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;flex-shrink:0;"> <span>No swap fee — you only pay the standard Polygon gas fee (fractions of a cent)</span></li>
-        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/safe.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;flex-shrink:0;"> <span>Contract is owned by the Mushroom Planet <strong style="color:var(--cream);">Safe multisig treasury</strong> — can be paused instantly if needed</span></li>
+        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;line-height:1.5;"><span style="display:inline-flex;align-items:flex-start;flex-shrink:0;padding-top:1px;"><img src="/images/blockchain.png" style="width:16px;height:16px;object-fit:contain;display:block;"></span><span>The contract holds reserves of both tokens and swaps at a <strong style="color:var(--cream);">fixed 1:100 ratio</strong> written permanently into the contract code</span></li>
+        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;line-height:1.5;"><span style="display:inline-flex;align-items:flex-start;flex-shrink:0;padding-top:1px;"><img src="/images/swaps.png" style="width:16px;height:16px;object-fit:contain;display:block;"></span><span>Two wallet confirmations required: one to <strong style="color:var(--cream);">approve</strong> the token spend, one to <strong style="color:var(--cream);">execute</strong> the swap</span></li>
+        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;line-height:1.5;"><span style="display:inline-flex;align-items:flex-start;flex-shrink:0;padding-top:1px;"><img src="/images/shroom.png" style="width:16px;height:16px;object-fit:contain;display:block;"></span><span>No swap fee — you only pay the standard Polygon gas fee (fractions of a cent)</span></li>
+        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;line-height:1.5;"><span style="display:inline-flex;align-items:flex-start;flex-shrink:0;padding-top:1px;"><img src="/images/safe.png" style="width:16px;height:16px;object-fit:contain;display:block;"></span><span>Contract is owned by the Mushroom Planet <strong style="color:var(--cream);">Safe multisig treasury</strong> — can be paused instantly if needed</span></li>
       </ul>
+      <div style="margin-top:0.75rem;padding:0.6rem 0.9rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,225,0.07);border-radius:0.6rem;font-family:'Space Grotesk',monospace;font-size:0.7rem;color:rgba(255,255,225,0.5);line-height:1.7;">
+        When the live market rate drifts from 1:100, arbitrage opportunities open up. If SPORE is cheaper on-chain than on QuickSwap, convert here and sell there for a profit — and vice versa. These trades naturally rebalance both the market and the reserves.
+      </div>
       <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.75rem;padding:0.6rem 0.9rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,225,0.07);border-radius:0.6rem;">
         <img src="/images/blockchain.png" style="width:16px;height:16px;object-fit:contain;">
         <a href="https://polygonscan.com/address/0xF6AcE46DD71C7500b7E2A7EBc0Cd6401dea85b0A" target="_blank" rel="noopener noreferrer" style="font-family:'Space Grotesk',monospace;font-size:0.72rem;color:var(--blue);text-decoration:none;">MushroomSwap Contract</a>
@@ -570,30 +585,12 @@
       <div class="status-msg" id="status-msg"></div>
     </div>
 
-        <!-- RESERVES -->
-    <div class="reserves-card reveal">
-      <div class="res-title">
-        <span class="res-live-dot"></span>
-        Contract Reserves
-      </div>
-      <div class="res-grid">
-        <div class="res-item">
-          <div class="ri-label">SHROOM Available</div>
-          <div class="ri-val shroom" id="res-shroom">Loading...</div>
-        </div>
-        <div class="res-item">
-          <div class="ri-label">SPORE Available</div>
-          <div class="ri-val spore" id="res-spore">Loading...</div>
-        </div>
-      </div>
-      <div class="res-warn" id="res-warn"></div>
-      <div style="margin-top:0.75rem;padding:0.75rem 1rem;background:rgba(254,206,0,0.05);border:1px solid rgba(254,206,0,0.12);border-radius:0.6rem;font-family:'Space Grotesk',monospace;font-size:0.7rem;color:rgba(255,255,225,0.5);line-height:1.7;">
-        When the live market rate drifts from 1:100, arbitrage opportunities open up. If SPORE is cheaper on-chain than on QuickSwap, convert here and sell there for a profit — and vice versa. These trades naturally rebalance both the market and the reserves.
-      </div>
-      <a class="contract-link" id="contract-polygonscan" href="#" target="_blank" rel="noopener">
+        <div style="text-align:center;margin-bottom:1.5rem;">
+      <a class="contract-link" id="contract-polygonscan" href="#" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;font-family:'Space Grotesk',monospace;font-size:0.65rem;color:rgba(255,255,225,0.25);text-decoration:none;transition:color 0.2s;">
         View contract on Polygonscan
       </a>
     </div>
+    <div id="res-warn" class="res-warn" style="display:none;margin-bottom:1rem;"></div>
 
     <div class="section-divider reveal">HOW IT WORKS</div>
 
@@ -750,8 +747,8 @@
 
       // Low reserve warnings
       const warn = document.getElementById('res-warn');
-      const lowShroom = shroomVal < 100_000;
-      const lowSpore  = sporeVal  < 10_000_000;
+      const lowShroom = shroomVal < 10_000;
+      const lowSpore  = sporeVal  < 1_000_000;
       if (lowShroom || lowSpore) {
         const which = [];
         if (lowShroom) which.push('SHROOM');
@@ -950,6 +947,7 @@ async function connectWallet() {
             Open in Trust Wallet
           </a>
         </div>
+        <button id="copy-link-btn" onclick="(function(){navigator.clipboard.writeText(window.location.href).then(function(){var b=document.getElementById('copy-link-btn');b.textContent='Copied!';b.style.color='#7de89a';b.style.borderColor='rgba(125,232,154,0.3)';setTimeout(function(){b.textContent='Copy Page Link';b.style.color='rgba(255,255,225,0.35)';b.style.borderColor='rgba(255,255,225,0.1)';},2000);}).catch(function(){});})();" style="width:100%;padding:0.55rem;background:transparent;border:1px solid rgba(255,255,225,0.1);border-radius:0.6rem;color:rgba(255,255,225,0.35);font-family:'Space Grotesk',monospace;font-size:0.72rem;cursor:pointer;margin-bottom:0.4rem;">Copy Page Link</button>
         <button onclick="document.getElementById('wallet-modal').remove()" style="width:100%;padding:0.55rem;background:transparent;border:1px solid rgba(255,255,225,0.1);border-radius:0.6rem;color:rgba(255,255,225,0.35);font-family:'Space Grotesk',monospace;font-size:0.72rem;cursor:pointer;">Cancel</button>
       </div>
     `;
