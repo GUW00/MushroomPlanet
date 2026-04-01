@@ -4659,7 +4659,7 @@ async function renderLeaderboard(tab) {
   if (tab === 'pixie') {
     html += lbSection('xp.png',    'Pixie Level',   p.xp  || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">Lv.'+fmtN(u.level||1)+'</span>'; });
     html += lbSection('pixie.png', 'Total XP',      p.xp  || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.xp)+' XP</span>'; });
-    html += lbSection('house.png',  'NFT Holdings', p.nft || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.nft_total)+'</span>'; });
+    html += lbSection('nft.png',  'NFT Holdings', p.nft || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.nft_total)+'</span>'; });
   } else if (tab === 'farm') {
     html += lbSection('fire.png',    'Current Streak',  s.streak        || [], function(u){ return esc(u.name)+' <span style="color:var(--red);font-family:Syne Mono,monospace;">'+fmtN(u.streak)+'</span>'; });
     html += lbSection('streak.png',  'Max Streak',      s.streak_record || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">'+fmtN(u.streak_record)+'</span>'; });
