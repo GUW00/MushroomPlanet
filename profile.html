@@ -4832,11 +4832,12 @@ installBtn.addEventListener('click', () => {
 });
 
 // iOS Safari: no beforeinstallprompt, show manual instructions instead
-const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent) 
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isStandalone = navigator.standalone === true;
 if (isIos && !isStandalone) {
   installBtn.style.display = 'block';
-  installBtn.textContent = 'Install App (iOS)';
+  installBtn.textContent = '+ Install App';
   installBtn.onclick = () => {
     const existing = document.getElementById('ios-install-toast');
     if (existing) { existing.remove(); return; }
@@ -4845,7 +4846,7 @@ if (isIos && !isStandalone) {
     toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(255,255,225,0.15);border-radius:1rem;padding:1rem 1.25rem;max-width:300px;width:90%;z-index:9999;font-family:Space Grotesk,sans-serif;font-size:0.8rem;color:rgba(255,255,225,0.85);text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.5);';
     toast.innerHTML = '<div style="font-size:1.4rem;margin-bottom:0.5rem;">📲</div>'
       + '<div style="font-weight:700;margin-bottom:0.4rem;color:#ffffe1;">Add to Home Screen</div>'
-      + '<div style="color:rgba(255,255,225,0.6);line-height:1.6;">Tap the <b style="color:#4fa8fd;">Share</b> button <span style="font-size:1rem;">&#8679;</span> at the bottom of Safari, then tap <b style="color:#4fa8fd;">Add to Home Screen</b></div>'
+      + '<div style="color:rgba(255,255,225,0.6);line-height:1.6;">Tap the <b style="color:#4fa8fd;">Share</b> button <span style="font-size:1rem;">⬆</span> in your browser, then tap <b style="color:#4fa8fd;">Add to Home Screen</b></div>'
       + '<div style="margin-top:0.75rem;font-size:0.7rem;color:rgba(255,255,225,0.3);">Tap anywhere to dismiss</div>';
     toast.onclick = () => toast.remove();
     document.body.appendChild(toast);
