@@ -17,6 +17,15 @@
   <script type="module" src="config.js?v=2"></script>
 
   <style>
+    /* Leaderboard 3-col on desktop */
+    @media (min-width: 769px) {
+      #lb-content { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 1.5rem; align-items: start; }
+      .lb-section-hdr { cursor: default !important; }
+    }
+    @media (max-width: 768px) {
+      .lb-section-hdr .lb-arrow { display: inline !important; }
+      #lb-content .lb-section-hdr span:last-child { display: inline !important; }
+    }
     @media(max-width: 600px), (display-mode: standalone) {
       #mega-slots-grid {
         grid-template-columns: repeat(2, 1fr) !important;
@@ -434,7 +443,7 @@
 
     /* ---- PLATFORM TABS ---- */
     .platform-strip {
-      display: flex; gap: 0.5rem; margin-bottom: 1.25rem;
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem;
     }
     .platform-btn {
       display: flex; align-items: center; gap: 0.5rem;
@@ -443,9 +452,12 @@
       color: rgba(255,255,225,0.4); cursor: pointer; font-family: 'Space Grotesk', sans-serif;
       font-size: 0.82rem; font-weight: 600; transition: all 0.2s;
     }
+    @media(max-width: 600px) {
+      .platform-btn { flex: 1 1 calc(50% - 0.25rem); justify-content: center; }
+    }
     @media(display-mode:standalone) {
       .platform-strip { gap: 0.4rem; }
-      .platform-btn { flex: 1; justify-content: center; padding: 0.5rem 0.4rem; font-size: 0.72rem; }
+      .platform-btn { flex: 1 1 calc(50% - 0.2rem); justify-content: center; padding: 0.5rem 0.4rem; font-size: 0.72rem; }
       .platform-btn img { width: 16px; height: 16px; }
     }
     .platform-btn.active {
@@ -697,6 +709,10 @@
       <button class="platform-btn" id="plat-wallet" onclick="setPlatform('wallet')">
         <img src="/images/wallets.png" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display='none'">
         Wallet
+      </button>
+      <button class="platform-btn" id="plat-leaderboard" onclick="setPlatform('leaderboard')">
+        <img src="/images/lb.png" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display='none'">
+        Leaderboard
       </button>
     </div>
 
@@ -1063,6 +1079,25 @@
             <span class="dr-val b" id="w-oc-spore">—</span>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD PANEL -->
+    <div id="panel-leaderboard" style="display:none;">
+      <div class="info-card reveal">
+        <div class="card-title">
+          <img src="/images/total_xp.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Leaderboard
+        </div>
+        <div class="tab-bar" style="margin-bottom:1rem;">
+          <button class="tab active" onclick="switchLbTab('pixie',this)"><img src="/images/pixie.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Pixie</button>
+          <button class="tab" onclick="switchLbTab('farm',this)"><img src="/images/shroomfarm.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Farm</button>
+          <button class="tab" onclick="switchLbTab('plant',this)"><img src="/images/sporulation.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Planted</button>
+          <button class="tab" onclick="switchLbTab('tips',this)"><img src="/images/gift.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Tips</button>
+          <button class="tab" onclick="switchLbTab('social',this)"><img src="/images/butterfly.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Social</button>
+          <button class="tab" onclick="switchLbTab('staking',this)"><img src="/images/mycelium.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Staking</button>
+        </div>
+        <div id="lb-content"><div class="empty-hint">Loading...</div></div>
       </div>
     </div>
 
@@ -1457,9 +1492,12 @@ function setPlatform(plat) {
   document.getElementById('plat-discord').classList.toggle('active', plat === 'discord');
   document.getElementById('plat-reddit').classList.toggle('active', plat === 'reddit');
   document.getElementById('plat-wallet').classList.toggle('active', plat === 'wallet');
-  document.getElementById('panel-discord').style.display = plat === 'discord' ? 'block' : 'none';
-  document.getElementById('panel-reddit').style.display  = plat === 'reddit'  ? 'block' : 'none';
-  document.getElementById('panel-wallet').style.display  = plat === 'wallet'  ? 'block' : 'none';
+  document.getElementById('plat-leaderboard').classList.toggle('active', plat === 'leaderboard');
+  document.getElementById('panel-discord').style.display      = plat === 'discord'     ? 'block' : 'none';
+  document.getElementById('panel-reddit').style.display       = plat === 'reddit'      ? 'block' : 'none';
+  document.getElementById('panel-wallet').style.display       = plat === 'wallet'      ? 'block' : 'none';
+  document.getElementById('panel-leaderboard').style.display  = plat === 'leaderboard' ? 'block' : 'none';
+  if (plat === 'leaderboard') renderLeaderboard('pixie');
   if(plat === 'wallet') {
     renderWallet(profileData.sporebot || {}, profileData.pixie || {});
     fetchUserLPPositions(profileData.pixie || {});
@@ -1849,7 +1887,7 @@ function renderTrialStatus(s, p) {
   if (ageDays >= 42 && isQualified) {
     el.innerHTML = '<div style="display:flex;align-items:center;gap:0.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.65rem 1rem;margin-bottom:1rem;font-family:Space Grotesk,monospace;font-size:0.7rem;color:var(--green);">'
       + '<div style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0;"></div>'
-      + 'Farm Active — requirements met'
+      + 'Farm Active —'
       + (function() {
           const tags = [];
           if (qualifiesShroom) tags.push('500k+');
@@ -1952,7 +1990,7 @@ function renderWithdrawStatus(s, p) {
     if (qualifiesNFT)    tags.push('NFT Holder');
     el.innerHTML = '<div style="display:flex;align-items:center;gap:0.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.65rem 1rem;margin-bottom:1rem;font-family:Space Grotesk,monospace;font-size:0.7rem;color:var(--green);">'
       + '<div style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0;"></div>'
-      + 'Withdraw Unlocked — Requirements met'
+      + 'Withdraw Unlocked —'
       + ' <span style="opacity:0.5;">(' + tags.join(' & ') + ')</span>'
       + '</div>';
     return;
@@ -4545,6 +4583,154 @@ function renderReddit(s, p) {
     + '</div>';
 }
 
+// ================================================================
+// LEADERBOARD
+// ================================================================
+var _lbSnapshot = null;
+var _lbSnapshotTs = 0;
+var LB_TTL = 86400000; // 24h — bot only refreshes every 4h anyway
+var LB_STALE = 14400000; // 4h — show stale instantly, revalidate in background
+
+async function fetchLbSnapshot() {
+  var now = Date.now();
+  var age = now - _lbSnapshotTs;
+
+  // Fresh — return immediately
+  if (_lbSnapshot && age < LB_STALE) return _lbSnapshot;
+
+  // Stale but not expired — return immediately and revalidate in background
+  if (_lbSnapshot && age < LB_TTL) {
+    _revalidateLbSnapshot();
+    return _lbSnapshot;
+  }
+
+  // Expired or first load — must fetch
+  return await _revalidateLbSnapshot();
+}
+
+async function _revalidateLbSnapshot() {
+  try {
+    var res = await fetch(window.API_BASE + '/api/leaderboard/snapshot');
+    var data = await res.json();
+    if (data.ok) {
+      _lbSnapshot = data.data;
+      _lbSnapshotTs = Date.now();
+      try {
+        sessionStorage.setItem('lb_snapshot', JSON.stringify({ data: _lbSnapshot, ts: _lbSnapshotTs }));
+      } catch(e) {}
+    }
+    return _lbSnapshot;
+  } catch(e) { return _lbSnapshot; }
+}
+
+// Load from sessionStorage on init so first render is instant
+(function() {
+  try {
+    var cached = JSON.parse(sessionStorage.getItem('lb_snapshot') || 'null');
+    if (cached && cached.data && (Date.now() - cached.ts) < LB_TTL) {
+      _lbSnapshot = cached.data;
+      _lbSnapshotTs = cached.ts;
+    }
+  } catch(e) {}
+})();
+
+var _currentLbTab = 'pixie';
+
+function switchLbTab(tab, btn) {
+  _currentLbTab = tab;
+  document.querySelectorAll('#panel-leaderboard .tab').forEach(function(b) { b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  renderLeaderboard(tab);
+}
+window.switchLbTab = switchLbTab;
+
+async function renderLeaderboard(tab) {
+  var el = document.getElementById('lb-content');
+  if (!el) return;
+  _lbSectionId = 0;
+  el.innerHTML = '<div class="empty-hint">Loading...</div>';
+  var snap = await fetchLbSnapshot();
+  if (!snap) { el.innerHTML = '<div class="empty-hint">Leaderboard data unavailable.</div>'; return; }
+  var html = '';
+  var p = snap.pixie || {};
+  var s = snap.sporebot || {};
+  var st = snap.staking || {};
+  var fmtSpore = function(n) { n=n||0; if(n>=1e9) return (n/1e9).toFixed(1)+'B'; if(n>=1e6) return (n/1e6).toFixed(1)+'M'; return n.toLocaleString(); };
+  if (tab === 'pixie') {
+    html += lbSection('xp.png',    'Pixie Level',   p.xp  || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">Lv.'+fmtN(u.level||1)+'</span>'; });
+    html += lbSection('pixie.png', 'Total XP',      p.xp  || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.xp)+' XP</span>'; });
+    html += lbSection('house.png',  'NFT Holdings', p.nft || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.nft_total)+'</span>'; });
+  } else if (tab === 'farm') {
+    html += lbSection('fire.png',    'Current Streak',  s.streak        || [], function(u){ return esc(u.name)+' <span style="color:var(--red);font-family:Syne Mono,monospace;">'+fmtN(u.streak)+'</span>'; });
+    html += lbSection('streak.png',  'Max Streak',      s.streak_record || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">'+fmtN(u.streak_record)+'</span>'; });
+    html += lbSection('animals.png', 'Total Feedings',  s.feed          || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.feed)+'</span>'; });
+  } else if (tab === 'plant') {
+    html += lbSection('shroom.png',     'Most Planted',   s.shroom_farm || [], function(u){ return esc(u.name)+' <span style="color:var(--green);font-family:Syne Mono,monospace;">'+fmtN(u.shroom_farm)+'</span>'; });
+    html += lbSection('apy1.png',       'Highest APY',    s.apy         || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">'+Math.round((u.apy||0)*100)+'%</span>'; });
+    html += lbSection('sporulation.png','Spores Per Day',  s.spore_rate  || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.spore_rate)+'/day</span>'; });
+  } else if (tab === 'tips') {
+    html += lbSection('shroom.png',    'Tipped SHROOM', p.tip_shroom || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">'+fmtN(u.tip_shroom)+'</span>'; });
+    html += lbSection('spore.png',     'Tipped SPORE',  p.tip_spore  || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.tip_spore)+'</span>'; });
+    html += lbSection('goodshroom.png','Good Shroom',    p.gs         || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">'+fmtN(u.gs)+'</span>'; });
+  } else if (tab === 'social') {
+    html += lbSection('fire.png',      'Current Streak', p.msg_streak  || [], function(u){ return esc(u.name)+' <span style="color:var(--red);font-family:Syne Mono,monospace;">'+fmtN(u.msg_streak)+'</span>'; });
+    html += lbSection('streak.png',    'Record Streak',  p.msg_record  || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">'+fmtN(u.msg_record)+'</span>'; });
+    html += lbSection('butterfly.png', 'Message XP',     p.msg_xp      || [], function(u){ return esc(u.name)+' <span style="color:var(--green);font-family:Syne Mono,monospace;">'+fmtN(u.msg_xp)+'</span>'; });
+  } else if (tab === 'staking') {
+    html += lbSection('spore.png',    'Most Staked',    st.staked   || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtSpore(u.staked)+'</span>'; });
+    html += lbSection('sporulation.png','Lifetime Earned',st.lifetime|| [], function(u){ return esc(u.name)+' <span style="color:var(--green);font-family:Syne Mono,monospace;">'+fmtSpore(u.lifetime)+'</span>'; });
+    html += lbSection('mycelium.png', 'MVP Leaders',    st.mvp      || [], function(u){ return esc(u.name)+' <span style="color:var(--purple);font-family:Syne Mono,monospace;">'+fmtN(u.mvp)+' MVP</span>'; });
+  }
+  el.innerHTML = html || '<div class="empty-hint">No data.</div>';
+  _lbSectionId = 0;
+  lbInitArrows();
+}
+
+var _lbSectionId = 0;
+function lbSection(icon, title, arr, rowFn) {
+  if (!arr || !arr.length) return '';
+  var id = 'lbs_' + (++_lbSectionId);
+  var rows = arr.map(function(u, i) {
+    var medal = i===0 ? '<span style="color:#ffd700;font-weight:700;min-width:1rem;">1</span>'
+              : i===1 ? '<span style="color:#c0c0c0;font-weight:700;min-width:1rem;">2</span>'
+              : i===2 ? '<span style="color:#cd7f32;font-weight:700;min-width:1rem;">3</span>'
+              : '<span style="color:rgba(255,255,225,0.3);font-size:0.65rem;min-width:1rem;">'+(i+1)+'</span>';
+    var avatarHtml = (u.discord_id && u.avatar)
+      ? '<img src="https://cdn.discordapp.com/avatars/'+u.discord_id+'/'+u.avatar+'.png?size=32" style="width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.display=\'none\'">'
+      : '<div style="width:20px;height:20px;border-radius:50%;background:rgba(255,255,225,0.08);display:flex;align-items:center;justify-content:center;font-size:0.55rem;flex-shrink:0;color:rgba(255,255,225,0.3);">'+(u.name||'?').charAt(0).toUpperCase()+'</div>';
+    return '<div style="padding:0.3rem 0;border-bottom:1px solid rgba(255,255,225,0.04);">'
+      + '<span style="display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;">'+medal+avatarHtml+rowFn(u)+'</span>'
+      + '</div>';
+  }).join('');
+  return '<div class="lb-section" style="margin-bottom:1.25rem;">'
+    + '<div class="lb-section-hdr" onclick="lbToggle(\''+id+'\')" style="display:flex;align-items:center;justify-content:space-between;gap:0.4rem;font-size:0.75rem;font-weight:700;color:rgba(255,255,225,0.7);margin-bottom:0.5rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;user-select:none;">'
+    + '<span style="display:flex;align-items:center;gap:0.4rem;"><img src="/images/'+icon+'" style="width:13px;height:13px;object-fit:contain;" onerror="this.style.display=\'none\'">'+title+'</span>'
+    + '<span id="'+id+'_arrow" style="font-size:0.6rem;color:rgba(255,255,225,0.3);transition:transform 0.2s;display:none;">&#9660;</span>'
+    + '</div>'
+    + '<div id="'+id+'" class="lb-rows">'+rows+'</div>'
+    + '</div>';
+}
+function lbToggle(id) {
+  var el = document.getElementById(id);
+  var arrow = document.getElementById(id+'_arrow');
+  if (!el) return;
+  // Only collapse on mobile (<=768px)
+  if (window.innerWidth > 768) return;
+  var isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.style.transform = isOpen ? 'rotate(-90deg)' : '';
+}
+window.lbToggle = lbToggle;
+
+function esc(s) { return (s||'Unknown').replace(/_/g,' '); }
+function fmtN(n) { return (n||0).toLocaleString(); }
+
+function lbInitArrows() {
+  if (window.innerWidth > 768) return;
+  document.querySelectorAll('#lb-content [id$="_arrow"]').forEach(function(a) {
+    a.style.display = 'inline';
+  });
+}
 // ================================================================
 // INIT
 // ================================================================

@@ -1330,6 +1330,18 @@ app.get('/api/reddit-user/:discord_id', async (req, res) => {
   }
 });
 
+app.get('/api/leaderboard/snapshot', async (req, res) => {
+  try {
+    const snap = await db.ref('Pixie/Leaderboard').get();
+    if (!snap.exists()) return res.json({ ok: false });
+    res.set('Cache-Control', 'public, max-age=14400, stale-while-revalidate=3600');
+    res.json({ ok: true, data: snap.val() });
+  } catch (err) {
+    console.error('[LB-SNAPSHOT]', err);
+    res.status(500).json({ ok: false });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
