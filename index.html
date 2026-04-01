@@ -7,7 +7,11 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne+Mono&display=swap" />
   <link rel="stylesheet" href="styles.css" />
   <style>
-    .contract-row { display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;background:var(--dark3);border-radius:0.875rem;margin-bottom:0.5rem;font-size:0.8rem; }
+    .contract-row { display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;background:var(--dark3);border-radius:0.875rem;margin-bottom:0.5rem;font-size:0.8rem;flex-wrap:wrap; }
+    @media(max-width:480px) {
+      .contract-row { flex-direction:column;align-items:flex-start; }
+      .copy-btn { margin-left:0;width:100%;text-align:center; }
+    }
     .contract-row img { width:22px;height:22px;object-fit:contain; }
     .contract-name { color:var(--cream);text-decoration:none;font-weight:600;transition:color 0.2s; }
     .contract-name:hover { color:var(--gold); }
@@ -412,7 +416,7 @@
         <li><img src="/images/sporebot.png" class="gi-sm"> <strong>Sporebot NFTs</strong> — unique trait combinations grant SGR boosts, dig bonuses, and farm perks</li>
       </ul>
       <p style="margin-top:0.75rem;">All NFT rewards are tracked in the <a href="/treasury.html">Treasury</a>. The NFT offchain reward pool is 68.74B SPORE distributed daily over 10 years.</p>
-      <div style="margin-top:1rem;"><a class="btn btn-blue" href="/index.html" onclick="showTab('shop', document.querySelectorAll('.guide-tab')[3]);return false;">Browse NFT Shop</a></div>
+      <div style="margin-top:1rem;"><a class="btn btn-blue" href="/earn.html" onclick="showTab('shop', document.querySelectorAll('.guide-tab')[3]);return false;">Browse NFT Shop</a></div>
     </div>
 
     <div class="section-divider reveal">Hold Onchain</div>
@@ -844,7 +848,7 @@
     <span id="pwa-avatar-wrap"><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;border:1px solid rgba(255,255,225,0.2);" onerror="this.style.display='none'"></span>
     <span>Profile</span>
   </a>
-    <a href="/index.html" class="pwa-tab" data-page="guide">
+    <a href="/earn.html" class="pwa-tab" data-page="guide">
     <span><img src="/images/earn.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
     <span>Earn</span>
   </a>
