@@ -718,6 +718,7 @@
       <!-- FARM TAB -->
       <div class="tab-panel active reveal" id="tab-farm">
         <div id="trial-status-card"></div>
+        <div id="withdraw-status-card"></div>
         <div class="info-card">
           <div class="card-title"><img src="/images/shroomfarm.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Farm Status</div>
           <div class="stage-bar-wrap">
@@ -976,34 +977,34 @@
           Token Contracts
         </div>
         <div id="tc-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.25rem;">
-          <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:0.75rem;padding:0.75rem;">
-            <div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.35rem;">
-              <img src="/images/shroom.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'">
-              <span style="font-size:0.82rem;font-weight:600;color:var(--red);">SHROOM</span>
+          <div style="background:rgba(253,70,79,0.04);border:1px solid rgba(253,70,79,0.18);border-radius:1rem;padding:1rem;">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+              <img src="/images/shroom.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
+              <span style="font-size:0.95rem;font-weight:700;color:var(--red);letter-spacing:0.05em;">SHROOM</span>
             </div>
-            <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;word-break:break-all;">0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1</div>
-            <div style="margin-bottom:0.5rem;">
-              <span style="font-family:Space Grotesk,monospace;font-size:1rem;font-weight:700;color:var(--red);" id="tc-shroom-price">...</span>
-              <span style="font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-left:0.4rem;" id="tc-shroom-1m">1M = ...</span>
+            <div style="font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.5);margin-bottom:0.6rem;word-break:break-all;line-height:1.5;background:rgba(255,255,225,0.04);padding:0.4rem 0.6rem;border-radius:0.5rem;">0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1</div>
+            <div style="margin-bottom:0.75rem;">
+              <div style="font-family:Space Grotesk,monospace;font-size:1.35rem;font-weight:700;color:var(--red);" id="tc-shroom-price">...</div>
+              <div style="font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.45);margin-top:0.15rem;" id="tc-shroom-1m">1M = ...</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:0.4rem;">
-              <button onclick="navigator.clipboard.writeText('0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.3em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:transparent;color:rgba(255,255,225,0.5);cursor:pointer;">Copy</button>
-              <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.3em 0;border-radius:999px;border:1px solid rgba(253,70,79,0.3);color:var(--red);text-decoration:none;text-align:center;">Polygon ↗</a>
+              <button onclick="navigator.clipboard.writeText('0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.2);background:rgba(255,255,225,0.04);color:rgba(255,255,225,0.6);cursor:pointer;transition:all 0.2s;">Copy</button>
+              <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(253,70,79,0.35);background:rgba(253,70,79,0.06);color:var(--red);text-decoration:none;text-align:center;transition:all 0.2s;">Polygon ↗</a>
             </div>
           </div>
-          <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:0.75rem;padding:0.75rem;">
-            <div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.35rem;">
-              <img src="/images/spore.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'">
-              <span style="font-size:0.82rem;font-weight:600;color:var(--blue);">SPORE</span>
+          <div style="background:rgba(79,168,253,0.04);border:1px solid rgba(79,168,253,0.18);border-radius:1rem;padding:1rem;">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+              <img src="/images/spore.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
+              <span style="font-size:0.95rem;font-weight:700;color:var(--blue);letter-spacing:0.05em;">SPORE</span>
             </div>
-            <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.35);margin-bottom:0.4rem;word-break:break-all;">0x089582AC20ea563c69408a79E1061de594b61bED</div>
-            <div style="margin-bottom:0.5rem;">
-              <span style="font-family:Space Grotesk,monospace;font-size:1rem;font-weight:700;color:var(--blue);" id="tc-spore-price">...</span>
-              <span style="font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-left:0.4rem;" id="tc-spore-100m">100M = ...</span>
+            <div style="font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.5);margin-bottom:0.6rem;word-break:break-all;line-height:1.5;background:rgba(255,255,225,0.04);padding:0.4rem 0.6rem;border-radius:0.5rem;">0x089582AC20ea563c69408a79E1061de594b61bED</div>
+            <div style="margin-bottom:0.75rem;">
+              <div style="font-family:Space Grotesk,monospace;font-size:1.35rem;font-weight:700;color:var(--blue);" id="tc-spore-price">...</div>
+              <div style="font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.45);margin-top:0.15rem;" id="tc-spore-100m">100M = ...</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:0.4rem;">
-              <button onclick="navigator.clipboard.writeText('0x089582AC20ea563c69408a79E1061de594b61bED').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.3em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:transparent;color:rgba(255,255,225,0.5);cursor:pointer;">Copy</button>
-              <a href="https://polygonscan.com/token/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.3em 0;border-radius:999px;border:1px solid rgba(79,168,253,0.3);color:var(--blue);text-decoration:none;text-align:center;">Polygon ↗</a>
+              <button onclick="navigator.clipboard.writeText('0x089582AC20ea563c69408a79E1061de594b61bED').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.2);background:rgba(255,255,225,0.04);color:rgba(255,255,225,0.6);cursor:pointer;transition:all 0.2s;">Copy</button>
+              <a href="https://polygonscan.com/token/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(79,168,253,0.35);background:rgba(79,168,253,0.06);color:var(--blue);text-decoration:none;text-align:center;transition:all 0.2s;">Polygon ↗</a>
             </div>
           </div>
         </div>
@@ -1112,12 +1113,16 @@
               <div class="data-row"><span class="dr-label"><img src="/images/streak.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Streak</span><span class="dr-val y" id="r-streak">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/streak.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Record Streak</span><span class="dr-val" id="r-maxstreak">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/forage.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total Forages</span><span class="dr-val" id="r-total-forages">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/growth.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Post Upvotes</span><span class="dr-val" id="r-post-upvotes">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/streak.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Comment Upvotes</span><span class="dr-val" id="r-comment-upvotes">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/vacation.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Vacation Days</span><span class="dr-val g" id="r-vacation">—</span></div>
             </div>
             <div>
               <div class="data-row"><span class="dr-label"><img src="/images/shroomfarm.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Feed Boost</span><span class="dr-val g" id="r-feed-boost">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/nft.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">NFT Forage Bonus</span><span class="dr-val p" id="r-nft-bonus">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/apy1.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Flair Forage Bonus</span><span class="dr-val y" id="r-flair-bonus">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/growth.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Post Bonus</span><span class="dr-val y" id="r-post-bonus">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/streak.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Comment Bonus</span><span class="dr-val y" id="r-comment-bonus">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/boost.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total Forage Bonus</span><span class="dr-val g" id="r-total-bonus">—</span></div>
             </div>
           </div>
@@ -1484,6 +1489,7 @@ function renderProfile() {
   renderHeader(s, p);
   renderQuickStats(s, p);
   renderTrialStatus(s, p);
+  renderWithdrawStatus(s, p);
   renderFarm(s, p);
   renderWallet(s, p);
   renderStaking(s, p);
@@ -1843,7 +1849,7 @@ function renderTrialStatus(s, p) {
   if (ageDays >= 42 && isQualified) {
     el.innerHTML = '<div style="display:flex;align-items:center;gap:0.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.65rem 1rem;margin-bottom:1rem;font-family:Space Grotesk,monospace;font-size:0.7rem;color:var(--green);">'
       + '<div style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0;"></div>'
-      + 'Farm access active — requirements met'
+      + 'Farm Active — requirements met'
       + (function() {
           const tags = [];
           if (qualifiesShroom) tags.push('500k+');
@@ -1892,6 +1898,101 @@ function renderTrialStatus(s, p) {
     + '</div>'
     + '<div style="font-size:0.78rem;margin-bottom:' + (isQualified ? '0' : '0.875rem') + ';">' + statusMsg + '</div>'
     + (isQualified ? '' : _trialOptionsHtml())
+    + '</div>';
+}
+
+function renderWithdrawStatus(s, p) {
+  const el = document.getElementById('withdraw-status-card');
+  if (!el) return;
+
+  const wallet       = p.Wallet || {};
+  const nftW         = wallet.NFT || {};
+  const onchain      = wallet.Onchain || {};
+  const onchainShroom = parseInt(onchain.shroom_balance || 0);
+  const onchainSpore  = parseInt(onchain.spore_balance  || 0);
+  const shroomEquiv   = onchainShroom + Math.floor(onchainSpore / 100);
+  const daysOver500k  = parseInt(onchain.Days_Over_500k || 0);
+  const lpBonus       = parseFloat(wallet.LP_Bonus || wallet.lp_bonus || 0);
+
+  // Count Sporebots and Mooshies with their hold duration
+  let sporebotCount = 0, mooshieCount = 0;
+  let sporebotDays = 0, mooshieDays = 0;
+  const MOOSHIE_NAMES = ['Mooshie','King Mooshie','Queen Mooshie','Gold Mooshie','Kid Shroom','House Mooshie'];
+  const now = Date.now();
+  Object.entries(nftW).forEach(function([k, v]) {
+    if (k === 'total_nft' || !v || typeof v !== 'object') return;
+    const name = k.replace(/ ID\d+$/, '');
+    const cnt  = parseInt(v.count || 1);
+    const addedStr = v.Date_Added || v.date_added || null;
+    const addedMs = addedStr ? new Date(addedStr.replace(' ','T') + (addedStr.includes('Z') ? '' : 'Z')).getTime() : 0;
+    const days = addedMs ? Math.floor((now - addedMs) / 86400000) : 0;
+    if (name.includes('SporeBots') || name.includes('Sporebot')) {
+      sporebotCount += cnt;
+      if (days > sporebotDays) sporebotDays = days;
+    } else if (MOOSHIE_NAMES.some(function(m) { return name.includes(m); })) {
+      mooshieCount += cnt;
+      if (days > mooshieDays) mooshieDays = days;
+    }
+  });
+
+  const nftHoldDays     = sporebotCount >= 2 ? sporebotDays : mooshieCount >= 1 ? mooshieDays : 0;
+  const qualifiesNFT    = (sporebotCount >= 2 && sporebotDays >= 42) || (mooshieCount >= 1 && mooshieDays >= 42);
+  const qualifiesShroom = shroomEquiv >= 500000 && daysOver500k >= 42;
+  const qualifiesLP     = lpBonus >= 0.1;
+  const isQualified     = qualifiesNFT || qualifiesShroom;
+
+  // Best progress for each option (for bar display when not qualified)
+  const shroomPct = daysOver500k >= 42 ? 100 : shroomEquiv >= 500000 ? Math.min(99, Math.round((daysOver500k / 42) * 100)) : Math.min(50, Math.round((shroomEquiv / 500000) * 50));
+  const nftNeeded = sporebotCount >= 2 ? sporebotDays : mooshieCount >= 1 ? mooshieDays : 0;
+  const nftPct    = Math.min(100, Math.round((nftNeeded / 42) * 100));
+
+  if (isQualified) {
+    const tags = [];
+    if (qualifiesShroom) tags.push('500k SHROOM');
+    if (qualifiesNFT)    tags.push('NFT Holder');
+    el.innerHTML = '<div style="display:flex;align-items:center;gap:0.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.65rem 1rem;margin-bottom:1rem;font-family:Space Grotesk,monospace;font-size:0.7rem;color:var(--green);">'
+      + '<div style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0;"></div>'
+      + 'Withdraw Unlocked — Requirements met'
+      + ' <span style="opacity:0.5;">(' + tags.join(' & ') + ')</span>'
+      + '</div>';
+    return;
+  }
+
+  // Not qualified — show progress toward each option
+  const pBar = function(pct, color) {
+    return '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;margin-top:0.35rem;">'
+      + '<div style="height:100%;width:' + Math.min(100,pct) + '%;background:' + color + ';border-radius:999px;transition:width 1.2s ease;"></div>'
+      + '</div>';
+  };
+
+  const optW = function(color, imgSrc, title, desc, pct, linkHref, linkLabel, link2Href, link2Label) {
+    return '<div style="display:flex;gap:0.75rem;align-items:flex-start;background:rgba(' + color + ',0.05);border:1px solid rgba(' + color + ',0.15);border-radius:0.75rem;padding:0.75rem 0.9rem;margin-bottom:0.5rem;">'
+      + '<img src="/images/' + imgSrc + '" style="width:22px;height:22px;object-fit:contain;flex-shrink:0;margin-top:2px;">'
+      + '<div style="flex:1;">'
+      + '<div style="font-size:0.65rem;font-family:Space Grotesk,monospace;letter-spacing:0.1em;text-transform:uppercase;color:rgba(' + color + ',1);margin-bottom:0.2rem;">' + title + '</div>'
+      + '<div style="font-size:0.75rem;color:rgba(255,255,225,0.55);line-height:1.5;margin-bottom:0.35rem;">' + desc + '</div>'
+      + pBar(pct, 'rgba(' + color + ',0.7)')
+      + '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.4rem;">'
+      + '<a href="' + linkHref + '" target="_blank" rel="noopener noreferrer" style="display:inline-flex;font-family:Space Grotesk,monospace;font-size:0.6rem;font-weight:600;padding:0.25em 0.75em;border-radius:999px;border:1px solid rgba(' + color + ',0.35);background:rgba(' + color + ',0.08);color:rgba(' + color + ',1);text-decoration:none;">' + linkLabel + ' ↗</a>'
+      + (link2Href ? '<a href="' + link2Href + '" target="_blank" rel="noopener noreferrer" style="display:inline-flex;font-family:Space Grotesk,monospace;font-size:0.6rem;font-weight:600;padding:0.25em 0.75em;border-radius:999px;border:1px solid rgba(' + color + ',0.35);background:rgba(' + color + ',0.08);color:rgba(' + color + ',1);text-decoration:none;">' + link2Label + ' ↗</a>' : '')
+      + '</div>'
+      + '</div></div>';
+  };
+
+  const shroomDesc = shroomEquiv < 500000
+    ? 'Need ' + (500000 - shroomEquiv).toLocaleString() + ' more SHROOM-equiv on-chain, then hold 42 days. 100 SPORE = 1 SHROOM.'
+    : 'Balance met! ' + daysOver500k + ' / 42 days held. Keep holding.';
+  const nftDesc = sporebotCount >= 2
+    ? '2 Sporebots held ' + sporebotDays + ' / 42 days.'
+    : mooshieCount >= 1
+      ? '1 Mooshie held ' + mooshieDays + ' / 42 days.'
+      : 'Need 2 Sporebot NFTs or any 1 Mooshie NFT, then hold 42 days.';
+
+  el.innerHTML = '<div style="background:rgba(79,168,253,0.04);border:1px solid rgba(79,168,253,0.15);border-radius:1rem;padding:1.1rem 1.25rem;margin-bottom:1rem;">'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;letter-spacing:0.12em;color:rgba(79,168,253,0.9);margin-bottom:0.5rem;">WITHDRAW STATUS</div>'
+    + '<div style="font-size:0.82rem;color:rgba(255,255,225,0.7);margin-bottom:0.875rem;line-height:1.6;">Meet <b style="color:var(--cream);">ONE</b> of the following to unlock on-chain withdrawals:</div>'
+    + optW('79,168,253',  'shroom.png',          'Option 1 - Hold SHROOM', shroomDesc, shroomPct, 'https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1', 'Buy SHROOM', 'https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED', 'Buy SPORE')
+    + optW('253,70,79',   'sporebot_helper.png', 'Option 2 - Hold NFTs',   nftDesc,    nftPct,    'https://launchmynft.io/collections/0xae42EdC0FC636D1214a6C5D829C37d778398F17b/OmDADyGCGOKTT2NZM0yj', 'Buy Sporebots', '', '')
     + '</div>';
 }
 
@@ -4248,13 +4349,21 @@ function renderReddit(s, p) {
   const feedBoost  = feed.feed_boost || 0;
   const nftBonus   = r.Wallet?.NFT_Forage_Bonus || 0;
   const flairName  = flair.Flair || 'SPROUT';
-  const FLAIR_BONUS = {'BRONZE':5,'SILVER':10,'GOLD':23,'EMERALD':42,'DIAMOND':69,'MASTER':85,'GRANDMASTER':100};
+  const FLAIR_BONUS = {'BRONZE':5,'SILVER':10,'GOLD':15,'EMERALD':20,'DIAMOND':25,'MASTER':30,'GRANDMASTER':40,'LEGEND':50};
   const flairBonusVal = Object.entries(FLAIR_BONUS).find(([k]) => flairName.toUpperCase().includes(k))?.[1] || 0;
-  const totalBonus = feedBoost + nftBonus + flairBonusVal;
-  setEl('r-feed-boost',   feedBoost + '%');
-  setEl('r-nft-bonus',    nftBonus + '%');
-  setEl('r-flair-bonus',  flairBonusVal + '%');
-  setEl('r-total-bonus',  totalBonus + '%');
+  const postUpvotes    = (flair.Stats || {}).post_upvotes    || 0;
+  const commentUpvotes = (flair.Stats || {}).comment_upvotes || 0;
+  const postBonus    = Math.min(50, Math.floor(postUpvotes    / 344) * 5);
+  const commentBonus = Math.min(50, Math.floor(commentUpvotes / 687) * 5);
+  const totalBonus = feedBoost + nftBonus + flairBonusVal + postBonus + commentBonus;
+  setEl('r-feed-boost',       feedBoost + '%');
+  setEl('r-nft-bonus',        nftBonus + '%');
+  setEl('r-flair-bonus',      flairBonusVal + '%');
+  setEl('r-post-bonus',       '+' + postBonus + '%');
+  setEl('r-comment-bonus',    '+' + commentBonus + '%');
+  setEl('r-total-bonus',      totalBonus + '%');
+  setEl('r-post-upvotes',     fmt(postUpvotes));
+  setEl('r-comment-upvotes',  fmt(commentUpvotes));
   // Tipping
   const shroomGiven    = (tipping.SHROOM?.Given    || 0) + (airdrop.SHROOM?.Given || 0);
   const shroomReceived =  tipping.SHROOM?.Received || 0;

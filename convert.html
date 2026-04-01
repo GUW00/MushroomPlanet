@@ -377,6 +377,15 @@
       font-family: 'Space Grotesk', monospace; font-size: 0.75rem; color: var(--red);
       text-align: center; display: none;
     }
+    .section-divider {
+      font-family: 'Space Grotesk', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--yellow);
+      margin: 1.75rem 0 0.75rem; display: flex; align-items: center; gap: 0.75rem;
+    }
+    .section-divider::before, .section-divider::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(254,206,0,0.35), transparent);
+    }
     .contract-link {
       display: flex; align-items: center; justify-content: center; gap: 0.5rem;
       font-family: 'Space Grotesk', monospace; font-size: 0.65rem;
@@ -486,30 +495,24 @@
       </div>
     </div>
 
-    <!-- RESERVES -->
-    <div class="reserves-card reveal">
-      <div class="res-title">
-        <span class="res-live-dot"></span>
-        Contract Reserves
+            <div class="section-divider reveal">In-House Convert</div>
+    <div class="guide-card reveal" style="background:var(--dark2);border:1px solid rgba(255,255,225,0.07);border-radius:1.25rem;padding:1.4rem;margin-bottom:2rem;">
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;"><img src="/images/swaps.png" style="width:20px;height:20px;object-fit:contain;"> MushroomSwap — In-House Token Convert</h3>
+      <p style="font-size:0.78rem;color:rgba(255,255,225,0.5);line-height:1.7;margin-bottom:0.75rem;">Mushroom Planet runs its own on-chain swap contract for converting between SHROOM and SPORE at a fixed <strong style="color:var(--cream);">1:100 ratio</strong>. Unlike QuickSwap, there are no swap fees, no price impact, and no slippage — you only pay a tiny POL gas fee.</p>
+      <h4 style="font-size:0.82rem;font-weight:700;margin-bottom:0.5rem;">How It Works</h4>
+      <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:0.4rem;">
+        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/blockchain.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;"> The contract holds reserves of both tokens and swaps at a <strong style="color:var(--cream);">fixed 1:100 ratio</strong> written permanently into the contract code</li>
+        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/swaps.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;"> Two wallet confirmations required: one to <strong style="color:var(--cream);">approve</strong> the token spend, one to <strong style="color:var(--cream);">execute</strong> the swap</li>
+        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/shroom.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;"> No swap fee — you only pay the standard Polygon gas fee (fractions of a cent)</li>
+        <li style="font-size:0.78rem;color:rgba(255,255,225,0.5);display:flex;align-items:flex-start;gap:0.5rem;"><img src="/images/safe.png" style="width:16px;height:16px;object-fit:contain;margin-top:2px;"> Contract is owned by the Mushroom Planet <strong style="color:var(--cream);">Safe multisig treasury</strong> — can be paused instantly if needed</li>
+      </ul>
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.75rem;padding:0.6rem 0.9rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,225,0.07);border-radius:0.6rem;">
+        <img src="/images/blockchain.png" style="width:16px;height:16px;object-fit:contain;">
+        <a href="https://polygonscan.com/address/0xF6AcE46DD71C7500b7E2A7EBc0Cd6401dea85b0A" target="_blank" rel="noopener noreferrer" style="font-family:'Space Grotesk',monospace;font-size:0.72rem;color:var(--blue);text-decoration:none;">MushroomSwap Contract</a>
       </div>
-      <div class="res-grid">
-        <div class="res-item">
-          <div class="ri-label">SHROOM Available</div>
-          <div class="ri-val shroom" id="res-shroom">Loading...</div>
-        </div>
-        <div class="res-item">
-          <div class="ri-label">SPORE Available</div>
-          <div class="ri-val spore" id="res-spore">Loading...</div>
-        </div>
-      </div>
-      <div class="res-warn" id="res-warn"></div>
-      <div style="margin-top:0.75rem;padding:0.75rem 1rem;background:rgba(254,206,0,0.05);border:1px solid rgba(254,206,0,0.12);border-radius:0.6rem;font-family:'Space Grotesk',monospace;font-size:0.7rem;color:rgba(255,255,225,0.5);line-height:1.7;">
-        When the live market rate drifts from 1:100, arbitrage opportunities open up. If SPORE is cheaper on-chain than on QuickSwap, convert here and sell there for a profit — and vice versa. These trades naturally rebalance both the market and the reserves.
-      </div>
-      <a class="contract-link" id="contract-polygonscan" href="#" target="_blank" rel="noopener">
-        View contract on Polygonscan
-      </a>
     </div>
+    
+     <div class="section-divider reveal">CONNECT WALLET & SWAP</div>
 
     <!-- SWAP CARD -->
     <div class="swap-card reveal">
@@ -560,11 +563,37 @@
       <button class="swap-btn connect" id="main-btn" onclick="mainAction()">
         Connect Wallet
       </button>
+      
 
       <div class="status-msg" id="status-msg"></div>
     </div>
 
-    <div class="glow-divider"></div>
+        <!-- RESERVES -->
+    <div class="reserves-card reveal">
+      <div class="res-title">
+        <span class="res-live-dot"></span>
+        Contract Reserves
+      </div>
+      <div class="res-grid">
+        <div class="res-item">
+          <div class="ri-label">SHROOM Available</div>
+          <div class="ri-val shroom" id="res-shroom">Loading...</div>
+        </div>
+        <div class="res-item">
+          <div class="ri-label">SPORE Available</div>
+          <div class="ri-val spore" id="res-spore">Loading...</div>
+        </div>
+      </div>
+      <div class="res-warn" id="res-warn"></div>
+      <div style="margin-top:0.75rem;padding:0.75rem 1rem;background:rgba(254,206,0,0.05);border:1px solid rgba(254,206,0,0.12);border-radius:0.6rem;font-family:'Space Grotesk',monospace;font-size:0.7rem;color:rgba(255,255,225,0.5);line-height:1.7;">
+        When the live market rate drifts from 1:100, arbitrage opportunities open up. If SPORE is cheaper on-chain than on QuickSwap, convert here and sell there for a profit — and vice versa. These trades naturally rebalance both the market and the reserves.
+      </div>
+      <a class="contract-link" id="contract-polygonscan" href="#" target="_blank" rel="noopener">
+        View contract on Polygonscan
+      </a>
+    </div>
+
+    <div class="section-divider reveal">HOW IT WORKS</div>
 
     <!-- INFO CARDS -->
     <div class="info-grid reveal">
