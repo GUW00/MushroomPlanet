@@ -18,13 +18,13 @@ const config = {
   theme: {
     colors: {
       primary: "#cece1a",       // Cream text or background
-      secondary: "#003bfe",     // Yellow highlights
+      secondary: "#031c6e",     // Yellow highlights
       accent: "#4652fd",        // Red accent
       dark: "#1a1a1a",          // Dark section background
       light: "#e8e8d0",         // Light section background (cream-like)
 
       sections: {
-        altLightBg: "#ffffe1",   // Alt section: cream background
+        altLightBg: "#ffe1fc",   // Alt section: cream background
         altLightText: "#1a1a1a", // ...with dark text
         altDarkBg: "#1a1a1a",    // Alt section: dark background
         altDarkText: "#ffffe1"  // ...with light text
