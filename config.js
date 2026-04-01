@@ -17,9 +17,9 @@ const config = {
 
   theme: {
     colors: {
-      primary: "#ffffe1",       // Cream text or background
+      primary: "#cece1a",       // Cream text or background
       secondary: "#003bfe",     // Yellow highlights
-      accent: "#fd464f",        // Red accent
+      accent: "#4652fd",        // Red accent
       dark: "#1a1a1a",          // Dark section background
       light: "#e8e8d0",         // Light section background (cream-like)
 

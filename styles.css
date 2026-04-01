@@ -509,17 +509,20 @@ section:target {
   scroll-margin-top: 80px; /* offset for sticky header */
 }
 
-
+body {
+  background: linear-gradient(to top, #1a0a2e 0%, #0f0f0f 40%) !important;
+  min-height: 100vh;
+}
 /* Make the menu fixed below the header */
 .main-menu {
-  position: fixed; /* Fix the menu just below the header */
-  top: 100px; /* Adjust this based on your header's height */
+  position: fixed;
+  top: 100px;
   left: 0;
   width: 100%;
-  background-color: #154fc400; /* Light cream color */
+  background-color: transparent;
   padding: 1rem 0;
-  box-shadow: 0 4px 10px rgba(158, 19, 19, 0.24); /* Optional shadow for visual effect */
-  z-index: 1000; /* Keeps the menu above other content */
+  box-shadow: none;
+  z-index: 1000;
   text-align: center;
 }
 
@@ -533,7 +536,7 @@ section:target {
 /* Style for menu links */
 .main-menu a {
   margin: 0 1rem;
-  color: #ff3d3d;
+  color: #ff3c2e;
   text-decoration: none;
   font-weight: 600;
   font-size: 1.05rem;
