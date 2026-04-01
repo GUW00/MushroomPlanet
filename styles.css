@@ -3,7 +3,7 @@
   --clr-text-light: var(--clr-sections-altLightText);
   --clr-text-dark:  var(--clr-sections-altDarkText);
   --clr-primary:    #ffffe1;
-  --clr-secondary:  #fece00;
+  --clr-secondary:  #e61b0d;
   --clr-accent:     #99cdfe;
   --clr-dark:       #e8e8d0;
   --clr-light:      #1a1a1a;
@@ -210,7 +210,7 @@ header {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #d40c0c; /* Red background */
+  background-color: #d40c0c00; /* Red background */
   padding: 0.1rem;
   text-align: center;
   z-index: 999; /* Keeps header on top */
@@ -399,6 +399,23 @@ nav {
   padding: 4rem 0;
 }
 
+header {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+header.hide-header {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+#global-menu {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+#global-menu.hide-header {
+  transform: translateY(-20px);
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Discord widget */
 .widget {
   margin: 4rem 0;
@@ -461,9 +478,9 @@ section:target {
   top: 100px; /* Adjust this based on your header's height */
   left: 0;
   width: 100%;
-  background-color: #ecf8ff; /* Light cream color */
+  background-color: #ecf8ff15; /* Light cream color */
   padding: 1rem 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Optional shadow for visual effect */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0); /* Optional shadow for visual effect */
   z-index: 1000; /* Keeps the menu above other content */
   text-align: center;
 }
@@ -478,7 +495,7 @@ section:target {
 /* Style for menu links */
 .main-menu a {
   margin: 0 1rem;
-  color: #000;
+  color: #eae2ec;
   text-decoration: none;
   font-weight: 600;
   font-size: 1.05rem;
@@ -486,7 +503,7 @@ section:target {
 }
 
 .main-menu a:hover {
-  color: #6e1585; /* Yellow color on hover */
+  color: #206ed4; /* Yellow color on hover */
 }
 
 /* Ensure the body content is pushed down below the fixed menu */

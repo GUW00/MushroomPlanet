@@ -18,7 +18,7 @@ const config = {
   theme: {
     colors: {
       primary: "#ffffe1",       // Cream text or background
-      secondary: "#fece00",     // Yellow highlights
+      secondary: "#003bfe",     // Yellow highlights
       accent: "#fd464f",        // Red accent
       dark: "#1a1a1a",          // Dark section background
       light: "#e8e8d0",         // Light section background (cream-like)
@@ -60,7 +60,7 @@ const config = {
     html: `
       <div class="main-menu desktop-only">
         <a href="profile.html">Sporebot</a>
-        <a href="earn.html">Earn</a>
+        <a href="indexhtml">Earn</a>
         <a href="convert.html">Convert</a>
         <a href="vote.html">Goverance</a>
         <a href="treasury.html">Treasury</a>
@@ -69,7 +69,7 @@ const config = {
 
       <div class="mobile-menu mobile-only">
         <a href="profile.html">Sporebot</a>
-        <a href="earn.html">Earn</a>
+        <a href="index.html">Earn</a>
         <a href="convert.html">Convert</a>
         <a href="vote.html">Vote</a>
         <a href="treasury.html">Treasury</a>
@@ -78,7 +78,29 @@ const config = {
       </div>
     `
   }
-
 };
+
+(function() {
+  var lastY = 0, ticking = false;
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      requestAnimationFrame(function() {
+        var y = window.scrollY;
+        var header = document.querySelector('header');
+        var menu = document.getElementById('global-menu');
+        if (y > lastY && y > 60) {
+          if (header) header.classList.add('hide-header');
+          if (menu) menu.classList.add('hide-header');
+        } else {
+          if (header) header.classList.remove('hide-header');
+          if (menu) menu.classList.remove('hide-header');
+        }
+        lastY = y;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+})();
 
 export default config;
