@@ -210,7 +210,7 @@ header {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #fe0000; /* Red background */
+  background-color: #d40c0c; /* Red background */
   padding: 0.1rem;
   text-align: center;
   z-index: 999; /* Keeps header on top */
@@ -461,7 +461,7 @@ section:target {
   top: 100px; /* Adjust this based on your header's height */
   left: 0;
   width: 100%;
-  background-color: #ffffe1; /* Light cream color */
+  background-color: #ecf8ff; /* Light cream color */
   padding: 1rem 0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Optional shadow for visual effect */
   z-index: 1000; /* Keeps the menu above other content */
@@ -486,7 +486,7 @@ section:target {
 }
 
 .main-menu a:hover {
-  color: #fece00; /* Yellow color on hover */
+  color: #cb00fe; /* Yellow color on hover */
 }
 
 /* Ensure the body content is pushed down below the fixed menu */

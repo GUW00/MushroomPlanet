@@ -17,7 +17,7 @@ const config = {
 
   theme: {
     colors: {
-      primary: "#ffffe1",       // Cream text or background
+      primary: "#e4e1ff",       // Cream text or background
       secondary: "#fece00",     // Yellow highlights
       accent: "#fd464f",        // Red accent
       dark: "#1a1a1a",          // Dark section background
@@ -71,7 +71,7 @@ const config = {
         <a href="profile.html">Sporebot</a>
         <a href="earn.html">Earn</a>
         <a href="convert.html">Convert</a>
-        <a href="vote.html">Goverance</a>
+        <a href="vote.html">Vote</a>
         <a href="treasury.html">Treasury</a>
         <a href="guides.html">Guides</a>
         </a>
