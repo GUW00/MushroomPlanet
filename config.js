@@ -107,7 +107,16 @@ const config = {
   btn.setAttribute('aria-label', 'Scroll to top');
   btn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg>';
   btn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-  document.addEventListener('DOMContentLoaded', function() { document.body.appendChild(btn); });
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.appendChild(btn);
+    try {
+      var user = JSON.parse(localStorage.getItem('mp_profile_user') || '{}');
+      if (user.discord_id && user.avatar) {
+        var el = document.getElementById('header-profile-icon');
+        if (el) el.src = 'https://cdn.discordapp.com/avatars/' + user.discord_id + '/' + user.avatar + '.png';
+      }
+    } catch(e) {}
+  });
 
   window.addEventListener('scroll', function() {
     if (window.scrollY > 300) {

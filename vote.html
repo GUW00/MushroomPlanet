@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="styles.css" />
 
   <style>
-    body { padding-top: 100px !important; }
+    body { padding-top: 160px !important; }
     @media(display-mode: standalone) {
       body { padding-top: 0 !important; }
       header { display: none !important; }
@@ -413,20 +413,20 @@
   <div id="starfield"></div>
 
   <header>
-    <nav class="container">
-      <a href="earn.html" class="logo">Mushroom Planet</a>
-      <ul class="nav-links">
-        <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
-        <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
-        <li><a href="/profile.html">PROFILE</a></li>
-      </ul>
-      <div class="header-icons">
-        <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank"><img src="/images/reddit.png" alt="Reddit"></a>
-        <a href="https://discord.com/invite/ECauU2KSSt" target="_blank"><img src="/images/discord.png" alt="Discord"></a>
-        <a href="/profile.html"><img src="/images/profile1.png" alt="Profile"></a>
-      </div>
-    </nav>
-  </header>
+  <nav class="container">
+    <a href="earn.html" class="logo">Mushroom Planet</a>
+    <ul class="nav-links">
+      <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
+      <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
+      <li><a href="/profile.html">PROFILE</a></li>
+    </ul>
+    <div class="header-icons">
+      <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank"><img src="/images/reddit.png" alt="Reddit"></a>
+      <a href="https://discord.com/invite/ECauU2KSSt" target="_blank"><img src="/images/discord.png" alt="Discord"></a>
+      <a href="/profile.html"><img id="header-profile-icon" src="/images/profile1.png" alt="Profile" style="border-radius:50%;"></a>
+    </div>
+  </nav>
+</header>
 
   <div id="global-menu"></div>
 
@@ -1508,6 +1508,7 @@
   <style>
     .header-icons { display: none; }
     .header-icons img { width: 22px !important; height: 22px !important; object-fit: contain !important; border-radius: 0 !important; border: none !important; margin: 0 !important; opacity: 0.85; }
+    .header-icons #header-profile-icon { border-radius: 50% !important; object-fit: cover !important; }
     @media (max-width: 768px) {
       .header-icons { display: flex; gap: 0.75rem; align-items: center; }
     }

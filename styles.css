@@ -1,4 +1,7 @@
 /* === Theme variables (fall-backs overridden by config.js) === */
+@media (min-width: 769px) {
+  #pwa-install-btn { display: none !important; }
+}
 :root {
   --clr-text-light: var(--clr-sections-altLightText);
   --clr-text-dark:  var(--clr-sections-altDarkText);
