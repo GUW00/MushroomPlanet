@@ -734,12 +734,15 @@
         <div class="info-card">
           <div class="card-title"><img src="/images/shroomfarm.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Farm Status</div>
           <div class="stage-bar-wrap">
-            <div class="stage-bar-labels">
-              <span id="farm-stage-label">Stage</span>
-              <span id="farm-stage-pct">0%</span>
+            <div class="stage-bar-labels" style="display:none;">
+              <span id="farm-stage-label"></span>
+              <span id="farm-stage-pct"></span>
             </div>
-            <div class="stage-bar-track">
-              <div class="stage-bar-fill" id="farm-stage-fill" style="width:0%"></div>
+            <div style="position:relative;padding-top:36px;margin:0 0.5rem;">
+              <div id="farm-stage-markers" style="position:absolute;top:0;left:0;right:0;height:36px;"></div>
+              <div class="stage-bar-track" style="position:relative;">
+                <div class="stage-bar-fill" id="farm-stage-fill" style="width:0%"></div>
+              </div>
             </div>
           </div>
           <div class="data-grid" style="margin-top:1rem;">
@@ -1082,7 +1085,9 @@
         </div>
         <div id="w-lp-content"><div class="empty-hint" style="padding:1rem 0;">No wallet registered.</div></div>
       </div>
-</div>
+
+    </div><!-- /panel-wallet -->
+
     <!-- LEADERBOARD PANEL -->
     <div id="panel-leaderboard" style="display:none;">
       <div class="info-card reveal">
@@ -1328,9 +1333,65 @@ function timeRemaining(iso) {
 }
 
 const STAGE_ORDER = ['Spore','Germination','Mycelium','Fruiting','Sporulation','Golden_Sporulation'];
+const STAGE_DAYS = { Spore: 0, Germination: 5, Mycelium: 15, Fruiting: 25, Sporulation: 42 };
 function stagePct(name) {
   const i = STAGE_ORDER.indexOf(name);
   return i < 0 ? 0 : Math.round((i + 1) / STAGE_ORDER.length * 100);
+}
+function farmDaysPct(farm) {
+  // Use Sporulation Date as source of truth: sporulation = day 42, so day 0 = sporDate - 42 days
+  const isLegendRank = farm && (farm.farm_rank || '').toUpperCase() === 'LEGEND';
+  const sporStr = farm && (isLegendRank
+    ? (farm.Golden_Sporulation_Date || farm.Sporulation_Date)
+    : (farm.Sporulation_Date || farm.Golden_Sporulation_Date));
+  if (sporStr) {
+    let norm = sporStr.trim();
+    if (/\d{4}-\d{2}-\d{2} \d{1,2}:\d{2} [AP]M/i.test(norm)) {
+      const parts = norm.split(' ');
+      let [h, m] = parts[1].split(':').map(Number);
+      const ampm = parts[2].toUpperCase();
+      if (ampm === 'PM' && h !== 12) h += 12;
+      if (ampm === 'AM' && h === 12) h = 0;
+      norm = parts[0] + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00Z';
+    } else {
+      norm = norm.replace(' ', 'T') + (norm.includes('Z') ? '' : 'Z');
+    }
+    const sporMs = new Date(norm).getTime();
+    const plantedMs = sporMs - (42 * 86400000);
+    const daysSincePlanted = (Date.now() - plantedMs) / 86400000;
+    const totalDays = (farm && (farm.farm_rank || '').toUpperCase() === 'LEGEND') ? 294 : 42;
+    return Math.min(100, Math.max(0, Math.round((daysSincePlanted / totalDays) * 100)));
+  }
+  // Fallback to planted_time
+  if (!farm || !farm.planted_time) return 0;
+  let pt = farm.planted_time;
+  if (!pt.includes('T')) pt = pt.replace(' ', 'T');
+  if (!pt.endsWith('Z') && !pt.includes('+')) pt += 'Z';
+  const days = (Date.now() - new Date(pt).getTime()) / 86400000;
+  return Math.min(100, Math.round((days / 42) * 100));
+}
+function farmDaysElapsed(farm) {
+  const isLegendFarm = farm && (farm.farm_rank || '').toUpperCase() === 'LEGEND';
+  const sporStr = farm && (isLegendFarm
+    ? (farm.Golden_Sporulation_Date || farm.Sporulation_Date)
+    : (farm.Sporulation_Date || farm.Golden_Sporulation_Date));
+  if (sporStr) {
+    let norm = sporStr.trim();
+    if (/\d{4}-\d{2}-\d{2} \d{1,2}:\d{2} [AP]M/i.test(norm)) {
+      const parts = norm.split(' ');
+      let [h, m] = parts[1].split(':').map(Number);
+      const ampm = parts[2].toUpperCase();
+      if (ampm === 'PM' && h !== 12) h += 12;
+      if (ampm === 'AM' && h === 12) h = 0;
+      norm = parts[0] + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00Z';
+    } else {
+      norm = norm.replace(' ', 'T') + (norm.includes('Z') ? '' : 'Z');
+    }
+    const sporMs = new Date(norm).getTime();
+    const plantedMs = sporMs - (42 * 86400000);
+    return Math.max(0, (Date.now() - plantedMs) / 86400000);
+  }
+  return 0;
 }
 
 const CEMOJIS = {turtle:'🐢',bunny:'🐰',fox:'🦊',frog:'🐸',wolf:'🐺',duck:'🦆',deer:'🦌',owl:'🦉',bear:'🐻',monkey:'🐒',songbird:'🐦',panda:'🐼'};
@@ -1621,12 +1682,79 @@ function renderFarm(s, p) {
   const pct     = stagePct(stage);
   const filled  = Math.min(42, Math.round(planted / 1_000_000));
 
-  setEl('farm-stage-label', stage);
-  setEl('farm-stage-pct', pct + '%');
+  let dayPct = farmDaysPct(farm);
+  // For Legend, remap real progress to evenly-spaced visual positions
+  if ((farm.farm_rank || '').toUpperCase() === 'LEGEND') {
+    const legendBreaks = [
+      { day: 0,   visPct: 0   },
+      { day: 5,   visPct: 20  },
+      { day: 15,  visPct: 40  },
+      { day: 25,  visPct: 60  },
+      { day: 42,  visPct: 80  },
+      { day: 294, visPct: 100 },
+    ];
+    const elapsed = farmDaysElapsed(farm);
+    let visPct = 0;
+    for (let i = 0; i < legendBreaks.length - 1; i++) {
+      const a = legendBreaks[i], b = legendBreaks[i + 1];
+      if (elapsed >= a.day && elapsed < b.day) {
+        const segProgress = (elapsed - a.day) / (b.day - a.day);
+        visPct = a.visPct + segProgress * (b.visPct - a.visPct);
+        break;
+      } else if (elapsed >= b.day) {
+        visPct = b.visPct;
+      }
+    }
+    dayPct = Math.round(visPct);
+  }
+  setEl('farm-stage-label', '');
+  setEl('farm-stage-pct', dayPct + '%');
   setTimeout(() => {
     const fill = document.getElementById('farm-stage-fill');
-    if (fill) fill.style.width = pct + '%';
+    if (fill) fill.style.width = dayPct + '%';
   }, 300);
+
+  // Stage marker dots
+  const daysElapsed = farmDaysElapsed(farm);
+  const isLegend = (farm.farm_rank || '').toUpperCase() === 'LEGEND';
+  const TOTAL_DAYS = isLegend ? 294 : 42;
+  const STAGE_MARKERS = isLegend ? [
+    { key: 'Spore',              day: 0,   pct: 0,   img: 'spore.png' },
+    { key: 'Germination',        day: 5,   pct: 20,  img: 'germination.png' },
+    { key: 'Mycelium',           day: 15,  pct: 40,  img: 'mycelium.png' },
+    { key: 'Fruiting',           day: 25,  pct: 60,  img: 'fruiting.png' },
+    { key: 'Sporulation',        day: 42,  pct: 80,  img: 'sporulation1.webp' },
+    { key: 'Golden_Sporulation', day: 294, pct: 100, img: 'sgr1.webp' },
+  ] : [
+    { key: 'Spore',       day: 0,  pct: 0,                     img: 'spore.png' },
+    { key: 'Germination', day: 5,  pct: Math.round(5/42*100),  img: 'germination.png' },
+    { key: 'Mycelium',    day: 15, pct: Math.round(15/42*100), img: 'mycelium.png' },
+    { key: 'Fruiting',    day: 25, pct: Math.round(25/42*100), img: 'fruiting.png' },
+    { key: 'Sporulation', day: 42, pct: 100,                   img: 'sporulation1.webp' },
+  ];
+
+  const markersEl = document.getElementById('farm-stage-markers');
+  if (markersEl) {
+    // clamp edge markers so they don't overflow
+    const clampLeft = (pct) => {
+      if (pct === 0) return 'left:0;transform:none;';
+      if (pct === 100) return 'right:0;left:auto;transform:none;';
+      return 'left:' + pct + '%;transform:translateX(-50%);';
+    };
+    markersEl.innerHTML = STAGE_MARKERS.map(m => {
+      const reached = daysElapsed >= m.day;
+      const isCurrent = stage === m.key;
+      const imgFilter = isCurrent
+        ? 'drop-shadow(0 0 5px var(--yellow))'
+        : reached ? 'none' : 'grayscale(1) opacity(0.25)';
+      const dotColor = isCurrent ? 'var(--yellow)' : reached ? 'var(--green)' : 'rgba(255,255,225,0.15)';
+      const labelColor = isCurrent ? 'var(--yellow)' : reached ? 'rgba(255,255,225,0.55)' : 'rgba(255,255,225,0.2)';
+      return '<div style="position:absolute;' + clampLeft(m.pct) + 'display:flex;flex-direction:column;align-items:center;gap:3px;top:0;">'
+        + '<img src="/images/' + m.img + '" style="width:18px;height:18px;object-fit:contain;filter:' + imgFilter + ';flex-shrink:0;" onerror="this.style.display=\'none\'">'
+        + '<div style="width:' + (isCurrent ? '6px' : '4px') + ';height:' + (isCurrent ? '6px' : '4px') + ';border-radius:50%;background:' + dotColor + ';box-shadow:' + (isCurrent ? '0 0 5px var(--yellow)' : 'none') + ';flex-shrink:0;"></div>'
+        + '</div>';
+    }).join('');
+  }
 
   setEl('f-stage',    stage);
   const RANK_IMGS = {
@@ -4656,6 +4784,27 @@ async function renderLeaderboard(tab) {
   var p = snap.pixie || {};
   var s = snap.sporebot || {};
   var st = snap.staking || {};
+  // Build avatar lookup from ALL pixie arrays combined
+  _avatarMap = {};
+  var _allPixieLists = (p.xp || []).concat(p.nft || []).concat(p.tip_shroom || []).concat(p.tip_spore || []).concat(p.gs || []).concat(p.msg_streak || []).concat(p.msg_record || []).concat(p.msg_xp || []);
+  _allPixieLists.forEach(function(u) {
+    if (u && u.name && u.discord_id && u.avatar && !_avatarMap[u.name]) {
+      _avatarMap[u.name] = { discord_id: u.discord_id, avatar: u.avatar };
+    }
+  });
+  // Also pull from sporebot/staking arrays (server enriches these too)
+  var _allSbLists = (snap.sporebot ? Object.values(snap.sporebot) : []).flat().concat(snap.staking ? Object.values(snap.staking).flat() : []);
+  _allSbLists.forEach(function(u) {
+    if (u && u.name && u.discord_id && u.avatar && !_avatarMap[u.name]) {
+      _avatarMap[u.name] = { discord_id: u.discord_id, avatar: u.avatar };
+    }
+  });
+  var _allPixieLists = (p.xp || []).concat(p.nft || []).concat(p.tip_shroom || []).concat(p.tip_spore || []).concat(p.gs || []).concat(p.msg_streak || []).concat(p.msg_record || []).concat(p.msg_xp || []);
+  _allPixieLists.forEach(function(u) {
+    if (u && u.name && u.discord_id && u.avatar && !_avatarMap[u.name]) {
+      _avatarMap[u.name] = { discord_id: u.discord_id, avatar: u.avatar };
+    }
+  });
   var fmtSpore = function(n) { n=n||0; if(n>=1e9) return (n/1e9).toFixed(1)+'B'; if(n>=1e6) return (n/1e6).toFixed(1)+'M'; return n.toLocaleString(); };
   if (tab === 'pixie') {
     html += lbSection('xp.png',    'Pixie Level',   p.xp  || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">Lv.'+fmtN(u.level||1)+'</span>'; });
@@ -4688,6 +4837,7 @@ async function renderLeaderboard(tab) {
 }
 
 var _lbSectionId = 0;
+var _avatarMap = {};
 function lbSection(icon, title, arr, rowFn) {
   if (!arr || !arr.length) return '';
   var id = 'lbs_' + (++_lbSectionId);
@@ -4696,8 +4846,15 @@ function lbSection(icon, title, arr, rowFn) {
               : i===1 ? '<span style="color:#c0c0c0;font-weight:700;min-width:1rem;">2</span>'
               : i===2 ? '<span style="color:#cd7f32;font-weight:700;min-width:1rem;">3</span>'
               : '<span style="color:rgba(255,255,225,0.3);font-size:0.65rem;min-width:1rem;">'+(i+1)+'</span>';
-    var avatarHtml = (u.discord_id && u.avatar)
-      ? '<img src="https://cdn.discordapp.com/avatars/'+u.discord_id+'/'+u.avatar+'.png?size=32" style="width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.display=\'none\'">'
+    // Fall back to pixie avatar map if sporebot entry lacks avatar
+    var resolvedAvatar = u.avatar;
+    var resolvedDid = u.discord_id;
+    if ((!resolvedAvatar || !resolvedDid) && u.name && _avatarMap[u.name]) {
+      resolvedDid = _avatarMap[u.name].discord_id;
+      resolvedAvatar = _avatarMap[u.name].avatar;
+    }
+    var avatarHtml = (resolvedDid && resolvedAvatar)
+      ? '<img src="https://cdn.discordapp.com/avatars/'+resolvedDid+'/'+resolvedAvatar+'.png?size=32" style="width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.display=\'none\'">'
       : '<div style="width:20px;height:20px;border-radius:50%;background:rgba(255,255,225,0.08);display:flex;align-items:center;justify-content:center;font-size:0.55rem;flex-shrink:0;color:rgba(255,255,225,0.3);">'+(u.name||'?').charAt(0).toUpperCase()+'</div>';
     return '<div style="padding:0.3rem 0;border-bottom:1px solid rgba(255,255,225,0.04);">'
       + '<span style="display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;">'+medal+avatarHtml+rowFn(u)+'</span>'

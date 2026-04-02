@@ -1332,10 +1332,103 @@ app.get('/api/reddit-user/:discord_id', async (req, res) => {
 
 app.get('/api/leaderboard/snapshot', async (req, res) => {
   try {
-    const snap = await db.ref('Pixie/Leaderboard').get();
+    const [snap, pixieSnap] = await Promise.all([
+      db.ref('Pixie/Leaderboard').get(),
+      db.ref('Pixie/Users').get(),
+    ]);
     if (!snap.exists()) return res.json({ ok: false });
+
+    // Build name->avatar lookup from Pixie/Users Misc
+    const avatarMap = {};
+    if (pixieSnap.exists()) {
+      pixieSnap.forEach(child => {
+        const misc = (child.val() || {}).Misc || {};
+        if (misc.username && misc.avatar_hash) {
+          avatarMap[misc.username] = { discord_id: child.key, avatar: misc.avatar_hash };
+        }
+      });
+    }
+
+    // Build discord_id -> name map for reverse lookup
+    const idToName = {};
+    if (pixieSnap.exists()) {
+      pixieSnap.forEach(child => {
+        const misc = (child.val() || {}).Misc || {};
+        if (misc.username) idToName[child.key] = misc.username;
+      });
+    }
+
+    // Collect ALL unique names from the leaderboard snapshot that need avatars
+    const namesToFetch = new Set();
+    const snapData = snap.val();
+    function collectNames(arr) {
+      if (!Array.isArray(arr)) return;
+      arr.forEach(u => { if (u.name && !avatarMap[u.name]) namesToFetch.add(u.name); });
+    }
+    for (const section of Object.keys(snapData)) {
+      for (const key of Object.keys(snapData[section] || {})) {
+        if (Array.isArray(snapData[section][key])) collectNames(snapData[section][key]);
+      }
+    }
+
+    // Build reverse map: name -> discord_id from Firebase (case-insensitive)
+    const nameToId = {};
+    if (pixieSnap.exists()) {
+      pixieSnap.forEach(child => {
+        const misc = (child.val() || {}).Misc || {};
+        if (misc.username) nameToId[misc.username.toLowerCase()] = child.key;
+      });
+    }
+
+    // Fetch avatars for all missing leaderboard names
+    await Promise.all([...namesToFetch].map(async name => {
+      const discordId = nameToId[name.toLowerCase()];
+      if (!discordId) return;
+      try {
+        const r = await fetch('https://discord.com/api/v10/users/' + discordId, {
+          headers: { Authorization: 'Bot ' + process.env.DISCORD_BOT_TOKEN }
+        });
+        const u = await r.json();
+        if (u.avatar) {
+          avatarMap[name] = { discord_id: discordId, avatar: u.avatar };
+          db.ref(`Pixie/Users/${discordId}/Misc`).update({ avatar_hash: u.avatar }).catch(() => {});
+        } else if (u.id) {
+          // User exists but has no avatar - store discord_id so we at least have that
+          avatarMap[name] = { discord_id: discordId, avatar: null };
+        }
+      } catch(e) {}
+    }));
+
+    // Enrich all leaderboard array entries with discord_id + avatar
+    const data = snap.val();
+    function enrichList(arr) {
+      if (!Array.isArray(arr)) return arr;
+      return arr.map(u => {
+        if (u.discord_id && u.avatar) return u;
+        const match = u.name && avatarMap[u.name];
+        if (match) return { ...u, discord_id: match.discord_id, avatar: match.avatar };
+        return u;
+      });
+    }
+    for (const section of Object.keys(data)) {
+      for (const key of Object.keys(data[section] || {})) {
+        if (Array.isArray(data[section][key])) {
+          data[section][key] = enrichList(data[section][key]);
+        }
+      }
+    }
+
+    const missing = [];
+    for (const section of Object.keys(data)) {
+      for (const key of Object.keys(data[section] || {})) {
+        if (Array.isArray(data[section][key])) {
+          data[section][key].forEach(u => { if (u.name && !u.avatar) missing.push(u.name); });
+        }
+      }
+    }
+    console.log('[LB-SNAPSHOT] Missing avatars:', [...new Set(missing)].join(', '));
     res.set('Cache-Control', 'public, max-age=14400, stale-while-revalidate=3600');
-    res.json({ ok: true, data: snap.val() });
+    res.json({ ok: true, data });
   } catch (err) {
     console.error('[LB-SNAPSHOT]', err);
     res.status(500).json({ ok: false });
