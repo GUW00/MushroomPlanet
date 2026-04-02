@@ -784,7 +784,7 @@
             </div>
             <div>
               <div class="data-row"><span class="dr-label"><img src="/images/apy1.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Staking APY</span><span class="dr-val y" id="s-apy">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/mycelium.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Mycelium Nodes</span><span class="dr-val p" id="s-nodes">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/mycelium_node.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Mycelium Nodes</span><span class="dr-val p" id="s-nodes">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/cooldown.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Next Node At</span><span class="dr-val b" id="s-next-node">—</span></div>
             </div>
           </div>
@@ -794,7 +794,7 @@
           <div id="mvp-breakdown"></div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><img src="/images/mycelium.png" style="width:14px;height:14px;object-fit:contain;opacity:0.9;" onerror="this.style.display='none'"> Node Breakdown</div>
+          <div class="card-title"><img src="/images/growing_nodes.png" style="width:14px;height:14px;object-fit:contain;opacity:0.9;" onerror="this.style.display='none'"> Growing Nodes</div>
           <div id="nodes-breakdown"><div class="empty-hint">No nodes yet.</div></div>
         </div>
       </div>
@@ -1098,10 +1098,10 @@
         <div class="tab-bar" style="margin-bottom:1rem;">
           <button class="tab active" onclick="switchLbTab('pixie',this)"><img src="/images/pixie.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Pixie</button>
           <button class="tab" onclick="switchLbTab('farm',this)"><img src="/images/shroomfarm.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Farm</button>
-          <button class="tab" onclick="switchLbTab('plant',this)"><img src="/images/sporulation.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Planted</button>
+          <button class="tab" onclick="switchLbTab('plant',this)"><img src="/images/plants.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Planted</button>
           <button class="tab" onclick="switchLbTab('tips',this)"><img src="/images/gift.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Tips</button>
           <button class="tab" onclick="switchLbTab('social',this)"><img src="/images/butterfly.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Social</button>
-          <button class="tab" onclick="switchLbTab('staking',this)"><img src="/images/mycelium.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Staking</button>
+          <button class="tab" onclick="switchLbTab('staking',this)"><img src="/images/spore.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Staking</button>
         </div>
         <div id="lb-content"><div class="empty-hint">Loading...</div></div>
       </div>
@@ -1721,16 +1721,16 @@ function renderFarm(s, p) {
   const STAGE_MARKERS = isLegend ? [
     { key: 'Spore',              day: 0,   pct: 0,   img: 'spore.png' },
     { key: 'Germination',        day: 5,   pct: 20,  img: 'germination.png' },
-    { key: 'Mycelium',           day: 15,  pct: 40,  img: 'mycelium.png' },
-    { key: 'Fruiting',           day: 25,  pct: 60,  img: 'fruiting.png' },
-    { key: 'Sporulation',        day: 42,  pct: 80,  img: 'sporulation1.webp' },
-    { key: 'Golden_Sporulation', day: 294, pct: 100, img: 'sgr1.webp' },
+    { key: 'Mycelium',           day: 15,  pct: 40,  img: 'fruiting.png' },
+    { key: 'Fruiting',           day: 25,  pct: 60,  img: 'shroomfarm.png' },
+    { key: 'Sporulation',        day: 42,  pct: 80,  img: 'sgr1.webp' },
+    { key: 'Golden_Sporulation', day: 294, pct: 100, img: 'sporulation1.webp' },
   ] : [
     { key: 'Spore',       day: 0,  pct: 0,                     img: 'spore.png' },
     { key: 'Germination', day: 5,  pct: Math.round(5/42*100),  img: 'germination.png' },
-    { key: 'Mycelium',    day: 15, pct: Math.round(15/42*100), img: 'mycelium.png' },
-    { key: 'Fruiting',    day: 25, pct: Math.round(25/42*100), img: 'fruiting.png' },
-    { key: 'Sporulation', day: 42, pct: 100,                   img: 'sporulation1.webp' },
+    { key: 'Mycelium',    day: 15, pct: Math.round(15/42*100), img: 'fruiting.png' },
+    { key: 'Fruiting',    day: 25, pct: Math.round(25/42*100), img: 'shroomfarm.png' },
+    { key: 'Sporulation', day: 42, pct: 100,                   img: 'sgr1.webp' },
   ];
 
   const markersEl = document.getElementById('farm-stage-markers');
@@ -3189,7 +3189,7 @@ function renderStaking(s, p) {
     return;
   }
   const categories = [
-    { key: 'mycelium_nodes',   label: 'Mycelium Nodes',  max: 25, img: 'mycelium.png' },
+    { key: 'mycelium_nodes',   label: 'Mycelium Nodes',  max: 25, img: 'mycelium_node.png' },
     { key: 'staked_spore',     label: 'Staked SPORE',    max: 20, img: 'spore.png' },
     { key: 'planted_shroom',   label: 'Planted SHROOM',  max: 15, img: 'shroom.png' },
     { key: 'onchain_spore',    label: 'Onchain SPORE',   max: 10, img: 'blockchain.png' },
@@ -3248,7 +3248,7 @@ function renderStaking(s, p) {
     if (nextNodePct > 0) {
       nbHtml += '<div style="margin-top:0.75rem;">'
         + '<div style="display:flex;justify-content:space-between;font-family:Space Grotesk,monospace;font-size:0.7rem;color:rgba(232,242,234,0.3);margin-bottom:0.35rem;">'
-        + '<span><img src="/images/growth.png" style="width:12px;height:12px;object-fit:contain;vertical-align:middle;margin-right:3px;" onerror="this.style.display=\'none\'">Next Node Progress</span><span>' + nextNodePct + '%</span></div>'
+        + '<span><img src="/images/mycelium_node.png" style="width:12px;height:12px;object-fit:contain;vertical-align:middle;margin-right:3px;" onerror="this.style.display=\'none\'">Next Node Progress</span><span>' + nextNodePct + '%</span></div>'
         + '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
         + '<div style="height:100%;width:' + nextNodePct + '%;background:var(--purple);border-radius:999px;"></div>'
         + '</div></div>';
@@ -3573,7 +3573,7 @@ function renderItemsOrganized(s) {
   var html = '';
 
   // ======== 1. GEMSTONES ========
-  html += secHdr('Cave Gems', 'gemstones.png');
+  html += secHdr('Gemstones', 'gemstones.png');
 
   const GEM_DEFS = [
     { key:'Wildtongue_Gemstone',  img:'wildtongue_gemstone.png',  label:'Wildtongue Gemstone', color:'var(--green)',
@@ -4828,8 +4828,8 @@ async function renderLeaderboard(tab) {
     html += lbSection('butterfly.png', 'Message XP',     p.msg_xp      || [], function(u){ return esc(u.name)+' <span style="color:var(--green);font-family:Syne Mono,monospace;">'+fmtN(u.msg_xp)+'</span>'; });
   } else if (tab === 'staking') {
     html += lbSection('spore.png',    'Most Staked',    st.staked   || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtSpore(u.staked)+'</span>'; });
-    html += lbSection('sporulation.png','Lifetime Earned',st.lifetime|| [], function(u){ return esc(u.name)+' <span style="color:var(--green);font-family:Syne Mono,monospace;">'+fmtSpore(u.lifetime)+'</span>'; });
-    html += lbSection('mycelium.png', 'MVP Leaders',    st.mvp      || [], function(u){ return esc(u.name)+' <span style="color:var(--purple);font-family:Syne Mono,monospace;">'+fmtN(u.mvp)+' MVP</span>'; });
+    html += lbSection('farm2.png','Lifetime Earned',st.lifetime|| [], function(u){ return esc(u.name)+' <span style="color:var(--green);font-family:Syne Mono,monospace;">'+fmtSpore(u.lifetime)+'</span>'; });
+    html += lbSection('mvp.png', 'MVP Leaders',    st.mvp      || [], function(u){ return esc(u.name)+' <span style="color:var(--purple);font-family:Syne Mono,monospace;">'+fmtN(u.mvp)+' MVP</span>'; });
   }
   el.innerHTML = html || '<div class="empty-hint">No data.</div>';
   _lbSectionId = 0;
