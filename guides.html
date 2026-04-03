@@ -354,6 +354,60 @@
     .gi-sm { width:13px; height:13px; object-fit:contain; vertical-align:middle; margin-right:4px; display:inline-block; }
 
     @media (max-width: 600px) {
+      .contract-row {
+        flex-wrap: wrap;
+      }
+
+      .contract-row .copy-btn,
+      .contract-row a.copy-btn {
+        margin-left: 0;
+        flex-basis: 100%;
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+      }
+    }
+    @media (max-width: 600px) {
+    .contract-row {
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .contract-name {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .contract-row .copy-btn {
+      margin-left: 0;
+    }
+
+    .contract-row .copy-btn:first-of-type {
+      order: 3;
+      flex: 0 0 auto;
+    }
+
+    .contract-row .copy-btn:last-of-type {
+      order: 4;
+      flex: 0 0 auto;
+    }
+
+    .contract-row a.contract-name {
+      order: 1;
+    }
+
+    .contract-row img {
+      order: 0;
+    }
+
+    .contract-row .copy-btn:first-of-type,
+    .contract-row .copy-btn:last-of-type {
+      flex-basis: 100%;
+      width: 100%;
+      margin-top: 0.35rem;
+    }
+  }
+    @media (max-width: 600px) {
       .guide-tabs { gap: 0.5rem; }
       .guide-tab { padding: 0.5rem 1rem; font-size: 0.65rem; }
       .guide-card { padding: 1.4rem; }

@@ -747,18 +747,20 @@
           </div>
           <div class="data-grid" style="margin-top:1rem;">
             <div>
-              <div class="data-row"><span class="dr-label"><img src="/images/shroomfarm.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Stage</span><span class="dr-val g" id="f-stage">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/shroomfarm.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Current Stage</span><span class="dr-val g" id="f-stage">—</span></div>
               <div class="data-row"><span class="dr-label"><span id="f-rank-img" style="margin-right:4px;"></span>Farm Rank</span><span class="dr-val r" id="f-rank">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/time.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Sporulation In</span><span class="dr-val" id="f-spor-date">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Spores / Day</span><span class="dr-val b" id="f-sgr">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/apy1.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total APY</span><span class="dr-val b" id="f-apy">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/planting.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Plots Filled</span><span class="dr-val" id="f-plots">—</span></div>
+            
             </div>
             <div>
+              <div class="data-row"><span class="dr-label"><img src="/images/lifetime.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Lifetime Generated</span><span class="dr-val b" id="f-lifetime">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/planting.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Plots Filled</span><span class="dr-val" id="f-plots">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/forage.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Forage Streak</span><span class="dr-val" id="f-streak">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/streak.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Max Streak</span><span class="dr-val" id="f-maxstreak">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/vacation.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Vacation Days</span><span class="dr-val y" id="f-vacation">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/lifetime.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Lifetime Generated</span><span class="dr-val b" id="f-lifetime">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/time.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Sporulation In</span><span class="dr-val" id="f-spor-date">—</span></div>
+              
             </div>
           </div>
         </div>
@@ -832,8 +834,8 @@
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title">
             <img src="/images/sporebot.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'">
-            Mega Sporebot Builder
-            <span style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);margin-left:0.5rem;">Equip up to 12 Sporebots</span>
+            Mega Sporebot Builder (BETA)
+            <span style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);margin-left:0.5rem;">Equip up to 12 Sporebots (NOT LIVE)</span>
           </div>
 
           <!-- Row 1: Mosaic + buttons (left) + slots (right) on desktop; mosaic+buttons row then slots on mobile -->
@@ -936,9 +938,9 @@
               <div class="data-row"><span class="dr-label">GS Given</span><span class="dr-val y" id="px-gs-given">—</span></div>
             </div>
             <div>
+              <div class="data-row"><span class="dr-label">Social Butterfly</span><span class="dr-val g" id="px-social">—</span></div>
               <div class="data-row"><span class="dr-label">Msg Streak</span><span class="dr-val" id="px-streak">—</span></div>
               <div class="data-row"><span class="dr-label">Max Streak</span><span class="dr-val" id="px-maxstreak">—</span></div>
-              <div class="data-row"><span class="dr-label">Social Butterfly</span><span class="dr-val g" id="px-social">—</span></div>
               <div class="data-row"><span class="dr-label">Verified</span><span class="dr-val" id="px-verified">—</span></div>
               <div class="data-row"><span class="dr-label">GS Received</span><span class="dr-val y" id="px-gs-received">—</span></div>
             </div>
@@ -2456,7 +2458,7 @@ function renderActiveSporebotCard(active, s) {
 
   // Trait pills
   var traitSlots = ['Background','Cap','Eyes','Face','Spots','Arms','Hands','Legs','Shoes','Pixie','Item','Mouth'];
-  var traitPills = traitSlots.filter(function(sl) { return traits[sl]; }).map(function(sl) {
+  var traitPills = traitSlots.filter(function(sl) { if (!traits[sl]) return false; var _tv = traits[sl]; return _tv.includes('Legendary') || _tv.includes('Rare') || _tv.includes('Blue') || _tv.includes('Pink'); }).map(function(sl) {
     var tv = traits[sl];
     var isRare = tv.includes('Legendary') || tv.includes('Rare') || tv.includes('Blue') || tv.includes('Pink');
     var tc = tv.includes('Legendary') ? 'var(--yellow)' : tv.includes('Super') ? 'var(--purple)' : tv.includes('Rare') ? 'var(--red)' : (tv.includes('Blue')||tv.includes('Pink')) ? 'var(--blue)' : 'rgba(255,255,225,0.25)';
@@ -4365,7 +4367,8 @@ function renderPixie(p) {
   setEl('px-flair-title', safe(flair.Title || flair.title, '-'));
   setEl('px-streak',      safe(msgXp.current_streak, 0) + ' days');
   setEl('px-maxstreak',   safe(msgXp.max_streak, 0) + ' days');
-  setEl('px-social',      quests.social_butterfly ? 'Completed' : 'In Progress');
+  const socialXp = msgXp.daily_limit || 0;
+  setEl('px-social', (quests.social_butterfly || socialXp >= 200) ? 'Completed' : (socialXp + ' / 200 XP'));
   setEl('px-verified',    sec.Verified ? 'Yes' : 'No');
 
   // GS & Tipping (matches /pixie command)
