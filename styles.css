@@ -517,7 +517,7 @@ section:target {
 }
 
 body {
-  background: linear-gradient(to top, #0d0c0f 0%, #0f0f0f 50%) !important;
+  background: linear-gradient(to top, #080214 0%, #0f0f0f 40%) !important;
   min-height: 100vh;
 }
 /* Make the menu fixed below the header */
