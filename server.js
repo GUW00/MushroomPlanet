@@ -1156,6 +1156,13 @@ app.get('/api/proposals', async (req, res) => {
         p.status = finalStatus;
         p.closed_at = now.toISOString();
         console.log(`[GOVERNANCE-AUTO-CLOSE] "${p.title}" auto-closed as ${finalStatus}`);
+        const autoEmoji = finalStatus === 'passed' ? 'PASSED' : 'FAILED';
+        const autoStage = p.stage === 'vote' ? 'Official Vote' : 'Official Proposal';
+        sendInboxToAll(
+          autoStage + ' ' + autoEmoji + ': ' + p.title.slice(0, 50),
+          '"' + p.title.slice(0, 80) + '" has ended and ' + (finalStatus === 'passed' ? 'passed! The team will now implement the decision.' : 'did not pass. Discussion continues in Discord.'),
+          '/vote.html'
+        );
       }
     }
     if (closeOps.length) await Promise.all(closeOps);
@@ -1422,6 +1429,11 @@ app.post('/api/proposals/create', async (req, res) => {
     });
 
     console.log(`[GOVERNANCE-CREATE] ${sessionUser.username} created proposal "${title}" (burned ${PROPOSAL_BURN_AMOUNT} SPORE)`);
+    sendInboxToAll(
+      'New Proposal: ' + title.slice(0, 60),
+      sessionUser.username + ' submitted a new Official Proposal. Vote ends in ' + PROPOSAL_DURATION_DAYS + ' days. Cast your vote to earn 1M SPORE.',
+      '/vote.html'
+    );
     res.json({ ok: true, id: proposalRef.key });
 
   } catch (err) {
@@ -1467,6 +1479,11 @@ app.post('/api/proposals/:id/advance', async (req, res) => {
     await db.ref(`Governance/Votes/${req.params.id}`).remove();
 
     console.log(`[GOVERNANCE-ADVANCE] Admin advanced "${proposal.title}" to Official Vote`);
+    sendInboxToAll(
+      'Official Vote Started: ' + proposal.title.slice(0, 55),
+      'This proposal has passed and is now an Official Vote. Your MVP score is your vote weight. Voting closes in ' + VOTE_DURATION_DAYS + ' days.',
+      '/vote.html'
+    );
     res.json({ ok: true });
   } catch (err) {
     console.error('[GOVERNANCE-ADVANCE] Error:', err);
@@ -1513,6 +1530,13 @@ app.post('/api/proposals/:id/close', async (req, res) => {
     });
 
     console.log(`[GOVERNANCE-CLOSE] "${proposal.title}" closed as ${finalStatus}`);
+    const closeEmoji = finalStatus === 'passed' ? 'PASSED' : 'FAILED';
+    const closeStage = proposal.stage === 'vote' ? 'Official Vote' : 'Official Proposal';
+    sendInboxToAll(
+      closeStage + ' ' + closeEmoji + ': ' + proposal.title.slice(0, 50),
+      '"' + proposal.title.slice(0, 80) + '" has ended and ' + (finalStatus === 'passed' ? 'passed! The team will now implement the decision.' : 'did not pass. Discussion continues in Discord.'),
+      '/vote.html'
+    );
     res.json({ ok: true, status: finalStatus });
   } catch (err) {
     console.error('[GOVERNANCE-CLOSE] Error:', err);
@@ -1524,6 +1548,42 @@ app.post('/api/proposals/:id/close', async (req, res) => {
 // Admin only — sends a message to all users' Inbox + push notification
 // ----------------------------------------------------------------
 const BROADCAST_ADMIN_ID = '1233612802883719261';
+
+// ----------------------------------------------------------------
+// Helper — write to all users' Inbox + send push if pref enabled
+// ----------------------------------------------------------------
+async function sendInboxToAll(title, body, url) {
+  try {
+    const snap = await db.ref('Pixie/Users').get();
+    if (!snap.exists()) return;
+    const users = snap.val();
+    const now = new Date().toISOString();
+    const dbWrites = [];
+    const pushSends = [];
+    for (const [uid, user] of Object.entries(users)) {
+      const msgRef = db.ref(`Pixie/Users/${uid}/Inbox`).push();
+      dbWrites.push(msgRef.set({ title, body, sent_at: now, from: 'system', read: false }));
+      const sub = user?.Notifications;
+      if (sub && sub.endpoint) {
+        const prefs = sub.prefs || {};
+        if (prefs.inbox !== false) {
+          pushSends.push(
+            webpush.sendNotification(sub, JSON.stringify({ title, body, url: url || '/vote.html' }))
+              .catch(async (err) => {
+                if (err.statusCode === 404 || err.statusCode === 410) {
+                  await db.ref(`Pixie/Users/${uid}/Notifications`).remove();
+                }
+              })
+          );
+        }
+      }
+    }
+    await Promise.all([...dbWrites, ...pushSends]);
+    console.log(`[INBOX] Sent "${title}" to ${Object.keys(users).length} users`);
+  } catch (err) {
+    console.error('[INBOX] sendInboxToAll error:', err.message);
+  }
+}
 
 app.post('/api/admin/broadcast', async (req, res) => {
   const { discord_id, message, title } = req.body;

@@ -1703,7 +1703,7 @@ window.closeMessagesModal = closeMessagesModal;
 // ================================================================
 // PUSH NOTIFICATION MODAL
 // ================================================================
-var _notifyPrefs = { master: false, reset: true, forage: true, social: true, raffle: true, inbox: true };
+var _notifyPrefs = { master: false, reset: false, forage: false, social: false, raffle: false, inbox: false };
 
 function setToggle(id, on) {
   var el  = document.getElementById('toggle-' + id);
@@ -1732,11 +1732,34 @@ async function openNotifyModal() {
       var res = await fetch(API_BASE + '/api/push-prefs/' + currentUser.discord_id);
       var data = await res.json();
       if (data.prefs) {
-        _notifyPrefs.reset  = data.prefs.reset  !== false;
-        _notifyPrefs.forage = data.prefs.forage !== false;
-        _notifyPrefs.social = data.prefs.social !== false;
+        // Explicit opt-in: only true if explicitly set to true
+        _notifyPrefs.reset  = data.prefs.reset  === true;
+        _notifyPrefs.forage = data.prefs.forage === true;
+        _notifyPrefs.social = data.prefs.social === true;
+        _notifyPrefs.raffle = data.prefs.raffle === true;
+        _notifyPrefs.inbox  = data.prefs.inbox  === true;
+      } else {
+        // No prefs saved yet — default everything OFF
+        _notifyPrefs.reset  = false;
+        _notifyPrefs.forage = false;
+        _notifyPrefs.social = false;
+        _notifyPrefs.raffle = false;
+        _notifyPrefs.inbox  = false;
       }
-    } catch(e) {}
+    } catch(e) {
+      _notifyPrefs.reset  = false;
+      _notifyPrefs.forage = false;
+      _notifyPrefs.social = false;
+      _notifyPrefs.raffle = false;
+      _notifyPrefs.inbox  = false;
+    }
+  } else {
+    // No active subscription — everything off
+    _notifyPrefs.reset  = false;
+    _notifyPrefs.forage = false;
+    _notifyPrefs.social = false;
+    _notifyPrefs.raffle = false;
+    _notifyPrefs.inbox  = false;
   }
 
   renderNotifyModal();
