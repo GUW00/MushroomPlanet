@@ -661,6 +661,7 @@
         </div>
       </div>
         <button class="btn-sm" id="btn-logout" onclick="logout()">Disconnect</button>
+        <button id="btn-notify" class="btn-sm" onclick="togglePushNotification()">Enable Farm Alerts</button>
       </div>
     </div>
 
@@ -1254,6 +1255,53 @@
 </script>
 
 <script>
+  const VAPID_PUBLIC_KEY = 'YOUR_VAPID_PUBLIC_KEY_HERE';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(base64);
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+}
+
+async function togglePushNotification() {
+  const discord_id = currentUser?.discord_id;
+  if (!discord_id) return;
+  const btn = document.getElementById('btn-notify');
+  const reg = await navigator.serviceWorker.ready;
+  const existing = await reg.pushManager.getSubscription();
+  if (existing) {
+    await existing.unsubscribe();
+    await fetch(API_BASE + '/api/push-unsubscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ discord_id })
+    });
+    btn.textContent = 'Enable Farm Alerts';
+    return;
+  }
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') return;
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+  });
+  await fetch(API_BASE + '/api/push-subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ discord_id, subscription: sub })
+  });
+  btn.textContent = 'Disable Farm Alerts';
+}
+
+// Set button state on load
+async function initPushButton() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  const reg = await navigator.serviceWorker.ready;
+  const existing = await reg.pushManager.getSubscription();
+  const btn = document.getElementById('btn-notify');
+  if (btn) btn.textContent = existing ? 'Disable Alerts' : 'Enable Alerts';
+}
 // ================================================================
 // CONFIG
 // ================================================================
