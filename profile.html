@@ -1274,13 +1274,23 @@
             </div>
           </div>
 
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;border-bottom:1px solid rgba(255,255,225,0.06);">
             <div>
               <div style="font-size:0.82rem;color:var(--cream);display:flex;align-items:center;gap:0.4rem;"><img src="/images/pixie.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Social Butterfly</div>
               <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.35);margin-top:0.1rem;">7:20 EST if 200 XP not earned</div>
             </div>
             <div id="toggle-social" onclick="togglePref('social')" style="width:40px;height:22px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,225,0.12);cursor:pointer;position:relative;transition:background 0.2s;">
               <div id="toggle-social-knob" style="position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:rgba(255,255,225,0.35);transition:all 0.2s;"></div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;">
+            <div>
+              <div style="font-size:0.82rem;color:var(--cream);display:flex;align-items:center;gap:0.4rem;"><img src="/images/raffle.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Raffle Winner</div>
+              <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.35);margin-top:0.1rem;">When you win a raffle</div>
+            </div>
+            <div id="toggle-raffle" onclick="togglePref('raffle')" style="width:40px;height:22px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,225,0.12);cursor:pointer;position:relative;transition:background 0.2s;">
+              <div id="toggle-raffle-knob" style="position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:rgba(255,255,225,0.35);transition:all 0.2s;"></div>
             </div>
           </div>
 
@@ -1323,7 +1333,7 @@
 // ================================================================
 // PUSH NOTIFICATION MODAL
 // ================================================================
-var _notifyPrefs = { master: false, reset: true, forage: true, social: true };
+var _notifyPrefs = { master: false, reset: true, forage: true, social: true, raffle: true };
 
 function setToggle(id, on) {
   var el  = document.getElementById('toggle-' + id);
@@ -1382,6 +1392,7 @@ async function openNotifyModal() {
         _notifyPrefs.reset  = data.prefs.reset  !== false;
         _notifyPrefs.forage = data.prefs.forage !== false;
         _notifyPrefs.social = data.prefs.social !== false;
+        _notifyPrefs.raffle = data.prefs.raffle !== false;
       }
     } catch(e) {}
   }
@@ -1395,6 +1406,7 @@ function renderNotifyModal() {
   setToggle('reset',  _notifyPrefs.reset);
   setToggle('forage', _notifyPrefs.forage);
   setToggle('social', _notifyPrefs.social);
+  setToggle('raffle', _notifyPrefs.raffle);
   var opts = document.getElementById('notify-options');
   if (opts) { opts.style.opacity = _notifyPrefs.master ? '1' : '0.35'; opts.style.pointerEvents = _notifyPrefs.master ? 'all' : 'none'; }
   // Update header button
@@ -1463,9 +1475,10 @@ async function savePrefs() {
     await fetch(API_BASE + '/api/push-prefs', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ discord_id, prefs: {
-        reset:  _notifyPrefs.reset,
-        forage: _notifyPrefs.forage,
-        social: _notifyPrefs.social,
+        reset:   _notifyPrefs.reset,
+        forage:  _notifyPrefs.forage,
+        social:  _notifyPrefs.social,
+        raffle:  _notifyPrefs.raffle,
         reminders: _notifyPrefs.forage || _notifyPrefs.social,
       }})
     });
