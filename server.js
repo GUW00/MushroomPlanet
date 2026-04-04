@@ -19,6 +19,54 @@ webpush.setVapidDetails(
 
 const serviceAccount = JSON.parse(fs.readFileSync('./firebase.json', 'utf8'));
 
+// ----------------------------------------------------------------
+// Firebase listener - fires push when raffle winner is recorded
+// ----------------------------------------------------------------
+function startRaffleWinnerListener() {
+  const ref = admin.database().ref('Pixie/Logs/Raffles/Completed');
+  ref.on('child_added', async (snap) => {
+    try {
+      const data = snap.val();
+      if (!data || !data.Winner) return;
+
+      // Winner stored as "<@discord_id>"
+      const match = data.Winner.match(/<@(\d+)>/);
+      if (!match) return;
+      const discord_id = match[1];
+
+      // Check if user has push subscription with raffle enabled
+      const subSnap = await admin.database().ref(`Pixie/Users/${discord_id}/Notifications`).get();
+      if (!subSnap.exists()) return;
+      const sub = subSnap.val();
+      if (!sub.endpoint) return;
+      const prefs = sub.prefs || {};
+      if (prefs.raffle === false) return;
+
+      const amount   = data.Amount_Awarded || data.Amount || 0;
+      const currency = data.Currency || 'tokens';
+      const host     = data.creator  || 'someone';
+
+      const payload = JSON.stringify({
+        title: 'You Won a Raffle!',
+        body: `You won ${Number(amount).toLocaleString()} ${currency.toUpperCase()} from ${host}'s raffle!`,
+        url: '/profile.html'
+      });
+
+      await webpush.sendNotification(sub, payload);
+      console.log(`[PUSH] Raffle win sent to ${discord_id} (${amount} ${currency})`);
+
+    } catch (err) {
+      if (err.statusCode === 404 || err.statusCode === 410) {
+        const match = (snap.val()?.Winner || '').match(/<@(\d+)>/);
+        if (match) await admin.database().ref(`Pixie/Users/${match[1]}/Notifications`).remove();
+      } else {
+        console.error('[PUSH] Raffle win listener error:', err.message);
+      }
+    }
+  });
+  console.log('[PUSH] Raffle winner listener active.');
+}
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://drbots---live-default-rtdb.firebaseio.com',
@@ -27,6 +75,7 @@ admin.initializeApp({
 const TESTING = process.env.TESTING === 'true';
 const db = admin.database();
 const app = express();
+startRaffleWinnerListener();
 app.use(cors({
   origin: ['https://mushroomplanet.earth', 'http://localhost:8080', 'http://localhost:5500'],
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -111,11 +160,18 @@ app.post('/api/push-test', async (req, res) => {
 
     if (!snap.exists()) return res.json({ success: false, message: 'No subscriptions found' });
 
-    const payload = JSON.stringify({
-      title: 'Daily Reset Completed!',
-      body: 'A new farm day has begun. Complete your daily activities!',
-      url: '/profile.html'
-    });
+    const { type } = req.body;
+    const payload = type === 'reminder'
+      ? JSON.stringify({
+          title: 'Farm Reset in 1 Hour!',
+          body: 'Still need to complete: !forage & Social Butterfly. Reset at 12:20 UTC.',
+          url: '/profile.html'
+        })
+      : JSON.stringify({
+          title: 'NEW FARM DAY BEGINS!',
+          body: 'The daily reset is complete and your cooldowns have been reset!',
+          url: '/profile.html'
+        });
 
     if (discord_id) {
       await webpush.sendNotification(snap.val(), payload);

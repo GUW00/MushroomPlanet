@@ -1244,7 +1244,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,225,0.08);margin-bottom:0.75rem;">
           <div>
             <div style="font-size:0.85rem;font-weight:600;color:var(--cream);">Enable Notifications</div>
-            <div style="font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-top:0.15rem;">Allow browser permission</div>
+            <div style="font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-top:0.15rem;">Only allowed in the Mushroom Planet app</div>
           </div>
           <div id="toggle-master" onclick="toggleMaster()" style="width:44px;height:24px;border-radius:999px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,225,0.15);cursor:pointer;position:relative;transition:background 0.2s;">
             <div id="toggle-master-knob" style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:rgba(255,255,225,0.4);transition:all 0.2s;"></div>
@@ -1341,7 +1341,34 @@ function setNotifyStatus(msg, color) {
 }
 
 async function openNotifyModal() {
-  document.getElementById('notify-modal-overlay').style.display = 'flex';
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (!isPWA) {
+    document.getElementById('notify-modal-overlay').style.display = 'flex';
+    document.getElementById('notify-options').style.display = 'none';
+    document.getElementById('toggle-master').style.display = 'none';
+    document.getElementById('notify-status').innerHTML = ''
+      + '<div style="color:rgba(255,255,225,0.6);font-size:0.72rem;line-height:1.7;text-align:left;">'
+      + 'Farm Alerts are only available in the <b style="color:var(--cream);">Mushroom Planet app</b>. Install the app first to enable notifications.'
+      + '</div>'
+      + '<div style="margin-top:0.85rem;text-align:left;">'
+      + '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.1em;color:rgba(255,255,225,0.3);margin-bottom:0.5rem;">ANDROID</div>'
+      + '<div style="font-size:0.72rem;color:rgba(255,255,225,0.55);line-height:1.7;">'
+      + '1. Tap <b style="color:var(--cream);">Install App</b> (red button)<br>'
+      + '2. Open the app and connect Discord'
+      + '</div>'
+      + '</div>'
+      + '<div style="margin-top:0.75rem;text-align:left;">'
+      + '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.1em;color:rgba(255,255,225,0.3);margin-bottom:0.5rem;">IOS</div>'
+      + '<div style="font-size:0.72rem;color:rgba(255,255,225,0.55);line-height:1.7;">'
+      + '1. Tap the <b style="color:#4fa8fd;">Share</b> button in your web browser<br>'
+      + '2. Select <b style="color:#4fa8fd;">Add to Home Screen</b>'
+      + '</div>'
+      + '</div>';
+    document.getElementById('notify-status').style.color = '';
+    document.getElementById('notify-status').style.textAlign = '';
+    document.getElementById('notify-status').style.lineHeight = '';
+    return;
+  }
   var reg = await navigator.serviceWorker.ready;
   var existing = await reg.pushManager.getSubscription();
   _notifyPrefs.master = !!existing;
@@ -1461,15 +1488,18 @@ function urlBase64ToUint8Array(base64String) {
 
 // Set button state on load
 async function initPushButton() {
+  const btn = document.getElementById('btn-notify');
+  if (!btn) return;
+  // Only show in PWA standalone mode
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (!isPWA) return;
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  btn.style.display = 'inline-flex';
   const reg = await navigator.serviceWorker.ready;
   const existing = await reg.pushManager.getSubscription();
-  const btn = document.getElementById('btn-notify');
-  if (btn) {
-    btn.textContent = existing ? 'Disable Alerts' : 'Enable Alerts';
-    btn.style.borderColor = existing ? 'var(--green)' : '';
-    btn.style.color = existing ? 'var(--green)' : '';
-  }
+  btn.textContent = existing ? 'Disable Alerts' : 'Enable Alerts';
+  btn.style.borderColor = existing ? 'var(--green)' : '';
+  btn.style.color = existing ? 'var(--green)' : '';
 }
 // ================================================================
 // CONFIG
