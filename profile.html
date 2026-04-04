@@ -1260,7 +1260,7 @@
 </script>
 
 <script>
-  const VAPID_PUBLIC_KEY = 'YOUR_VAPID_PUBLIC_KEY_HERE';
+  const VAPID_PUBLIC_KEY = 'BOGit9kZ57luccwDGeRmoA5lKHc0IrQm-WMtO9GreK43wrLSSwofT0gFCmrS2v3hXmmxIsTciNiNNr_pu7xWKBU';
 
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -1273,6 +1273,7 @@ async function togglePushNotification() {
   const discord_id = currentUser?.discord_id;
   if (!discord_id) return;
   const btn = document.getElementById('btn-notify');
+  try {
   const reg = await navigator.serviceWorker.ready;
   const existing = await reg.pushManager.getSubscription();
   if (existing) {
@@ -1297,6 +1298,12 @@ async function togglePushNotification() {
     body: JSON.stringify({ discord_id, subscription: sub })
   });
   btn.textContent = 'Disable Farm Alerts';
+  btn.style.borderColor = 'var(--green)';
+  btn.style.color = 'var(--green)';
+  } catch(err) {
+    console.error('[PUSH] togglePushNotification error:', err);
+    if (btn) { btn.textContent = 'Error - check console'; btn.style.borderColor = 'var(--red)'; btn.style.color = 'var(--red)'; }
+  }
 }
 
 // Set button state on load
@@ -1305,7 +1312,11 @@ async function initPushButton() {
   const reg = await navigator.serviceWorker.ready;
   const existing = await reg.pushManager.getSubscription();
   const btn = document.getElementById('btn-notify');
-  if (btn) btn.textContent = existing ? 'Disable Alerts' : 'Enable Alerts';
+  if (btn) {
+    btn.textContent = existing ? 'Disable Alerts' : 'Enable Alerts';
+    btn.style.borderColor = existing ? 'var(--green)' : '';
+    btn.style.color = existing ? 'var(--green)' : '';
+  }
 }
 // ================================================================
 // CONFIG
