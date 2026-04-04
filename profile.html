@@ -663,11 +663,12 @@
           <div class="profile-badges" id="prof-badges"></div>
         </div>
       </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.4rem;">
-          <button class="btn-sm" id="btn-logout" onclick="logout()">Disconnect</button>
-          <button id="btn-notify" class="btn-sm" onclick="openNotifyModal()">Farm Alerts</button>
         </div>
-      </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;width:100%;">
+      <button class="btn-sm" id="btn-logout" onclick="logout()">Disconnect</button>
+      <button id="btn-notify" class="btn-sm" onclick="openNotifyModal()">Farm Alerts</button>
+    </div>
+  </div>
     </div>
 
     <!-- QUICK STATS STRIP -->
@@ -1352,8 +1353,8 @@ function setNotifyStatus(msg, color) {
 
 async function openNotifyModal() {
   const isPWA = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  document.getElementById('notify-modal-overlay').style.display = 'flex';
   if (!isPWA) {
-    document.getElementById('notify-modal-overlay').style.display = 'flex';
     document.getElementById('notify-options').style.display = 'none';
     document.getElementById('toggle-master').style.display = 'none';
     document.getElementById('notify-status').innerHTML = ''
@@ -1379,8 +1380,18 @@ async function openNotifyModal() {
     document.getElementById('notify-status').style.lineHeight = '';
     return;
   }
-  var reg = await navigator.serviceWorker.ready;
-  var existing = await reg.pushManager.getSubscription();
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    setNotifyStatus('Push notifications not supported on this device.', 'rgba(253,70,79,0.7)');
+    return;
+  }
+  var reg, existing;
+  try {
+    reg = await navigator.serviceWorker.ready;
+    existing = await reg.pushManager.getSubscription();
+  } catch(e) {
+    setNotifyStatus('Service worker error: ' + e.message, 'rgba(253,70,79,0.7)');
+    return;
+  }
   _notifyPrefs.master = !!existing;
 
   // Load saved prefs from Firebase if subscribed
