@@ -70,6 +70,40 @@ app.post('/api/push-unsubscribe', async (req, res) => {
 });
 
 // ----------------------------------------------------------------
+// POST /api/push-test  (remove after testing)
+// ----------------------------------------------------------------
+app.post('/api/push-test', async (req, res) => {
+  const { discord_id } = req.body;
+  try {
+    const snap = discord_id
+      ? await db.ref(`PushSubscriptions/${discord_id}`).get()
+      : await db.ref('PushSubscriptions').get();
+
+    if (!snap.exists()) return res.json({ success: false, message: 'No subscriptions found' });
+
+    const payload = JSON.stringify({
+      title: 'Farm Reset!',
+      body: 'Your daily SHROOM farm has reset. Claim your SPORE now.',
+      url: '/profile.html'
+    });
+
+    if (discord_id) {
+      await webpush.sendNotification(snap.val(), payload);
+      return res.json({ success: true, message: `Sent to ${discord_id}` });
+    }
+
+    const subs = snap.val();
+    await Promise.all(Object.entries(subs).map(([id, sub]) =>
+      webpush.sendNotification(sub, payload).catch(e => console.error(`[PUSH-TEST] ${id}:`, e.message))
+    ));
+    res.json({ success: true, message: `Sent to ${Object.keys(subs).length} users` });
+  } catch (err) {
+    console.error('[PUSH-TEST]', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ----------------------------------------------------------------
 // CRON - Daily farm reset notification (12:20 UTC)
 // ----------------------------------------------------------------
 cron.schedule('20 12 * * *', async () => {
