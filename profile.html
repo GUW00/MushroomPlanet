@@ -204,9 +204,9 @@
     /* ---- PROFILE HEADER CARD ---- */
     .profile-header {
       background: var(--dark2); border: 1px solid rgba(255,255,225,0.07);
-      border-radius: 1.5rem; padding: 2rem; margin-bottom: 1.25rem;
+      border-radius: 1.5rem; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem;
       display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 1.25rem;
+      flex-wrap: wrap; gap: 1rem;
     }
     .profile-identity { display: flex; align-items: center; gap: 1.25rem; }
     .profile-avatar {
@@ -683,7 +683,12 @@
         </div>
       </div>
         </div>
-    </div>
+      </div>
+
+    <!-- ADMIN BROADCAST BUTTON (top-right of header, admin only) -->
+    <button id="admin-broadcast-btn" onclick="toggleBroadcastPopup()" style="display:none;margin-left:auto;background:rgba(253,70,79,0.1);border:1px solid rgba(253,70,79,0.3);color:var(--red);font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.08em;font-weight:700;padding:0.4em 1em;border-radius:999px;cursor:pointer;flex-shrink:0;transition:all 0.2s;" onmouseover="this.style.background='rgba(253,70,79,0.2)'" onmouseout="this.style.background='rgba(253,70,79,0.1)'">BROADCAST</button>
+
+    
 
     <!-- ACTION BUTTON ROW -->
     <div class="profile-action-row reveal" id="profile-action-row">
@@ -1287,6 +1292,20 @@
       </div>
     </div>
 
+    <!-- ADMIN BROADCAST MODAL -->
+    <div id="admin-broadcast-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;align-items:center;justify-content:center;padding:1rem;" onclick="closeBroadcastOutside(event)">
+      <div style="background:var(--dark2);border:1px solid rgba(253,70,79,0.25);border-radius:1.25rem;max-width:400px;width:100%;padding:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <div style="font-family:Space Grotesk,monospace;font-size:0.65rem;letter-spacing:0.15em;color:rgba(253,70,79,0.8);">ADMIN BROADCAST</div>
+          <button onclick="toggleBroadcastPopup()" style="background:rgba(255,255,225,0.06);border:1px solid rgba(255,255,225,0.12);color:rgba(255,255,225,0.6);font-size:0.85rem;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(253,70,79,0.15)';this.style.color='var(--red)'" onmouseout="this.style.background='rgba(255,255,225,0.06)';this.style.color='rgba(255,255,225,0.6)'">x</button>
+        </div>
+        <input id="broadcast-title-input" placeholder="Title (optional)" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,225,0.1);border-radius:0.5rem;padding:0.5rem 0.75rem;color:var(--cream);font-family:Space Grotesk,sans-serif;font-size:0.82rem;margin-bottom:0.5rem;outline:none;box-sizing:border-box;">
+        <textarea id="broadcast-msg-input" placeholder="Message to all users..." rows="4" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,225,0.1);border-radius:0.5rem;padding:0.5rem 0.75rem;color:var(--cream);font-family:Space Grotesk,sans-serif;font-size:0.82rem;outline:none;resize:none;box-sizing:border-box;margin-bottom:0.5rem;line-height:1.5;"></textarea>
+        <button onclick="sendBroadcast()" id="broadcast-send-btn" style="width:100%;background:rgba(253,70,79,0.12);border:1px solid rgba(253,70,79,0.35);color:var(--red);font-family:Space Grotesk,sans-serif;font-size:0.82rem;font-weight:700;padding:0.7rem;border-radius:0.75rem;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(253,70,79,0.22)'" onmouseout="this.style.background='rgba(253,70,79,0.12)'">Send to All Users</button>
+        <div id="broadcast-status" style="font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(255,255,225,0.3);margin-top:0.5rem;min-height:1em;text-align:center;"></div>
+      </div>
+    </div>
+
     <!-- SETTINGS MODAL -->
     <div id="settings-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;align-items:center;justify-content:center;padding:1rem;" onclick="closeSettingsModal(event)">
       <div style="background:var(--dark2);border:1px solid rgba(255,255,225,0.12);border-radius:1.25rem;max-width:380px;width:100%;padding:1.5rem;">
@@ -1346,6 +1365,15 @@
             </div>
             <div id="toggle-raffle" onclick="togglePref('raffle')" style="width:40px;height:22px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,225,0.12);cursor:pointer;position:relative;transition:background 0.2s;">
               <div id="toggle-raffle-knob" style="position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:rgba(255,255,225,0.35);transition:all 0.2s;"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;">
+            <div>
+              <div style="font-size:0.82rem;color:var(--cream);display:flex;align-items:center;gap:0.4rem;"><img src="/images/pixie.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Inbox Messages</div>
+              <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.35);margin-top:0.1rem;">Admin announcements & news</div>
+            </div>
+            <div id="toggle-inbox" onclick="togglePref('inbox')" style="width:40px;height:22px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,225,0.12);cursor:pointer;position:relative;transition:background 0.2s;">
+              <div id="toggle-inbox-knob" style="position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:rgba(255,255,225,0.35);transition:all 0.2s;"></div>
             </div>
           </div>
         </div>
@@ -1482,7 +1510,24 @@ function switchMsgTab(tab) {
   if (logsBtn) logsBtn.style.cssText = tab === 'logs'     ? activeStyle : inactiveStyle;
   if (tab === 'messages') {
     document.getElementById('messages-modal-pager').style.display = 'none';
-    document.getElementById('messages-modal-body').innerHTML = '<div class="empty-hint" style="padding:2rem 0;text-align:center;font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.2);">Inbox is empty.</div>';
+    // Load Inbox from Pixie/Users/{id}/Inbox
+    var inbox = (profileData && profileData.pixie && profileData.pixie.Inbox) || {};
+    var msgs = Object.values(inbox).filter(function(m) { return m && m.body; });
+    msgs.sort(function(a, b) { return (b.sent_at || '').localeCompare(a.sent_at || ''); });
+    if (!msgs.length) {
+      document.getElementById('messages-modal-body').innerHTML = '<div class="empty-hint" style="padding:2rem 0;text-align:center;font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.2);">Inbox is empty.</div>';
+    } else {
+      document.getElementById('messages-modal-body').innerHTML = msgs.map(function(m) {
+        var d = m.sent_at ? m.sent_at.slice(0,10) : '';
+        return '<div style="padding:0.75rem 0;border-bottom:1px solid rgba(255,255,225,0.06);">'
+          + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem;">'
+          + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.82rem;font-weight:700;color:var(--yellow);">' + (m.title || 'Message') + '</span>'
+          + '<span style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.25);">' + d + '</span>'
+          + '</div>'
+          + '<div style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;color:rgba(255,255,225,0.7);line-height:1.55;">' + m.body + '</div>'
+          + '</div>';
+      }).join('');
+    }
   } else {
     // Build log list from profileData on first switch
     if (!_msgAllLogs.length && profileData) {
@@ -1658,7 +1703,7 @@ window.closeMessagesModal = closeMessagesModal;
 // ================================================================
 // PUSH NOTIFICATION MODAL
 // ================================================================
-var _notifyPrefs = { master: false, reset: true, forage: true, social: true, raffle: true };
+var _notifyPrefs = { master: false, reset: true, forage: true, social: true, raffle: true, inbox: true };
 
 function setToggle(id, on) {
   var el  = document.getElementById('toggle-' + id);
@@ -1699,10 +1744,11 @@ async function openNotifyModal() {
 window.openNotifyModal = openNotifyModal;
 
 function renderNotifyModal() {
-  setToggle('master', _notifyPrefs.master);
   setToggle('reset',  _notifyPrefs.reset);
   setToggle('forage', _notifyPrefs.forage);
   setToggle('social', _notifyPrefs.social);
+  setToggle('raffle', _notifyPrefs.raffle);
+  setToggle('inbox',  _notifyPrefs.inbox);
   var opts = document.getElementById('notify-options');
   if (opts) { opts.style.opacity = _notifyPrefs.master ? '1' : '0.35'; opts.style.pointerEvents = _notifyPrefs.master ? 'all' : 'none'; }
   // Update header button
@@ -1775,6 +1821,7 @@ async function savePrefs() {
         forage: _notifyPrefs.forage,
         social: _notifyPrefs.social,
         raffle: _notifyPrefs.raffle,
+        inbox:  _notifyPrefs.inbox,
         reminders: _notifyPrefs.forage || _notifyPrefs.social,
       }})
     });
@@ -2164,6 +2211,14 @@ function renderProfile() {
 }
 
 function renderHeader(s, p) {
+  // Show admin panel if this is the admin user
+  if (currentUser && currentUser.discord_id === '1233612802883719261') {
+    var btn = document.getElementById('admin-broadcast-btn');
+    if (btn) btn.style.display = 'inline-flex';
+    // Move button into header flex row
+    var header = document.getElementById('prof-header');
+    if (header && btn && btn.parentNode !== header) header.appendChild(btn);
+  }
   const misc    = s.Misc   || {};
   const wallet  = p.Wallet || {};
   const flair   = p.Flair  || {};
@@ -2210,6 +2265,55 @@ function renderHeader(s, p) {
   }
   badgeEl.innerHTML = badges.join('');
 }
+
+function toggleBroadcastPopup() {
+  var popup = document.getElementById('admin-broadcast-popup');
+  if (!popup) return;
+  var isOpen = popup.style.display === 'flex';
+  popup.style.display = isOpen ? 'none' : 'flex';
+  if (!isOpen) document.getElementById('broadcast-status').textContent = '';
+}
+window.toggleBroadcastPopup = toggleBroadcastPopup;
+
+function closeBroadcastOutside(e) {
+  if (e.target === document.getElementById('admin-broadcast-popup')) toggleBroadcastPopup();
+}
+window.closeBroadcastOutside = closeBroadcastOutside;
+window.toggleBroadcastPopup = toggleBroadcastPopup;
+
+
+
+async function sendBroadcast() {
+  var title = (document.getElementById('broadcast-title-input').value || '').trim();
+  var msg   = (document.getElementById('broadcast-msg-input').value  || '').trim();
+  var status = document.getElementById('broadcast-status');
+  var btn    = document.getElementById('broadcast-send-btn');
+  if (!msg) { status.textContent = 'Enter a message.'; status.style.color = 'var(--red)'; return; }
+  btn.disabled = true; btn.textContent = 'Sending...';
+  status.textContent = ''; status.style.color = 'rgba(255,255,225,0.3)';
+  try {
+    var res = await fetch(window.API_BASE + '/api/admin/broadcast', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ discord_id: currentUser.discord_id, message: msg, title: title || undefined }),
+    });
+    var data = await res.json();
+    if (data.ok) {
+      status.textContent = 'Sent to ' + data.sent + ' users!';
+      status.style.color = 'var(--green)';
+      document.getElementById('broadcast-msg-input').value = '';
+      document.getElementById('broadcast-title-input').value = '';
+    } else {
+      status.textContent = data.message || 'Failed.';
+      status.style.color = 'var(--red)';
+    }
+  } catch(e) {
+    status.textContent = 'Error: ' + e.message;
+    status.style.color = 'var(--red)';
+  }
+  btn.disabled = false; btn.textContent = 'Send';
+}
+window.sendBroadcast = sendBroadcast;
 
 function renderQuickStats(s, p) {
   const bal     = s.Balance || {};

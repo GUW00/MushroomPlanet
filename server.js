@@ -1519,6 +1519,78 @@ app.post('/api/proposals/:id/close', async (req, res) => {
     res.status(500).json({ ok: false });
   }
 });
+// ----------------------------------------------------------------
+// POST /api/admin/broadcast
+// Admin only — sends a message to all users' Inbox + push notification
+// ----------------------------------------------------------------
+const BROADCAST_ADMIN_ID = '1233612802883719261';
+
+app.post('/api/admin/broadcast', async (req, res) => {
+  const { discord_id, message, title } = req.body;
+  if (!discord_id || discord_id !== BROADCAST_ADMIN_ID) {
+    return res.status(403).json({ ok: false, message: 'Not authorized' });
+  }
+  if (!message || message.trim().length < 3) {
+    return res.status(400).json({ ok: false, message: 'Message too short' });
+  }
+
+  try {
+    // Fetch all Pixie users
+    const snap = await db.ref('Pixie/Users').get();
+    if (!snap.exists()) return res.json({ ok: true, sent: 0 });
+
+    const users = snap.val();
+    const now = new Date().toISOString();
+    const msgTitle = (title || 'Message from Admin').trim();
+    const msgBody  = message.trim();
+
+    const dbWrites = [];
+    const pushSends = [];
+    let sentCount = 0;
+
+    for (const [uid, user] of Object.entries(users)) {
+      // Write to Pixie/Users/{uid}/Inbox
+      const msgRef = db.ref(`Pixie/Users/${uid}/Inbox`).push();
+      dbWrites.push(msgRef.set({
+        title:      msgTitle,
+        body:       msgBody,
+        sent_at:    now,
+        from:       'admin',
+        read:       false,
+      }));
+
+      // Push notification if subscribed and pref not disabled
+      const sub = user?.Notifications;
+      if (sub && sub.endpoint) {
+        const prefs = sub.prefs || {};
+        if (prefs.inbox !== false) {
+          pushSends.push(
+            webpush.sendNotification(sub, JSON.stringify({
+              title: msgTitle,
+              body:  msgBody,
+              url:   '/profile.html',
+            })).catch(async (err) => {
+              if (err.statusCode === 404 || err.statusCode === 410) {
+                await db.ref(`Pixie/Users/${uid}/Notifications`).remove();
+              }
+            })
+          );
+        }
+      }
+      sentCount++;
+    }
+
+    await Promise.all(dbWrites);
+    await Promise.all(pushSends);
+
+    console.log(`[BROADCAST] Admin sent "${msgTitle}" to ${sentCount} users`);
+    res.json({ ok: true, sent: sentCount });
+  } catch (err) {
+    console.error('[BROADCAST] Error:', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
 app.post('/api/rpc/polygon', async (req, res) => {
   try {
     const r = await fetch(process.env.ALCHEMY_POLYGON_URL, {
