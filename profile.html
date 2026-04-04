@@ -1777,17 +1777,30 @@ async function openNotifyModal() {
 window.openNotifyModal = openNotifyModal;
 
 function renderNotifyModal() {
-  setToggle('reset',  _notifyPrefs.reset);
-  setToggle('forage', _notifyPrefs.forage);
-  setToggle('social', _notifyPrefs.social);
-  setToggle('raffle', _notifyPrefs.raffle);
-  setToggle('inbox',  _notifyPrefs.inbox);
+  // Master toggle
+  var masterEl   = document.getElementById('stg-toggle-master');
+  var masterKnob = document.getElementById('stg-toggle-master-knob');
+  if (masterEl && masterKnob) {
+    masterEl.style.background  = _notifyPrefs.master ? 'var(--green)' : 'rgba(255,255,255,0.1)';
+    masterEl.style.borderColor = _notifyPrefs.master ? 'rgba(34,197,94,0.5)' : 'rgba(255,255,225,0.15)';
+    masterKnob.style.background = _notifyPrefs.master ? '#fff' : 'rgba(255,255,225,0.4)';
+    masterKnob.style.left       = _notifyPrefs.master ? '24px' : '2px';
+  }
+
+  // Sub-pref toggles — only show as on if master is also on
+  var showPrefs = _notifyPrefs.master;
+  setToggle('reset',  showPrefs && _notifyPrefs.reset);
+  setToggle('forage', showPrefs && _notifyPrefs.forage);
+  setToggle('social', showPrefs && _notifyPrefs.social);
+  setToggle('raffle', showPrefs && _notifyPrefs.raffle);
+  setToggle('inbox',  showPrefs && _notifyPrefs.inbox);
+
+  // Options panel opacity
   var opts = document.getElementById('stg-notify-options');
   if (opts) {
     opts.style.opacity       = _notifyPrefs.master ? '1' : '0.35';
     opts.style.pointerEvents = _notifyPrefs.master ? 'all' : 'none';
   }
-  setToggle('master', _notifyPrefs.master);
 }
 
 async function toggleMaster() {
