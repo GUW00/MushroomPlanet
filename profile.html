@@ -1647,32 +1647,42 @@ function msgPage(dir) {
 }
 window.msgPage = msgPage;
 
-function openSettingsModal() {
+async function openSettingsModal() {
   document.getElementById('settings-modal-overlay').style.display = 'flex';
   document.getElementById('global-menu').style.display = 'none';
-  // Sync toggle states
-  var reg = navigator.serviceWorker && navigator.serviceWorker.ready;
-  if (reg) {
-    reg.then(function(r) {
-      r.pushManager.getSubscription().then(function(sub) {
-        _notifyPrefs.master = !!sub;
-        renderNotifyModal();
-        if (sub && currentUser && currentUser.discord_id) {
-          fetch(API_BASE + '/api/push-prefs/' + currentUser.discord_id)
-            .then(function(r2) { return r2.json(); })
-            .then(function(data) {
-              if (data.prefs) {
-                _notifyPrefs.reset  = data.prefs.reset  !== false;
-                _notifyPrefs.forage = data.prefs.forage !== false;
-                _notifyPrefs.social = data.prefs.social !== false;
-                _notifyPrefs.raffle = data.prefs.raffle !== false;
-              }
-              renderNotifyModal();
-            }).catch(function() {});
+
+  // Reset all to off while loading
+  _notifyPrefs.master = false;
+  _notifyPrefs.reset  = false;
+  _notifyPrefs.forage = false;
+  _notifyPrefs.social = false;
+  _notifyPrefs.raffle = false;
+  _notifyPrefs.inbox  = false;
+  renderNotifyModal();
+
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+
+  try {
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    _notifyPrefs.master = !!sub;
+
+    if (sub && currentUser && currentUser.discord_id) {
+      try {
+        var r2 = await fetch(API_BASE + '/api/push-prefs/' + currentUser.discord_id);
+        var data = await r2.json();
+        if (data.prefs) {
+          _notifyPrefs.reset  = data.prefs.reset  === true;
+          _notifyPrefs.forage = data.prefs.forage === true;
+          _notifyPrefs.social = data.prefs.social === true;
+          _notifyPrefs.raffle = data.prefs.raffle === true;
+          _notifyPrefs.inbox  = data.prefs.inbox  === true;
         }
-      });
-    });
-  }
+      } catch(e) {}
+    }
+  } catch(e) {}
+
+  renderNotifyModal();
 }
 window.openSettingsModal = openSettingsModal;
 
@@ -1774,11 +1784,11 @@ function renderNotifyModal() {
   setToggle('inbox',  _notifyPrefs.inbox);
   var opts = document.getElementById('notify-options');
   if (opts) { opts.style.opacity = _notifyPrefs.master ? '1' : '0.35'; opts.style.pointerEvents = _notifyPrefs.master ? 'all' : 'none'; }
-  // Update header button
-  var btn = document.getElementById('btn-notify');
-  if (btn) {
-    btn.style.borderColor = _notifyPrefs.master ? 'var(--green)' : '';
-    btn.style.color       = _notifyPrefs.master ? 'var(--green)' : '';
+  // Update notify options opacity
+  var opts = document.getElementById('notify-options');
+  if (opts) {
+    opts.style.opacity      = _notifyPrefs.master ? '1' : '0.35';
+    opts.style.pointerEvents = _notifyPrefs.master ? 'all' : 'none';
   }
 }
 
