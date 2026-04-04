@@ -1408,7 +1408,7 @@ function renderNotifyModal() {
   setToggle('social', _notifyPrefs.social);
   setToggle('raffle', _notifyPrefs.raffle);
   var opts = document.getElementById('notify-options');
-  if (opts) { opts.style.opacity = _notifyPrefs.master ? '1' : '0.35'; opts.style.pointerEvents = _notifyPrefs.master ? 'all' : 'none'; }
+  if (opts) { opts.style.display = 'block'; opts.style.opacity = _notifyPrefs.master ? '1' : '0.35'; opts.style.pointerEvents = _notifyPrefs.master ? 'all' : 'none'; }
   // Update header button
   var btn = document.getElementById('btn-notify');
   if (btn) {
