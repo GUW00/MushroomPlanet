@@ -6,8 +6,16 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+import webpush from 'web-push';
+import cron from 'node-cron';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config();
+
+webpush.setVapidDetails(
+  process.env.VAPID_EMAIL,
+  process.env.VAPID_PUBLIC_KEY,
+  process.env.VAPID_PRIVATE_KEY
+);
 
 const serviceAccount = JSON.parse(fs.readFileSync('./firebase.json', 'utf8'));
 
@@ -29,6 +37,71 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
+// ----------------------------------------------------------------
+// POST /api/push-subscribe
+// ----------------------------------------------------------------
+app.post('/api/push-subscribe', async (req, res) => {
+  const { discord_id, subscription } = req.body;
+  if (!discord_id || !subscription) return res.status(400).json({ success: false });
+  try {
+    await db.ref(`PushSubscriptions/${discord_id}`).set(subscription);
+    console.log(`[PUSH] Subscribed: ${discord_id}`);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[PUSH] Subscribe error:', err);
+    res.status(500).json({ success: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/push-unsubscribe
+// ----------------------------------------------------------------
+app.post('/api/push-unsubscribe', async (req, res) => {
+  const { discord_id } = req.body;
+  if (!discord_id) return res.status(400).json({ success: false });
+  try {
+    await db.ref(`PushSubscriptions/${discord_id}`).remove();
+    console.log(`[PUSH] Unsubscribed: ${discord_id}`);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[PUSH] Unsubscribe error:', err);
+    res.status(500).json({ success: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// CRON - Daily farm reset notification (12:20 UTC)
+// ----------------------------------------------------------------
+cron.schedule('20 12 * * *', async () => {
+  console.log('[PUSH] Sending daily reset notifications...');
+  try {
+    const snap = await db.ref('PushSubscriptions').get();
+    if (!snap.exists()) return;
+    const payload = JSON.stringify({
+      title: 'Farm Reset!',
+      body: 'Your daily SHROOM farm has reset. Claim your SPORE now.',
+      url: '/profile.html'
+    });
+    const subs = snap.val();
+    const sends = Object.entries(subs).map(async ([discord_id, sub]) => {
+      try {
+        await webpush.sendNotification(sub, payload);
+      } catch (err) {
+        if (err.statusCode === 404 || err.statusCode === 410) {
+          // Subscription expired/invalid - clean it up
+          await db.ref(`PushSubscriptions/${discord_id}`).remove();
+          console.log(`[PUSH] Removed stale subscription: ${discord_id}`);
+        } else {
+          console.error(`[PUSH] Failed for ${discord_id}:`, err.message);
+        }
+      }
+    });
+    await Promise.all(sends);
+    console.log(`[PUSH] Done. Notified ${Object.keys(subs).length} users.`);
+  } catch (err) {
+    console.error('[PUSH] Cron error:', err);
+  }
+}, { timezone: 'UTC' });
 // ----------------------------------------------------------------
 // POST /api/send-code
 // ----------------------------------------------------------------
