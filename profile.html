@@ -665,7 +665,7 @@
       </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.4rem;">
           <button class="btn-sm" id="btn-logout" onclick="logout()">Disconnect</button>
-          <button id="btn-notify" class="btn-sm" onclick="togglePushNotification()">Enable Farm Alerts</button>
+          <button id="btn-notify" class="btn-sm" onclick="openNotifyModal()">Farm Alerts</button>
         </div>
       </div>
     </div>
@@ -1232,6 +1232,64 @@
         </div>
     </div>
 
+    <!-- NOTIFY MODAL -->
+    <div id="notify-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;align-items:center;justify-content:center;padding:1rem;" onclick="closeNotifyModal(event)">
+      <div style="background:var(--dark2);border:1px solid rgba(255,255,225,0.12);border-radius:1.25rem;max-width:360px;width:100%;padding:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+          <div style="font-family:Space Grotesk,monospace;font-size:0.75rem;letter-spacing:0.15em;color:var(--cream);">FARM ALERTS</div>
+          <button onclick="document.getElementById('notify-modal-overlay').style.display='none'" style="background:none;border:none;color:rgba(255,255,225,0.4);font-size:1.1rem;cursor:pointer;line-height:1;">x</button>
+        </div>
+
+        <!-- Master toggle -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,225,0.08);margin-bottom:0.75rem;">
+          <div>
+            <div style="font-size:0.85rem;font-weight:600;color:var(--cream);">Enable Notifications</div>
+            <div style="font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(255,255,225,0.35);margin-top:0.15rem;">Allow browser permission</div>
+          </div>
+          <div id="toggle-master" onclick="toggleMaster()" style="width:44px;height:24px;border-radius:999px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,225,0.15);cursor:pointer;position:relative;transition:background 0.2s;">
+            <div id="toggle-master-knob" style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:rgba(255,255,225,0.4);transition:all 0.2s;"></div>
+          </div>
+        </div>
+
+        <!-- Individual toggles -->
+        <div id="notify-options" style="opacity:0.35;pointer-events:none;transition:opacity 0.2s;">
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;border-bottom:1px solid rgba(255,255,225,0.06);">
+            <div>
+              <div style="font-size:0.82rem;color:var(--cream);display:flex;align-items:center;gap:0.4rem;"><img src="/images/shroomfarm.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Farm Reset</div>
+              <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.35);margin-top:0.1rem;">Daily at 8:20 AM EST</div>
+            </div>
+            <div id="toggle-reset" onclick="togglePref('reset')" style="width:40px;height:22px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,225,0.12);cursor:pointer;position:relative;transition:background 0.2s;">
+              <div id="toggle-reset-knob" style="position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:rgba(255,255,225,0.35);transition:all 0.2s;"></div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;border-bottom:1px solid rgba(255,255,225,0.06);">
+            <div>
+              <div style="font-size:0.82rem;color:var(--cream);display:flex;align-items:center;gap:0.4rem;"><img src="/images/forage.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Forage Reminder</div>
+              <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.35);margin-top:0.1rem;">7:20 EST if !forage not done</div>
+            </div>
+            <div id="toggle-forage" onclick="togglePref('forage')" style="width:40px;height:22px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,225,0.12);cursor:pointer;position:relative;transition:background 0.2s;">
+              <div id="toggle-forage-knob" style="position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:rgba(255,255,225,0.35);transition:all 0.2s;"></div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;">
+            <div>
+              <div style="font-size:0.82rem;color:var(--cream);display:flex;align-items:center;gap:0.4rem;"><img src="/images/pixie.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Social Butterfly</div>
+              <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.35);margin-top:0.1rem;">7:20 EST if 200 XP not earned</div>
+            </div>
+            <div id="toggle-social" onclick="togglePref('social')" style="width:40px;height:22px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,225,0.12);cursor:pointer;position:relative;transition:background 0.2s;">
+              <div id="toggle-social-knob" style="position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:rgba(255,255,225,0.35);transition:all 0.2s;"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div id="notify-status" style="font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(255,255,225,0.3);text-align:center;margin-top:1rem;"></div>
+      </div>
+    </div>
+
     <!-- NFT MODAL -->
     <div id="nft-modal-overlay" class="nft-modal-overlay" onclick="closeNftModal(event)">
       <div class="nft-modal">
@@ -1262,48 +1320,143 @@
 <script>
   const VAPID_PUBLIC_KEY = 'BEM0MqfWdR3O-FUUQXAPCVYLd41hjMxcL9jIqLnCzPIdBQ9ycepe_gJrswLiXAgdoIaS4E3280FLs-bszhfTTus';
 
+// ================================================================
+// PUSH NOTIFICATION MODAL
+// ================================================================
+var _notifyPrefs = { master: false, reset: true, forage: true, social: true };
+
+function setToggle(id, on) {
+  var el  = document.getElementById('toggle-' + id);
+  var knob = document.getElementById('toggle-' + id + '-knob');
+  if (!el || !knob) return;
+  el.style.background   = on ? 'var(--green)' : 'rgba(255,255,255,0.08)';
+  el.style.borderColor  = on ? 'rgba(34,197,94,0.5)' : 'rgba(255,255,225,0.12)';
+  knob.style.background = on ? '#fff' : 'rgba(255,255,225,0.35)';
+  knob.style.left       = on ? '22px' : '2px';
+}
+
+function setNotifyStatus(msg, color) {
+  var el = document.getElementById('notify-status');
+  if (el) { el.textContent = msg; el.style.color = color || 'rgba(255,255,225,0.3)'; }
+}
+
+async function openNotifyModal() {
+  document.getElementById('notify-modal-overlay').style.display = 'flex';
+  var reg = await navigator.serviceWorker.ready;
+  var existing = await reg.pushManager.getSubscription();
+  _notifyPrefs.master = !!existing;
+
+  // Load saved prefs from Firebase if subscribed
+  if (existing && currentUser?.discord_id) {
+    try {
+      var res = await fetch(API_BASE + '/api/push-prefs/' + currentUser.discord_id);
+      var data = await res.json();
+      if (data.prefs) {
+        _notifyPrefs.reset  = data.prefs.reset  !== false;
+        _notifyPrefs.forage = data.prefs.forage !== false;
+        _notifyPrefs.social = data.prefs.social !== false;
+      }
+    } catch(e) {}
+  }
+
+  renderNotifyModal();
+}
+window.openNotifyModal = openNotifyModal;
+
+function renderNotifyModal() {
+  setToggle('master', _notifyPrefs.master);
+  setToggle('reset',  _notifyPrefs.reset);
+  setToggle('forage', _notifyPrefs.forage);
+  setToggle('social', _notifyPrefs.social);
+  var opts = document.getElementById('notify-options');
+  if (opts) { opts.style.opacity = _notifyPrefs.master ? '1' : '0.35'; opts.style.pointerEvents = _notifyPrefs.master ? 'all' : 'none'; }
+  // Update header button
+  var btn = document.getElementById('btn-notify');
+  if (btn) {
+    btn.style.borderColor = _notifyPrefs.master ? 'var(--green)' : '';
+    btn.style.color       = _notifyPrefs.master ? 'var(--green)' : '';
+  }
+}
+
+async function toggleMaster() {
+  var discord_id = currentUser?.discord_id;
+  if (!discord_id) return;
+  setNotifyStatus('Updating...', 'rgba(255,255,225,0.3)');
+
+  if (_notifyPrefs.master) {
+    // Unsubscribe
+    try {
+      var reg = await navigator.serviceWorker.ready;
+      var sub = await reg.pushManager.getSubscription();
+      if (sub) await sub.unsubscribe();
+      await fetch(API_BASE + '/api/push-unsubscribe', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ discord_id })
+      });
+      _notifyPrefs.master = false;
+      setNotifyStatus('Notifications disabled.', 'rgba(253,70,79,0.7)');
+    } catch(e) { setNotifyStatus('Error: ' + e.message, 'rgba(253,70,79,0.7)'); return; }
+  } else {
+    // Subscribe
+    try {
+      var permission = await Notification.requestPermission();
+      if (permission !== 'granted') { setNotifyStatus('Permission denied.', 'rgba(253,70,79,0.7)'); return; }
+      var reg2 = await navigator.serviceWorker.ready;
+      var sub2 = await reg2.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+      await fetch(API_BASE + '/api/push-subscribe', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ discord_id, subscription: sub2 })
+      });
+      _notifyPrefs.master = true;
+      setNotifyStatus('Notifications enabled!', 'var(--green)');
+      await savePrefs();
+    } catch(e) { setNotifyStatus('Error: ' + e.message, 'rgba(253,70,79,0.7)'); return; }
+  }
+  renderNotifyModal();
+}
+window.toggleMaster = toggleMaster;
+
+async function togglePref(key) {
+  if (!_notifyPrefs.master) return;
+  _notifyPrefs[key] = !_notifyPrefs[key];
+  setToggle(key, _notifyPrefs[key]);
+  await savePrefs();
+  setNotifyStatus('Saved!', 'var(--green)');
+  setTimeout(() => setNotifyStatus('', ''), 1500);
+}
+window.togglePref = togglePref;
+
+async function savePrefs() {
+  var discord_id = currentUser?.discord_id;
+  if (!discord_id) return;
+  try {
+    await fetch(API_BASE + '/api/push-prefs', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ discord_id, prefs: {
+        reset:  _notifyPrefs.reset,
+        forage: _notifyPrefs.forage,
+        social: _notifyPrefs.social,
+        reminders: _notifyPrefs.forage || _notifyPrefs.social,
+      }})
+    });
+  } catch(e) { console.error('[PUSH] savePrefs error:', e); }
+}
+
+function closeNotifyModal(e) {
+  if (e.target === document.getElementById('notify-modal-overlay')) {
+    document.getElementById('notify-modal-overlay').style.display = 'none';
+  }
+}
+window.closeNotifyModal = closeNotifyModal;
+
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
   const raw = atob(base64);
   return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
-}
-
-async function togglePushNotification() {
-  const discord_id = currentUser?.discord_id;
-  if (!discord_id) return;
-  const btn = document.getElementById('btn-notify');
-  try {
-  const reg = await navigator.serviceWorker.ready;
-  const existing = await reg.pushManager.getSubscription();
-  if (existing) {
-    await existing.unsubscribe();
-    await fetch(API_BASE + '/api/push-unsubscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ discord_id })
-    });
-    btn.textContent = 'Enable Farm Alerts';
-    return;
-  }
-  const permission = await Notification.requestPermission();
-  if (permission !== 'granted') return;
-  const sub = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-  });
-  await fetch(API_BASE + '/api/push-subscribe', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ discord_id, subscription: sub })
-  });
-  btn.textContent = 'Disable Farm Alerts';
-  btn.style.borderColor = 'var(--green)';
-  btn.style.color = 'var(--green)';
-  } catch(err) {
-    console.error('[PUSH] togglePushNotification error:', err);
-    if (btn) { btn.textContent = 'Error - check console'; btn.style.borderColor = 'var(--red)'; btn.style.color = 'var(--red)'; }
-  }
 }
 
 // Set button state on load

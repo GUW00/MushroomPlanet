@@ -44,7 +44,10 @@ app.post('/api/push-subscribe', async (req, res) => {
   const { discord_id, subscription } = req.body;
   if (!discord_id || !subscription) return res.status(400).json({ success: false });
   try {
-    await db.ref(`PushSubscriptions/${discord_id}`).set(subscription);
+    await db.ref(`Pixie/Users/${discord_id}/Notifications`).update({
+      endpoint: subscription.endpoint,
+      keys: subscription.keys,
+    });
     console.log(`[PUSH] Subscribed: ${discord_id}`);
     res.json({ success: true });
   } catch (err) {
@@ -60,11 +63,38 @@ app.post('/api/push-unsubscribe', async (req, res) => {
   const { discord_id } = req.body;
   if (!discord_id) return res.status(400).json({ success: false });
   try {
-    await db.ref(`PushSubscriptions/${discord_id}`).remove();
+    await db.ref(`Pixie/Users/${discord_id}/Notifications`).remove();
     console.log(`[PUSH] Unsubscribed: ${discord_id}`);
     res.json({ success: true });
   } catch (err) {
     console.error('[PUSH] Unsubscribe error:', err);
+    res.status(500).json({ success: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// GET /api/push-prefs/:discord_id
+// ----------------------------------------------------------------
+app.get('/api/push-prefs/:discord_id', async (req, res) => {
+  try {
+    const snap = await db.ref(`Pixie/Users/${req.params.discord_id}/Notifications/prefs`).get();
+    res.json({ success: true, prefs: snap.val() || null });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/push-prefs
+// ----------------------------------------------------------------
+app.post('/api/push-prefs', async (req, res) => {
+  const { discord_id, prefs } = req.body;
+  if (!discord_id || !prefs) return res.status(400).json({ success: false });
+  try {
+    await db.ref(`Pixie/Users/${discord_id}/Notifications/prefs`).set(prefs);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[PUSH] Prefs error:', err);
     res.status(500).json({ success: false });
   }
 });
@@ -76,14 +106,14 @@ app.post('/api/push-test', async (req, res) => {
   const { discord_id } = req.body;
   try {
     const snap = discord_id
-      ? await db.ref(`PushSubscriptions/${discord_id}`).get()
-      : await db.ref('PushSubscriptions').get();
+      ? await db.ref(`Pixie/Users/${discord_id}/Notifications`).get()
+      : await db.ref('Pixie/Users').get();
 
     if (!snap.exists()) return res.json({ success: false, message: 'No subscriptions found' });
 
     const payload = JSON.stringify({
-      title: 'Farm Reset!',
-      body: 'Your daily SHROOM farm has reset. Claim your SPORE now.',
+      title: 'Daily Reset Completed!',
+      body: 'A new farm day has begun. Complete your daily activities!',
       url: '/profile.html'
     });
 
@@ -92,11 +122,15 @@ app.post('/api/push-test', async (req, res) => {
       return res.json({ success: true, message: `Sent to ${discord_id}` });
     }
 
-    const subs = snap.val();
-    await Promise.all(Object.entries(subs).map(([id, sub]) =>
-      webpush.sendNotification(sub, payload).catch(e => console.error(`[PUSH-TEST] ${id}:`, e.message))
-    ));
-    res.json({ success: true, message: `Sent to ${Object.keys(subs).length} users` });
+    const users = snap.val();
+    let count = 0;
+    await Promise.all(Object.entries(users).map(([id, user]) => {
+      const sub = user?.Notifications;
+      if (!sub || !sub.endpoint) return;
+      count++;
+      return webpush.sendNotification(sub, payload).catch(e => console.error(`[PUSH-TEST] ${id}:`, e.message));
+    }));
+    res.json({ success: true, message: `Sent to ${count} users` });
   } catch (err) {
     console.error('[PUSH-TEST]', err);
     res.status(500).json({ success: false, message: err.message });
@@ -109,21 +143,24 @@ app.post('/api/push-test', async (req, res) => {
 cron.schedule('20 12 * * *', async () => {
   console.log('[PUSH] Sending daily reset notifications...');
   try {
-    const snap = await db.ref('PushSubscriptions').get();
+    const snap = await db.ref('Pixie/Users').get();
     if (!snap.exists()) return;
     const payload = JSON.stringify({
       title: 'Farm Reset!',
       body: 'Your daily SHROOM farm has reset. Claim your SPORE now.',
       url: '/profile.html'
     });
-    const subs = snap.val();
-    const sends = Object.entries(subs).map(async ([discord_id, sub]) => {
+    const users = snap.val();
+    const sends = Object.entries(users).map(async ([discord_id, user]) => {
+      const sub = user?.Notifications;
+      if (!sub || !sub.endpoint) return;
       try {
+        const prefs = sub.prefs || {};
+        if (prefs.reset === false) return;
         await webpush.sendNotification(sub, payload);
       } catch (err) {
         if (err.statusCode === 404 || err.statusCode === 410) {
-          // Subscription expired/invalid - clean it up
-          await db.ref(`PushSubscriptions/${discord_id}`).remove();
+          await db.ref(`Pixie/Users/${discord_id}/Notifications`).remove();
           console.log(`[PUSH] Removed stale subscription: ${discord_id}`);
         } else {
           console.error(`[PUSH] Failed for ${discord_id}:`, err.message);
@@ -131,9 +168,67 @@ cron.schedule('20 12 * * *', async () => {
       }
     });
     await Promise.all(sends);
-    console.log(`[PUSH] Done. Notified ${Object.keys(subs).length} users.`);
+    console.log(`[PUSH] Done. Notified ${Object.keys(users).length} users.`);
   } catch (err) {
     console.error('[PUSH] Cron error:', err);
+  }
+}, { timezone: 'UTC' });
+
+// ----------------------------------------------------------------
+// CRON - Daily reminder notification (11:20 UTC, 1hr before reset)
+// ----------------------------------------------------------------
+cron.schedule('20 11 * * *', async () => {
+  console.log('[PUSH] Sending daily reminder notifications...');
+  try {
+    const snap = await db.ref('Pixie/Users').get();
+    if (!snap.exists()) return;
+    const users = snap.val();
+
+    const sends = Object.entries(users).map(async ([discord_id, user]) => {
+      const sub = user?.Notifications;
+      if (!sub || !sub.endpoint) return;
+
+      const prefs = sub.prefs || {};
+      if (prefs.reminders === false) return;
+
+      try {
+        // Fetch both in parallel
+        const [sporSnap, pixSnap] = await Promise.all([
+          db.ref(`Sporebot/Users/${discord_id}/Daily_Check/daily_forage`).get(),
+          db.ref(`Pixie/Users/${discord_id}/Message_XP/daily_limit`).get(),
+        ]);
+
+        const foragesDone = sporSnap.val() === true;
+        const socialDone  = (pixSnap.val() || 0) >= 200;
+
+        if (foragesDone && socialDone) return; // nothing to remind
+
+        const missing = [];
+        if (!foragesDone) missing.push('!forage');
+        if (!socialDone)  missing.push('Social Butterfly');
+
+        const payload = JSON.stringify({
+          title: 'Farm Reset in 1 Hour!',
+          body: 'Still need to complete: ' + missing.join(' & ') + '. Reset at 12:20 UTC.',
+          url: '/profile.html'
+        });
+
+        await webpush.sendNotification(sub, payload);
+
+      } catch (err) {
+        if (err.statusCode === 404 || err.statusCode === 410) {
+          await db.ref(`Pixie/Users/${discord_id}/Notifications`).remove();
+          console.log(`[PUSH] Removed stale subscription: ${discord_id}`);
+        } else {
+          console.error(`[PUSH] Reminder failed for ${discord_id}:`, err.message);
+        }
+      }
+    });
+
+    await Promise.all(sends);
+    console.log('[PUSH] Reminder cron done.');
+  } catch (err) {
+    console.error('[PUSH] Reminder cron error:', err);
   }
 }, { timezone: 'UTC' });
 // ----------------------------------------------------------------
