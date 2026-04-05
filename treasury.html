@@ -546,6 +546,7 @@ async function loadSporebotTotals() {
         <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:var(--blue);display:inline-block;"></span>SPORE</span>
         <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:#22c55e;display:inline-block;"></span>SPOREBOT (OFF-CHAIN)</span>
         <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:#a855f7;display:inline-block;"></span>NFT OFFCHAIN</span>
+        <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:#c084fc;display:inline-block;"></span>GOVERNANCE</span>
       </div>
       <div class="bar-group" id="combined-bars"></div>
     </div>
@@ -904,16 +905,16 @@ async function loadSporebotTotals() {
   };
 
   const combinedBars = [
+    { img: '/images/sporebot.png',      label: 'Sporebot Rewards',       key: 'sporebot',      pct: 20, shroom: '875,000,000',  spore: '60,000,000,000',  baseShroom: 875_000_000,  baseSpore: 60_000_000_000  },
     { img: '/images/sporulation1.webp', label: 'LP Rewards',             key: 'lp',            pct: 20, shroom: '613,000,000',  spore: '80,700,000,000',  baseShroom: 613_000_000,  baseSpore: 80_700_000_000  },
     { img: '/images/nft.png',           label: 'NFT Rewards',            key: 'nft',           pct: 20, shroom: '600,000,000',  spore: '60,000,000,000',  baseShroom: 600_000_000,  baseSpore: 60_000_000_000  },
-    { img: '/images/sporebot.png',      label: 'Sporebot Rewards',       key: 'sporebot',      pct: 20, shroom: '725,000,000',  spore: '60,000,000,000',  baseShroom: 725_000_000,  baseSpore: 60_000_000_000  },
     { emoji: '🤝',                      label: 'Partnerships / Collabs', key: null,            pct: 10, shroom: '250,000,000',  spore: '25,000,000,000',  baseShroom: 250_000_000,  baseSpore: 25_000_000_000  },
     { img: '/images/innovations.png',    label: 'Innovation / Misc',      key: null,           pct: 10, shroom: '250,000,000',  spore: '25,000,000,000',  baseShroom: 250_000_000,  baseSpore: 25_000_000_000  },
-    { img: '/images/vote.png',          label: 'Governance',             key: null,            pct: 5,  shroom: '150,000,000',  spore: '15,000,000,000',  baseShroom: 150_000_000,  baseSpore: 15_000_000_000  },
     { img: '/images/reserves.png',      label: 'Strategic Reserve',      key: null,            pct: 5,  shroom: '150,000,000',  spore: '15,000,000,000',  baseShroom: 150_000_000,  baseSpore: 15_000_000_000  },
     { img: '/images/swaps.png',         label: 'Swap Function',          key: null,            pct: 5,  shroom: '150,000,000',  spore: '15,000,000,000',  baseShroom: 150_000_000,  baseSpore: 15_000_000_000  },
     { img: '/images/emergency-funds.png', label: 'Emergency Fund',       key: null,            pct: 5,  shroom: '150,000,000',  spore: '15,000,000,000',  baseShroom: 150_000_000,  baseSpore: 15_000_000_000  },
     { img: '/images/blockchain.png',    label: 'Onchain Rewards',        key: 'spore_rewards', pct: 0,  shroom: '0',            spore: '68,740,000,000',  baseShroom: 0,            baseSpore: 68_740_000_000, sporeOnly: true },
+    { img: '/images/vote.png',          label: 'Governance',             key: 'governance',    pct: 5,  shroom: '0',            spore: '15,000,000,000',  baseShroom: 0,            baseSpore: 15_000_000_000, sporeOnly: true, govPurple: true },
     { img: '/images/nft.png',           label: 'NFT Offchain Rewards',   key: 'nft_offchain',  pct: 0,  shroom: '0',            spore: '68,740,000,000',  baseShroom: 0,            baseSpore: 68_740_000_000, sporeOnly: true, purple: true },
   ];
 
@@ -998,8 +999,9 @@ async function loadSporebotTotals() {
         ? Math.max(0, 68_740_000_000 - ((typeof calcNFTOffchainSpent === 'function') ? calcNFTOffchainSpent() : 0))
         : 0;
       const inBotSporeDisplay = (item.key === 'sporebot' && window._sporebotTotals) ? window._sporebotTotals.grand_total_spores || 0 : 0;
+      const govRemDisplay = Math.max(0, 15_000_000_000);
       const sporeLine = item.key === 'sporebot'
-        ? `<span style="color:rgba(79,168,253,0.7);">${fmtNum(remSpore)} SPORE</span><span style="color:rgba(168,85,247,0.7);">${fmtNum(nftOffchainRemDisplay)} NFT Pool</span>${inBotSporeDisplay > 0 ? `<span style="color:rgba(34,197,94,0.7);cursor:pointer;" onclick="openSporebotModal()">Sporebot (View Totals)</span>` : ''}`
+        ? `<span style="color:rgba(79,168,253,0.7);">${fmtNum(remSpore)} SPORE</span><span style="color:rgba(168,85,247,0.7);">${fmtNum(nftOffchainRemDisplay)} NFT Pool</span><span style="color:rgba(192,132,252,0.7);">${fmtNum(govRemDisplay)} Gov</span><span style="color:rgba(34,197,94,0.7);cursor:pointer;" onclick="openSporebotModal()">Sporebot (view totals)</span>`
         : `<span style="color:rgba(79,168,253,0.7);">${fmtNum(remSpore)} SPORE</span>`;
 
       // Build gradient: red-rem | red-spent-gray | blue-rem | blue-spent-gray
@@ -1014,7 +1016,13 @@ async function loadSporebotTotals() {
 
       const PURPLE = '#a855f7';
       let gradient, totalPct;
-      if (item.sporeOnly && item.purple) {
+      const GOV_PURPLE = '#c084fc';
+      if (item.sporeOnly && item.govPurple) {
+        const rp = sporeRemPct * 2;
+        const sp = sporeSpentPct * 2;
+        gradient = `linear-gradient(90deg, ${GOV_PURPLE} ${rp}%, rgba(192,132,252,0.25) ${rp}%, rgba(192,132,252,0.25) ${rp+sp}%, transparent ${rp+sp}%)`;
+        totalPct = rp + sp;
+      } else if (item.sporeOnly && item.purple) {
         const rp = sporeRemPct * 2;
         const sp = sporeSpentPct * 2;
         gradient = `linear-gradient(90deg, ${PURPLE} ${rp}%, rgba(168,85,247,0.25) ${rp}%, rgba(168,85,247,0.25) ${rp+sp}%, transparent ${rp+sp}%)`;
@@ -1033,7 +1041,8 @@ async function loadSporebotTotals() {
         if (item.key === 'sporebot') {
           const SPORE_ALLOC = 60_000_000_000;
           const NFT_ALLOC   = 68_740_000_000;
-          const SHROOM_EQ   = item.baseShroom + (SPORE_ALLOC / 100) + (NFT_ALLOC / 100);
+          const GOV_ALLOC   = 15_000_000_000;
+          const SHROOM_EQ   = item.baseShroom + (SPORE_ALLOC / 100) + (NFT_ALLOC / 100) + (GOV_ALLOC / 100);
           const nftRem      = Math.max(0, NFT_ALLOC - nftOffchainSpentAmt);
           const nftSpent    = NFT_ALLOC - nftRem;
           const shroomRemPctW   = (remShroom         / SHROOM_EQ) * 100;
@@ -1052,8 +1061,10 @@ async function loadSporebotTotals() {
           const f2 = e2 + sporeSpentPct2;
           const g2 = f2 + nftRemPct2;
           const h2 = g2 + nftSpentPct2;
-          gradient = `linear-gradient(90deg, var(--red) ${aW}%, #22c55e ${aW}%, #22c55e ${bW}%, rgba(255,255,255,0.12) ${bW}%, rgba(255,255,255,0.12) ${c2}%, var(--blue) ${c2}%, var(--blue) ${d2}%, #22c55e ${d2}%, #22c55e ${e2}%, rgba(255,255,255,0.12) ${e2}%, rgba(255,255,255,0.12) ${f2}%, #a855f7 ${f2}%, #a855f7 ${g2}%, rgba(168,85,247,0.3) ${g2}%, rgba(168,85,247,0.3) ${h2}%, transparent ${h2}%)`;
-          totalPct = Math.min(100, h2);
+          const govRemPct2   = ((GOV_ALLOC / 100) / SHROOM_EQ) * 100;
+          const i2 = h2 + govRemPct2;
+          gradient = `linear-gradient(90deg, var(--red) ${aW}%, #22c55e ${aW}%, #22c55e ${bW}%, rgba(255,255,255,0.12) ${bW}%, rgba(255,255,255,0.12) ${c2}%, var(--blue) ${c2}%, var(--blue) ${d2}%, #22c55e ${d2}%, #22c55e ${e2}%, rgba(255,255,255,0.12) ${e2}%, rgba(255,255,255,0.12) ${f2}%, #a855f7 ${f2}%, #a855f7 ${g2}%, rgba(168,85,247,0.3) ${g2}%, rgba(168,85,247,0.3) ${h2}%, #c084fc ${h2}%, #c084fc ${i2}%, transparent ${i2}%)`;
+          totalPct = Math.min(100, i2);
         } else {
           gradient = `linear-gradient(90deg, var(--red) ${a}%, rgba(255,255,255,0.12) ${b}%, rgba(255,255,255,0.12) ${c}%, var(--blue) ${c}%, var(--blue) ${e}%, rgba(255,255,255,0.12) ${e}%, rgba(255,255,255,0.12) ${f}%, transparent ${f}%)`;
           totalPct = f;
@@ -1088,15 +1099,7 @@ async function loadSporebotTotals() {
             <div class="bar-track" style="height:10px;">
               <div style="height:100%;width:0%;border-radius:999px;background:${gradient};transition:width 1.4s cubic-bezier(0.16,1,0.3,1);" data-pct="${Math.min(100, totalPct)}"></div>
             </div>
-            ${item.key === 'sporebot' ? (() => {
-              const SPORE_ALLOC = 60_000_000_000;
-              const NFT_ALLOC   = 68_740_000_000;
-              const SHROOM_EQ   = item.baseShroom + (SPORE_ALLOC / 100) + (NFT_ALLOC / 100);
-              const shroomPct   = Math.min(100, (item.baseShroom / SHROOM_EQ) * 100);
-              const sporePct    = 100 - shroomPct;
-              return `<div style="position:absolute;bottom:-3px;left:0;width:${shroomPct}%;height:2px;background:rgba(253,70,79,0.6);border-radius:999px;"></div>
-                      <div style="position:absolute;bottom:-3px;left:${shroomPct}%;width:${sporePct}%;height:2px;background:rgba(79,168,253,0.6);border-radius:999px;"></div>`;
-            })() : ''}
+            
           </div>
         </div>`);
       if (isSporebot) {
