@@ -1510,21 +1510,39 @@ function switchMsgTab(tab) {
   if (logsBtn) logsBtn.style.cssText = tab === 'logs'     ? activeStyle : inactiveStyle;
   if (tab === 'messages') {
     document.getElementById('messages-modal-pager').style.display = 'none';
-    // Load Inbox from Pixie/Users/{id}/Inbox
     var inbox = (profileData && profileData.pixie && profileData.pixie.Inbox) || {};
-    var msgs = Object.values(inbox).filter(function(m) { return m && m.body; });
+    var _readKeys = JSON.parse(localStorage.getItem('mp_inbox_read') || '{}');
+    var _archivedKeys = JSON.parse(localStorage.getItem('mp_inbox_archived') || '{}');
+    var msgs = Object.entries(inbox)
+      .filter(function(e) { return e[1] && e[1].body && !_archivedKeys[e[0]]; })
+      .map(function(e) { return Object.assign({ _key: e[0] }, e[1]); });
     msgs.sort(function(a, b) { return (b.sent_at || '').localeCompare(a.sent_at || ''); });
+    var unreadCount = msgs.filter(function(m) { return !_readKeys[m._key]; }).length;
+    var body = document.getElementById('messages-modal-body');
     if (!msgs.length) {
-      document.getElementById('messages-modal-body').innerHTML = '<div class="empty-hint" style="padding:2rem 0;text-align:center;font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.2);">Inbox is empty.</div>';
+      body.innerHTML = '<div class="empty-hint" style="padding:2rem 0;text-align:center;font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.2);">Inbox is empty.</div>';
     } else {
-      document.getElementById('messages-modal-body').innerHTML = msgs.map(function(m) {
+      var header = unreadCount > 0
+        ? '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);padding:0.35rem 0 0.75rem;">'
+          + '<span style="color:var(--yellow);font-weight:700;">' + unreadCount + ' unread</span> of ' + msgs.length + ' messages</div>'
+        : '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.25);padding:0.35rem 0 0.75rem;">All caught up</div>';
+      body.innerHTML = header + msgs.map(function(m, i) {
+        var isRead = !!_readKeys[m._key];
         var d = m.sent_at ? m.sent_at.slice(0,10) : '';
-        return '<div style="padding:0.75rem 0;border-bottom:1px solid rgba(255,255,225,0.06);">'
-          + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem;">'
-          + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.82rem;font-weight:700;color:var(--yellow);">' + (m.title || 'Message') + '</span>'
-          + '<span style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.25);">' + d + '</span>'
+        var expandId = 'inbox_msg_' + i;
+        return '<div id="inbox_row_' + i + '" style="border-bottom:1px solid rgba(255,255,225,0.05);">'
+          + '<div onclick="inboxToggle(' + i + ',\'' + m._key + '\')" style="display:flex;align-items:center;gap:0.6rem;padding:0.7rem 0;cursor:pointer;">'
+          + '<div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:' + (isRead ? 'transparent' : 'var(--yellow)') + ';border:1px solid ' + (isRead ? 'rgba(255,255,225,0.15)' : 'var(--yellow)') + ';transition:all 0.2s;" id="inbox_dot_' + i + '"></div>'
+          + '<div style="flex:1;min-width:0;">'
+          + '<div style="font-family:Space Grotesk,sans-serif;font-size:0.82rem;font-weight:' + (isRead ? '400' : '700') + ';color:' + (isRead ? 'rgba(255,255,225,0.5)' : 'var(--cream)') + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="inbox_title_' + i + '">' + (m.title || 'Message') + '</div>'
           + '</div>'
-          + '<div style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;color:rgba(255,255,225,0.7);line-height:1.55;">' + m.body + '</div>'
+          + '<span style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.2);flex-shrink:0;">' + d + '</span>'
+          + '<span style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.2);flex-shrink:0;transition:transform 0.2s;" id="inbox_arr_' + i + '">›</span>'
+          + '</div>'
+          + '<div id="' + expandId + '" style="display:none;padding:0 0 0.75rem 1.3rem;">'
+          + '<div style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;color:rgba(255,255,225,0.7);line-height:1.6;margin-bottom:0.6rem;">' + m.body + '</div>'
+          + '<button onclick="event.stopPropagation();inboxArchive(\'' + m._key + '\',' + i + ')" style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);background:none;border:1px solid rgba(255,255,225,0.1);border-radius:999px;padding:0.2em 0.7em;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color=\'var(--red)\';this.style.borderColor=\'rgba(253,70,79,0.3)\'" onmouseout="this.style.color=\'rgba(255,255,225,0.3)\';this.style.borderColor=\'rgba(255,255,225,0.1)\'">Archive</button>'
+          + '</div>'
           + '</div>';
       }).join('');
     }
@@ -1550,6 +1568,39 @@ function switchMsgTab(tab) {
   }
 }
 window.switchMsgTab = switchMsgTab;
+
+var _inboxOpenStates = {};
+function inboxToggle(i, key) {
+  var expandEl = document.getElementById('inbox_msg_' + i);
+  var arrEl    = document.getElementById('inbox_arr_' + i);
+  var dotEl    = document.getElementById('inbox_dot_' + i);
+  var titleEl  = document.getElementById('inbox_title_' + i);
+  if (!expandEl) return;
+  var isOpen = _inboxOpenStates[i];
+  _inboxOpenStates[i] = !isOpen;
+  expandEl.style.display = isOpen ? 'none' : 'block';
+  if (arrEl) arrEl.style.transform = isOpen ? '' : 'rotate(90deg)';
+  // Mark as read
+  try {
+    var reads = JSON.parse(localStorage.getItem('mp_inbox_read') || '{}');
+    reads[key] = true;
+    localStorage.setItem('mp_inbox_read', JSON.stringify(reads));
+    if (dotEl) { dotEl.style.background = 'transparent'; dotEl.style.border = '1px solid rgba(255,255,225,0.15)'; }
+    if (titleEl) { titleEl.style.fontWeight = '400'; titleEl.style.color = 'rgba(255,255,225,0.5)'; }
+  } catch(e) {}
+}
+window.inboxToggle = inboxToggle;
+
+function inboxArchive(key, i) {
+  try {
+    var archived = JSON.parse(localStorage.getItem('mp_inbox_archived') || '{}');
+    archived[key] = true;
+    localStorage.setItem('mp_inbox_archived', JSON.stringify(archived));
+    var row = document.getElementById('inbox_row_' + i);
+    if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.3s'; setTimeout(function() { row.remove(); }, 300); }
+  } catch(e) {}
+}
+window.inboxArchive = inboxArchive;
 
 async function openMessagesModal() {
   _msgActiveTab = 'messages';
