@@ -1308,14 +1308,10 @@
     const desc     = document.getElementById('create-desc').value.trim();
     const category = document.getElementById('create-category').value;
     const discordLink = document.getElementById('create-discord-link').value.trim();
-    const yesMeaning = document.getElementById('create-yes-meaning').value.trim();
-    const noMeaning  = document.getElementById('create-no-meaning').value.trim();
     const options = ['Yes', 'No'];
 
     if (!title || title.length < 10) { showToast('Title too short (min 10 chars)', 'error'); return; }
     if (!desc  || desc.length  < 50) { showToast('Description too short (min 50 chars)', 'error'); return; }
-    if (!yesMeaning) { showToast('Please define what YES means', 'error'); return; }
-    if (!noMeaning)  { showToast('Please define what NO means', 'error'); return; }
 
     const btn = document.getElementById('btn-submit-proposal');
     btn.disabled = true; btn.textContent = 'Submitting...';
@@ -1325,7 +1321,7 @@
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
-        body: JSON.stringify({ discord_id: currentUser.discord_id, title, description: desc, category, options, discord_link: discordLink, yes_meaning: yesMeaning, no_meaning: noMeaning }),
+        body: JSON.stringify({ discord_id: currentUser.discord_id, title, description: desc, category, options, discord_link: discordLink }),
       });
       const data = await res.json();
       if (!data.ok) {
