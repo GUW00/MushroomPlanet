@@ -999,7 +999,7 @@ async function loadSporebotTotals() {
         : 0;
       const inBotSporeDisplay = (item.key === 'sporebot' && window._sporebotTotals) ? window._sporebotTotals.grand_total_spores || 0 : 0;
       const sporeLine = item.key === 'sporebot'
-        ? `<span style="color:rgba(79,168,253,0.7);">${fmtNum(remSpore)} SPORE</span><span style="color:rgba(168,85,247,0.7);">${fmtNum(nftOffchainRemDisplay)} NFT Pool</span>${inBotSporeDisplay > 0 ? `<span style="color:rgba(34,197,94,0.7);">${fmtNum(inBotSporeDisplay)} Sporebot</span>` : ''}`
+        ? `<span style="color:rgba(79,168,253,0.7);">${fmtNum(remSpore)} SPORE</span><span style="color:rgba(168,85,247,0.7);">${fmtNum(nftOffchainRemDisplay)} NFT Pool</span>${inBotSporeDisplay > 0 ? `<span style="color:rgba(34,197,94,0.7);cursor:pointer;" onclick="openSporebotModal()">Sporebot (View Totals)</span>` : ''}`
         : `<span style="color:rgba(79,168,253,0.7);">${fmtNum(remSpore)} SPORE</span>`;
 
       // Build gradient: red-rem | red-spent-gray | blue-rem | blue-spent-gray
@@ -1067,8 +1067,9 @@ async function loadSporebotTotals() {
         ? `<span style="color:var(--blue);">SPORE: ${sporeRemPctOfAlloc}%</span>`
         : `<span style="color:var(--red);">SHROOM: ${shroomRemPctOfAlloc}%</span> &nbsp;·&nbsp; <span style="color:var(--blue);">SPORE: ${sporeRemPctOfAlloc}%</span>`;
 
-      c.insertAdjacentHTML('beforeend', `
-        <div class="bar-item" style="position:relative;">
+      const isSporebot = item.key === 'sporebot';
+    c.insertAdjacentHTML('beforeend', `
+        <div class="bar-item" style="position:relative;${isSporebot ? 'cursor:pointer;' : ''}">
           <div class="bar-meta">
             <span class="bm-label">${item.img ? `<img src="${item.img}" style="height:1em;width:1em;vertical-align:middle;border-radius:3px;margin-right:0.3rem;">` : (item.emoji || '') + ' '}${item.label}</span>
             <span class="bm-pct" style="display:flex;align-items:center;gap:0.75rem;">
@@ -1098,6 +1099,12 @@ async function loadSporebotTotals() {
             })() : ''}
           </div>
         </div>`);
+      if (isSporebot) {
+        const el = c.lastElementChild;
+        el.addEventListener('click', () => openSporebotModal());
+        el.querySelector('.bm-label').insertAdjacentHTML('beforeend',
+          ' <span style="font-family:\'Space Grotesk\',monospace;font-size:0.58rem;color:#22c55e;opacity:0.8;vertical-align:middle;">[view totals]</span>');
+      }
     });
   }
 
@@ -1710,6 +1717,61 @@ async function loadSporebotTotals() {
     <span>Guide</span>
   </a>
 </nav>
+<!-- Sporebot Totals Modal -->
+<div id="sporebot-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1rem;" onclick="if(event.target===this)closeSporebotModal()">
+  <div style="background:#1a1a1a;border:1px solid rgba(34,197,94,0.3);border-radius:1.5rem;padding:2rem;max-width:420px;width:100%;position:relative;box-shadow:0 0 40px rgba(34,197,94,0.1);">
+    <button onclick="closeSporebotModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:rgba(255,255,225,0.3);font-size:1.2rem;cursor:pointer;line-height:1;" onmouseover="this.style.color='var(--cream)'" onmouseout="this.style.color='rgba(255,255,225,0.3)'">x</button>
+    <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.5rem;">
+      <img src="/images/sporebot.png" style="height:1.6rem;width:1.6rem;border-radius:4px;">
+      <span style="font-weight:700;font-size:1.1rem;">Sporebot In-Bot Totals</span>
+      <span style="font-family:'Space Grotesk',monospace;font-size:0.6rem;padding:0.2em 0.6em;background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3);border-radius:999px;margin-left:auto;">LIVE SNAPSHOT</span>
+    </div>
+    <div id="sporebot-modal-body" style="display:flex;flex-direction:column;gap:0.75rem;">
+      <div style="text-align:center;color:rgba(255,255,225,0.3);font-size:0.8rem;">Loading...</div>
+    </div>
+    <div style="margin-top:1.25rem;font-size:0.65rem;font-family:'Space Grotesk',monospace;color:rgba(255,255,225,0.2);text-align:center;line-height:1.5;">
+      Snapshot written by admin command<br>Tokens held in-bot are distributed but not yet withdrawn onchain
+    </div>
+  </div>
+</div>
+<script>
+function openSporebotModal() {
+  const modal = document.getElementById('sporebot-modal');
+  modal.style.display = 'flex';
+  const t = window._sporebotTotals;
+  const body = document.getElementById('sporebot-modal-body');
+  if (!t) {
+    body.innerHTML = '<div style="text-align:center;color:rgba(255,255,225,0.3);font-size:0.8rem;">No snapshot available. Run !totals in Discord first.</div>';
+    return;
+  }
+  const fmt = v => v >= 1e9 ? (v/1e9).toFixed(2)+'B' : v >= 1e6 ? (v/1e6).toFixed(2)+'M' : v >= 1e3 ? (v/1e3).toFixed(2)+'K' : Number(v).toLocaleString();
+  const rows = [
+    { label: 'Farm Balances',     shroom: t.farm_shrooms,           spore: t.farm_spores },
+    { label: 'Discord Wallets',   shroom: t.discord_shroom_wallet,  spore: t.discord_spore_wallet },
+    { label: 'Reddit Balances',   shroom: t.reddit_shrooms,         spore: t.reddit_spores },
+    { label: 'Staked Spores',     shroom: null,                     spore: t.staked_spores },
+    { label: 'Grand Total',       shroom: t.grand_total_shrooms,    spore: t.grand_total_spores, bold: true },
+  ];
+  body.innerHTML = rows.map(r => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.75rem;background:rgba(255,255,255,0.03);border-radius:0.6rem;border:1px solid rgba(255,255,225,${r.bold?'0.1':'0.04'});">
+      <span style="font-family:'Space Grotesk',monospace;font-size:0.68rem;color:rgba(255,255,225,0.45);letter-spacing:0.1em;text-transform:uppercase;">${r.label}</span>
+      <span style="display:flex;flex-direction:column;align-items:flex-end;gap:0.15rem;">
+        ${r.shroom !== null ? `<span style="color:var(--red);font-weight:${r.bold?700:600};font-size:${r.bold?'0.95':'0.82'}rem;font-family:'Space Grotesk',monospace;">${fmt(r.shroom)} SHROOM</span>` : ''}
+        <span style="color:var(--blue);font-weight:${r.bold?700:600};font-size:${r.bold?'0.95':'0.82'}rem;font-family:'Space Grotesk',monospace;">${fmt(r.spore)} SPORE</span>
+      </span>
+    </div>`).join('');
+  const ts = t.timestamp ? new Date(t.timestamp).toLocaleString() : null;
+  if (ts) {
+    body.insertAdjacentHTML('beforeend', `<div style="text-align:right;font-size:0.62rem;font-family:'Space Grotesk',monospace;color:rgba(255,255,225,0.2);margin-top:0.25rem;">Last updated: ${ts}</div>`);
+  }
+}
+function closeSporebotModal() {
+  document.getElementById('sporebot-modal').style.display = 'none';
+}
+window.openSporebotModal = openSporebotModal;
+window.closeSporebotModal = closeSporebotModal;
+</script>
+
 <script>
 (function() {
   const page = window.location.pathname.split('/').pop().replace('.html','') || 'profile';
