@@ -577,6 +577,9 @@
       overflow-y:auto;
       opacity:0;transition:opacity 0.2s;pointer-events:none;
     }
+    @media (display-mode: standalone) {
+      .nft-modal-overlay { padding-top: 3rem; align-items: center; }
+    }
     .nft-modal-overlay.open { opacity:1;pointer-events:all; }
     .nft-modal {
       background:var(--dark2);border:1px solid rgba(255,255,225,0.12);
@@ -1702,13 +1705,7 @@ async function openSettingsModal() {
   document.getElementById('settings-modal-overlay').style.display = 'flex';
   document.getElementById('global-menu').style.display = 'none';
 
-  // Reset all to off while loading
-  _notifyPrefs.master = false;
-  _notifyPrefs.reset  = false;
-  _notifyPrefs.forage = false;
-  _notifyPrefs.social = false;
-  _notifyPrefs.raffle = false;
-  _notifyPrefs.inbox  = false;
+  // Don't reset - just render current state while loading
   renderNotifyModal();
 
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
@@ -1765,6 +1762,10 @@ window.closeMessagesModal = closeMessagesModal;
 // PUSH NOTIFICATION MODAL
 // ================================================================
 var _notifyPrefs = { master: false, reset: false, forage: false, social: false, raffle: false, inbox: false };
+try {
+  var _savedPrefs = JSON.parse(localStorage.getItem('mp_notify_prefs') || 'null');
+  if (_savedPrefs) Object.assign(_notifyPrefs, _savedPrefs);
+} catch(e) {}
 
 function setToggle(id, on) {
   var el   = document.getElementById('stg-tog-' + id);
@@ -1870,6 +1871,7 @@ async function toggleMaster() {
         body: JSON.stringify({ discord_id })
       });
       _notifyPrefs.master = false;
+      localStorage.setItem('mp_notify_prefs', JSON.stringify(_notifyPrefs));
       setNotifyStatus('Notifications disabled.', 'rgba(253,70,79,0.7)');
     } catch(e) { setNotifyStatus('Error: ' + e.message, 'rgba(253,70,79,0.7)'); return; }
   } else {
@@ -1909,6 +1911,7 @@ async function savePrefs() {
   var discord_id = currentUser?.discord_id;
   if (!discord_id) return;
   try {
+    localStorage.setItem('mp_notify_prefs', JSON.stringify(_notifyPrefs));
     await fetch(API_BASE + '/api/push-prefs', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ discord_id, prefs: {
@@ -3021,10 +3024,15 @@ const PLANT_LIMIT_VALS = { Uncommon:200000, Rare:500000, 'Super Rare':1000000 };
 const HERB_VALS = { Uncommon:5, Rare:10, 'Super Rare':15 };
 const DOUBLE_HERB_VALS = { Uncommon:5, Rare:10, 'Super Rare':25 };
 
-function openSporebotModal(tokenId, imageUrl, traits) {
+function openSporebotModal(tokenId, imageUrl, traits, rarityScore) {
   const overlay = document.getElementById('nft-modal-overlay');
   document.getElementById('nft-modal-name').textContent = 'Sporebot #' + tokenId;
-  document.getElementById('nft-modal-rarity').textContent = '';
+  var rScore = rarityScore || null;
+  var rarityLabel = rScore ? (rScore >= 350 ? 'Legendary' : rScore >= 200 ? 'Super Rare' : rScore >= 100 ? 'Rare' : rScore >= 50 ? 'Uncommon' : 'Common') : null;
+  var rarityColor = rarityLabel === 'Legendary' ? 'var(--yellow)' : rarityLabel === 'Super Rare' ? 'var(--purple)' : rarityLabel === 'Rare' ? 'var(--red)' : 'rgba(255,255,225,0.35)';
+  document.getElementById('nft-modal-rarity').innerHTML = rScore
+    ? '<span style="color:' + rarityColor + ';">' + rarityLabel + '</span> <span style="color:rgba(255,255,225,0.25);">| Rarity Score: ' + rScore + '</span>'
+    : '';
 
   const img = document.getElementById('nft-modal-img');
   img.src = imageUrl || 'https://alchemy.mypinata.cloud/ipfs/QmYh9hwJZNTDy192auvCq1jnpvhmLhAFW4qRRcXSraNntL/' + tokenId + '.png';
@@ -3254,8 +3262,8 @@ function sbRenderPage() {
   slice.forEach(function(item) {
     var safeId = 'sbp_' + item.tokenId;
     window._sporebotCache = window._sporebotCache || {};
-    window._sporebotCache[safeId] = { tokenId: item.tokenId, image: item.image || '', traits: item.traits || {} };
-    html += '<div class="nft-card" style="cursor:pointer;" onclick="openSporebotModal(window._sporebotCache[\'' + safeId + '\'].tokenId,window._sporebotCache[\'' + safeId + '\'].image,window._sporebotCache[\'' + safeId + '\'].traits)">';
+    window._sporebotCache[safeId] = { tokenId: item.tokenId, image: item.image || '', traits: item.traits || {}, rarity_score: item.rarity_score || null };
+    html += '<div class="nft-card" style="cursor:pointer;" onclick="openSporebotModal(window._sporebotCache[\'' + safeId + '\'].tokenId,window._sporebotCache[\'' + safeId + '\'].image,window._sporebotCache[\'' + safeId + '\'].traits,window._sporebotCache[\'' + safeId + '\'].rarity_score)">';
     if (item.image) {
       html += '<img src="' + fixIpfs(item.image) + '" alt="' + item.label + '" loading="lazy" onerror="this.style.display=\'none\'">';
     } else {
@@ -3780,7 +3788,7 @@ function renderSporebots(s, p) {
     if (!image && tokenId) {
       image = 'https://alchemy.mypinata.cloud/ipfs/QmYh9hwJZNTDy192auvCq1jnpvhmLhAFW4qRRcXSraNntL/' + tokenId + '.png';
     }
-    bots.push({ tokenId: tokenId, image: fixIpfs(image), traits: entry.traits || {}, label: 'Sporebot #' + tokenId, count: parseInt(entry.count || 1) });
+    bots.push({ tokenId: tokenId, image: fixIpfs(image), traits: entry.traits || {}, rarity_score: entry.rarity_score || null, label: 'Sporebot #' + tokenId, count: parseInt(entry.count || 1) });
   });
 
   bots.sort(function(a, b) { return parseInt(a.tokenId) - parseInt(b.tokenId); });
