@@ -225,6 +225,8 @@ cron.schedule('0 */1 * * *', async () => {
             body: 'You still need to !forage today to keep your streak alive.',
             url: 'https://discord.com/channels/1190059108368400535/1305415396928655452'
           }));
+          const fRef = db.ref(`Pixie/Messages/${discord_id}/inbox`).push();
+          await fRef.set({ title: 'Forage Reminder!', body: 'You still need to !forage today to keep your streak alive.', sent_at: new Date().toISOString(), from: 'system', read: false });
         }
 
         if (!socialDone && prefs.social !== false) {
@@ -233,6 +235,8 @@ cron.schedule('0 */1 * * *', async () => {
             body: 'You have not completed the Social Butterfly today.',
             url: 'https://discord.com/channels/1190059108368400535/1190059109085614082'
           }));
+          const sRef = db.ref(`Pixie/Messages/${discord_id}/inbox`).push();
+          await sRef.set({ title: 'Social Butterfly Reminder!', body: 'You have not completed your Social Butterfly (200 XP) today.', sent_at: new Date().toISOString(), from: 'system', read: false });
         }
 
       } catch (err) {

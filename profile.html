@@ -1316,17 +1316,15 @@
         <!-- Status tabs: Active / Closed -->
         <div style="display:flex;gap:0.3rem;padding:0.5rem 1.25rem 0;flex-shrink:0;">
           <button id="gv-tab-active" onclick="switchGvStatus('active')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.35em 0.6em;border-radius:999px;border:1px solid rgba(34,197,94,0.35);background:rgba(34,197,94,0.08);color:var(--green);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.35rem;"><img src="/images/cooldown.png" style="width:12px;height:12px;object-fit:contain;" onerror="this.style.display='none'">Active</button>
-          <button id="gv-tab-closed" onclick="switchGvStatus('closed')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.35em 0.6em;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:transparent;color:rgba(255,255,225,0.35);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.35rem;"><img src="/images/close.png" style="width:12px;height:12px;object-fit:contain;" onerror="this.style.display='none'">Closed</button>
+          <button id="gv-tab-closed" onclick="switchGvStatus('closed')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.35em 0.6em;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:transparent;color:rgba(255,255,225,0.35);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.35rem;"><img src="/images/expired.png" style="width:12px;height:12px;object-fit:contain;" onerror="this.style.display='none'">Closed</button>
         </div>
         <!-- Body -->
         <div style="margin:0.5rem 1.25rem 0;padding:0.6rem 0.875rem;background:rgba(255,255,225,0.03);border:1px solid rgba(255,255,225,0.07);border-radius:0.75rem;flex-shrink:0;">
-          <div style="display:flex;align-items:center;gap:0.4rem;font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.4);line-height:1.6;">
-            <img src="/images/raffle.png" style="width:12px;height:12px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
-            Tap any <span style="color:var(--green);">Active</span> raffle or airdrop to jump to it in Discord and enter.
+          <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.4);line-height:1.8;">
+            <img src="/images/raffle.png" style="width:11px;height:11px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Tap any <span style="color:var(--green);">Active</span> giveaway to enter it in Discord.
           </div>
-          <div style="display:flex;align-items:center;gap:0.4rem;font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.4);margin-top:0.3rem;line-height:1.6;">
-            <img src="/images/pixie.png" style="width:12px;height:12px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
-            You must be <span style="color:var(--yellow);">LvL 5 and Pixie Verified</span> to participate
+          <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.4);line-height:1.8;margin-top:0.2rem;">
+            <img src="/images/pixie.png" style="width:11px;height:11px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Must be <span style="color:var(--yellow);">Pixie Verified</span> to participate.
           </div>
         </div>
         <div id="giveaways-modal-body" style="padding:0.75rem 1.25rem;overflow-y:auto;flex:1;min-height:200px;"></div>
@@ -1353,7 +1351,7 @@
         <!-- Header -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
           <div style="font-family:Space Grotesk,monospace;font-size:0.75rem;letter-spacing:0.15em;color:var(--cream);">SETTINGS</div>
-          <button onclick="document.getElementById('settings-modal-overlay').style.display='none';document.getElementById('global-menu').style.display='';" style="background:rgba(255,255,225,0.06);border:1px solid rgba(255,255,225,0.12);color:rgba(255,255,225,0.6);font-size:0.85rem;cursor:pointer;line-height:1;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(253,70,79,0.15)';this.style.borderColor='rgba(253,70,79,0.3)';this.style.color='var(--red)'" onmouseout="this.style.background='rgba(255,255,225,0.06)';this.style.borderColor='rgba(255,255,225,0.12)';this.style.color='rgba(255,255,225,0.6)'">x</button>
+          <button onclick="closeSettingsX()" style="background:rgba(255,255,225,0.06);border:1px solid rgba(255,255,225,0.12);color:rgba(255,255,225,0.6);font-size:0.85rem;cursor:pointer;line-height:1;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(253,70,79,0.15)';this.style.borderColor='rgba(253,70,79,0.3)';this.style.color='var(--red)'" onmouseout="this.style.background='rgba(255,255,225,0.06)';this.style.borderColor='rgba(255,255,225,0.12)';this.style.color='rgba(255,255,225,0.6)'">x</button>
         </div>
 
         <!-- Notifications section header -->
@@ -1665,11 +1663,11 @@ function switchMsgTab(tab) {
     document.getElementById('messages-modal-pager').style.display = 'none';
     var inbox = (profileData && profileData.pixie && profileData.pixie.Inbox) || {};
     var _readKeys = _inboxMeta.read || {};
-    var msgs = Object.entries(_inboxArchived)
+    var msgs = Object.entries(_inboxMessages)
       .filter(function(e) { return e[1] && e[1].body; })
       .map(function(e) { return Object.assign({ _key: e[0] }, e[1]); });
     msgs.sort(function(a, b) { return (b.sent_at || '').localeCompare(a.sent_at || ''); });
-    var unreadCount = msgs.filter(function(m) { return !_readKeys[m._key]; }).length;
+    var unreadCount = msgs.filter(function(m) { return !m.read; }).length;
     var body = document.getElementById('messages-modal-body');
     if (!msgs.length) {
       body.innerHTML = '<div class="empty-hint" style="padding:2rem 0;text-align:center;font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.2);">Inbox is empty.</div>';
@@ -1700,6 +1698,7 @@ function switchMsgTab(tab) {
           + '</div>'
           + '</div>';
       }).join('');
+    if (msgs.length) setTimeout(function() { attachInboxSwipes(msgs); }, 50);
     }
   } else {
     // Build log list from profileData on first switch
@@ -1781,6 +1780,55 @@ function archToggle(i) {
   }
 }
 window.archToggle = archToggle;
+
+// ---- SWIPE TO ARCHIVE / UNARCHIVE ----
+function attachSwipe(el, onSwipeRight, onSwipeLeft) {
+  var startX = 0, startY = 0, moved = false;
+  el.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    moved = false;
+  }, { passive: true });
+  el.addEventListener('touchmove', function(e) {
+    var dx = e.touches[0].clientX - startX;
+    var dy = e.touches[0].clientY - startY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
+      moved = true;
+      el.style.transform = 'translateX(' + (dx * 0.4) + 'px)';
+      el.style.opacity = String(1 - Math.abs(dx) / 400);
+    }
+  }, { passive: true });
+  el.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - startX;
+    el.style.transform = '';
+    el.style.opacity = '';
+    if (!moved) return;
+    if (dx > 80 && onSwipeRight) onSwipeRight();
+    else if (dx < -80 && onSwipeLeft) onSwipeLeft();
+  }, { passive: true });
+}
+
+function attachInboxSwipes(msgs) {
+  msgs.forEach(function(m, i) {
+    var row = document.getElementById('inbox_row_' + i);
+    if (!row) return;
+    attachSwipe(row,
+      function() { inboxArchive(m._key, i); },
+      null
+    );
+  });
+}
+
+function attachArchivedSwipes(msgs) {
+  msgs.forEach(function(m, i) {
+    var row = document.getElementById('arch_row_' + i);
+    if (!row) return;
+    attachSwipe(row,
+      null,
+      function() { inboxUnarchive(m._key, i); }
+    );
+  });
+}
 
 function inboxUnarchive(key, i) {
   try {
@@ -2144,10 +2192,16 @@ async function openSettingsModal() {
 }
 window.openSettingsModal = openSettingsModal;
 
+function closeSettingsX() {
+  document.getElementById('settings-modal-overlay').style.display = 'none';
+  var gm = document.getElementById('global-menu');
+  if (gm) gm.style.display = '';
+}
+window.closeSettingsX = closeSettingsX;
+
 function closeSettingsModal(e) {
   if (e.target === document.getElementById('settings-modal-overlay')) {
-    document.getElementById('settings-modal-overlay').style.display = 'none';
-    document.getElementById('global-menu').style.display = '';
+    closeSettingsX();
   }
 }
 window.closeSettingsModal = closeSettingsModal;
