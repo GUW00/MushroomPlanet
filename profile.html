@@ -1306,7 +1306,13 @@
         <!-- Header -->
         <div style="padding:1rem 1.25rem 0.75rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,225,0.08);flex-shrink:0;">
           <div style="font-family:Space Grotesk,monospace;font-size:0.75rem;letter-spacing:0.15em;color:var(--cream);">GIVEAWAYS</div>
-          <button onclick="closeGiveawaysX()" style="background:rgba(255,255,225,0.06);border:1px solid rgba(255,255,225,0.12);color:rgba(255,255,225,0.6);font-size:0.85rem;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(253,70,79,0.15)';this.style.color='var(--red)'" onmouseout="this.style.background='rgba(255,255,225,0.06)';this.style.color='rgba(255,255,225,0.6)'">x</button>
+          <button onclick="logout()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-family:Space Grotesk,sans-serif;font-size:0.82rem;font-weight:700;padding:0.75rem;border-radius:0.75rem;border:1px solid rgba(253,70,79,0.25);background:rgba(253,70,79,0.06);color:var(--red);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(253,70,79,0.12)'" onmouseout="this.style.background='rgba(253,70,79,0.06)'">
+          <img src="/images/discord.png" style="width:16px;height:16px;object-fit:contain;" onerror="this.style.display='none'">
+          Disconnect Account
+        </button>
+        <button onclick="closeSettingsX()" style="width:100%;margin-top:0.75rem;font-family:Space Grotesk,sans-serif;font-size:0.82rem;font-weight:700;padding:0.75rem;border-radius:0.75rem;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,225,0.04);color:rgba(255,255,225,0.5);cursor:pointer;">
+          Close
+        </button>
         </div>
         <!-- Type tabs: Raffle / Airdrop -->
         <div style="display:flex;gap:0.4rem;padding:0.75rem 1.25rem 0;flex-shrink:0;">
@@ -1351,7 +1357,7 @@
         <!-- Header -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
           <div style="font-family:Space Grotesk,monospace;font-size:0.75rem;letter-spacing:0.15em;color:var(--cream);">SETTINGS</div>
-          <button onclick="closeSettingsX()" style="background:rgba(255,255,225,0.06);border:1px solid rgba(255,255,225,0.12);color:rgba(255,255,225,0.6);font-size:0.85rem;cursor:pointer;line-height:1;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(253,70,79,0.15)';this.style.borderColor='rgba(253,70,79,0.3)';this.style.color='var(--red)'" onmouseout="this.style.background='rgba(255,255,225,0.06)';this.style.borderColor='rgba(255,255,225,0.12)';this.style.color='rgba(255,255,225,0.6)'">x</button>
+          <button onclick="closeSettingsX()" style="background:rgba(255,255,225,0.06);border:1px solid rgba(255,255,225,0.12);color:rgba(255,255,225,0.6);font-size:0.85rem;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(253,70,79,0.15)';this.style.color='var(--red)'" onmouseout="this.style.background='rgba(255,255,225,0.06)';this.style.color='rgba(255,255,225,0.6)'">x</button>
         </div>
 
         <!-- Notifications section header -->
@@ -1437,10 +1443,7 @@
           <img src="/images/discord.png" style="width:16px;height:16px;object-fit:contain;" onerror="this.style.display='none'">
           Disconnect Account
         </button>
-        <button onclick="closeSettingsX()" style="width:100%;margin-top:0.75rem;font-family:Space Grotesk,sans-serif;font-size:0.82rem;font-weight:700;padding:0.75rem;border-radius:0.75rem;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,225,0.04);color:rgba(255,255,225,0.5);cursor:pointer;">
-          Close
-        </button>
-      </div>
+        </div>
     </div>
 
     <!-- NOTIFY MODAL (legacy stub - UI moved to Settings modal) -->
