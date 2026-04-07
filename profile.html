@@ -1512,6 +1512,58 @@ var MSG_PER_PAGE = 10;
 var MSG_MAX = 50;
 
 var _msgActiveTab = 'messages';
+var _inboxMeta = { read: {}, archived: {} };
+
+async function loadInboxMeta() {
+  if (!currentUser || !currentUser.discord_id) return;
+  try {
+    var r = await fetch(API_BASE + '/api/inbox-meta/' + currentUser.discord_id);
+    var data = await r.json();
+    if (data.ok) {
+      _inboxMeta.read     = data.read     || {};
+      _inboxMeta.archived = data.archived || {};
+    }
+  } catch(e) {}
+}
+
+function saveInboxMeta() {
+  if (!currentUser || !currentUser.discord_id) return;
+  fetch(API_BASE + '/api/inbox-meta', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      discord_id: currentUser.discord_id,
+      read:     _inboxMeta.read     || {},
+      archived: _inboxMeta.archived || {},
+    })
+  }).catch(function(e) { console.warn('[inbox-meta] save failed', e); });
+}
+var _inboxMeta = { read: {}, archived: {} };
+
+async function loadInboxMeta() {
+  if (!currentUser || !currentUser.discord_id) return;
+  try {
+    var r = await fetch(API_BASE + '/api/inbox-meta/' + currentUser.discord_id);
+    var data = await r.json();
+    if (data.ok) {
+      _inboxMeta.read     = data.read     || {};
+      _inboxMeta.archived = data.archived || {};
+    }
+  } catch(e) {}
+}
+
+function saveInboxMeta() {
+  if (!currentUser || !currentUser.discord_id) return;
+  fetch(API_BASE + '/api/inbox-meta', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      discord_id: currentUser.discord_id,
+      read:     _inboxMeta.read     || {},
+      archived: _inboxMeta.archived || {},
+    })
+  }).catch(function(e) { console.warn('[inbox-meta] save failed', e); });
+}
 
 function switchMsgTab(tab) {
   _msgActiveTab = tab;
@@ -1526,7 +1578,7 @@ function switchMsgTab(tab) {
   if (tab === 'archived') {
     document.getElementById('messages-modal-pager').style.display = 'none';
     var inbox = (profileData && profileData.pixie && profileData.pixie.Inbox) || {};
-    var _archivedKeys = JSON.parse(localStorage.getItem('mp_inbox_archived') || '{}');
+    var _archivedKeys = _inboxMeta.archived || {};
     var msgs = Object.entries(inbox)
       .filter(function(e) { return e[1] && e[1].body && _archivedKeys[e[0]]; })
       .map(function(e) { return Object.assign({ _key: e[0] }, e[1]); });
@@ -1560,8 +1612,8 @@ function switchMsgTab(tab) {
   if (tab === 'messages') {
     document.getElementById('messages-modal-pager').style.display = 'none';
     var inbox = (profileData && profileData.pixie && profileData.pixie.Inbox) || {};
-    var _readKeys = JSON.parse(localStorage.getItem('mp_inbox_read') || '{}');
-    var _archivedKeys = JSON.parse(localStorage.getItem('mp_inbox_archived') || '{}');
+    var _readKeys = _inboxMeta.read || {};
+    var _archivedKeys = _inboxMeta.archived || {};
     var msgs = Object.entries(inbox)
       .filter(function(e) { return e[1] && e[1].body && !_archivedKeys[e[0]]; })
       .map(function(e) { return Object.assign({ _key: e[0] }, e[1]); });
@@ -1636,9 +1688,9 @@ function inboxToggle(i, key) {
   }
   // Mark as read
   try {
-    var reads = JSON.parse(localStorage.getItem('mp_inbox_read') || '{}');
-    reads[key] = true;
-    localStorage.setItem('mp_inbox_read', JSON.stringify(reads));
+    _inboxMeta.read = _inboxMeta.read || {};
+    _inboxMeta.read[key] = true;
+    saveInboxMeta();
     if (dotEl) { dotEl.style.background = 'transparent'; dotEl.style.border = '1px solid rgba(255,255,225,0.15)'; }
     if (titleEl) { titleEl.style.fontWeight = '400'; titleEl.style.color = 'rgba(255,255,225,0.5)'; }
   } catch(e) {}
@@ -1647,9 +1699,9 @@ window.inboxToggle = inboxToggle;
 
 function inboxArchive(key, i) {
   try {
-    var archived = JSON.parse(localStorage.getItem('mp_inbox_archived') || '{}');
-    archived[key] = true;
-    localStorage.setItem('mp_inbox_archived', JSON.stringify(archived));
+    _inboxMeta.archived = _inboxMeta.archived || {};
+    _inboxMeta.archived[key] = true;
+    saveInboxMeta();
     var row = document.getElementById('inbox_row_' + i);
     if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.3s'; setTimeout(function() { row.remove(); }, 300); }
   } catch(e) {}
@@ -1676,9 +1728,9 @@ window.archToggle = archToggle;
 
 function inboxUnarchive(key, i) {
   try {
-    var archived = JSON.parse(localStorage.getItem('mp_inbox_archived') || '{}');
-    delete archived[key];
-    localStorage.setItem('mp_inbox_archived', JSON.stringify(archived));
+    _inboxMeta.archived = _inboxMeta.archived || {};
+    delete _inboxMeta.archived[key];
+    saveInboxMeta();
     var row = document.getElementById('arch_row_' + i);
     if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.3s'; setTimeout(function() { switchMsgTab('archived'); }, 300); }
   } catch(e) {}
@@ -1691,6 +1743,7 @@ async function openMessagesModal() {
   el.style.display = 'flex';
   document.getElementById('global-menu').style.display = 'none';
   document.getElementById('messages-modal-pager').style.display = 'none';
+  await loadInboxMeta();
   switchMsgTab('messages');
   return;
 
