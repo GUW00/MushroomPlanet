@@ -1282,6 +1282,7 @@
         <!-- Tabs -->
         <div style="display:flex;gap:0.4rem;padding:0.75rem 1.25rem 0;flex-shrink:0;">
           <button id="msg-tab-messages" onclick="switchMsgTab('messages')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.5em 0.75em;border-radius:999px;border:1px solid rgba(254,206,0,0.3);background:rgba(254,206,0,0.08);color:var(--yellow);cursor:pointer;transition:all 0.2s;">Inbox</button>
+          <button id="msg-tab-archived" onclick="switchMsgTab('archived')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.5em 0.75em;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:transparent;color:rgba(255,255,225,0.4);cursor:pointer;transition:all 0.2s;">Archived</button>
           <button id="msg-tab-logs" onclick="switchMsgTab('logs')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.5em 0.75em;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:transparent;color:rgba(255,255,225,0.4);cursor:pointer;transition:all 0.2s;">Logs</button>
         </div>
         <!-- Body -->
@@ -1516,10 +1517,46 @@ function switchMsgTab(tab) {
   _msgActiveTab = tab;
   var msgBtn  = document.getElementById('msg-tab-messages');
   var logsBtn = document.getElementById('msg-tab-logs');
+  var archBtn = document.getElementById('msg-tab-archived');
   var activeStyle  = 'flex:1;font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.5em 0.75em;border-radius:999px;border:1px solid rgba(254,206,0,0.3);background:rgba(254,206,0,0.08);color:var(--yellow);cursor:pointer;transition:all 0.2s;';
   var inactiveStyle = 'flex:1;font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.5em 0.75em;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:transparent;color:rgba(255,255,225,0.4);cursor:pointer;transition:all 0.2s;';
   if (msgBtn)  msgBtn.style.cssText  = tab === 'messages' ? activeStyle : inactiveStyle;
   if (logsBtn) logsBtn.style.cssText = tab === 'logs'     ? activeStyle : inactiveStyle;
+  if (archBtn) archBtn.style.cssText = tab === 'archived' ? activeStyle : inactiveStyle;
+  if (tab === 'archived') {
+    document.getElementById('messages-modal-pager').style.display = 'none';
+    var inbox = (profileData && profileData.pixie && profileData.pixie.Inbox) || {};
+    var _archivedKeys = JSON.parse(localStorage.getItem('mp_inbox_archived') || '{}');
+    var msgs = Object.entries(inbox)
+      .filter(function(e) { return e[1] && e[1].body && _archivedKeys[e[0]]; })
+      .map(function(e) { return Object.assign({ _key: e[0] }, e[1]); });
+    msgs.sort(function(a, b) { return (b.sent_at || '').localeCompare(a.sent_at || ''); });
+    var body = document.getElementById('messages-modal-body');
+    if (!msgs.length) {
+      body.innerHTML = '<div class="empty-hint" style="padding:2rem 0;text-align:center;font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.2);">No archived messages.</div>';
+    } else {
+      body.innerHTML = '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.25);padding:0.35rem 0 0.75rem;">' + msgs.length + ' archived</div>'
+        + msgs.map(function(m, i) {
+          var d = m.sent_at ? m.sent_at.slice(0,10) : '';
+          var expandId = 'arch_msg_' + i;
+          return '<div id="arch_row_' + i + '" style="border-bottom:1px solid rgba(255,255,225,0.05);">'
+            + '<div onclick="archToggle(' + i + ')" style="display:flex;align-items:center;gap:0.6rem;padding:0.7rem 0;cursor:pointer;">'
+            + '<div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:transparent;border:1px solid rgba(255,255,225,0.15);"></div>'
+            + '<div style="flex:1;min-width:0;">'
+            + '<div id="arch_title_' + i + '" style="font-family:Space Grotesk,sans-serif;font-size:0.82rem;font-weight:400;color:rgba(255,255,225,0.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (m.title || 'Message') + '</div>'
+            + '</div>'
+            + '<span style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.2);flex-shrink:0;">' + d + '</span>'
+            + '<span style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.2);flex-shrink:0;transition:transform 0.2s;" id="arch_arr_' + i + '">></span>'
+            + '</div>'
+            + '<div id="' + expandId + '" style="display:none;padding:0 0 0.75rem 1.3rem;">'
+            + '<div style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;color:rgba(255,255,225,0.55);line-height:1.6;margin-bottom:0.6rem;">' + m.body + '</div>'
+            + '<button onclick="event.stopPropagation();inboxUnarchive(\'' + m._key + '\',' + i + ')" style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);background:none;border:1px solid rgba(255,255,225,0.1);border-radius:999px;padding:0.2em 0.7em;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color=\'var(--yellow)\';this.style.borderColor=\'rgba(254,206,0,0.3)\'" onmouseout="this.style.color=\'rgba(255,255,225,0.3)\';this.style.borderColor=\'rgba(255,255,225,0.1)\'">Restore</button>'
+            + '</div>'
+            + '</div>';
+        }).join('');
+    }
+    return;
+  }
   if (tab === 'messages') {
     document.getElementById('messages-modal-pager').style.display = 'none';
     var inbox = (profileData && profileData.pixie && profileData.pixie.Inbox) || {};
@@ -1592,6 +1629,11 @@ function inboxToggle(i, key) {
   _inboxOpenStates[i] = !isOpen;
   expandEl.style.display = isOpen ? 'none' : 'block';
   if (arrEl) arrEl.style.transform = isOpen ? '' : 'rotate(90deg)';
+  if (titleEl) {
+    titleEl.style.whiteSpace = isOpen ? 'nowrap' : 'normal';
+    titleEl.style.overflow   = isOpen ? 'hidden' : 'visible';
+    titleEl.style.textOverflow = isOpen ? 'ellipsis' : 'clip';
+  }
   // Mark as read
   try {
     var reads = JSON.parse(localStorage.getItem('mp_inbox_read') || '{}');
@@ -1613,6 +1655,35 @@ function inboxArchive(key, i) {
   } catch(e) {}
 }
 window.inboxArchive = inboxArchive;
+
+var _archOpenStates = {};
+function archToggle(i) {
+  var expandEl = document.getElementById('arch_msg_' + i);
+  var arrEl    = document.getElementById('arch_arr_' + i);
+  var titleEl  = document.getElementById('arch_title_' + i);
+  if (!expandEl) return;
+  var isOpen = _archOpenStates[i];
+  _archOpenStates[i] = !isOpen;
+  expandEl.style.display = isOpen ? 'none' : 'block';
+  if (arrEl) arrEl.style.transform = isOpen ? '' : 'rotate(90deg)';
+  if (titleEl) {
+    titleEl.style.whiteSpace = isOpen ? 'nowrap' : 'normal';
+    titleEl.style.overflow   = isOpen ? 'hidden' : 'visible';
+    titleEl.style.textOverflow = isOpen ? 'ellipsis' : 'clip';
+  }
+}
+window.archToggle = archToggle;
+
+function inboxUnarchive(key, i) {
+  try {
+    var archived = JSON.parse(localStorage.getItem('mp_inbox_archived') || '{}');
+    delete archived[key];
+    localStorage.setItem('mp_inbox_archived', JSON.stringify(archived));
+    var row = document.getElementById('arch_row_' + i);
+    if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.3s'; setTimeout(function() { switchMsgTab('archived'); }, 300); }
+  } catch(e) {}
+}
+window.inboxUnarchive = inboxUnarchive;
 
 async function openMessagesModal() {
   _msgActiveTab = 'messages';

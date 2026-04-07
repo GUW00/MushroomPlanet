@@ -39,6 +39,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
 // ----------------------------------------------------------------
+// Push notification timing (UTC)
+// ----------------------------------------------------------------
+const RESET_HOUR = 12;
+const RESET_MINUTE = 20;
+
+// ----------------------------------------------------------------
 // Firebase listener - fires push when raffle winner is recorded
 // ----------------------------------------------------------------
 app.post('/api/push-subscribe', async (req, res) => {
@@ -111,64 +117,18 @@ app.post('/api/push-prefs', async (req, res) => {
   }
 });
 
-
-// ----------------------------------------------------------------
-// POST /api/push-test  (remove after testing)
-// ----------------------------------------------------------------
-app.post('/api/push-test', async (req, res) => {
-  const { discord_id } = req.body;
-  try {
-    const snap = discord_id
-      ? await db.ref(`Pixie/Users/${discord_id}/Notifications`).get()
-      : await db.ref('Pixie/Users').get();
-
-    if (!snap.exists()) return res.json({ success: false, message: 'No subscriptions found' });
-
-    const { type } = req.body;
-    const payload = type === 'reminder'
-      ? JSON.stringify({
-          title: 'Farm Reset in 1 Hour!',
-          body: 'Still need to complete: !forage & Social Butterfly. Reset at 12:20 UTC.',
-          url: '/profile.html'
-        })
-      : JSON.stringify({
-          title: 'NEW FARM DAY BEGINS!',
-          body: 'The daily reset is complete and your cooldowns have been reset!',
-          url: '/profile.html'
-        });
-
-    if (discord_id) {
-      await webpush.sendNotification(snap.val(), payload);
-      return res.json({ success: true, message: `Sent to ${discord_id}` });
-    }
-
-    const users = snap.val();
-    let count = 0;
-    await Promise.all(Object.entries(users).map(([id, user]) => {
-      const sub = user?.Notifications;
-      if (!sub || !sub.endpoint) return;
-      count++;
-      return webpush.sendNotification(sub, payload).catch(e => console.error(`[PUSH-TEST] ${id}:`, e.message));
-    }));
-    res.json({ success: true, message: `Sent to ${count} users` });
-  } catch (err) {
-    console.error('[PUSH-TEST]', err);
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
 // ----------------------------------------------------------------
 // CRON - Daily farm reset notification (12:20 UTC)
 // ----------------------------------------------------------------
-cron.schedule('20 12 * * *', async () => {
+cron.schedule(`${RESET_MINUTE} ${RESET_HOUR} * * *`, async () => {
   console.log('[PUSH] Sending daily reset notifications...');
   try {
     const snap = await db.ref('Pixie/Users').get();
     if (!snap.exists()) return;
     const payload = JSON.stringify({
       title: 'Farm Reset!',
-      body: 'Your daily SHROOM farm has reset. Claim your SPORE now.',
-      url: '/profile.html'
+      body: 'A New Farming Day Begins!',
+      url: 'https://discord.com/channels/1190059108368400535/1305415396928655452'
     });
     const users = snap.val();
     const sends = Object.entries(users).map(async ([discord_id, user]) => {
@@ -197,7 +157,7 @@ cron.schedule('20 12 * * *', async () => {
 // ----------------------------------------------------------------
 // CRON - Daily reminder notification (11:20 UTC, 1hr before reset)
 // ----------------------------------------------------------------
-cron.schedule('20 11 * * *', async () => {
+cron.schedule('0 */1 * * *', async () => {
   console.log('[PUSH] Sending daily reminder notifications...');
   try {
     const reminderSnap = await db.ref('Pixie/Notifications/Reminders').get();
@@ -220,17 +180,23 @@ cron.schedule('20 11 * * *', async () => {
         const socialDone  = (socialSnap.val() || 0) >= 200;
         if (foragesDone && socialDone) return;
 
-        const missing = [];
-        if (!foragesDone) missing.push('!forage');
-        if (!socialDone)  missing.push('Social Butterfly');
+        const prefs = sub.prefs || {};
 
-        const payload = JSON.stringify({
-          title: 'Farm Reset in 1 Hour!',
-          body: 'Still need to complete: ' + missing.join(' & ') + '. Reset at 12:20 UTC.',
-          url: '/profile.html'
-        });
+        if (!foragesDone && prefs.forage !== false) {
+          await webpush.sendNotification(sub, JSON.stringify({
+            title: 'Forage Reminder!',
+            body: 'You still need to !forage today to keep your streak alive.',
+            url: 'https://discord.com/channels/1190059108368400535/1305415396928655452'
+          }));
+        }
 
-        await webpush.sendNotification(sub, payload);
+        if (!socialDone && prefs.social !== false) {
+          await webpush.sendNotification(sub, JSON.stringify({
+            title: 'Social Butterfly Reminder!',
+            body: 'You have not completed the Social Butterfly today.',
+            url: 'https://discord.com/channels/1190059108368400535/1190059109085614082'
+          }));
+        }
 
       } catch (err) {
         if (err.statusCode === 404 || err.statusCode === 410) {
@@ -316,7 +282,7 @@ app.post('/api/push-raffle-win', async (req, res) => {
     const payload = JSON.stringify({
       title: 'You Won a Raffle!',
       body: `You won ${Number(amount).toLocaleString()} ${currency} from ${host}'s raffle!`,
-      url: '/profile.html'
+      url: 'https://discord.com/channels/1190059108368400535/1369734800864444499'
     });
     await webpush.sendNotification(sub, payload);
     console.log(`[PUSH] Raffle win sent to ${discord_id}`);
@@ -358,7 +324,7 @@ cron.schedule('0 * * * *', async () => {
         await webpush.sendNotification(sub, JSON.stringify({
           title: 'Elder Pipe is Ready!',
           body: 'Your Elder Pipe cooldown has reset. Use !pipe to reset all your daily cooldowns.',
-          url: '/profile.html'
+          url: 'https://discord.com/channels/1190059108368400535/1305415396928655452'
         }));
         console.log(`[PUSH] Pipe ready sent to ${discord_id}`);
       } catch(err) {
