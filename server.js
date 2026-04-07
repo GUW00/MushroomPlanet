@@ -19,54 +19,6 @@ webpush.setVapidDetails(
 
 const serviceAccount = JSON.parse(fs.readFileSync('./firebase.json', 'utf8'));
 
-// ----------------------------------------------------------------
-// Firebase listener - fires push when raffle winner is recorded
-// ----------------------------------------------------------------
-function startRaffleWinnerListener() {
-  const ref = admin.database().ref('Pixie/Logs/Raffles/Completed');
-  ref.on('child_added', async (snap) => {
-    try {
-      const data = snap.val();
-      if (!data || !data.Winner) return;
-
-      // Winner stored as "<@discord_id>"
-      const match = data.Winner.match(/<@(\d+)>/);
-      if (!match) return;
-      const discord_id = match[1];
-
-      // Check if user has push subscription with raffle enabled
-      const subSnap = await admin.database().ref(`Pixie/Users/${discord_id}/Notifications`).get();
-      if (!subSnap.exists()) return;
-      const sub = subSnap.val();
-      if (!sub.endpoint) return;
-      const prefs = sub.prefs || {};
-      if (prefs.raffle === false) return;
-
-      const amount   = data.Amount_Awarded || data.Amount || 0;
-      const currency = data.Currency || 'tokens';
-      const host     = data.creator  || 'someone';
-
-      const payload = JSON.stringify({
-        title: 'You Won a Raffle!',
-        body: `You won ${Number(amount).toLocaleString()} ${currency.toUpperCase()} from ${host}'s raffle!`,
-        url: '/profile.html'
-      });
-
-      await webpush.sendNotification(sub, payload);
-      console.log(`[PUSH] Raffle win sent to ${discord_id} (${amount} ${currency})`);
-
-    } catch (err) {
-      if (err.statusCode === 404 || err.statusCode === 410) {
-        const match = (snap.val()?.Winner || '').match(/<@(\d+)>/);
-        if (match) await admin.database().ref(`Pixie/Users/${match[1]}/Notifications`).remove();
-      } else {
-        console.error('[PUSH] Raffle win listener error:', err.message);
-      }
-    }
-  });
-  console.log('[PUSH] Raffle winner listener active.');
-}
-
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://drbots---live-default-rtdb.firebaseio.com',
@@ -75,7 +27,7 @@ admin.initializeApp({
 const TESTING = process.env.TESTING === 'true';
 const db = admin.database();
 const app = express();
-startRaffleWinnerListener();
+
 app.use(cors({
   origin: ['https://mushroomplanet.earth', 'http://localhost:8080', 'http://localhost:5500'],
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -87,7 +39,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
 // ----------------------------------------------------------------
-// POST /api/push-subscribe
+// Firebase listener - fires push when raffle winner is recorded
 // ----------------------------------------------------------------
 app.post('/api/push-subscribe', async (req, res) => {
   const { discord_id, subscription } = req.body;
@@ -112,7 +64,11 @@ app.post('/api/push-unsubscribe', async (req, res) => {
   const { discord_id } = req.body;
   if (!discord_id) return res.status(400).json({ success: false });
   try {
-    await db.ref(`Pixie/Users/${discord_id}/Notifications`).remove();
+    await Promise.all([
+      db.ref(`Pixie/Users/${discord_id}/Notifications`).remove(),
+      db.ref(`Pixie/Notifications/Reminders/${discord_id}`).remove(),
+      db.ref(`Pixie/Notifications/Pipe/${discord_id}`).remove(),
+    ]);
     console.log(`[PUSH] Unsubscribed: ${discord_id}`);
     res.json({ success: true });
   } catch (err) {
@@ -141,12 +97,20 @@ app.post('/api/push-prefs', async (req, res) => {
   if (!discord_id || !prefs) return res.status(400).json({ success: false });
   try {
     await db.ref(`Pixie/Users/${discord_id}/Notifications/prefs`).set(prefs);
+    // Maintain Reminders index for efficient cron targeting
+    const wantsReminders = prefs.forage !== false || prefs.social !== false;
+    if (wantsReminders && prefs.reminders !== false) {
+      await db.ref(`Pixie/Notifications/Reminders/${discord_id}`).set(true);
+    } else {
+      await db.ref(`Pixie/Notifications/Reminders/${discord_id}`).remove();
+    }
     res.json({ success: true });
   } catch (err) {
     console.error('[PUSH] Prefs error:', err);
     res.status(500).json({ success: false });
   }
 });
+
 
 // ----------------------------------------------------------------
 // POST /api/push-test  (remove after testing)
@@ -236,28 +200,25 @@ cron.schedule('20 12 * * *', async () => {
 cron.schedule('20 11 * * *', async () => {
   console.log('[PUSH] Sending daily reminder notifications...');
   try {
-    const snap = await db.ref('Pixie/Users').get();
-    if (!snap.exists()) return;
-    const users = snap.val();
+    const reminderSnap = await db.ref('Pixie/Notifications/Reminders').get();
+    if (!reminderSnap.exists()) return;
+    const opted_in = Object.keys(reminderSnap.val());
 
-    const sends = Object.entries(users).map(async ([discord_id, user]) => {
-      const sub = user?.Notifications;
-      if (!sub || !sub.endpoint) return;
-
-      const prefs = sub.prefs || {};
-      if (prefs.reminders === false) return;
-
+    const sends = opted_in.map(async (discord_id) => {
       try {
-        // Fetch both in parallel
-        const [sporSnap, pixSnap] = await Promise.all([
+        const [subSnap, forageSnap, socialSnap] = await Promise.all([
+          db.ref(`Pixie/Users/${discord_id}/Notifications`).get(),
           db.ref(`Sporebot/Users/${discord_id}/Daily_Check/daily_forage`).get(),
           db.ref(`Pixie/Users/${discord_id}/Message_XP/daily_limit`).get(),
         ]);
 
-        const foragesDone = sporSnap.val() === true;
-        const socialDone  = (pixSnap.val() || 0) >= 200;
+        if (!subSnap.exists()) return;
+        const sub = subSnap.val();
+        if (!sub.endpoint) return;
 
-        if (foragesDone && socialDone) return; // nothing to remind
+        const foragesDone = forageSnap.val() === true;
+        const socialDone  = (socialSnap.val() || 0) >= 200;
+        if (foragesDone && socialDone) return;
 
         const missing = [];
         if (!foragesDone) missing.push('!forage');
@@ -274,7 +235,8 @@ cron.schedule('20 11 * * *', async () => {
       } catch (err) {
         if (err.statusCode === 404 || err.statusCode === 410) {
           await db.ref(`Pixie/Users/${discord_id}/Notifications`).remove();
-          console.log(`[PUSH] Removed stale subscription: ${discord_id}`);
+          await db.ref(`Pixie/Notifications/Reminders/${discord_id}`).remove();
+          console.log(`[PUSH] Removed stale reminder subscription: ${discord_id}`);
         } else {
           console.error(`[PUSH] Reminder failed for ${discord_id}:`, err.message);
         }
@@ -287,6 +249,7 @@ cron.schedule('20 11 * * *', async () => {
     console.error('[PUSH] Reminder cron error:', err);
   }
 }, { timezone: 'UTC' });
+
 // ----------------------------------------------------------------
 // POST /api/send-code
 // ----------------------------------------------------------------
@@ -320,6 +283,94 @@ app.post('/api/send-code', async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+
+// ----------------------------------------------------------------
+// POST /api/push-schedule-pipe
+// ----------------------------------------------------------------
+app.post('/api/push-schedule-pipe', async (req, res) => {
+  const { discord_id, ready_at } = req.body;
+  if (!discord_id || !ready_at) return res.status(400).json({ ok: false });
+  try {
+    await db.ref(`Pixie/Notifications/Pipe/${discord_id}`).set(ready_at);
+    console.log(`[PUSH] Pipe scheduled for ${discord_id} at ${ready_at}`);
+    res.json({ ok: true });
+  } catch(err) {
+    console.error('[PUSH] Schedule pipe error:', err.message);
+    res.status(500).json({ ok: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/push-raffle-win
+// ----------------------------------------------------------------
+app.post('/api/push-raffle-win', async (req, res) => {
+  const { discord_id, amount, currency, host } = req.body;
+  if (!discord_id) return res.status(400).json({ ok: false });
+  try {
+    const subSnap = await db.ref(`Pixie/Users/${discord_id}/Notifications`).get();
+    if (!subSnap.exists()) return res.json({ ok: true, sent: false });
+    const sub = subSnap.val();
+    if (!sub.endpoint) return res.json({ ok: true, sent: false });
+    const prefs = sub.prefs || {};
+    if (prefs.raffle === false) return res.json({ ok: true, sent: false });
+    const payload = JSON.stringify({
+      title: 'You Won a Raffle!',
+      body: `You won ${Number(amount).toLocaleString()} ${currency} from ${host}'s raffle!`,
+      url: '/profile.html'
+    });
+    await webpush.sendNotification(sub, payload);
+    console.log(`[PUSH] Raffle win sent to ${discord_id}`);
+    res.json({ ok: true, sent: true });
+  } catch(err) {
+    if (err.statusCode === 404 || err.statusCode === 410) {
+      await db.ref(`Pixie/Users/${discord_id}/Notifications`).remove();
+    }
+    console.error('[PUSH] Raffle win error:', err.message);
+    res.json({ ok: true, sent: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// CRON - Pipe ready notifications (every hour)
+// ----------------------------------------------------------------
+cron.schedule('0 * * * *', async () => {
+  try {
+    const snap = await db.ref('Pixie/Notifications/Pipe').get();
+    if (!snap.exists()) return;
+    const schedule = snap.val();
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 3600000);
+
+    await Promise.all(Object.entries(schedule).map(async ([discord_id, readyAt]) => {
+      const readyTime = new Date(readyAt);
+      if (readyTime > now || readyTime < oneHourAgo) return;
+
+      await db.ref(`Pixie/Notifications/Pipe/${discord_id}`).remove();
+
+      const subSnap = await db.ref(`Pixie/Users/${discord_id}/Notifications`).get();
+      if (!subSnap.exists()) return;
+      const sub = subSnap.val();
+      if (!sub.endpoint) return;
+      const prefs = sub.prefs || {};
+      if (prefs.pipe === false) return;
+
+      try {
+        await webpush.sendNotification(sub, JSON.stringify({
+          title: 'Elder Pipe is Ready!',
+          body: 'Your Elder Pipe cooldown has reset. Use !pipe to reset all your daily cooldowns.',
+          url: '/profile.html'
+        }));
+        console.log(`[PUSH] Pipe ready sent to ${discord_id}`);
+      } catch(err) {
+        if (err.statusCode === 404 || err.statusCode === 410) {
+          await db.ref(`Pixie/Users/${discord_id}/Notifications`).remove();
+        }
+      }
+    }));
+  } catch(err) {
+    console.error('[PUSH] Pipe cron error:', err.message);
+  }
+}, { timezone: 'UTC' });
 
 // ----------------------------------------------------------------
 // POST /api/verify-code
