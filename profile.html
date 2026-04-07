@@ -1347,7 +1347,7 @@
 
     <!-- SETTINGS MODAL -->
     <div id="settings-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;align-items:center;justify-content:center;padding:1rem;" onclick="closeSettingsModal(event)">
-      <div style="background:var(--dark2);border:1px solid rgba(255,255,225,0.12);border-radius:1.25rem;max-width:380px;width:100%;padding:1.5rem;">
+      <div style="background:var(--dark2);border:1px solid rgba(255,255,225,0.12);border-radius:1.25rem;max-width:380px;width:100%;padding:1.5rem;" onclick="event.stopPropagation()">
         <!-- Header -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
           <div style="font-family:Space Grotesk,monospace;font-size:0.75rem;letter-spacing:0.15em;color:var(--cream);">SETTINGS</div>
