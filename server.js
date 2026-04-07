@@ -28,6 +28,11 @@ const TESTING = process.env.TESTING === 'true';
 const db = admin.database();
 const app = express();
 
+async function getUserNotifPrefs(discord_id) {
+  const snap = await db.ref(`Pixie/Notifications/Prefs/${discord_id}`).get();
+  return snap.val() || {};
+}
+
 app.use(cors({
   origin: ['https://mushroomplanet.earth', 'http://localhost:8080', 'http://localhost:5500'],
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -84,11 +89,43 @@ app.post('/api/push-unsubscribe', async (req, res) => {
 });
 
 // ----------------------------------------------------------------
+// GET /api/inbox-meta/:discord_id  (read + archived keys)
+// ----------------------------------------------------------------
+app.get('/api/inbox-meta/:discord_id', async (req, res) => {
+  try {
+    const [readSnap, archSnap] = await Promise.all([
+      db.ref(`Pixie/Users/${req.params.discord_id}/Inbox_Read`).get(),
+      db.ref(`Pixie/Users/${req.params.discord_id}/Inbox_Archived`).get(),
+    ]);
+    res.json({ ok: true, read: readSnap.val() || {}, archived: archSnap.val() || {} });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/inbox-meta  (save read + archived keys)
+// ----------------------------------------------------------------
+app.post('/api/inbox-meta', async (req, res) => {
+  const { discord_id, read, archived } = req.body;
+  if (!discord_id) return res.status(400).json({ ok: false });
+  try {
+    const updates = {};
+    if (read     !== undefined) updates[`Pixie/Users/${discord_id}/Inbox_Read`]     = read;
+    if (archived !== undefined) updates[`Pixie/Users/${discord_id}/Inbox_Archived`] = archived;
+    await db.ref().update(updates);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+// ----------------------------------------------------------------
 // GET /api/push-prefs/:discord_id
 // ----------------------------------------------------------------
 app.get('/api/push-prefs/:discord_id', async (req, res) => {
   try {
-    const snap = await db.ref(`Pixie/Users/${req.params.discord_id}/Notifications/prefs`).get();
+    const snap = await db.ref(`Pixie/Notifications/Prefs/${req.params.discord_id}`).get();
     res.json({ success: true, prefs: snap.val() || null });
   } catch (err) {
     res.status(500).json({ success: false });
@@ -102,7 +139,7 @@ app.post('/api/push-prefs', async (req, res) => {
   const { discord_id, prefs } = req.body;
   if (!discord_id || !prefs) return res.status(400).json({ success: false });
   try {
-    await db.ref(`Pixie/Users/${discord_id}/Notifications/prefs`).set(prefs);
+    await db.ref(`Pixie/Notifications/Prefs/${discord_id}`).update(prefs);
     // Maintain Reminders index for efficient cron targeting
     const wantsReminders = prefs.forage !== false || prefs.social !== false;
     if (wantsReminders && prefs.reminders !== false) {
@@ -135,7 +172,7 @@ cron.schedule(`${RESET_MINUTE} ${RESET_HOUR} * * *`, async () => {
       const sub = user?.Notifications;
       if (!sub || !sub.endpoint) return;
       try {
-        const prefs = sub.prefs || {};
+        const prefs = await getUserNotifPrefs(discord_id);
         if (prefs.reset === false) return;
         await webpush.sendNotification(sub, payload);
       } catch (err) {
@@ -180,7 +217,7 @@ cron.schedule('0 */1 * * *', async () => {
         const socialDone  = (socialSnap.val() || 0) >= 200;
         if (foragesDone && socialDone) return;
 
-        const prefs = sub.prefs || {};
+        const prefs = await getUserNotifPrefs(discord_id);
 
         if (!foragesDone && prefs.forage !== false) {
           await webpush.sendNotification(sub, JSON.stringify({
@@ -277,7 +314,7 @@ app.post('/api/push-raffle-win', async (req, res) => {
     if (!subSnap.exists()) return res.json({ ok: true, sent: false });
     const sub = subSnap.val();
     if (!sub.endpoint) return res.json({ ok: true, sent: false });
-    const prefs = sub.prefs || {};
+    const prefs = await getUserNotifPrefs(discord_id);
     if (prefs.raffle === false) return res.json({ ok: true, sent: false });
     const payload = JSON.stringify({
       title: 'You Won a Raffle!',
@@ -317,7 +354,7 @@ cron.schedule('0 * * * *', async () => {
       if (!subSnap.exists()) return;
       const sub = subSnap.val();
       if (!sub.endpoint) return;
-      const prefs = sub.prefs || {};
+      const prefs = await getUserNotifPrefs(discord_id);
       if (prefs.pipe === false) return;
 
       try {
@@ -1578,11 +1615,11 @@ async function sendInboxToAll(title, body, url) {
     const dbWrites = [];
     const pushSends = [];
     for (const [uid, user] of Object.entries(users)) {
-      const msgRef = db.ref(`Pixie/Users/${uid}/Inbox`).push();
+      const msgRef = db.ref(`Pixie/Messages/${uid}/inbox`).push();
       dbWrites.push(msgRef.set({ title, body, sent_at: now, from: 'system', read: false }));
       const sub = user?.Notifications;
       if (sub && sub.endpoint) {
-        const prefs = sub.prefs || {};
+        const prefs = await getUserNotifPrefs(uid);
         if (prefs.inbox !== false) {
           pushSends.push(
             webpush.sendNotification(sub, JSON.stringify({ title, body, url: url || '/vote.html' }))
@@ -1626,8 +1663,7 @@ app.post('/api/admin/broadcast', async (req, res) => {
     let sentCount = 0;
 
     for (const [uid, user] of Object.entries(users)) {
-      // Write to Pixie/Users/{uid}/Inbox
-      const msgRef = db.ref(`Pixie/Users/${uid}/Inbox`).push();
+      const msgRef = db.ref(`Pixie/Messages/${uid}/inbox`).push();
       dbWrites.push(msgRef.set({
         title:      msgTitle,
         body:       msgBody,
@@ -1636,10 +1672,9 @@ app.post('/api/admin/broadcast', async (req, res) => {
         read:       false,
       }));
 
-      // Push notification if subscribed and pref not disabled
       const sub = user?.Notifications;
       if (sub && sub.endpoint) {
-        const prefs = sub.prefs || {};
+        const prefs = await getUserNotifPrefs(uid);
         if (prefs.inbox !== false) {
           pushSends.push(
             webpush.sendNotification(sub, JSON.stringify({
@@ -1667,6 +1702,138 @@ app.post('/api/admin/broadcast', async (req, res) => {
     res.status(500).json({ ok: false, message: 'Server error' });
   }
 });
+
+// ----------------------------------------------------------------
+// GET /api/messages/:discord_id  - load inbox + archived
+// ----------------------------------------------------------------
+app.get('/api/messages/:discord_id', async (req, res) => {
+  try {
+    const [inboxSnap, archSnap] = await Promise.all([
+      db.ref(`Pixie/Messages/${req.params.discord_id}/inbox`).get(),
+      db.ref(`Pixie/Messages/${req.params.discord_id}/archived`).get(),
+    ]);
+    res.json({
+      ok: true,
+      inbox:    inboxSnap.val()  || {},
+      archived: archSnap.val()   || {},
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/messages/:discord_id/read/:key
+// ----------------------------------------------------------------
+app.post('/api/messages/:discord_id/read/:key', async (req, res) => {
+  try {
+    await db.ref(`Pixie/Messages/${req.params.discord_id}/inbox/${req.params.key}`).update({ read: true });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/messages/:discord_id/archive/:key
+// Moves message from inbox to archived
+// ----------------------------------------------------------------
+app.post('/api/messages/:discord_id/archive/:key', async (req, res) => {
+  const { discord_id, key } = req.params;
+  try {
+    const snap = await db.ref(`Pixie/Messages/${discord_id}/inbox/${key}`).get();
+    if (!snap.exists()) return res.status(404).json({ ok: false });
+    const msg = snap.val();
+    await db.ref(`Pixie/Messages/${discord_id}/archived/${key}`).set(msg);
+    await db.ref(`Pixie/Messages/${discord_id}/inbox/${key}`).remove();
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/messages/:discord_id/unarchive/:key
+// Moves message from archived back to inbox
+// ----------------------------------------------------------------
+app.post('/api/messages/:discord_id/unarchive/:key', async (req, res) => {
+  const { discord_id, key } = req.params;
+  try {
+    const snap = await db.ref(`Pixie/Messages/${discord_id}/archived/${key}`).get();
+    if (!snap.exists()) return res.status(404).json({ ok: false });
+    const msg = snap.val();
+    await db.ref(`Pixie/Messages/${discord_id}/inbox/${key}`).set(msg);
+    await db.ref(`Pixie/Messages/${discord_id}/archived/${key}`).remove();
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// DELETE /api/messages/:discord_id/:folder/:key
+// Permanently deletes a message (inbox or archived)
+// ----------------------------------------------------------------
+app.post('/api/messages/:discord_id/delete/:folder/:key', async (req, res) => {
+  const { discord_id, folder, key } = req.params;
+  if (folder !== 'inbox' && folder !== 'archived') return res.status(400).json({ ok: false });
+  try {
+    await db.ref(`Pixie/Messages/${discord_id}/${folder}/${key}`).remove();
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+// ----------------------------------------------------------------
+// GET /api/giveaways/:discord_id  - NOT needed - shared data below
+// GET /api/giveaways  - public: active + archived raffles & airdrops
+// ----------------------------------------------------------------
+app.get('/api/giveaways', async (req, res) => {
+  try {
+    const [raffleActive, raffleCompleted, airdropActive, airdropCompleted] = await Promise.all([
+      db.ref('Pixie/Logs/Raffles/Active').get(),
+      db.ref('Pixie/Logs/Raffles/Completed').get(),
+      db.ref('Pixie/Logs/Airdrops/Active').get(),
+      db.ref('Pixie/Logs/Airdrops/Completed').get(),
+    ]);
+    // Completed entries are nested: {timestamp: {FullData: {...}, Summary: {...}}}
+    // Flatten to {timestamp: FullData} so the frontend gets the same shape as Active
+    function flattenCompleted(val) {
+      if (!val) return {};
+      const out = {};
+      for (const [ts, entry] of Object.entries(val)) {
+        let record = null;
+        if (entry && entry.FullData) {
+          record = Object.assign({}, entry.FullData);
+          // Summary has the resolved Winner {DisplayName, UserID} — merge it in
+          if (entry.Summary && entry.Summary.Winner) record.Winner = entry.Summary.Winner;
+        } else if (entry && entry.Summary) {
+          record = entry.Summary;
+        } else if (entry && (entry.Amount || entry.Currency)) {
+          record = entry;
+        }
+        if (!record) continue;
+        out[ts] = record;
+      }
+      // Keep only the 10 most recent (keys are timestamp strings, sort descending)
+      const sorted = Object.keys(out).sort((a, b) => b.localeCompare(a)).slice(0, 10);
+      const trimmed = {};
+      for (const k of sorted) trimmed[k] = out[k];
+      return trimmed;
+    }
+    res.set('Cache-Control', 'public, max-age=30');
+    res.json({
+      ok: true,
+      raffles:  { active: raffleActive.val()  || {}, closed: flattenCompleted(raffleCompleted.val())  },
+      airdrops: { active: airdropActive.val() || {}, closed: flattenCompleted(airdropCompleted.val()) },
+    });
+  } catch (err) {
+    console.error('[GIVEAWAYS]', err);
+    res.status(500).json({ ok: false });
+  }
+});
+
 
 app.post('/api/rpc/polygon', async (req, res) => {
   try {
