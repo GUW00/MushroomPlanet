@@ -1924,13 +1924,14 @@ async function savePrefs() {
     await fetch(API_BASE + '/api/push-prefs', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ discord_id, prefs: {
-        reset:  _notifyPrefs.reset,
-        forage: _notifyPrefs.forage,
-        social: _notifyPrefs.social,
-        raffle: _notifyPrefs.raffle,
-        inbox:  _notifyPrefs.inbox,
-        reminders: _notifyPrefs.forage || _notifyPrefs.social,
-      }})
+      reset:  _notifyPrefs.reset,
+      forage: _notifyPrefs.forage,
+      social: _notifyPrefs.social,
+      raffle: _notifyPrefs.raffle,
+      inbox:  _notifyPrefs.inbox,
+      pipe:   _notifyPrefs.pipe,
+      reminders: _notifyPrefs.forage || _notifyPrefs.social,
+    }})
     });
   } catch(e) { console.error('[PUSH] savePrefs error:', e); }
 }
