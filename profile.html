@@ -700,7 +700,7 @@
         Messages
       </button>
       <button class="prof-action-btn" onclick="openGiveawaysModal()">
-        <img src="/images/raffle.png" style="width:16px;height:16px;object-fit:contain;" onerror="this.style.display='none'">
+        <img src="/images/giveaway.png" style="width:16px;height:16px;object-fit:contain;" onerror="this.style.display='none'">
         Giveaways
       </button>
       <button class="prof-action-btn" onclick="openSettingsModal()">
@@ -1319,6 +1319,16 @@
           <button id="gv-tab-closed" onclick="switchGvStatus('closed')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.35em 0.6em;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:transparent;color:rgba(255,255,225,0.35);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.35rem;"><img src="/images/close.png" style="width:12px;height:12px;object-fit:contain;" onerror="this.style.display='none'">Closed</button>
         </div>
         <!-- Body -->
+        <div style="margin:0.5rem 1.25rem 0;padding:0.6rem 0.875rem;background:rgba(255,255,225,0.03);border:1px solid rgba(255,255,225,0.07);border-radius:0.75rem;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:0.4rem;font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.4);line-height:1.6;">
+            <img src="/images/raffle.png" style="width:12px;height:12px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
+            Tap any <span style="color:var(--green);">Active</span> raffle or airdrop to jump to it in Discord and enter.
+          </div>
+          <div style="display:flex;align-items:center;gap:0.4rem;font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.4);margin-top:0.3rem;line-height:1.6;">
+            <img src="/images/pixie.png" style="width:12px;height:12px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
+            You must be <span style="color:var(--yellow);">LvL 5 and Pixie Verified</span> to participate
+          </div>
+        </div>
         <div id="giveaways-modal-body" style="padding:0.75rem 1.25rem;overflow-y:auto;flex:1;min-height:200px;"></div>
       </div>
     </div>
@@ -2053,8 +2063,13 @@ function renderGiveaways() {
       ? '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.25);margin-top:0.2rem;">' + (isActive ? 'Expires: ' : 'Ended: ') + expires + '</div>'
       : '';
 
+    var GUILD_ID = '1190059108368400535';
+    var channelId = isRaffle ? '1369734800864444499' : '1243213001767522324';
+    var msgId = d.message_id ? String(d.message_id) : '';
+    var discordUrl = (isActive && msgId) ? 'https://discord.com/channels/' + GUILD_ID + '/' + channelId + '/' + msgId : '';
+
     return '<div style="border-bottom:1px solid rgba(255,255,225,0.05);padding:0.75rem 0;">'
-      + '<div onclick="gvToggle(' + idx + ')" style="display:flex;align-items:flex-start;gap:0.6rem;cursor:pointer;">'
+      + '<div onclick="' + (discordUrl ? 'window.open(\'' + discordUrl + '\',\'_blank\')' : 'gvToggle(' + idx + ')') + '" style="display:flex;align-items:flex-start;gap:0.6rem;cursor:pointer;">'
       + '<div style="flex:1;min-width:0;">'
       + '<div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.2rem;">'
       + badge
