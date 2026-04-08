@@ -1807,6 +1807,22 @@ app.post('/api/messages/:discord_id/archive/:key', async (req, res) => {
 });
 
 // ----------------------------------------------------------------
+// POST /api/messages/:discord_id/delete/:key
+// ----------------------------------------------------------------
+app.post('/api/messages/:discord_id/delete/:key', async (req, res) => {
+  const { discord_id, key } = req.params;
+  try {
+    await Promise.all([
+      db.ref(`Pixie/Messages/${discord_id}/inbox/${key}`).remove(),
+      db.ref(`Pixie/Messages/${discord_id}/archived/${key}`).remove(),
+    ]);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+// ----------------------------------------------------------------
 // POST /api/messages/:discord_id/unarchive/:key
 // Moves message from archived back to inbox
 // ----------------------------------------------------------------

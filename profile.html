@@ -1784,28 +1784,72 @@ function archToggle(i) {
 }
 window.archToggle = archToggle;
 
-// ---- SWIPE TO ARCHIVE / UNARCHIVE ----
+// ---- SWIPE TO ARCHIVE / DELETE ----
+var _undoTimer = null;
+
+function showUndoToast(label, onUndo) {
+  var existing = document.getElementById('inbox-undo-toast');
+  if (existing) { existing.remove(); if (_undoTimer) clearTimeout(_undoTimer); }
+  var toast = document.createElement('div');
+  toast.id = 'inbox-undo-toast';
+  toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;border:1px solid rgba(255,255,225,0.15);border-radius:999px;padding:0.5em 1em;display:flex;align-items:center;gap:0.75rem;font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.7);z-index:999999;box-shadow:0 4px 20px rgba(0,0,0,0.5);transition:opacity 0.3s;';
+  toast.innerHTML = '<span>' + label + '</span><button onclick="window._inboxUndo()" style="background:none;border:none;color:var(--yellow);font-family:Space Grotesk,monospace;font-size:0.72rem;font-weight:700;cursor:pointer;padding:0;">UNDO</button>';
+  document.body.appendChild(toast);
+  window._inboxUndo = function() {
+    if (_undoTimer) clearTimeout(_undoTimer);
+    toast.remove();
+    onUndo();
+  };
+  _undoTimer = setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, 10000);
+}
+
 function attachSwipe(el, onSwipeRight, onSwipeLeft) {
-  var startX = 0, startY = 0, moved = false;
+  var startX = 0, startY = 0, isDragging = false, isHorizontal = false;
+  el.style.position = 'relative';
+  el.style.overflow = 'hidden';
+
+  // Build background action hints
+  var bg = document.createElement('div');
+  bg.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 1rem;pointer-events:none;border-radius:0;';
+  bg.innerHTML = '<span style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:700;color:var(--yellow);opacity:0;" id="swipe-hint-l-' + el.id + '">ARCHIVE</span>'
+               + '<span style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:700;color:var(--red);opacity:0;" id="swipe-hint-r-' + el.id + '">DELETE</span>';
+  el.insertBefore(bg, el.firstChild);
+
+  var inner = el.children[1]; // the actual row content div
+
   el.addEventListener('touchstart', function(e) {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
-    moved = false;
+    isDragging = false; isHorizontal = false;
   }, { passive: true });
+
   el.addEventListener('touchmove', function(e) {
     var dx = e.touches[0].clientX - startX;
     var dy = e.touches[0].clientY - startY;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
-      moved = true;
-      el.style.transform = 'translateX(' + (dx * 0.4) + 'px)';
-      el.style.opacity = String(1 - Math.abs(dx) / 400);
+    if (!isDragging && Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+    if (!isDragging) {
+      isHorizontal = Math.abs(dx) > Math.abs(dy);
+      isDragging = true;
     }
+    if (!isHorizontal) return;
+    var hintL = document.getElementById('swipe-hint-l-' + el.id);
+    var hintR = document.getElementById('swipe-hint-r-' + el.id);
+    if (inner) inner.style.transform = 'translateX(' + (dx * 0.5) + 'px)';
+    var pct = Math.min(Math.abs(dx) / 100, 1);
+    if (dx > 0 && hintL) hintL.style.opacity = String(pct);
+    if (dx < 0 && hintR) hintR.style.opacity = String(pct);
+    if (dx > 0 && hintL) hintR && (hintR.style.opacity = '0');
+    if (dx < 0 && hintR) hintL && (hintL.style.opacity = '0');
   }, { passive: true });
+
   el.addEventListener('touchend', function(e) {
     var dx = e.changedTouches[0].clientX - startX;
-    el.style.transform = '';
-    el.style.opacity = '';
-    if (!moved) return;
+    if (inner) { inner.style.transition = 'transform 0.2s'; inner.style.transform = ''; setTimeout(function() { if (inner) inner.style.transition = ''; }, 200); }
+    var hintL = document.getElementById('swipe-hint-l-' + el.id);
+    var hintR = document.getElementById('swipe-hint-r-' + el.id);
+    if (hintL) hintL.style.opacity = '0';
+    if (hintR) hintR.style.opacity = '0';
+    if (!isDragging || !isHorizontal) return;
     if (dx > 80 && onSwipeRight) onSwipeRight();
     else if (dx < -80 && onSwipeLeft) onSwipeLeft();
   }, { passive: true });
@@ -1817,7 +1861,7 @@ function attachInboxSwipes(msgs) {
     if (!row) return;
     attachSwipe(row,
       function() { inboxArchive(m._key, i); },
-      null
+      function() { inboxDeleteWithUndo(m._key, i); }
     );
   });
 }
@@ -1827,10 +1871,54 @@ function attachArchivedSwipes(msgs) {
     var row = document.getElementById('arch_row_' + i);
     if (!row) return;
     attachSwipe(row,
-      null,
-      function() { inboxUnarchive(m._key, i); }
+      function() { inboxUnarchive(m._key, i); },
+      function() { archivedDeleteWithUndo(m._key, i); }
     );
   });
+}
+
+function inboxDeleteWithUndo(key, i) {
+  var msg = _inboxMessages[key];
+  var row = document.getElementById('inbox_row_' + i);
+  if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.2s'; setTimeout(function() { row.remove(); }, 200); }
+  delete _inboxMessages[key];
+  updateUnreadBadge();
+  showUndoToast('Message deleted', function() {
+    if (msg) _inboxMessages[key] = msg;
+    switchMsgTab('messages');
+  });
+  // Actual delete after undo window — fires after 10.5s if no undo
+  var deleteTimer = setTimeout(function() {
+    fetch(API_BASE + '/api/messages/' + currentUser.discord_id + '/delete/' + key, { method: 'POST' })
+      .catch(function(e) { console.warn('[msg-delete]', e); });
+  }, 10500);
+  window._inboxUndo = (function(origUndo, timer) {
+    return function() {
+      clearTimeout(timer);
+      origUndo();
+    };
+  })(window._inboxUndo, deleteTimer);
+}
+
+function archivedDeleteWithUndo(key, i) {
+  var msg = _inboxArchived[key];
+  var row = document.getElementById('arch_row_' + i);
+  if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.2s'; setTimeout(function() { row.remove(); }, 200); }
+  delete _inboxArchived[key];
+  showUndoToast('Message deleted', function() {
+    if (msg) _inboxArchived[key] = msg;
+    switchMsgTab('archived');
+  });
+  var deleteTimer = setTimeout(function() {
+    fetch(API_BASE + '/api/messages/' + currentUser.discord_id + '/delete/' + key, { method: 'POST' })
+      .catch(function(e) { console.warn('[msg-delete]', e); });
+  }, 10500);
+  window._inboxUndo = (function(origUndo, timer) {
+    return function() {
+      clearTimeout(timer);
+      origUndo();
+    };
+  })(window._inboxUndo, deleteTimer);
 }
 
 function inboxUnarchive(key, i) {
