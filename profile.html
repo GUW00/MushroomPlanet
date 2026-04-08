@@ -2172,17 +2172,14 @@ async function openSettingsModal() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
   try {
-    var reg = await navigator.serviceWorker.ready;
-    var sub = await reg.pushManager.getSubscription();
-    _notifyPrefs.master = !!sub;
-
     _notifyPrefs.reset  = false;
     _notifyPrefs.forage = false;
     _notifyPrefs.social = false;
     _notifyPrefs.raffle = false;
     _notifyPrefs.inbox  = false;
     _notifyPrefs.pipe   = false;
-    if (sub && currentUser && currentUser.discord_id) {
+
+    if (currentUser && currentUser.discord_id) {
       try {
         var r2 = await fetch(API_BASE + '/api/push-prefs/' + currentUser.discord_id);
         var data = await r2.json();
@@ -2195,6 +2192,18 @@ async function openSettingsModal() {
           _notifyPrefs.pipe   = data.prefs.pipe   === true;
         }
       } catch(e) {}
+    }
+
+    // Check master from both local SW and Firebase endpoint
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      _notifyPrefs.master = true;
+    } else if (currentUser && currentUser.discord_id) {
+      // PWA may lose local subscription — check if Firebase has an endpoint stored
+      var subSnap = await fetch(API_BASE + '/api/push-status/' + currentUser.discord_id);
+      var subData = await subSnap.json();
+      _notifyPrefs.master = subData.subscribed === true;
     }
   } catch(e) {}
 

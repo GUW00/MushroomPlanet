@@ -129,6 +129,18 @@ app.post('/api/inbox-meta', async (req, res) => {
 });
 
 // ----------------------------------------------------------------
+// GET /api/push-status/:discord_id  - check if user has active subscription
+// ----------------------------------------------------------------
+app.get('/api/push-status/:discord_id', async (req, res) => {
+  try {
+    const snap = await db.ref(`Pixie/Users/${req.params.discord_id}/Notifications/endpoint`).get();
+    res.json({ subscribed: snap.exists() && !!snap.val() });
+  } catch (err) {
+    res.status(500).json({ subscribed: false });
+  }
+});
+
+// ----------------------------------------------------------------
 // GET /api/push-prefs/:discord_id
 // ----------------------------------------------------------------
 app.get('/api/push-prefs/:discord_id', async (req, res) => {
