@@ -29,8 +29,13 @@ const db = admin.database();
 const app = express();
 
 async function getUserNotifPrefs(discord_id) {
-  const snap = await db.ref(`Pixie/Notifications/Prefs/${discord_id}`).get();
-  return snap.val() || {};
+  const types = ['forage','social','pipe','raffle','reset','inbox'];
+  const snaps = await Promise.all(
+    types.map(t => db.ref(`Pixie/Notifications/${t.charAt(0).toUpperCase()+t.slice(1)}/${discord_id}`).get())
+  );
+  const prefs = {};
+  types.foreach((t, i) => { prefs[t] = snaps[i].val(); });
+  return prefs;
 }
 
 app.use(cors({
@@ -75,10 +80,11 @@ app.post('/api/push-unsubscribe', async (req, res) => {
   const { discord_id } = req.body;
   if (!discord_id) return res.status(400).json({ success: false });
   try {
+    const types = ['Forage','Social','Pipe','Raffle','Reset','Inbox','Reminders'];
+    const removes = types.map(t => db.ref(`Pixie/Notifications/${t}/${discord_id}`).remove());
     await Promise.all([
       db.ref(`Pixie/Users/${discord_id}/Notifications`).remove(),
-      db.ref(`Pixie/Notifications/Reminders/${discord_id}`).remove(),
-      db.ref(`Pixie/Notifications/Pipe/${discord_id}`).remove(),
+      ...removes,
     ]);
     console.log(`[PUSH] Unsubscribed: ${discord_id}`);
     res.json({ success: true });
@@ -125,8 +131,8 @@ app.post('/api/inbox-meta', async (req, res) => {
 // ----------------------------------------------------------------
 app.get('/api/push-prefs/:discord_id', async (req, res) => {
   try {
-    const snap = await db.ref(`Pixie/Notifications/Prefs/${req.params.discord_id}`).get();
-    res.json({ success: true, prefs: snap.val() || null });
+    const prefs = await getUserNotifPrefs(req.params.discord_id);
+    res.json({ success: true, prefs });
   } catch (err) {
     res.status(500).json({ success: false });
   }
@@ -139,12 +145,19 @@ app.post('/api/push-prefs', async (req, res) => {
   const { discord_id, prefs } = req.body;
   if (!discord_id || !prefs) return res.status(400).json({ success: false });
   try {
-    await db.ref(`Pixie/Notifications/Prefs/${discord_id}`).update(prefs);
-    // Maintain Reminders index for efficient cron targeting
-    const wantsReminders = prefs.forage !== false || prefs.social !== false;
-    if (wantsReminders && prefs.reminders !== false) {
+    const typeMap = { forage:'Forage', social:'Social', pipe:'Pipe', raffle:'Raffle', reset:'Reset', inbox:'Inbox' };
+    const updates = {};
+    for (const [key, dbKey] of Object.entries(typeMap)) {
+      if (prefs[key] !== undefined) {
+        updates[`Pixie/Notifications/${dbKey}/${discord_id}`] = prefs[key] === true ? true : null;
+      }
+    }
+    await db.ref().update(updates);
+    // Maintain Reminders index
+    const wantsReminders = prefs.forage === true || prefs.social === true;
+    if (wantsReminders) {
       await db.ref(`Pixie/Notifications/Reminders/${discord_id}`).set(true);
-    } else {
+    } else if (prefs.forage === false && prefs.social === false) {
       await db.ref(`Pixie/Notifications/Reminders/${discord_id}`).remove();
     }
     res.json({ success: true });
@@ -326,6 +339,8 @@ app.post('/api/push-raffle-win', async (req, res) => {
       url: 'https://discord.com/channels/1190059108368400535/1369734800864444499'
     });
     await webpush.sendNotification(sub, payload);
+    const rRef = db.ref(`Pixie/Messages/${discord_id}/inbox`).push();
+    await rRef.set({ title: 'You Won a Raffle!', body: `You won ${Number(amount).toLocaleString()} ${currency} from ${host}'s raffle!`, sent_at: new Date().toISOString(), from: 'system', read: false });
     console.log(`[PUSH] Raffle win sent to ${discord_id}`);
     res.json({ ok: true, sent: true });
   } catch(err) {
@@ -367,6 +382,8 @@ cron.schedule('0 * * * *', async () => {
           body: 'Your Elder Pipe cooldown has reset. Use !pipe to reset all your daily cooldowns.',
           url: 'https://discord.com/channels/1190059108368400535/1305415396928655452'
         }));
+        const pRef = db.ref(`Pixie/Messages/${discord_id}/inbox`).push();
+        await pRef.set({ title: 'Elder Pipe is Ready!', body: 'Your Elder Pipe cooldown has reset. Use !pipe to reset all your daily cooldowns.', sent_at: new Date().toISOString(), from: 'system', read: false });
         console.log(`[PUSH] Pipe ready sent to ${discord_id}`);
       } catch(err) {
         if (err.statusCode === 404 || err.statusCode === 410) {

@@ -695,9 +695,10 @@
 
     <!-- ACTION BUTTON ROW -->
     <div class="profile-action-row reveal" id="profile-action-row">
-      <button class="prof-action-btn" onclick="openMessagesModal()">
+      <button class="prof-action-btn" id="msg-action-btn" onclick="openMessagesModal()" style="position:relative;">
         <img src="/images/messages.png" style="width:16px;height:16px;object-fit:contain;" onerror="this.style.display='none'">
         Messages
+        <span id="msg-unread-badge" style="display:none;position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:999px;background:var(--red,#fd464f);color:#fff;font-family:Space Grotesk,monospace;font-size:0.6rem;font-weight:700;line-height:18px;text-align:center;padding:0 4px;box-shadow:0 1px 4px rgba(0,0,0,0.4);pointer-events:none;"></span>
       </button>
       <button class="prof-action-btn" onclick="openGiveawaysModal()">
         <img src="/images/giveaway.png" style="width:16px;height:16px;object-fit:contain;" onerror="this.style.display='none'">
@@ -1556,8 +1557,9 @@ async function loadMessages() {
     var r = await fetch(API_BASE + '/api/messages/' + currentUser.discord_id);
     var data = await r.json();
     if (data.ok) {
-      _inboxMessages = data.inbox    || {};
+      _inboxMessages = data.inbox || {};
       _inboxArchived = data.archived || {};
+    updateUnreadBadge();
     }
   } catch(e) { console.warn('[messages] load failed', e); }
 }
@@ -1747,6 +1749,7 @@ function inboxToggle(i, key) {
       .catch(function(e) { console.warn('[msg-read]', e); });
     if (dotEl) { dotEl.style.background = 'transparent'; dotEl.style.border = '1px solid rgba(255,255,225,0.15)'; }
     if (titleEl) { titleEl.style.fontWeight = '400'; titleEl.style.color = 'rgba(255,255,225,0.5)'; }
+    updateUnreadBadge();
   } catch(e) {}
 }
 window.inboxToggle = inboxToggle;
@@ -2183,6 +2186,7 @@ async function openSettingsModal() {
           _notifyPrefs.social = data.prefs.social === true;
           _notifyPrefs.raffle = data.prefs.raffle === true;
           _notifyPrefs.inbox  = data.prefs.inbox  === true;
+          _notifyPrefs.pipe   = data.prefs.pipe   === true;
         }
       } catch(e) {}
     }
@@ -2215,9 +2219,24 @@ function closeMessagesModal(e) {
 window.closeMessagesModal = closeMessagesModal;
 
 // also restore on X button click - patch the inline close too
+function updateUnreadBadge() {
+  var msgs = Object.values(_inboxMessages).filter(function(m) { return m && m.body; });
+  var count = msgs.filter(function(m) { return !m.read; }).length;
+  var badge = document.getElementById('msg-unread-badge');
+  if (!badge) return;
+  if (count > 0) {
+    badge.textContent = count > 99 ? '99+' : String(count);
+    badge.style.display = 'block';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+window.updateUnreadBadge = updateUnreadBadge;
+
 function closeMsgModalX() {
   document.getElementById('messages-modal-overlay').style.display = 'none';
   document.getElementById('global-menu').style.display = '';
+  updateUnreadBadge();
 }
 window.closeMsgModalX = closeMsgModalX;
 window.closeMessagesModal = closeMessagesModal;
