@@ -2325,6 +2325,7 @@ function renderNotifyModal() {
   // Sub-pref toggles — only show as on if master is also on
   var showPrefs = _notifyPrefs.master;
   setToggle('reset',  showPrefs && _notifyPrefs.reset);
+  setToggle('pipe',   showPrefs && _notifyPrefs.pipe);
   setToggle('forage', showPrefs && _notifyPrefs.forage);
   setToggle('social', showPrefs && _notifyPrefs.social);
   setToggle('raffle', showPrefs && _notifyPrefs.raffle);

@@ -29,12 +29,14 @@ const db = admin.database();
 const app = express();
 
 async function getUserNotifPrefs(discord_id) {
-  const types = ['forage','social','pipe','raffle','reset','inbox'];
+  const types = ['Forage','Social','Raffle','Reset','Inbox'];
   const snaps = await Promise.all(
-    types.map(t => db.ref(`Pixie/Notifications/${t.charAt(0).toUpperCase()+t.slice(1)}/${discord_id}`).get())
+    types.map(t => db.ref(`Pixie/Notifications/${t}/${discord_id}`).get())
   );
   const prefs = {};
-  types.foreach((t, i) => { prefs[t] = snaps[i].val(); });
+  types.forEach((t, i) => { prefs[t.toLowerCase()] = snaps[i].val(); });
+  const pipeSnap = await db.ref(`Pixie/Notifications/Pipe/${discord_id}/enabled`).get();
+  prefs.pipe = pipeSnap.val();
   return prefs;
 }
 
@@ -145,7 +147,10 @@ app.post('/api/push-prefs', async (req, res) => {
   const { discord_id, prefs } = req.body;
   if (!discord_id || !prefs) return res.status(400).json({ success: false });
   try {
-    const typeMap = { forage:'Forage', social:'Social', pipe:'Pipe', raffle:'Raffle', reset:'Reset', inbox:'Inbox' };
+    const typeMap = { forage:'Forage', social:'Social', raffle:'Raffle', reset:'Reset', inbox:'Inbox' };
+    if (prefs.pipe !== undefined) {
+      await db.ref(`Pixie/Notifications/Pipe/${discord_id}/enabled`).set(prefs.pipe === true ? true : null);
+    }
     const updates = {};
     for (const [key, dbKey] of Object.entries(typeMap)) {
       if (prefs[key] !== undefined) {
@@ -232,24 +237,34 @@ cron.schedule('0 */1 * * *', async () => {
 
         const prefs = await getUserNotifPrefs(discord_id);
 
+        const todayUTC = new Date().toISOString().slice(0, 10);
+
         if (!foragesDone && prefs.forage !== false) {
           await webpush.sendNotification(sub, JSON.stringify({
             title: 'Forage Reminder!',
             body: 'You still need to !forage today to keep your streak alive.',
             url: 'https://discord.com/channels/1190059108368400535/1305415396928655452'
           }));
-          const fRef = db.ref(`Pixie/Messages/${discord_id}/inbox`).push();
-          await fRef.set({ title: 'Forage Reminder!', body: 'You still need to !forage today to keep your streak alive.', sent_at: new Date().toISOString(), from: 'system', read: false });
+          const forageInboxSnap = await db.ref(`Pixie/Notifications/Reminders/${discord_id}/forage_inbox_date`).get();
+          if (forageInboxSnap.val() !== todayUTC) {
+            const fRef = db.ref(`Pixie/Messages/${discord_id}/inbox`).push();
+            await fRef.set({ title: 'Forage Reminder!', body: 'You still need to !forage today to keep your streak alive.', sent_at: new Date().toISOString(), from: 'system', read: false });
+            await db.ref(`Pixie/Notifications/Reminders/${discord_id}`).update({ forage_inbox_date: todayUTC });
+          }
         }
 
         if (!socialDone && prefs.social !== false) {
           await webpush.sendNotification(sub, JSON.stringify({
             title: 'Social Butterfly Reminder!',
-            body: 'You have not completed the Social Butterfly today.',
+            body: 'You have not completed your Social Butterfly (200 XP) today.',
             url: 'https://discord.com/channels/1190059108368400535/1190059109085614082'
           }));
-          const sRef = db.ref(`Pixie/Messages/${discord_id}/inbox`).push();
-          await sRef.set({ title: 'Social Butterfly Reminder!', body: 'You have not completed your Social Butterfly (200 XP) today.', sent_at: new Date().toISOString(), from: 'system', read: false });
+          const socialInboxSnap = await db.ref(`Pixie/Notifications/Reminders/${discord_id}/social_inbox_date`).get();
+          if (socialInboxSnap.val() !== todayUTC) {
+            const sRef = db.ref(`Pixie/Messages/${discord_id}/inbox`).push();
+            await sRef.set({ title: 'Social Butterfly Reminder!', body: 'You have not completed your Social Butterfly (200 XP) today.', sent_at: new Date().toISOString(), from: 'system', read: false });
+            await db.ref(`Pixie/Notifications/Reminders/${discord_id}`).update({ social_inbox_date: todayUTC });
+          }
         }
 
       } catch (err) {
@@ -311,7 +326,11 @@ app.post('/api/push-schedule-pipe', async (req, res) => {
   const { discord_id, ready_at } = req.body;
   if (!discord_id || !ready_at) return res.status(400).json({ ok: false });
   try {
-    await db.ref(`Pixie/Notifications/Pipe/${discord_id}`).set(ready_at);
+    const pipeEnabledSnap = await db.ref(`Pixie/Notifications/Pipe/${discord_id}/enabled`).get();
+    await db.ref(`Pixie/Notifications/Pipe/${discord_id}`).update({
+      ready_at,
+      enabled: pipeEnabledSnap.val() === true ? true : null,
+    });
     console.log(`[PUSH] Pipe scheduled for ${discord_id} at ${ready_at}`);
     res.json({ ok: true });
   } catch(err) {
@@ -363,11 +382,13 @@ cron.schedule('0 * * * *', async () => {
     const now = new Date();
     const oneHourAgo = new Date(now.getTime() - 3600000);
 
-    await Promise.all(Object.entries(schedule).map(async ([discord_id, readyAt]) => {
+    await Promise.all(Object.entries(schedule).map(async ([discord_id, entry]) => {
+      const readyAt = entry?.ready_at;
+      if (!readyAt) return;
       const readyTime = new Date(readyAt);
       if (readyTime > now || readyTime < oneHourAgo) return;
 
-      await db.ref(`Pixie/Notifications/Pipe/${discord_id}`).remove();
+      await db.ref(`Pixie/Notifications/Pipe/${discord_id}/ready_at`).remove();
 
       const subSnap = await db.ref(`Pixie/Users/${discord_id}/Notifications`).get();
       if (!subSnap.exists()) return;
