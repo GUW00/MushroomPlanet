@@ -2176,6 +2176,12 @@ async function openSettingsModal() {
     var sub = await reg.pushManager.getSubscription();
     _notifyPrefs.master = !!sub;
 
+    _notifyPrefs.reset  = false;
+    _notifyPrefs.forage = false;
+    _notifyPrefs.social = false;
+    _notifyPrefs.raffle = false;
+    _notifyPrefs.inbox  = false;
+    _notifyPrefs.pipe   = false;
     if (sub && currentUser && currentUser.discord_id) {
       try {
         var r2 = await fetch(API_BASE + '/api/push-prefs/' + currentUser.discord_id);
