@@ -1628,7 +1628,7 @@ function switchMsgTab(tab) {
   if (archBtn) archBtn.style.cssText = tab === 'archived' ? activeStyle : inactiveStyle;
   if (tab === 'archived') {
     document.getElementById('messages-modal-pager').style.display = 'none';
-    var msgs = Object.entries(_inboxMessages)
+    var msgs = Object.entries(_inboxArchived)
       .filter(function(e) { return e[1] && e[1].body; })
       .map(function(e) { return Object.assign({ _key: e[0] }, e[1]); });
     msgs.sort(function(a, b) { return (b.sent_at || '').localeCompare(a.sent_at || ''); });
