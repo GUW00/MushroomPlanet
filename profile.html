@@ -2804,6 +2804,7 @@ async function loadProfileData() {
     profileData.redditName = redditData.redditName || null;
     renderProfile();
     showState('profile');
+    loadMessages().then(updateUnreadBadge);
   } catch(err) {
     console.error('[LOAD] failed', err);
     showState('gate');
