@@ -224,7 +224,7 @@ cron.schedule(`${RESET_MINUTE} ${RESET_HOUR} * * *`, async () => {
 // ----------------------------------------------------------------
 // CRON - Daily reminder notification (11:20 UTC, 1hr before reset)
 // ----------------------------------------------------------------
-cron.schedule('0 */1 * * *', async () => {
+cron.schedule('0 */10 * * *', async () => {
   console.log('[PUSH] Sending daily reminder notifications...');
   try {
     const reminderSnap = await db.ref('Pixie/Notifications/Reminders').get();
@@ -249,20 +249,12 @@ cron.schedule('0 */1 * * *', async () => {
 
         const prefs = await getUserNotifPrefs(discord_id);
 
-        const todayUTC = new Date().toISOString().slice(0, 10);
-
         if (!foragesDone && prefs.forage !== false) {
           await webpush.sendNotification(sub, JSON.stringify({
             title: 'Forage Reminder!',
             body: 'You still need to !forage today to keep your streak alive.',
             url: 'https://discord.com/channels/1190059108368400535/1305415396928655452'
           }));
-          const forageInboxSnap = await db.ref(`Pixie/Notifications/Reminders/${discord_id}/forage_inbox_date`).get();
-          if (forageInboxSnap.val() !== todayUTC) {
-            const fRef = db.ref(`Pixie/Messages/${discord_id}/inbox`).push();
-            await fRef.set({ title: 'Forage Reminder!', body: 'You still need to !forage today to keep your streak alive.', sent_at: new Date().toISOString(), from: 'system', read: false });
-            await db.ref(`Pixie/Notifications/Reminders/${discord_id}`).update({ forage_inbox_date: todayUTC });
-          }
         }
 
         if (!socialDone && prefs.social !== false) {
@@ -271,12 +263,6 @@ cron.schedule('0 */1 * * *', async () => {
             body: 'You have not completed your Social Butterfly (200 XP) today.',
             url: 'https://discord.com/channels/1190059108368400535/1190059109085614082'
           }));
-          const socialInboxSnap = await db.ref(`Pixie/Notifications/Reminders/${discord_id}/social_inbox_date`).get();
-          if (socialInboxSnap.val() !== todayUTC) {
-            const sRef = db.ref(`Pixie/Messages/${discord_id}/inbox`).push();
-            await sRef.set({ title: 'Social Butterfly Reminder!', body: 'You have not completed your Social Butterfly (200 XP) today.', sent_at: new Date().toISOString(), from: 'system', read: false });
-            await db.ref(`Pixie/Notifications/Reminders/${discord_id}`).update({ social_inbox_date: todayUTC });
-          }
         }
 
       } catch (err) {
