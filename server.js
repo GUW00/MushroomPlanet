@@ -1108,7 +1108,7 @@ app.get('/api/config/public', (req, res) => {
 const DISCORD_CLIENT_ID     = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const SESSION_SECRET        = process.env.SESSION_SECRET || 'mushroom-planet-secret';
-const PROPOSAL_BURN_AMOUNT  = 10000000; // 10M MVP burn to create proposal
+const PROPOSAL_BURN_AMOUNT  = 1000000; // 10M MVP burn to create proposal
 const PROPOSAL_DURATION_DAYS   = 5;
 const VOTE_DURATION_DAYS       = 5;
 
@@ -1544,7 +1544,7 @@ app.post('/api/proposals/create', async (req, res) => {
       description:  description.trim(),
       category:     category || 'other',
       options:      options.filter(Boolean),
-      stage:        requestedstage === 'vote' ? 'vote' : 'proposal',
+      stage:        requestedStage === 'vote' ? 'vote' : 'proposal',
       status:       'active',
       author_id:    sessionUser.discord_id,
       author_name:  sessionUser.username,
@@ -1568,8 +1568,8 @@ app.post('/api/proposals/create', async (req, res) => {
     res.json({ ok: true, id: proposalRef.key });
 
   } catch (err) {
-    console.error('[GOVERNANCE-CREATE] Error:', err);
-    res.status(500).json({ ok: false, message: 'Server error' });
+    console.error('[GOVERNANCE-CREATE] Error:', err.message, err.stack);
+    res.status(500).json({ ok: false, message: err.message || 'Server error' });
   }
 });
 
