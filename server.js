@@ -1108,7 +1108,7 @@ app.get('/api/config/public', (req, res) => {
 const DISCORD_CLIENT_ID     = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const SESSION_SECRET        = process.env.SESSION_SECRET || 'mushroom-planet-secret';
-const PROPOSAL_BURN_AMOUNT  = 6874;
+const PROPOSAL_BURN_AMOUNT  = 10000000; // 10M MVP burn to create proposal
 const PROPOSAL_DURATION_DAYS   = 5;
 const VOTE_DURATION_DAYS       = 5;
 
@@ -1185,11 +1185,20 @@ app.post('/api/auth/discord/callback', async (req, res) => {
       avatar_hash: discordUser.avatar || null,
     });
 
+    const [levelSnap, flairSnap] = await Promise.all([
+      db.ref(`Pixie/Users/${discord_id}/Pixie/LvL`).get(),
+      db.ref(`Pixie/Users/${discord_id}/Flair/Flair`).get(),
+    ]);
+    const level = levelSnap.exists() ? levelSnap.val() : 1;
+    const flair = flairSnap.exists() ? flairSnap.val() : 'SPROUT';
+    console.log(`[GOV-AUTH] ${discord_id} level=${level} flair=${flair}`);
     const user = {
       discord_id,
       username: discordUser.username,
       avatar:   discordUser.avatar,
       mvp,
+      level,
+      flair,
     };
 
     // Create session
@@ -1445,8 +1454,8 @@ app.post('/api/proposals/:id/vote', async (req, res) => {
 
     await db.ref().update(updates);
 
-    // Award flat 1M SPORE reward for voting (both proposal and official vote), once per proposal
-    const VOTE_REWARD = 100;
+    // Award SPORE reward: 500K for proposals, 1M for official votes
+    const VOTE_REWARD = proposal.stage === 'vote' ? 1_000_000 : 500_000;
     const walletRef = db.ref(`Pixie/Users/${sessionUser.discord_id}/Wallet`);
     const walletSnap = await walletRef.get();
     const wallet = walletSnap.val() || {};
@@ -1470,7 +1479,13 @@ app.post('/api/proposals/create', async (req, res) => {
   const sessionUser = getSessionUser(req);
   if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
 
-  const { title, description, category, options, discord_link, yes_meaning, no_meaning } = req.body;
+  const { title, description, category, options, discord_link, yes_meaning, no_meaning, stage: requestedStage } = req.body;
+
+  // Only mods can create Official Votes directly (stage: 'vote')
+  const MOD_IDS_CREATE = ['1233612802883719261'];
+  if (requestedStage === 'vote' && !MOD_IDS_CREATE.includes(sessionUser.discord_id)) {
+    return res.status(403).json({ ok: false, message: 'Only mods can create Official Votes directly.' });
+  }
 
   // Resolve username if fallback auth was used
   if (!sessionUser.username) {
@@ -1521,7 +1536,7 @@ app.post('/api/proposals/create', async (req, res) => {
       description:  description.trim(),
       category:     category || 'other',
       options:      options.filter(Boolean),
-      stage:        'proposal',
+      stage:        requestedstage === 'vote' ? 'vote' : 'proposal',
       status:       'active',
       author_id:    sessionUser.discord_id,
       author_name:  sessionUser.username,
