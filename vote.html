@@ -791,7 +791,7 @@
       const res = await fetch(`${window.API_BASE}/api/vote/user/${user.discord_id}`);
       const data = await res.json();
       if (data.ok) {
-        currentUser = { ...user, mvp: data.mvp, level: user.level || 1, flair: user.flair || 'SPROUT' };
+        currentUser = { ...user, mvp: data.mvp, level: data.level || user.level || 1, flair: data.flair || user.flair || 'SPROUT' };
         localStorage.setItem('mp_profile_user', JSON.stringify(currentUser));
       } else {
         currentUser = user;

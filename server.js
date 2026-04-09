@@ -1227,10 +1227,19 @@ app.post('/api/auth/discord/callback', async (req, res) => {
 // ----------------------------------------------------------------
 app.get('/api/vote/user/:discord_id', async (req, res) => {
   try {
-    const snap = await db.ref(`Pixie/Users/${req.params.discord_id}/MVP/total`).get();
-    res.json({ ok: true, mvp: snap.exists() ? snap.val() : 0 });
+    const [mvpSnap, levelSnap, flairSnap] = await Promise.all([
+      db.ref(`Pixie/Users/${req.params.discord_id}/MVP/total`).get(),
+      db.ref(`Pixie/Users/${req.params.discord_id}/Pixie/LvL`).get(),
+      db.ref(`Pixie/Users/${req.params.discord_id}/Flair/Flair`).get(),
+    ]);
+    res.json({
+      ok: true,
+      mvp:   mvpSnap.exists()   ? mvpSnap.val()   : 0,
+      level: levelSnap.exists() ? levelSnap.val() : 1,
+      flair: flairSnap.exists() ? flairSnap.val() : 'SPROUT',
+    });
   } catch (err) {
-    res.json({ ok: false, mvp: 0 });
+    res.json({ ok: false, mvp: 0, level: 1, flair: 'SPROUT' });
   }
 });
 
@@ -1506,26 +1515,25 @@ app.post('/api/proposals/create', async (req, res) => {
     const walletSnap = await walletRef.get();
     const wallet     = walletSnap.val() || {};
     const sporeBalance = wallet.spore_wallet || 0;
+    const isMod = ['1233612802883719261'].includes(sessionUser.discord_id);
 
-    if (sporeBalance < PROPOSAL_BURN_AMOUNT) {
-      return res.status(400).json({
-        ok: false,
-        message: `Insufficient SPORE. Need ${PROPOSAL_BURN_AMOUNT.toLocaleString()} but you have ${sporeBalance.toLocaleString()}.`,
+    if (!isMod || requestedStage !== 'vote') {
+      if (sporeBalance < PROPOSAL_BURN_AMOUNT) {
+        return res.status(400).json({
+          ok: false,
+          message: `Insufficient SPORE. Need ${PROPOSAL_BURN_AMOUNT.toLocaleString()} but you have ${sporeBalance.toLocaleString()}.`,
+        });
+      }
+      await walletRef.update({
+        spore_wallet: sporeBalance - PROPOSAL_BURN_AMOUNT,
+      });
+      await db.ref('Governance/Burns').push({
+        discord_id:  sessionUser.discord_id,
+        username:    sessionUser.username,
+        amount:      PROPOSAL_BURN_AMOUNT,
+        burned_at:   new Date().toISOString(),
       });
     }
-
-    // Burn SPORE (deduct from wallet — the tokens stay in bot economy as burned)
-    await walletRef.update({
-      spore_wallet: sporeBalance - PROPOSAL_BURN_AMOUNT,
-    });
-
-    // Log burn
-    await db.ref('Governance/Burns').push({
-      discord_id:  sessionUser.discord_id,
-      username:    sessionUser.username,
-      amount:      PROPOSAL_BURN_AMOUNT,
-      burned_at:   new Date().toISOString(),
-    });
 
     const now     = new Date();
     const endsAt  = new Date(now.getTime() + PROPOSAL_DURATION_DAYS * 24 * 60 * 60 * 1000);
