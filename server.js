@@ -1677,9 +1677,7 @@ async function sendInboxToAll(title, body, url) {
         if (prefs.inbox !== false) {
           pushSends.push(
             webpush.sendNotification(sub, JSON.stringify({ title, body, url: url || '/vote.html' }))
-              .then(r => { if (uid === '1233612802883719261') console.log(`[PUSH-DEBUG] inbox ok status:${r.statusCode}`); })
               .catch(async (err) => {
-                if (uid === '1233612802883719261') console.error(`[PUSH-DEBUG] inbox FAILED status:${err.statusCode} body:${err.body} msg:${err.message}`);
                 if (err.statusCode === 404 || err.statusCode === 410) {
                   await db.ref(`Pixie/Users/${uid}/Notifications`).remove();
                 }
