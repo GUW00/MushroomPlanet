@@ -3201,10 +3201,11 @@ function renderFarm(s, p) {
   } else { sgrEl.innerHTML = '<div class="empty-hint">Run !farm in Discord to generate breakdown data.</div>'; }
   // Daily actions
   // Hourly cooldown helper
-  function hourlyCooldown(tsStr) {
+  function hourlyCooldown(tsStr, cooldownMs) {
     if (!tsStr) return 'Ready';
     const last = new Date(tsStr.replace(' ', 'T') + (tsStr.includes('Z') ? '' : 'Z'));
-    const diff = 3600000 - (Date.now() - last.getTime());
+    const cd = cooldownMs || 3600000;
+    const diff = cd - (Date.now() - last.getTime());
     if (diff <= 0) return 'Ready';
     const m = Math.floor(diff / 60000);
     const s = Math.floor((diff % 60000) / 1000);
@@ -3212,7 +3213,16 @@ function renderFarm(s, p) {
   }
 
   const misc = s.Misc || {};
-  const gatherCD = hourlyCooldown(daily.last_gather);
+  const comp = s.Companion || {};
+  const turtleUniqueActive = comp.active === 'turtle' && (() => {
+    const pd = (comp.pets || {}).turtle || {};
+    let days = pd.total_days || 0;
+    if (comp.adopted_at) {
+      try { const a = new Date(comp.adopted_at.replace(' ','T')+'Z'); days += Math.floor((Date.now()-a.getTime())/86400000); } catch(e){}
+    }
+    return days >= 42; // Bond Lv.5 requires 42 days
+  })();
+const gatherCD = hourlyCooldown(daily.last_gather, turtleUniqueActive ? 1800000 : 3600000);
   const caveCD   = hourlyCooldown(daily.last_cave);
   const feedCD   = hourlyCooldown(misc.last_hourly_feed);
 
@@ -3236,7 +3246,9 @@ function renderFarm(s, p) {
     { label: 'Quest',   img:'scroll.png',    done: (s.Quests || {}).Daily_Quest === true || (profileData.reddit || {}).Quests?.Daily_Quest === true, cadence: 'Daily',
       info: 'Complete the daily Reddit quest posted in r/MushroomPlanet.' },
     { label: 'Gather',  img:'herbs.png',     done: gatherCD === 'Ready', cadence: 'Hourly', cooldown: gatherCD,
-      info: 'Gather herbs once per hour. Herbs are used for brewing potions. Higher Herbology skill = better herbs.' },
+  info: turtleUniqueActive
+    ? '⚡ Quick Gather active! Gather herbs every 30 minutes. Unique bonus from Turtle (Bond Lv.5).'
+    : 'Gather herbs once per hour. Herbs are used for brewing potions. Higher Herbology skill = better herbs.' },
     { label: 'Cave',    img:'cave.png',      done: caveCD   === 'Ready', cadence: 'Hourly', cooldown: caveCD,
       info: 'Explore the cave once per hour for gemstones and rare ingredients. Miner Helmet lets you continue your run' },
     { label: 'Feed',    img:'shroomfarm.png',done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD,
@@ -4747,6 +4759,20 @@ function renderCompanion(s) {
     wolf:"Wolf's Instinct",duck:'Vacation Trader',deer:"Nature's Head Start",owl:'A Party of 3',
     bear:"Bear's Protection",monkey:"Jester's Jackpot",songbird:"Songbird's Melody",panda:"Panda's Aura"
   };
+  const UNIQUE_DESCS = {
+    turtle:'!gather every 30 min instead of 1 hour.',
+    bunny:'Double herb procs become TRIPLED.',
+    fox:'Increased chance to find Voidspore.',
+    frog:'5% chance to add an extra stat to brews.',
+    wolf:'+1 extra continue per cave run.',
+    duck:'Sell vacation days for SHROOMS.',
+    deer:'Farm auto-starts in Germination stage.',
+    owl:'Equip up to 3 companions at once.',
+    bear:'+10% Gold Totem Chance.',
+    monkey:'+10% Queen Totem Chance.',
+    songbird:'+10% Kid Totem Chance.',
+    panda:'+10% King Totem Chance.',
+  };
   const BONUS_LABELS = {
     turtle:'Herb Find Rate',bunny:'Double Herb Chance',fox:'Rare Herb Chance',frog:'Extra Daily Brews',
     wolf:'Daily Cave Runs',duck:'Vacation Interval',deer:'Harvest Bonus',owl:'Patience',
@@ -4786,7 +4812,9 @@ function renderCompanion(s) {
       + '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:' + (unlocked ? 'rgba(255,255,225,0.55)' : 'rgba(255,255,225,0.35)') + ';">' + (BONUS_LABELS[k]||'') + '</div>'
       + (unlocked
           ? '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;margin-top:0.1rem;color:' + (uniqueUnlocked ? 'var(--purple)' : 'rgba(255,255,225,0.2)') + ';">'
-            + (uniqueUnlocked ? '✨ ' + UNIQUE_LABELS[k] : '🔒 Unique: Reach Bond Lv.5')
+            + (uniqueUnlocked
+                ? '✨ ' + UNIQUE_LABELS[k] + ' — <span style="color:rgba(192,132,252,0.7);">' + (UNIQUE_DESCS[k]||'') + '</span>'
+                : '🔒 Unique: Reach Bond Lv.5')
             + '</div>'
           : '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.55);">Feed ' + (UNLOCK_FEED[k]||0).toLocaleString() + ' SHROOM to unlock</div>'
         )
@@ -5354,12 +5382,36 @@ function renderStats(s, p) {
       sources.push({ label: pName, value: potionVal, img: pImg, color: 'var(--purple)', suffix: normKey === 'Plant_Limit' ? '' : normKey === 'Extra_Brews' ? '' : '%' });
     }
 
-    // 3. Companion
-    if (activeKey && COMP_BONUS_TYPE[activeKey] === normKey) {
-      const cval = compBonusVal(activeKey, activeCompDays);
-      const cname = activeKey.charAt(0).toUpperCase() + activeKey.slice(1);
-      const blLabel = ['','Acquaintance','Friend','Trusted Ally','Soul Bond','Eternal Bond'][activeCompBl] || '';
-      sources.push({ label: cname + ' (Bond Lv.' + activeCompBl + ' - ' + blLabel + ')', value: cval, img: COMP_IMG[activeKey] || 'animals.png', color: 'var(--purple)', suffix: normKey === 'Plant_Limit' ? '' : normKey === 'Extra_Brews' ? '' : '%' });
+    // 3b. Companion unique bonus (Bond Lv.5)
+    const COMP_UNIQUE_STAT = {
+      turtle: 'Herb_Find_Rate',   // Quick Gather shows on the gather card, not here — skip or note it
+      deer:   null,               // unique is auto-start (non-numeric)
+      bear:   'Gold_Totem_Chance',
+      songbird:'Kid_Totem_Chance',
+      monkey: 'Queen_Totem_Chance',
+      panda:  'King_Totem_Chance',
+    };
+    const COMP_UNIQUE_VAL = { bear: 10, songbird: 10, monkey: 10, panda: 10 };
+    const COMP_UNIQUE_LABEL = {
+      turtle: 'Quick Gather (30m cooldown)',
+      bear: "Bear's Protection (+10% Gold Totem)",
+      songbird: "Songbird's Melody (+10% Kid Totem)",
+      monkey: "Jester's Jackpot (+10% Queen Totem)",
+      panda: "Panda's Aura (+10% King Totem)",
+    };
+    if (activeKey && activeCompBl >= 5) {
+      const uStat = COMP_UNIQUE_STAT[activeKey];
+      const uVal  = COMP_UNIQUE_VAL[activeKey];
+      if (uStat && uStat === normKey && uVal) {
+        const cname = activeKey.charAt(0).toUpperCase() + activeKey.slice(1);
+        sources.push({
+          label: cname + ' Unique — ' + (COMP_UNIQUE_LABEL[activeKey] || ''),
+          value: uVal,
+          img: COMP_IMG[activeKey] || 'animals.png',
+          color: 'var(--purple)',
+          suffix: '%'
+        });
+      }
     }
 
     // 4. Totem items (Queen/King/Kid/Gold give base 5% to their respective chance stats)
