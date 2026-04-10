@@ -872,8 +872,14 @@
         </div>
         <!-- Sporebot NFT Collection -->
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><img src="/images/sporebot_helper.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Sporebot NFTs
-            <span id="sb-nft-count" style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.35);margin-left:0.5rem;"></span>
+          <div class="card-title" style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+            <img src="/images/sporebot_helper.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Sporebot NFTs
+            <span id="sb-nft-count" style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.35);margin-left:0.25rem;"></span>
+            <div style="margin-left:auto;display:flex;gap:0.35rem;">
+              <button class="sb-sort-btn" onclick="sbSetSort('id',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(255,255,225,0.4);background:rgba(255,255,225,0.07);color:var(--cream);cursor:pointer;opacity:1;"># ID</button>
+              <button class="sb-sort-btn" onclick="sbSetSort('rarity',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(255,255,225,0.12);background:rgba(255,255,225,0.07);color:var(--cream);cursor:pointer;opacity:0.45;">Rarity</button>
+              <button class="sb-sort-btn" onclick="sbSetSort('traits',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(255,255,225,0.12);background:rgba(255,255,225,0.07);color:var(--cream);cursor:pointer;opacity:0.45;">Traits</button>
+            </div>
           </div>
           <div id="sb-nft-grid"><div class="empty-hint">No Sporebot NFTs found. Run !nft in Discord to sync.</div></div>
           <!-- Pagination -->
@@ -3736,9 +3742,41 @@ window.openSporebotModal = openSporebotModal;
 // ================================================================
 var _sbNfts = [];
 var _sbCurrentPage = 0;
-var SB_PER_PAGE = 9; // 3 rows of 3
+var SB_PER_PAGE = 9;
+function sbGetPerPage() {
+  return window.innerWidth >= 768 ? 12 : 10;
+}
+var _sbFavourites = {};
+var _sbSortMode = 'id'; // 'id' | 'rarity' | 'traits'
+function sbSetSort(mode, btn) {
+  _sbSortMode = mode;
+  document.querySelectorAll('.sb-sort-btn').forEach(function(b) {
+    b.style.opacity = '0.45';
+    b.style.borderColor = 'rgba(255,255,225,0.12)';
+  });
+  if (btn) { btn.style.opacity = '1'; btn.style.borderColor = 'rgba(255,255,225,0.4)'; }
+  _sbCurrentPage = 0;
+  sbRenderPage();
+}
+window.sbSetSort = sbSetSort;
+
+function sbLoadFavourites() {
+  try { _sbFavourites = JSON.parse(localStorage.getItem('sb_favs') || '{}'); } catch(e) { _sbFavourites = {}; }
+}
+function sbSaveFavourites() {
+  try { localStorage.setItem('sb_favs', JSON.stringify(_sbFavourites)); } catch(e) {}
+}
+function sbToggleFav(tokenId, e) {
+  if (e) e.stopPropagation();
+  if (_sbFavourites[tokenId]) { delete _sbFavourites[tokenId]; } else { _sbFavourites[tokenId] = true; }
+  sbSaveFavourites();
+  sbRenderPage();
+}
+window.sbToggleFav = sbToggleFav;
+sbLoadFavourites();
 
 function renderSporebots(s, p) {
+  sbLoadFavourites();
   var wallet  = (p && p.Wallet) || {};
   var nftWallet = wallet.NFT || {};
   var active = s.Active_Sporebot || s.Sporebot || null;
@@ -3888,25 +3926,68 @@ function sbRenderPage() {
     return;
   }
 
-  var totalPages = Math.ceil(_sbNfts.length / SB_PER_PAGE);
+  function sbCountRareTraits(traits) {
+    if (!traits || typeof traits !== 'object') return 0;
+    var count = 0;
+    var TRAIT_SLOTS = ['Background','Cap','Eyes','Face','Spots','Arms','Hands','Legs','Shoes','Pixie','Item','Mouth'];
+    TRAIT_SLOTS.forEach(function(slot) {
+      var v = traits[slot];
+      if (!v) return;
+      if (v.includes('Legendary') || v.includes('Super-Rare') || v.includes('Super Rare') || v.includes('Rare') || v.includes('Blue') || v.includes('Pink') || v.includes('Uncommon')) count++;
+    });
+    return count;
+  }
+
+  var sorted = _sbNfts.slice().sort(function(a, b) {
+    var fa = _sbFavourites[a.tokenId] ? 0 : 1;
+    var fb = _sbFavourites[b.tokenId] ? 0 : 1;
+    if (fa !== fb) return fa - fb;
+    if (_sbSortMode === 'rarity') {
+      return (parseInt(b.rarity_score) || 0) - (parseInt(a.rarity_score) || 0);
+    }
+    if (_sbSortMode === 'traits') {
+      return sbCountRareTraits(b.traits) - sbCountRareTraits(a.traits);
+    }
+    return parseInt(a.tokenId) - parseInt(b.tokenId);
+  });
+
+  var _perPage = window.innerWidth >= 768 ? 12 : 10;
+  var totalPages = Math.ceil(sorted.length / _perPage);
   if (_sbCurrentPage >= totalPages) _sbCurrentPage = totalPages - 1;
   if (_sbCurrentPage < 0) _sbCurrentPage = 0;
 
-  var start = _sbCurrentPage * SB_PER_PAGE;
-  var slice = _sbNfts.slice(start, start + SB_PER_PAGE);
+  var start = _sbCurrentPage * _perPage;
+  var slice = sorted.slice(start, start + _perPage);
 
-  var html = '<div class="nft-grid">';
+  var gridCols = window.innerWidth >= 768 ? '6' : '2';
+  var html = '<div style="display:grid;grid-template-columns:repeat(' + gridCols + ',1fr);gap:0.5rem;">';
   slice.forEach(function(item) {
     var safeId = 'sbp_' + item.tokenId;
+    var isFav = !!_sbFavourites[item.tokenId];
     window._sporebotCache = window._sporebotCache || {};
     window._sporebotCache[safeId] = { tokenId: item.tokenId, image: item.image || '', traits: item.traits || {}, rarity_score: item.rarity_score || null };
-    html += '<div class="nft-card" style="cursor:pointer;" onclick="openSporebotModal(window._sporebotCache[\'' + safeId + '\'].tokenId,window._sporebotCache[\'' + safeId + '\'].image,window._sporebotCache[\'' + safeId + '\'].traits,window._sporebotCache[\'' + safeId + '\'].rarity_score)">';
+    html += '<div class="nft-card" style="cursor:pointer;position:relative;" onclick="openSporebotModal(window._sporebotCache[\'' + safeId + '\'].tokenId,window._sporebotCache[\'' + safeId + '\'].image,window._sporebotCache[\'' + safeId + '\'].traits,window._sporebotCache[\'' + safeId + '\'].rarity_score)">';
+
+    // Favourite star button (top-right)
+    html += '<button onclick="sbToggleFav(\'' + item.tokenId + '\',event)" title="' + (isFav ? 'Unfavourite' : 'Favourite') + '" style="position:absolute;top:4px;right:4px;z-index:2;background:' + (isFav ? 'rgba(252,211,0,0.18)' : 'rgba(0,0,0,0.35)') + ';border:1px solid ' + (isFav ? 'rgba(252,211,0,0.6)' : 'rgba(255,255,225,0.12)') + ';border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.7rem;line-height:1;padding:0;">'
+      + (isFav ? '&#11088;' : '&#9734;') + '</button>';
+
     if (item.image) {
       html += '<img src="' + fixIpfs(item.image) + '" alt="' + item.label + '" loading="lazy" onerror="this.style.display=\'none\'">';
     } else {
-      html += '<div class="nft-card-placeholder">🤖</div>';
+      html += '<div class="nft-card-placeholder">&#129302;</div>';
     }
     html += '<div class="nft-card-name">' + item.label + '</div>';
+
+    // Number input (only shown if count > 1 or user might want to select qty)
+    if (item.count && item.count > 1) {
+      html += '<div style="display:flex;align-items:center;justify-content:center;gap:0.35rem;margin-top:0.3rem;" onclick="event.stopPropagation()">'
+        + '<label style="font-family:Space Grotesk,monospace;font-size:0.55rem;color:rgba(255,255,225,0.4);">Qty</label>'
+        + '<input type="number" min="1" max="' + item.count + '" value="1" id="sbqty_' + item.tokenId + '" onclick="event.stopPropagation()" style="width:42px;background:rgba(255,255,225,0.07);border:1px solid rgba(255,255,225,0.15);color:var(--cream);font-family:Space Grotesk,monospace;font-size:0.65rem;padding:0.15rem 0.3rem;border-radius:5px;text-align:center;">'
+        + '<span style="font-family:Space Grotesk,monospace;font-size:0.55rem;color:rgba(255,255,225,0.3);">/ ' + item.count + '</span>'
+        + '</div>';
+    }
+
     html += '</div>';
   });
   html += '</div>';
