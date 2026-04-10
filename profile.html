@@ -797,22 +797,26 @@
           </div>
           <div class="data-grid" style="margin-top:1rem;">
             <div>
-              <div class="data-row"><span class="dr-label"><img src="/images/shroomfarm.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Current Stage</span><span class="dr-val g" id="f-stage">—</span></div>
-              <div class="data-row"><span class="dr-label"><span id="f-rank-img" style="margin-right:4px;"></span>Farm Rank</span><span class="dr-val r" id="f-rank">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/time.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Sporulation In</span><span class="dr-val" id="f-spor-date">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/shroom.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Shrooms Planted</span><span class="dr-val g" id="f-shrooms-planted">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/nft.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">NFT Boost</span><span class="dr-val y" id="f-nft-boost">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/sporulation1.webp" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total Planted</span><span class="dr-val b" id="f-total-planted">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/planting.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Plots Filled</span><span class="dr-val" id="f-plots">—</span></div>
+              
               <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Spores / Day</span><span class="dr-val b" id="f-sgr">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/apy1.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total APY</span><span class="dr-val b" id="f-apy">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/lifetime.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Lifetime Generated</span><span class="dr-val b" id="f-lifetime">—</span></div>
             
             </div>
             <div>
-              <div class="data-row"><span class="dr-label"><img src="/images/lifetime.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Lifetime Generated</span><span class="dr-val b" id="f-lifetime">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/planting.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Plots Filled</span><span class="dr-val" id="f-plots">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/shroomfarm.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Current Stage</span><span class="dr-val g" id="f-stage">—</span></div>
+              <div class="data-row"><span class="dr-label"><span id="f-rank-img" style="margin-right:4px;"></span>Farm Rank</span><span class="dr-val r" id="f-rank">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/time.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Sporulation In</span><span class="dr-val" id="f-spor-date">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/forage.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Forage Streak</span><span class="dr-val" id="f-streak">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/streak.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Max Streak</span><span class="dr-val" id="f-maxstreak">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/vacation.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Vacation Days</span><span class="dr-val y" id="f-vacation">—</span></div>
               
             </div>
           </div>
+          <div id="f-sporulation-hint" style="display:none;margin-top:0.75rem;padding:0.5rem 0.75rem;background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.25);border-radius:0.5rem;font-size:0.72rem;color:rgba(255,200,0,0.9);font-family:'space grotesk',monospace;"></div>
         </div>
         <div class="info-card">
           <div class="card-title"><span class="dr-label"><img src="/images/cooldown.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Farm Cooldowns</span></div>
@@ -3029,7 +3033,12 @@ function renderFarm(s, p) {
   const planted = bal.shroom_farm || 0;
   const stage   = farm.current_stage || 'Inactive';
   const pct     = stagePct(stage);
-  const filled  = Math.min(42, Math.round(planted / 1_000_000));
+  const nftWalletF = profileData.pixie?.Wallet?.NFT || {};
+  const fbCountF = Object.entries(nftWalletF)
+    .filter(([k]) => k.startsWith('Farm Boost'))
+    .reduce((sum, [,v]) => sum + (v?.count || 1), 0);
+  const nftBoostF = fbCountF * 1_000_000;
+  const filled  = Math.min(42, Math.round((planted + nftBoostF) / 1_000_000));
 
   let dayPct = farmDaysPct(farm);
   // For Legend, remap real progress to evenly-spaced visual positions
@@ -3116,8 +3125,35 @@ function renderFarm(s, p) {
   const rankImgEl = document.getElementById('f-rank-img');
   if(rankImgEl) rankImgEl.innerHTML = '<img src="/images/' + (RANK_IMGS[rankName]||'bronze.png') + '" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;" onerror="this.style.display=\'none\'">';
   setEl('f-sgr',      fmt(farm.spore_generation_rate) + ' / day');
-  setEl('f-apy',      farm.APY != null ? Math.round(farm.APY * 100) + '%' : '-');
+  setEl('f-shrooms-planted', fmt(planted));
+  setEl('f-nft-boost',  nftBoostF > 0 ? fmt(nftBoostF) : '0');
+  setEl('f-total-planted', fmt(planted + nftBoostF));
   setEl('f-plots',    filled + ' / 42');
+
+  // Sporulation hint
+  const hintEl = document.getElementById('f-sporulation-hint');
+  if (hintEl) {
+    const curStage = (farm.current_stage || '').toLowerCase();
+    if (curStage === 'sporulation' || curStage === 'golden_sporulation') {
+      const RANK_ORDER_F = ['BRONZE','SILVER','GOLD','EMERALD','DIAMOND','MASTER','GRANDMASTER','LEGEND'];
+      const curRank = (farm.farm_rank || 'BRONZE').toUpperCase();
+      const curRankIdx = RANK_ORDER_F.indexOf(curRank);
+      let nextRankLabel = '';
+      if (curStage === 'golden_sporulation') {
+        nextRankLabel = 'Max Stage Reached';
+      } else if (curRank === 'LEGEND') {
+        nextRankLabel = 'Golden Sporulation';
+      } else if (curRankIdx >= 0 && curRankIdx < RANK_ORDER_F.length - 1) {
+        nextRankLabel = RANK_ORDER_F[curRankIdx + 1];
+      }
+      hintEl.style.display = 'block';
+      hintEl.textContent = nextRankLabel && nextRankLabel !== 'Max Stage Reached'
+        ? 'Ready to rank up! Use !harvest in Discord to advance to ' + nextRankLabel + '.'
+        : 'You are at the maximum stage!';
+    } else {
+      hintEl.style.display = 'none';
+    }
+  }
   setEl('f-streak',   safe(farm.streak, 0) + ' days');
   setEl('f-maxstreak',safe(farm.streak_record, 0) + ' days');
   setEl('f-vacation', safe(farm.vacation_days, 0));
