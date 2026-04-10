@@ -544,18 +544,7 @@ async function loadSporebotTotals() {
         Treasury Allocation Plan (March 10, 2026)
         <span style="font-size:0.72rem;color:rgba(255,255,225,0.3);font-family:'Space Grotesk',monospace;font-weight:400;margin-left:0.5rem;"></span>
       </div>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { overflow-x: hidden; max-width: 100%; }
-
-    body {
-      background: var(--dark);
-      color: var(--cream);
-      font-family: 'Space Grotesk', sans-serif;
-      overflow-x: hidden;
-      max-widt<div style="display:flex;flex-wrap:wrap;gap:0.5rem 1rem;margin-bottom:1rem;font-family:'Space Grotesk',monospace;font-size:0.65rem;color:rgba(255,255,225,0.4);">h: 100%;
-      padding-top: 100px;
-    }
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem 1rem;margin-bottom:1rem;font-family:'Space Grotesk',monospace;font-size:0.65rem;color:rgba(255,255,225,0.4);">
         <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block;"></span>SHROOM</span>
         <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:var(--blue);display:inline-block;"></span>SPORE</span>
         <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:#22c55e;display:inline-block;"></span>SPOREBOT (OFF-CHAIN)</span>
@@ -1684,7 +1673,6 @@ async function loadSporebotTotals() {
     if (window.loadSporebotTotals) loadSporebotTotals();
     else window.addEventListener('load', loadSporebotTotals);
   });
-  loadSwapWallet();
   loadFeed().then(() => loadHoldings());
   </script>
   <style>
