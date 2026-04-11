@@ -56,6 +56,49 @@ app.use(cookieParser());
 const RESET_HOUR = 12;
 const RESET_MINUTE = 20;
 
+app.post('/api/actions/equip-sporebot', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+
+  // Verify ownership server-side before forwarding
+  try {
+    const nftSnap = await db.ref(
+      `Pixie/Users/${sessionUser.discord_id}/Wallet/NFT`
+    ).get();
+    const nftWallet = nftSnap.val() || {};
+    const ownsBot = Object.entries(nftWallet).some(([k]) => {
+      const match = k.match(/ ID(\d+)$/);
+      return match
+        && match[1] === String(req.body.token_id)
+        && (k.includes('Sporebot') || k.includes('SporeBots'));
+    });
+    if (!ownsBot) {
+      return res.status(403).json({ ok: false, message: 'You do not own this Sporebot' });
+    }
+
+    // Forward to bot_actions - discord_id always from session
+    const r = await fetch('http://localhost:5001/actions/equip-sporebot', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-discord-id': sessionUser.discord_id,
+  },
+  body: JSON.stringify(req.body),
+});
+const text = await r.text();
+try {
+  const data = JSON.parse(text);
+  res.json(data);
+} catch(e) {
+  console.error('[EQUIP-SPOREBOT] Non-JSON response from port 5001:', text);
+  res.status(500).json({ ok: false, message: 'Server error' });
+}
+  } catch (err) {
+    console.error('[EQUIP-SPOREBOT]', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
 // ----------------------------------------------------------------
 // Firebase listener - fires push when raffle winner is recorded
 // ----------------------------------------------------------------
