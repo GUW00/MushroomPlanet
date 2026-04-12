@@ -2385,6 +2385,46 @@ window.closeMsgModalX = closeMsgModalX;
 window.closeMessagesModal = closeMessagesModal;
 
 // ================================================================
+// ACTIVATE POTION
+// ================================================================
+async function activatePotion(slotKey) {
+  if (!currentUser || !currentUser.discord_id) return;
+  var btn = document.getElementById('actpot_' + slotKey);
+  if (btn) { btn.textContent = '...'; btn.disabled = true; btn.style.opacity = '0.5'; }
+  try {
+    var res = await fetch(API_BASE + '/actions/equip-potion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+      credentials: 'include',
+      body: JSON.stringify({ slot_key: slotKey }),
+    });
+    var data = await res.json();
+    if (data.on_cooldown) {
+      if (btn) { btn.textContent = 'CD: ' + data.cooldown_remaining; btn.disabled = true; btn.style.opacity = '0.6'; }
+      return;
+    }
+    if (data.ok) {
+      // Patch local profileData and re-render brewing tab
+      var updatedPotions = data.updated_potions || {};
+      if (profileData && profileData.sporebot) {
+        profileData.sporebot.Inventory = profileData.sporebot.Inventory || {};
+        profileData.sporebot.Inventory.Potions = updatedPotions;
+      }
+      renderBrewing(profileData.sporebot || {});
+      renderStats(profileData.sporebot || {}, profileData.pixie || {});
+      // Flash active potion card
+      var activeCard = document.getElementById('brew-active-content');
+      if (activeCard) { activeCard.style.outline = '1.5px solid var(--yellow)'; setTimeout(function(){activeCard.style.outline='';},1500); }
+    } else {
+      if (btn) { btn.textContent = 'Error'; btn.style.color = 'var(--red)'; btn.disabled = false; btn.style.opacity = '1'; setTimeout(function(){renderBrewing(profileData.sporebot||{});},2000); }
+    }
+  } catch(e) {
+    console.error('[activatePotion]', e);
+    if (btn) { btn.textContent = 'Error'; btn.disabled = false; btn.style.opacity = '1'; }
+  }
+}
+window.activatePotion = activatePotion;
+// ================================================================
 // PUSH NOTIFICATION MODAL
 // ================================================================
 var _notifyPrefs = { master: false, reset: false, forage: false, social: false, raffle: false, inbox: false };
@@ -5397,9 +5437,26 @@ function renderBrewing(s) {
 
   // Stored potions
   const storedEl = document.getElementById('brew-stored-content');
-  const stored = Object.entries(potions).filter(([k])=>k.startsWith('Potion_'));
+  const stored = Object.entries(potions).filter(([k])=>k.startsWith('Potion_') && !['Potion_Cooldown','Potion_Timer'].includes(k) && typeof potions[k] === 'object' && potions[k] !== null);
+  // Cooldown display on active potion card
+  var potionCooldown = potions.Potion_Cooldown || false;
+  var potionTimerStr = potions.Potion_Timer || null;
+  var potionCdRemaining = null;
+  if (potionCooldown && potionTimerStr) {
+    var timerMs = new Date(potionTimerStr.replace(' ','T') + (potionTimerStr.includes('Z') ? '' : 'Z')).getTime();
+    var cdDiff = (timerMs + 3*86400000) - Date.now();
+    if (cdDiff > 0) {
+      var cdD = Math.floor(cdDiff/86400000), cdH = Math.floor((cdDiff%86400000)/3600000), cdM = Math.floor((cdDiff%3600000)/60000);
+      potionCdRemaining = (cdD > 0 ? cdD+'d ' : '') + cdH+'h '+cdM+'m';
+    }
+  }
+  // Append cooldown badge to active potion card
+  if (potionCdRemaining) {
+    var cdBanner = '<div style="margin-top:0.6rem;padding:0.4rem 0.75rem;background:rgba(253,70,79,0.07);border:1px solid rgba(253,70,79,0.2);border-radius:0.5rem;font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(253,70,79,0.8);">Swap cooldown: ' + potionCdRemaining + ' remaining</div>';
+    if (activeEl) activeEl.innerHTML += cdBanner;
+  }
   if(stored.length){
-    storedEl.innerHTML = stored.map(([,v],i)=>{
+    storedEl.innerHTML = stored.map(([k,v],i)=>{
       if(typeof v !== 'object') return '';
       const score = v['Potion Score'] ? Number(v['Potion Score']).toFixed(1) : null;
       const stats = Object.entries(v)
@@ -5408,6 +5465,10 @@ function renderBrewing(s) {
           +'<span style="color:rgba(255,255,225,0.55);display:flex;align-items:center;">'+(STAT_EMOJI[sl]||STAT_EMOJI[k]||'')+sl+'</span>'
           +'<span style="font-family:Space Grotesk,monospace;color:var(--green);">'+(typeof val==='number'?val+'%':val)+'</span>'
           +'</div>';}).join('');
+      var safeKey = k.replace(/"/g,'');
+      var activateBtn = potionCdRemaining
+        ? '<button disabled style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25em 0.75em;border-radius:999px;border:1px solid rgba(255,255,225,0.08);background:none;color:rgba(255,255,225,0.2);cursor:not-allowed;" title="Swap on cooldown">CD: '+potionCdRemaining+'</button>'
+        : '<button id="actpot_'+safeKey+'" onclick="event.stopPropagation();activatePotion(\''+safeKey+'\')" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25em 0.75em;border-radius:999px;border:1px solid rgba(254,206,0,0.35);background:rgba(254,206,0,0.08);color:var(--yellow);cursor:pointer;transition:all 0.2s;">Activate</button>';
       return '<div style="border-bottom:1px solid rgba(255,255,225,0.05);padding-bottom:0.25rem;margin-bottom:0.25rem;">'
         +'<div class="data-row" style="cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'
         +(function(){const id=(v.emoji||'').match(/:potion(\d+):/)?.[1]||(v.emoji||'').match(/:(\d+)>/)?.[1];const src=id?'/images/potion'+id+'.png':'/images/potion2.png';return '<img src="'+src+'" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:6px;" onerror="this.src=\'/images/potion2.png\'">';})()
@@ -5416,7 +5477,10 @@ function renderBrewing(s) {
         +(score?'<span style="color:rgba(255,255,225,0.3);">'+score+'/10</span>':'')
         +'<span style="color:rgba(255,255,225,0.25);font-size:0.65rem;">tap</span>'
         +'</span></div>'
-        +'<div style="display:none;">'+stats+'</div>'
+        +'<div style="display:none;padding:0.4rem 0 0.4rem 0.75rem;">'
+        +stats
+        +'<div style="margin-top:0.5rem;">'+activateBtn+'</div>'
+        +'</div>'
         +'</div>';
     }).join('');
   } else { storedEl.innerHTML = '<div class="empty-hint">No stored potions.</div>'; }

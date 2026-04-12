@@ -56,6 +56,46 @@ app.use(cookieParser());
 const RESET_HOUR = 12;
 const RESET_MINUTE = 20;
 
+app.post('/api/actions/equip-potion', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+
+  const { slot_key } = req.body;
+  if (!slot_key || !slot_key.startsWith('Potion_')) {
+    return res.status(400).json({ ok: false, message: 'Invalid slot key' });
+  }
+
+  // Verify the potion actually exists in their inventory before forwarding
+  try {
+    const potionSnap = await db.ref(
+      `Sporebot/Users/${sessionUser.discord_id}/Inventory/Potions/${slot_key}`
+    ).get();
+    if (!potionSnap.exists() || typeof potionSnap.val() !== 'object') {
+      return res.status(404).json({ ok: false, message: 'Potion not found in that slot' });
+    }
+
+    const r = await fetch('http://localhost:5001/actions/equip-potion', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-discord-id': sessionUser.discord_id,
+      },
+      body: JSON.stringify(req.body),
+    });
+    const text = await r.text();
+    try {
+      const data = JSON.parse(text);
+      res.json(data);
+    } catch(e) {
+      console.error('[EQUIP-POTION] Non-JSON from port 5001:', text);
+      res.status(500).json({ ok: false, message: 'Server error' });
+    }
+  } catch (err) {
+    console.error('[EQUIP-POTION]', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
 app.post('/api/actions/equip-sporebot', async (req, res) => {
   const sessionUser = getSessionUser(req);
   if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
