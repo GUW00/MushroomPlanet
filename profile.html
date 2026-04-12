@@ -999,6 +999,10 @@
 
       <!-- BREWING TAB -->
       <div class="tab-panel reveal" id="tab-brewing">
+        <div class="info-card" id="brew-station-card">
+          <div class="card-title"><img src="/images/potionrecipe.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Brew Station</div>
+          <div id="brew-station-content"><div class="empty-hint">Loading...</div></div>
+        </div>
         <div class="info-card">
           <div class="card-title"><img src="/images/potionrecipe.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Active Potion</div>
           <div id="brew-active-content"><div class="empty-hint">No active potion.</div></div>
@@ -2387,24 +2391,30 @@ window.closeMessagesModal = closeMessagesModal;
 // ================================================================
 // ACTIVATE POTION
 // ================================================================
-async function activatePotion(slotKey) {
+async function activatePotion(safeKey, originalKey) {
+  var slotKey = originalKey || safeKey;
   if (!currentUser || !currentUser.discord_id) return;
-  var btn = document.getElementById('actpot_' + slotKey);
+  var btn = document.getElementById('actpot_' + safeKey);
   if (btn) { btn.textContent = '...'; btn.disabled = true; btn.style.opacity = '0.5'; }
   try {
-    var res = await fetch(API_BASE + '/actions/equip-potion', {
+    var res = await fetch(API_BASE + '/api/actions/equip-potion', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
       credentials: 'include',
       body: JSON.stringify({ slot_key: slotKey }),
     });
     var data = await res.json();
+    console.log('[activatePotion] response:', data);
     if (data.on_cooldown) {
-      if (btn) { btn.textContent = 'CD: ' + data.cooldown_remaining; btn.disabled = true; btn.style.opacity = '0.6'; }
+      if (btn) { btn.textContent = 'CD: ' + data.cooldown_remaining; btn.disabled = true; btn.style.color = 'rgba(253,70,79,0.7)'; btn.style.borderColor = 'rgba(253,70,79,0.3)'; }
+      var toast = document.createElement('div');
+      toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(253,70,79,0.3);border-radius:0.75rem;padding:0.65rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(253,70,79,0.9);z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
+      toast.textContent = 'Swap on cooldown - ' + data.cooldown_remaining + ' remaining';
+      document.body.appendChild(toast);
+      setTimeout(function() { toast.remove(); }, 4000);
       return;
     }
     if (data.ok) {
-      // Patch local profileData and re-render brewing tab
       var updatedPotions = data.updated_potions || {};
       if (profileData && profileData.sporebot) {
         profileData.sporebot.Inventory = profileData.sporebot.Inventory || {};
@@ -2412,17 +2422,194 @@ async function activatePotion(slotKey) {
       }
       renderBrewing(profileData.sporebot || {});
       renderStats(profileData.sporebot || {}, profileData.pixie || {});
-      // Flash active potion card
       var activeCard = document.getElementById('brew-active-content');
       if (activeCard) { activeCard.style.outline = '1.5px solid var(--yellow)'; setTimeout(function(){activeCard.style.outline='';},1500); }
     } else {
-      if (btn) { btn.textContent = 'Error'; btn.style.color = 'var(--red)'; btn.disabled = false; btn.style.opacity = '1'; setTimeout(function(){renderBrewing(profileData.sporebot||{});},2000); }
+      if (btn) { btn.textContent = 'Error'; btn.style.color = 'var(--red)'; btn.disabled = false; btn.style.opacity = '1'; }
     }
   } catch(e) {
     console.error('[activatePotion]', e);
     if (btn) { btn.textContent = 'Error'; btn.disabled = false; btn.style.opacity = '1'; }
   }
 }
+// ================================================================
+// BREW STATION
+// ================================================================
+var _brewSelected = []; // array of ingredient name strings
+
+function renderBrewStation(s) {
+  var el = document.getElementById('brew-station-content');
+  if (!el) return;
+  var inv        = (s.Inventory || {}).Ingredients || {};
+  var potions    = (s.Inventory || {}).Potions || {};
+  var farm       = s.Farm || {};
+  var skills     = s.Skills || {};
+  var farmRank   = (farm.farm_rank || 'BRONZE').toUpperCase();
+  var brewLvl    = (skills.Brewing || {}).level || 1;
+  var brews      = potions.Brews || 0;
+  var activePot  = potions.Active_Potion || {};
+  var extraBrews = parseInt(activePot.Extra_Brews || activePot['Extra Brews'] || 0);
+  var maxBrews   = 3 + extraBrews;
+  var potionCount = Object.keys(potions).filter(function(k){ return k.startsWith('Potion_') && !['Potion_Cooldown','Potion_Timer'].includes(k) && typeof potions[k] === 'object'; }).length;
+  var maxSlots = 5;
+
+  var RANK_LIMITS = {BRONZE:2,SILVER:3,GOLD:3,EMERALD:4,DIAMOND:4,MASTER:4,GRANDMASTER:4,LEGEND:4};
+  var ingLimit = RANK_LIMITS[farmRank] || 2;
+
+  var MASTER_LIST = ['Sunspore','Ashroot','Glowcap','Frostmoss','Veilfruit','Dreamdust','Bloodberry','Elderbloom','Woobud','Voidspore'];
+  var ING_IMGS = {
+    Sunspore:'/images/sunspore.png',Ashroot:'/images/ashroot.png',Glowcap:'/images/glowcap.png',
+    Frostmoss:'/images/frostmoss.png',Veilfruit:'/images/veilfruit.png',Dreamdust:'/images/dreamdust.png',
+    Bloodberry:'/images/bloodberry.png',Elderbloom:'/images/elderbloom.png',Woobud:'/images/woobud.png',
+    Voidspore:'/images/voidspore.png',
+  };
+  var ING_TIER = {
+    Sunspore:'BRONZE',Ashroot:'BRONZE',Glowcap:'BRONZE',
+    Frostmoss:'GOLD',Veilfruit:'GOLD',Dreamdust:'GOLD',
+    Bloodberry:'DIAMOND',Elderbloom:'DIAMOND',Woobud:'DIAMOND',
+    Voidspore:'MYTHIC',
+  };
+  var TIER_COLOR = {BRONZE:'rgba(180,130,80,0.8)',GOLD:'rgba(254,206,0,0.8)',DIAMOND:'rgba(79,168,253,0.8)',MYTHIC:'rgba(192,132,252,0.9)'};
+
+  // Info bar
+  var atLimit = brews >= maxBrews;
+  var infoHtml = '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.875rem;padding:0.6rem 0.875rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:0.75rem;">'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.5);display:flex;align-items:center;gap:0.35rem;"><img src="/images/potionrecipe.png" style="width:12px;height:12px;object-fit:contain;">Brewing Lv.' + brewLvl + '</div>'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:' + (atLimit ? 'var(--red)' : 'rgba(255,255,225,0.5)') + ';display:flex;align-items:center;gap:0.35rem;margin-left:auto;"><img src="/images/cooldown.png" style="width:12px;height:12px;object-fit:contain;">Brews: ' + brews + '/' + maxBrews + '</div>'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:' + (potionCount >= maxSlots ? 'var(--red)' : 'rgba(255,255,225,0.5)') + ';display:flex;align-items:center;gap:0.35rem;"><img src="/images/backpack1.png" style="width:12px;height:12px;object-fit:contain;">Slots: ' + potionCount + '/' + maxSlots + '</div>'
+    + '<div style="width:100%;font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);">Select 2-' + ingLimit + ' ingredients (Voidspore adds a bonus stat). Rank: <span style="color:var(--yellow);">' + farmRank + '</span></div>'
+    + '</div>';
+
+  // Selected chips
+  var selHtml = '<div style="min-height:32px;display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.75rem;padding:0.4rem 0.5rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.08);border-radius:0.625rem;">';
+  if (_brewSelected.length === 0) {
+    selHtml += '<span style="font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(255,255,225,0.2);align-self:center;padding:0 0.25rem;">Tap ingredients below to select...</span>';
+  } else {
+    _brewSelected.forEach(function(ing, idx) {
+      var tc = TIER_COLOR[ING_TIER[ing]] || 'rgba(255,255,225,0.5)';
+      selHtml += '<span onclick="brewDeselect(' + idx + ')" style="display:inline-flex;align-items:center;gap:0.3rem;font-family:Space Grotesk,monospace;font-size:0.65rem;padding:0.2em 0.6em;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid ' + tc + ';color:' + tc + ';cursor:pointer;" title="Click to remove">'
+        + '<img src="' + (ING_IMGS[ing]||'') + '" style="width:12px;height:12px;object-fit:contain;">' + ing
+        + ' <span style="opacity:0.5;font-size:0.6rem;">x</span>'
+        + '</span>';
+    });
+  }
+  selHtml += '</div>';
+
+  // Ingredient grid - owned only
+  var ownedIngs = MASTER_LIST.filter(function(ing){ return (inv[ing]||0) > 0; });
+  var ingGridHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:0.4rem;margin-bottom:0.875rem;">';
+  if (!ownedIngs.length) {
+    ingGridHtml += '<div class="empty-hint" style="grid-column:1/-1;">No ingredients. Use !gather or !cave.</div>';
+  } else {
+    ownedIngs.forEach(function(ing) {
+      var qty = inv[ing] || 0;
+      var tc = TIER_COLOR[ING_TIER[ing]] || 'rgba(255,255,225,0.3)';
+      var selCount = _brewSelected.filter(function(x){return x===ing;}).length;
+      var isVoid = ing === 'Voidspore';
+      var nonVoidSelected = _brewSelected.filter(function(x){return x!=='Voidspore';}).length;
+      var voidSelected = _brewSelected.filter(function(x){return x==='Voidspore';}).length;
+      var canAdd = selCount < qty && _brewSelected.length < ingLimit + (isVoid ? 0 : voidSelected) + 1
+        && !(isVoid && voidSelected >= 1)
+        && !(!isVoid && nonVoidSelected >= ingLimit);
+      var dimmed = !canAdd && selCount === 0;
+      ingGridHtml += '<div onclick="' + (canAdd ? 'brewSelect(\'' + ing + '\')' : '') + '" style="display:flex;flex-direction:column;align-items:center;gap:0.25rem;padding:0.5rem 0.25rem;border-radius:0.625rem;border:1px solid ' + (selCount > 0 ? tc : 'rgba(255,255,225,0.08)') + ';background:' + (selCount > 0 ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.02)') + ';cursor:' + (canAdd ? 'pointer' : 'default') + ';opacity:' + (dimmed ? '0.35' : '1') + ';transition:all 0.15s;" title="' + ing + '">'
+        + '<img src="' + (ING_IMGS[ing]||'') + '" style="width:24px;height:24px;object-fit:contain;">'
+        + '<div style="font-family:Space Grotesk,monospace;font-size:0.55rem;color:' + tc + ';text-align:center;">' + ing + '</div>'
+        + '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.4);">x' + qty + (selCount > 0 ? ' <span style="color:var(--yellow);">(+' + selCount + ')</span>' : '') + '</div>'
+        + '</div>';
+    });
+  }
+  ingGridHtml += '</div>';
+
+  // Brew button
+  var nonVoidSel = _brewSelected.filter(function(x){return x!=='Voidspore';}).length;
+  var canBrew = nonVoidSel >= 2 && !atLimit && potionCount < maxSlots;
+  var brewBtnHtml = '<button id="brew-btn" onclick="doBrew()" '
+    + (canBrew ? '' : 'disabled ')
+    + 'style="width:100%;font-family:Space Grotesk,sans-serif;font-size:0.85rem;font-weight:700;padding:0.75rem;border-radius:0.875rem;border:1px solid ' + (canBrew ? 'rgba(192,132,252,0.4)' : 'rgba(255,255,225,0.08)') + ';background:' + (canBrew ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.02)') + ';color:' + (canBrew ? 'var(--purple)' : 'rgba(255,255,225,0.2)') + ';cursor:' + (canBrew ? 'pointer' : 'not-allowed') + ';transition:all 0.2s;">'
+    + (atLimit ? 'Brew Limit Reached (' + brews + '/' + maxBrews + ')' : potionCount >= maxSlots ? 'Potion Slots Full' : nonVoidSel < 2 ? 'Select 2+ Ingredients' : 'Brew Potion')
+    + '</button>';
+
+  el.innerHTML = infoHtml + selHtml + ingGridHtml + brewBtnHtml;
+}
+window.renderBrewStation = renderBrewStation; 
+
+function brewSelect(ing) {
+  _brewSelected.push(ing);
+  renderBrewStation(profileData.sporebot || {});
+}
+window.brewSelect = brewSelect;
+
+function brewDeselect(idx) {
+  _brewSelected.splice(idx, 1);
+  renderBrewStation(profileData.sporebot || {});
+}
+window.brewDeselect = brewDeselect;
+
+async function doBrew() {
+  if (!currentUser || !currentUser.discord_id) return;
+  if (_brewSelected.length < 2) return;
+  var btn = document.getElementById('brew-btn');
+  if (btn) { btn.textContent = 'Brewing...'; btn.disabled = true; }
+  try {
+    var res = await fetch(API_BASE + '/api/actions/brew', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+      credentials: 'include',
+      body: JSON.stringify({ ingredients: _brewSelected }),
+    });
+    var data = await res.json();
+    console.log('[doBrew] response:', data);
+    if (data.ok) {
+      _brewSelected = [];
+      // Patch local data
+      if (profileData && profileData.sporebot) {
+        var inv = profileData.sporebot.Inventory = profileData.sporebot.Inventory || {};
+        inv.Ingredients = data.new_inventory;
+        inv.Potions = inv.Potions || {};
+        inv.Potions[data.slot] = data.potion;
+        inv.Potions.Brews = data.brews_today;
+        profileData.sporebot.Skills = profileData.sporebot.Skills || {};
+        profileData.sporebot.Skills.Brewing = { level: data.brewing_level, xp: data.brewing_xp };
+      }
+      renderBrewing(profileData.sporebot || {});
+      // Show result toast
+      var p = data.potion;
+      var potionId = (p.emoji||'').match(/:potion(\d+):/)?.[1];
+      var pImg = (potionId && parseInt(potionId) < 100) ? '/images/potion' + potionId + '.png' : '/images/potion2.png';
+      var statLines = Object.entries(p).filter(function(e){ return !['name','emoji','Potion Score','Potion_Score'].includes(e[0]); })
+        .map(function(e){ return e[0].replace(/_/g,' ') + ': ' + (typeof e[1]==='number' ? e[1]+'%' : e[1]); }).join(' | ');
+      var resultEl = document.getElementById('brew-result-banner');
+      if (!resultEl) {
+        resultEl = document.createElement('div');
+        resultEl.id = 'brew-result-banner';
+        var brewBtn = document.getElementById('brew-btn');
+        if (brewBtn && brewBtn.parentNode) {
+          brewBtn.parentNode.insertBefore(resultEl, brewBtn);
+        } else {
+          var stationEl = document.getElementById('brew-station-content');
+          if (stationEl) stationEl.appendChild(resultEl);
+        }
+      }
+      resultEl.style.cssText = 'margin-bottom:0.75rem;padding:0.875rem 1rem;background:rgba(192,132,252,0.08);border:1px solid rgba(192,132,252,0.3);border-radius:0.875rem;position:relative;';
+      resultEl.innerHTML = '<button onclick="document.getElementById(\'brew-result-banner\').remove()" style="position:absolute;top:0.4rem;right:0.5rem;background:none;border:none;color:rgba(255,255,225,0.35);font-size:0.9rem;cursor:pointer;line-height:1;padding:0;">x</button>'
+        + '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">'
+        + '<img src="' + pImg + '" style="width:24px;height:24px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+        + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.9rem;font-weight:700;color:var(--purple);">' + (p.name||'Potion') + '</span>'
+        + '<span style="font-family:Space Grotesk,monospace;font-size:0.7rem;color:rgba(255,255,225,0.4);">' + (p['Potion Score']||'').toString().slice(0,4) + '/10</span>'
+        + '</div>'
+        + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.6);line-height:1.8;">' + statLines + '</div>'
+        + (data.leveled_up ? '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:var(--yellow);margin-top:0.35rem;">Brewing Level Up! Now Lv.' + data.brewing_level + '</div>' : '')
+        + '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.25);margin-top:0.25rem;">+' + data.xp_gain + ' Brewing XP | Saved to ' + data.slot + '</div>';
+    } else {
+      if (btn) { btn.textContent = 'Error: ' + (data.message||'Failed'); btn.style.color='var(--red)'; btn.disabled=false; setTimeout(function(){ renderBrewStation(profileData.sporebot||{}); },3000); }
+    }
+  } catch(e) {
+    console.error('[doBrew]', e);
+    if (btn) { btn.textContent = 'Error'; btn.disabled = false; }
+  }
+}
+window.doBrew = doBrew;
 window.activatePotion = activatePotion;
 // ================================================================
 // PUSH NOTIFICATION MODAL
@@ -4524,8 +4711,8 @@ function megaRenderMosaic() {
   if (emptyMsg) emptyMsg.style.display = 'none';
 
   // Show up to 9 tiles in a 3x3 grid
-  var slots = assigned.slice(0, 9);
-  // Fill remaining with faded placeholders if < 9
+  var slots = assigned.slice(0, 12);
+  // Fill remaining with faded placeholders if < 12
   var total = 12;
   for (var i = 0; i < total; i++) {
     var tile = document.createElement('div');
@@ -4584,7 +4771,9 @@ function megaRenderTotals() {
       return '<div class="data-row"><span class="dr-label">' + (STAT_EMOJI[e[0]]||'') + e[0] + '</span><span class="dr-val g">' + fmtBonus(e[0], e[1]) + '</span></div>';
     }).join('') + '</div>';
   };
-  rows.innerHTML = mkRows(col1) + mkRows(col2);
+  var isMobile = window.innerWidth <= 600 || window.matchMedia('(display-mode: standalone)').matches;
+  rows.style.gridTemplateColumns = isMobile ? '1fr' : '1fr 1fr';
+  rows.innerHTML = isMobile ? mkRows(entries) : mkRows(col1) + mkRows(col2);
 }
 
 function megaOpenSlotPicker(slot) {
@@ -5413,6 +5602,33 @@ function renderBrewing(s) {
   const potions = inv.Potions || {};
   const ingredients = inv.Ingredients || {};
   function cleanEmoji(str){ return str ? String(str).replace(/<:[^:]+:\d+>/g,'').trim() : ''; }
+  renderBrewStation(s);
+
+  // Cooldown calculation - must be first so both active card and stored buttons can use it
+  var potionCooldown = potions.Potion_Cooldown || false;
+  var potionTimerStr = potions.Potion_Timer || null;
+  var potionCdRemaining = null;
+  if (potionCooldown && potionTimerStr) {
+    var timerMs;
+    if (/\d{1,2}:\d{2} [AP]M/i.test(potionTimerStr)) {
+      var parts = potionTimerStr.match(/(\d{4}-\d{2}-\d{2}) (\d{1,2}):(\d{2}) ([AP]M)/i);
+      if (parts) {
+        var h = parseInt(parts[2]); var m = parseInt(parts[3]); var ampm = parts[4].toUpperCase();
+        if (ampm === 'PM' && h !== 12) h += 12;
+        if (ampm === 'AM' && h === 12) h = 0;
+        timerMs = new Date(parts[1] + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00Z').getTime();
+      }
+    } else {
+      timerMs = new Date(potionTimerStr.replace(' ','T') + (potionTimerStr.includes('Z') ? '' : 'Z')).getTime();
+    }
+    var cdDiff = (timerMs + 3*86400000) - Date.now();
+    if (cdDiff > 0) {
+      var cdD = Math.floor(cdDiff/86400000);
+      var cdH = Math.floor((cdDiff%86400000)/3600000);
+      var cdM = Math.floor((cdDiff%3600000)/60000);
+      potionCdRemaining = (cdD > 0 ? cdD+'d ' : '') + cdH+'h '+cdM+'m';
+    }
+  }
 
   // Active potion
   const activeEl = document.getElementById('brew-active-content');
@@ -5432,43 +5648,32 @@ function renderBrewing(s) {
       const statImg = STAT_EMOJI[statLabel] || STAT_EMOJI[k] || '';
       h += '<div class="data-row"><span class="dr-label">' + statImg + statLabel + '</span><span class="dr-val g">' + (typeof v==='number'?v+'%':v) + '</span></div>';
     });
+    if (potionCdRemaining) {
+      h += '<div style="margin-top:0.75rem;padding:0.5rem 0.75rem;background:rgba(253,70,79,0.07);border:1px solid rgba(253,70,79,0.2);border-radius:0.5rem;display:flex;align-items:center;gap:0.5rem;font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(253,70,79,0.85);">'
+        + '<img src="/images/cooldown.png" style="width:13px;height:13px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+        + 'Swap cooldown: <b>' + potionCdRemaining + '</b> remaining'
+        + '</div>';
+    }
     activeEl.innerHTML = h;
   } else { activeEl.innerHTML = '<div class="empty-hint">No active potion. Use !potion in Discord.</div>'; }
 
   // Stored potions
   const storedEl = document.getElementById('brew-stored-content');
-  const stored = Object.entries(potions).filter(([k])=>k.startsWith('Potion_') && !['Potion_Cooldown','Potion_Timer'].includes(k) && typeof potions[k] === 'object' && potions[k] !== null);
-  // Cooldown display on active potion card
-  var potionCooldown = potions.Potion_Cooldown || false;
-  var potionTimerStr = potions.Potion_Timer || null;
-  var potionCdRemaining = null;
-  if (potionCooldown && potionTimerStr) {
-    var timerMs = new Date(potionTimerStr.replace(' ','T') + (potionTimerStr.includes('Z') ? '' : 'Z')).getTime();
-    var cdDiff = (timerMs + 3*86400000) - Date.now();
-    if (cdDiff > 0) {
-      var cdD = Math.floor(cdDiff/86400000), cdH = Math.floor((cdDiff%86400000)/3600000), cdM = Math.floor((cdDiff%3600000)/60000);
-      potionCdRemaining = (cdD > 0 ? cdD+'d ' : '') + cdH+'h '+cdM+'m';
-    }
-  }
-  // Append cooldown badge to active potion card
-  if (potionCdRemaining) {
-    var cdBanner = '<div style="margin-top:0.6rem;padding:0.4rem 0.75rem;background:rgba(253,70,79,0.07);border:1px solid rgba(253,70,79,0.2);border-radius:0.5rem;font-family:Space Grotesk,monospace;font-size:0.62rem;color:rgba(253,70,79,0.8);">Swap cooldown: ' + potionCdRemaining + ' remaining</div>';
-    if (activeEl) activeEl.innerHTML += cdBanner;
-  }
+  const stored = Object.entries(potions).filter(([k,v])=>k.startsWith('Potion_') && !['Potion_Cooldown','Potion_Timer'].includes(k) && typeof v === 'object' && v !== null);
   if(stored.length){
     storedEl.innerHTML = stored.map(([k,v],i)=>{
       if(typeof v !== 'object') return '';
       const score = v['Potion Score'] ? Number(v['Potion Score']).toFixed(1) : null;
       const stats = Object.entries(v)
-        .filter(([k])=>!['name','emoji','Potion Score','Potion_Score'].includes(k))
-        .map(([k,val])=>{const sl=k.replace(/_/g,' ');return '<div style="display:flex;justify-content:space-between;padding:0.25rem 0 0.25rem 0.75rem;font-size:0.75rem;border-top:1px solid rgba(255,255,225,0.04);">'
-          +'<span style="color:rgba(255,255,225,0.55);display:flex;align-items:center;">'+(STAT_EMOJI[sl]||STAT_EMOJI[k]||'')+sl+'</span>'
+        .filter(([sk])=>!['name','emoji','Potion Score','Potion_Score'].includes(sk))
+        .map(([sk,val])=>{const sl=sk.replace(/_/g,' ');return '<div style="display:flex;justify-content:space-between;padding:0.25rem 0 0.25rem 0.75rem;font-size:0.75rem;border-top:1px solid rgba(255,255,225,0.04);">'
+          +'<span style="color:rgba(255,255,225,0.55);display:flex;align-items:center;">'+(STAT_EMOJI[sl]||STAT_EMOJI[sk]||'')+sl+'</span>'
           +'<span style="font-family:Space Grotesk,monospace;color:var(--green);">'+(typeof val==='number'?val+'%':val)+'</span>'
           +'</div>';}).join('');
-      var safeKey = k.replace(/"/g,'');
+      var safeKey = k.replace(/[^a-zA-Z0-9_]/g,'');
       var activateBtn = potionCdRemaining
-        ? '<button disabled style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25em 0.75em;border-radius:999px;border:1px solid rgba(255,255,225,0.08);background:none;color:rgba(255,255,225,0.2);cursor:not-allowed;" title="Swap on cooldown">CD: '+potionCdRemaining+'</button>'
-        : '<button id="actpot_'+safeKey+'" onclick="event.stopPropagation();activatePotion(\''+safeKey+'\')" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25em 0.75em;border-radius:999px;border:1px solid rgba(254,206,0,0.35);background:rgba(254,206,0,0.08);color:var(--yellow);cursor:pointer;transition:all 0.2s;">Activate</button>';
+        ? '<button disabled style="font-family:Space Grotesk,monospace;font-size:0.62rem;padding:0.25em 0.85em;border-radius:999px;border:1px solid rgba(253,70,79,0.2);background:none;color:rgba(253,70,79,0.5);cursor:not-allowed;">CD: ' + potionCdRemaining + '</button>'
+        : '<button id="actpot_' + safeKey + '" onclick="event.stopPropagation();activatePotion(\'' + safeKey + '\',\'' + k + '\')" style="font-family:Space Grotesk,monospace;font-size:0.62rem;padding:0.25em 0.85em;border-radius:999px;border:1px solid rgba(254,206,0,0.35);background:rgba(254,206,0,0.08);color:var(--yellow);cursor:pointer;transition:all 0.2s;">Activate</button>';
       return '<div style="border-bottom:1px solid rgba(255,255,225,0.05);padding-bottom:0.25rem;margin-bottom:0.25rem;">'
         +'<div class="data-row" style="cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'
         +(function(){const id=(v.emoji||'').match(/:potion(\d+):/)?.[1]||(v.emoji||'').match(/:(\d+)>/)?.[1];const src=id?'/images/potion'+id+'.png':'/images/potion2.png';return '<img src="'+src+'" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:6px;" onerror="this.src=\'/images/potion2.png\'">';})()
@@ -5477,13 +5682,14 @@ function renderBrewing(s) {
         +(score?'<span style="color:rgba(255,255,225,0.3);">'+score+'/10</span>':'')
         +'<span style="color:rgba(255,255,225,0.25);font-size:0.65rem;">tap</span>'
         +'</span></div>'
-        +'<div style="display:none;padding:0.4rem 0 0.4rem 0.75rem;">'
+        +'<div style="display:none;padding:0.25rem 0;">'
         +stats
-        +'<div style="margin-top:0.5rem;">'+activateBtn+'</div>'
+        +'<div style="padding:0.5rem 0 0.25rem 0.75rem;">'+activateBtn+'</div>'
         +'</div>'
         +'</div>';
     }).join('');
   } else { storedEl.innerHTML = '<div class="empty-hint">No stored potions.</div>'; }
+  
 
   // Ingredients
   const ingEl = document.getElementById('brew-ingredients-content');

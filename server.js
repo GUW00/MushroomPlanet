@@ -56,11 +56,26 @@ app.use(cookieParser());
 const RESET_HOUR = 12;
 const RESET_MINUTE = 20;
 
+app.post('/api/actions/brew', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+  try {
+    const r = await fetch('http://localhost:5001/actions/brew', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': sessionUser.discord_id },
+      body: JSON.stringify(req.body),
+    });
+    const text = await r.text();
+    try { res.json(JSON.parse(text)); } catch(e) { res.status(500).json({ ok: false, message: 'Server error' }); }
+  } catch(err) { console.error('[BREW]', err); res.status(500).json({ ok: false, message: 'Server error' }); }
+});
+
 app.post('/api/actions/equip-potion', async (req, res) => {
   const sessionUser = getSessionUser(req);
   if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
 
   const { slot_key } = req.body;
+  console.log('[EQUIP-POTION] slot_key received:', slot_key);
   if (!slot_key || !slot_key.startsWith('Potion_')) {
     return res.status(400).json({ ok: false, message: 'Invalid slot key' });
   }
