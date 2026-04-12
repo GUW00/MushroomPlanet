@@ -56,6 +56,23 @@ app.use(cookieParser());
 const RESET_HOUR = 12;
 const RESET_MINUTE = 20;
 
+app.get('/api/user/:id/sb-favorites', async (req, res) => {
+  try {
+    const snap = await db.ref(`Sporebot/Users/${req.params.id}/Favorites`).get();
+    res.json({ ok: true, favorites: snap.exists() ? snap.val() : {} });
+  } catch(err) { res.status(500).json({ ok: false }); }
+});
+
+app.post('/api/user/:id/sb-favorites', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser || sessionUser.discord_id !== req.params.id)
+    return res.status(401).json({ ok: false });
+  try {
+    await db.ref(`Sporebot/Users/${req.params.id}/Favorites`).set(req.body.favorites || {});
+    res.json({ ok: true });
+  } catch(err) { res.status(500).json({ ok: false }); }
+});
+
 app.post('/api/actions/brew', async (req, res) => {
   const sessionUser = getSessionUser(req);
   if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });

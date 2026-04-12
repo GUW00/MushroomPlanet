@@ -2432,6 +2432,37 @@ async function activatePotion(safeKey, originalKey) {
     if (btn) { btn.textContent = 'Error'; btn.disabled = false; btn.style.opacity = '1'; }
   }
 }
+
+async function discardPotion(safeKey, slotKey) {
+  slotKey = slotKey || safeKey;
+  if (!currentUser || !currentUser.discord_id) return;
+  if (!confirm('Discard this potion? This cannot be undone.')) return;
+  var btn = document.getElementById('discpot_' + safeKey);
+  if (btn) { btn.textContent = '...'; btn.disabled = true; }
+  try {
+    var res = await fetch(API_BASE + '/api/actions/discard-potion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+      credentials: 'include',
+      body: JSON.stringify({ slot_key: slotKey }),
+    });
+    var data = await res.json();
+    if (data.ok) {
+      if (profileData && profileData.sporebot) {
+        var pots = profileData.sporebot.Inventory = profileData.sporebot.Inventory || {};
+        pots.Potions = pots.Potions || {};
+        delete pots.Potions[slotKey];
+      }
+      renderBrewing(profileData.sporebot || {});
+    } else {
+      if (btn) { btn.textContent = 'Error'; btn.disabled = false; }
+    }
+  } catch(e) {
+    console.error('[discardPotion]', e);
+    if (btn) { btn.textContent = 'Error'; btn.disabled = false; }
+  }
+}
+window.discardPotion = discardPotion;
 // ================================================================
 // BREW STATION
 // ================================================================
@@ -3879,16 +3910,16 @@ const TRAIT_SLOT_STAT = {
   Legs:'Double Herb Chance', Hands:'Rare Herb Chance', Pixie:'Spore Yield', Shoes:'Herb Find Rate',
 };
 const ITEM_BONUSES = {
-  'Red-Shroom-(Rare)':     ['Harvest Bonus', 5],
-  'Pink-Shroom-(Rare)':    ['Harvest Bonus', 2],
-  'Blue-Shroom-(Rare)':    ['Harvest Bonus', 1],
-  'Spores':                ['Spore Yield', 2],
+  'Red-Shroom-(Rare)':      ['Harvest Bonus', 5],
+  'Pink-Shroom-(Rare)':     ['Harvest Bonus', 2],
+  'Blue-Shroom-(Rare)':     ['Harvest Bonus', 1],
+  'Spores':                 ['Spore Yield', 2],
   'Elder-Pipe-(Super-Rare)':['Pipe Reduction', 1],
-  'Blue-Potion-(Rare)':    ['Extra Brews', 2],
-  'Red-Potion-(Rare)':     ['Extra Brews', 3],
+  'Blue-Potion-(Rare)':     ['Extra Brews', 2],
+  'Red-Potion-(Rare)':      ['Extra Brews', 3],
   'Gold-Shroom-(Legendary)':['Gold Totem Chance', 5],
   'Gold-Spores-(Legendary)':['Spore Yield', 5],
-  'Gold-Shovel-(Legendary)':['Harvest Bonus', 100],
+  'Gold-Shovel-(Legendary)':['Harvest Bonus', 10],
 };
 const MOUTH_BONUSES = {
   'Gold-(Legendary)':     ['Plant Limit', 1000000],
@@ -4037,10 +4068,28 @@ function sbSetBonusSort(sel) {
 window.sbSetBonusSort = sbSetBonusSort;
 
 function sbLoadFavourites() {
+  // Seed from localStorage as instant fallback, then sync from Firebase
   try { _sbFavourites = JSON.parse(localStorage.getItem('sb_favs') || '{}'); } catch(e) { _sbFavourites = {}; }
+  if (!currentUser || !currentUser.discord_id) return;
+  fetch(API_BASE + '/api/user/' + currentUser.discord_id + '/sb-favorites')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data.ok) {
+        _sbFavourites = data.favorites || {};
+        try { localStorage.setItem('sb_favs', JSON.stringify(_sbFavourites)); } catch(e) {}
+        sbRenderPage();
+      }
+    }).catch(function(){});
 }
 function sbSaveFavourites() {
   try { localStorage.setItem('sb_favs', JSON.stringify(_sbFavourites)); } catch(e) {}
+  if (!currentUser || !currentUser.discord_id) return;
+  fetch(API_BASE + '/api/user/' + currentUser.discord_id + '/sb-favorites', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+    credentials: 'include',
+    body: JSON.stringify({ favorites: _sbFavourites }),
+  }).catch(function(e){ console.warn('[sb-favorites] save failed', e); });
 }
 function sbFlipCard(tokenId, e) {
   if (e) e.stopPropagation();
@@ -4104,10 +4153,14 @@ function calcSporebotBonuses(traits) {
     var traitVal = traits[slot];
     if (!traitVal) continue;
     var rarity = 'Common';
-    if (traitVal.includes('Legendary')) rarity = 'Legendary';
-    else if (traitVal.includes('Super-Rare') || traitVal.includes('Super Rare')) rarity = 'Super Rare';
-    else if (traitVal.includes('Blue') || traitVal.includes('Pink')) rarity = 'Uncommon';
-    else if (traitVal.includes('Rare')) rarity = 'Rare';
+    if (!traitVal) continue;
+    var rarity = 'Common';
+    if (traitVal.includes('Gold') && traitVal.includes('Legendary')) rarity = 'Super Rare';
+    else if (traitVal.includes('Red') && traitVal.includes('Super-Rare')) rarity = 'Rare';
+    else if ((traitVal.includes('Blue') || traitVal.includes('Pink')) && traitVal.includes('Rare')) rarity = 'Uncommon';
+    else if (traitVal.includes('Legendary')) rarity = 'Super Rare';
+    else if (traitVal.includes('Super-Rare') || traitVal.includes('Super Rare')) rarity = 'Rare';
+    else if (traitVal.includes('Rare')) rarity = 'Uncommon';
     else if (traitVal.includes('Uncommon')) rarity = 'Uncommon';
     if (rarity === 'Common') continue;
     var statRarity = rarity === 'Legendary' ? 'Super Rare' : rarity;
@@ -4138,7 +4191,10 @@ function renderActiveSporebotCard(active, s) {
     return;
   }
 
-  var title    = active.title    || 'Unknown';
+  var customNamesA = ((profileData && profileData.sporebot && profileData.sporebot.Misc) || {}).SporeBot_Names || {};
+  var tokenIdA = active.token_id ? String(active.token_id) : null;
+  var customNameA = tokenIdA ? (customNamesA[tokenIdA] || null) : null;
+  var title = customNameA ? customNameA + ' #' + tokenIdA : (active.title || 'Unknown');
   var tokenId  = active.token_id || null;
   var image    = active.image    || (tokenId ? fixIpfs('https://ipfs.io/ipfs/QmYh9hwJZNTDy192auvCq1jnpvhmLhAFW4qRRcXSraNntL/' + tokenId + '.png') : null);
   var rScore   = active.rarity_score || null;
@@ -4963,7 +5019,10 @@ function renderSporebots(s, p) {
     if (!image && tokenId) {
       image = 'https://alchemy.mypinata.cloud/ipfs/QmYh9hwJZNTDy192auvCq1jnpvhmLhAFW4qRRcXSraNntL/' + tokenId + '.png';
     }
-    bots.push({ tokenId: tokenId, image: fixIpfs(image), traits: entry.traits || {}, rarity_score: entry.rarity_score || null, label: 'Sporebot #' + tokenId, count: parseInt(entry.count || 1) });
+    var customNames = (profileData.sporebot.Misc || {}).SporeBot_Names || {};
+    var customName = customNames[tokenId] || customNames[String(tokenId)] || null;
+    var label = customName ? customName + ' #' + tokenId : 'Sporebot #' + tokenId;
+    bots.push({ tokenId: tokenId, image: fixIpfs(image), traits: entry.traits || {}, rarity_score: entry.rarity_score || null, label: label, count: parseInt(entry.count || 1) });
   });
 
 
@@ -5221,8 +5280,11 @@ function renderNFTs(p) {
               : displayName.includes('Farm Boost') ? 'Farm Boost'
               : displayName.includes('Mooshie') || displayName.includes('Kid Shroom') || displayName.includes('House') ? 'Mooshie Collection'
               : 'Other';
-    const label = tokenId ? displayName.replace('SporeBots','Sporebot') + ' #' + tokenId
-                          : displayName.replace('Farm Boost (Gen 1)','Farm Boost');
+    const customNamesN = ((profileData.sporebot || {}).Misc || {}).SporeBot_Names || {};
+      const customNameN = tokenId ? (customNamesN[tokenId] || customNamesN[String(tokenId)] || null) : null;
+      const label = tokenId
+        ? (customNameN ? customNameN + ' #' + tokenId : displayName.replace('SporeBots','Sporebot') + ' #' + tokenId)
+        : displayName.replace('Farm Boost (Gen 1)','Farm Boost');
     // For Sporebots, build image from token ID if not cached
     let image = entry.image || null;
     if (!image && tokenId && col === 'Sporebots') {
@@ -5671,9 +5733,11 @@ function renderBrewing(s) {
           +'<span style="font-family:Space Grotesk,monospace;color:var(--green);">'+(typeof val==='number'?val+'%':val)+'</span>'
           +'</div>';}).join('');
       var safeKey = k.replace(/[^a-zA-Z0-9_]/g,'');
+      var discardBtn = '<button id="discpot_' + safeKey + '" onclick="event.stopPropagation();discardPotion(\'' + safeKey + '\',\'' + k + '\')" style="font-family:\'Space Grotesk\',sans-serif;font-size:0.62rem;padding:0.25em 0.85em;border-radius:999px;border:1px solid rgba(253,70,79,0.2);background:none;color:rgba(253,70,79,0.5);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.3rem;" onmouseover="this.style.borderColor=\'rgba(253,70,79,0.5)\';this.style.color=\'var(--red)\'" onmouseout="this.style.borderColor=\'rgba(253,70,79,0.2)\';this.style.color=\'rgba(253,70,79,0.5)\'"><img src="/images/trash.png" style="width:11px;height:11px;object-fit:contain;opacity:0.7;" onerror="this.style.display=\'none\'">Discard</button>';
       var activateBtn = potionCdRemaining
         ? '<button disabled style="font-family:Space Grotesk,monospace;font-size:0.62rem;padding:0.25em 0.85em;border-radius:999px;border:1px solid rgba(253,70,79,0.2);background:none;color:rgba(253,70,79,0.5);cursor:not-allowed;">CD: ' + potionCdRemaining + '</button>'
         : '<button id="actpot_' + safeKey + '" onclick="event.stopPropagation();activatePotion(\'' + safeKey + '\',\'' + k + '\')" style="font-family:Space Grotesk,monospace;font-size:0.62rem;padding:0.25em 0.85em;border-radius:999px;border:1px solid rgba(254,206,0,0.35);background:rgba(254,206,0,0.08);color:var(--yellow);cursor:pointer;transition:all 0.2s;">Activate</button>';
+      var actionBtns = '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">' + activateBtn + discardBtn + '</div>';
       return '<div style="border-bottom:1px solid rgba(255,255,225,0.05);padding-bottom:0.25rem;margin-bottom:0.25rem;">'
         +'<div class="data-row" style="cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'
         +(function(){const id=(v.emoji||'').match(/:potion(\d+):/)?.[1]||(v.emoji||'').match(/:(\d+)>/)?.[1];const src=id?'/images/potion'+id+'.png':'/images/potion2.png';return '<img src="'+src+'" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:6px;" onerror="this.src=\'/images/potion2.png\'">';})()
@@ -5684,7 +5748,7 @@ function renderBrewing(s) {
         +'</span></div>'
         +'<div style="display:none;padding:0.25rem 0;">'
         +stats
-        +'<div style="padding:0.5rem 0 0.25rem 0.75rem;">'+activateBtn+'</div>'
+        +'<div style="padding:0.5rem 0 0.25rem 0.75rem;">'+actionBtns+'</div>'
         +'</div>'
         +'</div>';
     }).join('');
