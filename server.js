@@ -73,6 +73,70 @@ app.post('/api/user/:id/sb-favorites', async (req, res) => {
   } catch(err) { res.status(500).json({ ok: false }); }
 });
 
+app.post('/api/user/:id/refresh-onchain', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser || sessionUser.discord_id !== req.params.id)
+    return res.status(401).json({ ok: false, message: 'Not authenticated' });
+
+  const discord_id = req.params.id;
+  const rpcUrl = process.env.ALCHEMY_POLYGON_URL;
+
+  try {
+    const walletSnap = await db.ref(`Pixie/Users/${discord_id}/Wallet/Address`).get();
+    const address = walletSnap.val();
+    if (!address) return res.json({ ok: false, message: 'No wallet address on file' });
+
+    const SHROOM = '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1';
+    const SPORE  = '0x089582AC20ea563c69408a79E1061de594b61bED';
+    const balOf  = '0x70a08231' + address.replace('0x','').toLowerCase().padStart(64,'0');
+
+    const [shroomRes, sporeRes] = await Promise.all([
+      fetch(rpcUrl, { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({jsonrpc:'2.0',method:'eth_call',params:[{to:SHROOM,data:balOf},'latest'],id:1}) }),
+      fetch(rpcUrl, { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({jsonrpc:'2.0',method:'eth_call',params:[{to:SPORE,data:balOf},'latest'],id:2}) }),
+    ]);
+
+    const [sj, pj] = await Promise.all([shroomRes.json(), sporeRes.json()]);
+    const shroomBal = Math.floor(parseInt(sj.result, 16) / 1e18);
+    const sporeBal  = Math.floor(parseInt(pj.result, 16) / 1e18);
+    const shroomEquiv = shroomBal + Math.floor(sporeBal / 100);
+
+    // Days_Over_500k logic — mirror balance.py
+    const now = new Date();
+    const onchainSnap = await db.ref(`Pixie/Users/${discord_id}/Wallet/Onchain`).get();
+    const existing = onchainSnap.val() || {};
+    let daysOver500k = existing.Days_Over_500k || 0;
+
+    if (shroomEquiv >= 500000) {
+      const lastCheck = existing.last_verified ? new Date(existing.last_verified) : null;
+      if (lastCheck) {
+        const daysSince = Math.floor((now - lastCheck) / 86400000);
+        daysOver500k = Math.min(daysOver500k + daysSince, 999);
+      } else {
+        daysOver500k = 1;
+      }
+    } else {
+      daysOver500k = 0;
+    }
+
+    await db.ref(`Pixie/Users/${discord_id}/Wallet/Onchain`).update({
+      shroom_balance: shroomBal,
+      spore_balance:  sporeBal,
+      effective_balance: shroomEquiv,
+      Days_Over_500k: daysOver500k,
+      status: 'verified',
+      last_verified: now.toISOString().slice(0,10),
+    });
+
+    console.log(`[REFRESH-ONCHAIN] ${discord_id} SHROOM=${shroomBal} SPORE=${sporeBal} Days500k=${daysOver500k}`);
+    res.json({ ok: true, shroom_balance: shroomBal, spore_balance: sporeBal, days_over_500k: daysOver500k });
+  } catch(err) {
+    console.error('[REFRESH-ONCHAIN]', err);
+    res.status(500).json({ ok: false, message: 'Failed to fetch onchain balances' });
+  }
+});
+
 app.post('/api/actions/brew', async (req, res) => {
   const sessionUser = getSessionUser(req);
   if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
@@ -85,6 +149,23 @@ app.post('/api/actions/brew', async (req, res) => {
     const text = await r.text();
     try { res.json(JSON.parse(text)); } catch(e) { res.status(500).json({ ok: false, message: 'Server error' }); }
   } catch(err) { console.error('[BREW]', err); res.status(500).json({ ok: false, message: 'Server error' }); }
+});
+
+app.post('/api/actions/buy-potion-slot', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+  try {
+    const r = await fetch('http://localhost:5001/actions/buy-potion-slot', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': sessionUser.discord_id },
+      body: JSON.stringify(req.body),
+    });
+    const data = await r.json();
+    res.json(data);
+  } catch (err) {
+    console.error('[BUY-POTION-SLOT]', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
 });
 
 app.post('/api/actions/equip-potion', async (req, res) => {
@@ -128,6 +209,25 @@ app.post('/api/actions/equip-potion', async (req, res) => {
   }
 });
 
+app.post('/api/actions/discard-potion', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+  const { slot_key } = req.body;
+  if (!slot_key || !slot_key.startsWith('Potion_')) return res.status(400).json({ ok: false });
+  try {
+    const r = await fetch('http://localhost:5001/actions/discard-potion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': sessionUser.discord_id },
+      body: JSON.stringify(req.body),
+    });
+    const text = await r.text();
+    try { res.json(JSON.parse(text)); } catch(e) { res.status(500).json({ ok: false }); }
+  } catch(err) {
+    console.error('[DISCARD-POTION]', err);
+    res.status(500).json({ ok: false });
+  }
+});
+
 app.post('/api/actions/equip-sporebot', async (req, res) => {
   const sessionUser = getSessionUser(req);
   if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
@@ -167,6 +267,26 @@ try {
 }
   } catch (err) {
     console.error('[EQUIP-SPOREBOT]', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
+// ----------------------------------------------------------------
+// Companions
+// ----------------------------------------------------------------
+app.post('/api/actions/swap-companion', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+  try {
+    const r = await fetch('http://localhost:5001/actions/swap-companion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': sessionUser.discord_id },
+      body: JSON.stringify(req.body),
+    });
+    const data = await r.json();
+    res.json(data);
+  } catch (err) {
+    console.error('[SWAP-COMPANION]', err);
     res.status(500).json({ ok: false, message: 'Server error' });
   }
 });

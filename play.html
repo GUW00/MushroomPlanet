@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2d5a1b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mushroom Planet">
+  <link rel="apple-touch-icon" href="/images/icon-192.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>My Farm | Mushroom Planet</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: #1a1a2e;
+      font-family: 'Space Grotesk', sans-serif;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    /* --- DESKTOP BLOCK --- */
+    #desktop-block {
+      display: none;
+      position: fixed; inset: 0;
+      background: #0e0e1a;
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: #fff;
+      text-align: center;
+      padding: 2rem;
+    }
+    #desktop-block .icon { font-size: 4rem; }
+    #desktop-block h2 { font-size: 1.4rem; color: #a8ff78; }
+    #desktop-block p { color: rgba(255,255,255,0.6); font-size: 0.9rem; max-width: 320px; line-height: 1.5; }
+
+    /* --- GAME WRAPPER --- */
+    #game-wrap {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+    }
+
+    /* --- TOP BAR --- */
+    #top-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      background: rgba(10,10,20,0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      z-index: 100;
+      border-bottom: 1px solid rgba(168,255,120,0.15);
+    }
+    #top-bar .farm-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #a8ff78;
+      letter-spacing: 0.05em;
+    }
+    #top-bar .back-btn {
+      width: 36px; height: 36px;
+      background: rgba(168,255,120,0.1);
+      border: 1px solid rgba(168,255,120,0.3);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #a8ff78; font-size: 1.1rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    #top-bar .coord-badge {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.35);
+      font-family: monospace;
+      background: rgba(255,255,255,0.05);
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+
+    /* --- CANVAS --- */
+    #farm-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      cursor: grab;
+    }
+    #farm-canvas:active { cursor: grabbing; }
+
+    /* --- BOTTOM HUD --- */
+    #bottom-hud {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 64px;
+      background: rgba(10,10,20,0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-top: 1px solid rgba(168,255,120,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 0.5rem;
+      z-index: 100;
+    }
+    .hud-btn {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 3px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 6px 14px;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      min-width: 56px;
+      cursor: pointer;
+    }
+    .hud-btn .hud-icon { font-size: 1.3rem; line-height: 1; }
+    .hud-btn.active {
+      background: rgba(168,255,120,0.1);
+      border-color: rgba(168,255,120,0.4);
+      color: #a8ff78;
+    }
+
+    /* --- TOOLTIP --- */
+    #tile-tooltip {
+      position: absolute;
+      background: rgba(10,10,20,0.92);
+      border: 1px solid rgba(168,255,120,0.3);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.72rem;
+      color: #fff;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 200;
+      white-space: nowrap;
+    }
+    #tile-tooltip.visible { opacity: 1; }
+
+    /* --- LOADING SCREEN --- */
+    #loading {
+      position: fixed; inset: 0;
+      background: #0e0e1a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem; z-index: 9000;
+      transition: opacity 0.5s;
+    }
+    #loading.hidden { opacity: 0; pointer-events: none; }
+    #loading .shroom-spin { font-size: 3rem; animation: spin 1.2s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading p { color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+
+    /* --- MINIMAP --- */
+    #minimap {
+      position: absolute;
+      bottom: 76px; right: 12px;
+      width: 80px; height: 80px;
+      border: 1px solid rgba(168,255,120,0.25);
+      border-radius: 6px;
+      overflow: hidden;
+      z-index: 100;
+      opacity: 0.75;
+    }
+    #minimap-canvas {
+      width: 100%; height: 100%;
+      image-rendering: pixelated;
+    }
+
+    /* Stage 1 badge */
+    #stage-badge {
+      position: absolute;
+      top: 60px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10,10,20,0.7);
+      border: 1px solid rgba(168,255,120,0.2);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.6rem;
+      color: rgba(168,255,120,0.5);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      z-index: 50;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Desktop block -->
+<div id="desktop-block">
+  <div class="icon">📱</div>
+  <h2>Mobile & PWA Only</h2>
+  <p>The farm view is designed for mobile devices. Open Mushroom Planet on your phone to explore your farm!</p>
+</div>
+
+<!-- Loading -->
+<div id="loading">
+  <div class="shroom-spin">🍄</div>
+  <p>Growing your farm...</p>
+</div>
+
+<!-- Game -->
+<div id="game-wrap">
+  <div id="top-bar">
+    <a class="back-btn" href="/profile.html">&#8592;</a>
+    <span class="farm-name">🍄 My Farm</span>
+    <span class="coord-badge" id="coord-display">0, 0</span>
+  </div>
+
+  <div id="stage-badge">Stage 1 - Visual Preview</div>
+
+  <canvas id="farm-canvas"></canvas>
+
+  <div id="minimap">
+    <canvas id="minimap-canvas" width="80" height="80"></canvas>
+  </div>
+
+  <div id="tile-tooltip"></div>
+
+  <div id="bottom-hud">
+    <div class="hud-btn active">
+      <span class="hud-icon">🏡</span>
+      <span>Farm</span>
+    </div>
+    <div class="hud-btn">
+      <span class="hud-icon">🎒</span>
+      <span>Items</span>
+    </div>
+    <div class="hud-btn">
+      <span class="hud-icon">🌀</span>
+      <span>Spores</span>
+    </div>
+    <div class="hud-btn">
+      <span class="hud-icon">🗺️</span>
+      <span>Map</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DESKTOP GUARD
+// ============================================================
+function isMobileOrPWA() {
+  const ua = navigator.userAgent;
+  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+  const isSmallScreen = window.innerWidth <= 900;
+  return isMobileUA || isPWA || isSmallScreen;
+}
+
+if (!isMobileOrPWA()) {
+  document.getElementById('desktop-block').style.display = 'flex';
+  document.getElementById('game-wrap').style.display = 'none';
+  document.getElementById('loading').style.display = 'none';
+}
+
+// ============================================================
+// TILE ENGINE
+// ============================================================
+const TILE = 32;
+
+// Tile type IDs
+const T = {
+  GRASS:        0,
+  GRASS2:       1,  // slightly varied
+  GRASS3:       2,  // darker patch
+  DIRT:         3,
+  DIRT_PATH:    4,  // dirt path center
+  DIRT_EDGE_N:  5,
+  DIRT_EDGE_S:  6,
+  DIRT_EDGE_E:  7,
+  DIRT_EDGE_W:  8,
+  WATER:        9,
+  WATER2:       10,
+  WATER_EDGE_N: 11,
+  WATER_EDGE_S: 12,
+  WATER_EDGE_E: 13,
+  WATER_EDGE_W: 14,
+  WATER_CORNER_NE: 15,
+  WATER_CORNER_NW: 16,
+  WATER_CORNER_SE: 17,
+  WATER_CORNER_SW: 18,
+  SAND:         19,
+  STONE:        20,
+  FARMPLOT:     21,
+  FARMPLOT_WET: 22,
+};
+
+// Object type IDs (drawn on top of tiles)
+const O = {
+  NONE:           0,
+  TREE_OAK:       1,
+  TREE_PINE:      2,
+  MUSHROOM_RED:   3,
+  MUSHROOM_BROWN: 4,
+  HOUSE:          5,
+  FENCE_H:        6,
+  FENCE_V:        7,
+  FENCE_CORNER:   8,
+  FLOWER:         9,
+  ROCK:           10,
+  WELL:           11,
+  CHEST:          12,
+  STUMP:          13,
+  BUSH:           14,
+  SIGN:           15,
+};
+
+// Tile label for tooltip
+const TILE_LABELS = {
+  [T.GRASS]:        'Grassland',
+  [T.GRASS2]:       'Meadow',
+  [T.GRASS3]:       'Shaded Grass',
+  [T.DIRT]:         'Dirt',
+  [T.DIRT_PATH]:    'Dirt Path',
+  [T.WATER]:        'Water',
+  [T.WATER2]:       'Deep Water',
+  [T.SAND]:         'Sandy Shore',
+  [T.STONE]:        'Stone Path',
+  [T.FARMPLOT]:     'Farm Plot (Dry)',
+  [T.FARMPLOT_WET]: 'Farm Plot (Watered)',
+};
+
+const OBJ_LABELS = {
+  [O.TREE_OAK]:       'Oak Tree',
+  [O.TREE_PINE]:      'Pine Tree',
+  [O.MUSHROOM_RED]:   '🍄 Mushroom',
+  [O.MUSHROOM_BROWN]: '🍄 Brown Mushroom',
+  [O.HOUSE]:          '🏡 Your Farmhouse',
+  [O.FENCE_H]:        'Fence',
+  [O.FENCE_V]:        'Fence',
+  [O.FENCE_CORNER]:   'Fence Corner',
+  [O.FLOWER]:         'Wildflower',
+  [O.ROCK]:           'Boulder',
+  [O.WELL]:           '💧 Well',
+  [O.CHEST]:          '📦 Chest',
+  [O.STUMP]:          'Tree Stump',
+  [O.BUSH]:           'Berry Bush',
+  [O.SIGN]:           'Signpost',
+};
+
+// ============================================================
+// MAP DEFINITION  (20 wide x 24 tall, Y=0 is north)
+// ============================================================
+// Each cell: [tileID, objectID]
+// prettier-ignore
+const G = T.GRASS, G2 = T.GRASS2, G3 = T.GRASS3;
+const D = T.DIRT, DP = T.DIRT_PATH;
+const W = T.WATER, W2 = T.WATER2;
+const WN = T.WATER_EDGE_N, WS = T.WATER_EDGE_S;
+const WE = T.WATER_EDGE_E, WW = T.WATER_EDGE_W;
+const WNE = T.WATER_CORNER_NE, WNW = T.WATER_CORNER_NW;
+const WSE = T.WATER_CORNER_SE, WSW = T.WATER_CORNER_SW;
+const SA = T.SAND, ST = T.STONE;
+const FP = T.FARMPLOT, FW = T.FARMPLOT_WET;
+
+const MAP_W = 20;
+const MAP_H = 24;
+
+// tiles[y][x]  -- tileType
+// prettier-ignore
+const tiles = [
+  [G3,G3,G3,G3, W2,W2,W2,W2,W2,W2,W2,W2,W2,W2,W2, G3,G3,G3,G3,G3],// 0
+  [G3,G3,G3,WN, W2,W2,W2,W2,W2,W2,W2,W2,W2,W2,W2, WN,G3,G3,G3,G3],// 1
+  [G3,G3,SA,WW, W2,W2,W2,W2,W2, W,W2,W2,W2,W2,W2, WE,SA,G3,G3,G3],// 2
+  [G3,G3,SA,WW, W, W, W, W, W, W, W, W, W, W2,W2, WE,SA,G3,G3,G3],// 3
+  [G3,G3,SA,WSW,WS,WS,WS,WS,WS,WS,WS,WS,WSE,W2,W2,WE,SA,G3,G3,G3],// 4
+  [G3,G ,SA,SA, SA,SA,SA,SA,SA,SA,SA,SA,SA, W2,W2,WE,SA,G3,G3,G3],// 5
+  [G ,G2,G ,SA, SA,SA,SA,SA,SA,SA,SA,SA,SA, WS,WS,WSE,G,G3,G3,G3],// 6
+  [G ,G ,G ,G , G, G, G, G, G, G, G, G, G, G, G, G, G, G3,G3,G3],// 7
+  [G ,G ,G ,G , G, G, G, G, G, G, G, G, G, G, G, G, G, G3,G3,G3],// 8
+  [G ,G ,G ,G , G, G, G, G,DP,DP, G, G, G, G, G, G, G, G ,G ,G ],// 9
+  [G ,G ,G ,G , G, G,FP,FP,FP,FP,FP,FP, G, G, G, G, G, G ,G ,G ],//10
+  [G ,G ,G ,G ,DP,DP,FW,FW,FP,FW,FW,FP, G, G, G, G, G, G ,G ,G ],//11
+  [G ,G ,G ,G , G, G,FP,FP,FP,FP,FP,FP, G, G, G, G, G, G ,G ,G ],//12
+  [G ,G ,G ,G , G, G, G, G,DP,DP, G, G, G, G, G, G, G, G ,G ,G ],//13
+  [G ,G ,G ,G , G, G, G, G,DP, G, G, G, G, G, G, G, G, G ,G ,G ],//14
+  [G ,G3,G ,G , G, G, G, G,DP, G, G, G, G, G, G, G, G, G ,G ,G ],//15
+  [G ,G3,G ,G ,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST, G, G, G, G ,G ,G ],//16
+  [G ,G ,G ,G ,ST, G, G, G,ST, G, G, G,ST, G, G, G, G, G ,G ,G ],//17
+  [G ,G ,G ,G ,ST,ST,ST,ST,ST,ST,ST,ST,ST, G, G, G, G, G ,G ,G ],//18
+  [G ,G ,G ,G , G, G, G, G, G, G, G, G, G, G, G, G, G, G ,G ,G ],//19
+  [G ,G ,G ,G , G, G, G, G, G, G, G, G, G, G, G, G, G, G ,G ,G ],//20
+  [G2,G2,G ,G , G, G, G, G, G, G, G, G, G, G, G, G, G, G ,G ,G ],//21
+  [G2,G2,G2,G , G, G, G, G, G, G, G, G, G, G, G, G, G2,G2,G2,G2],//22
+  [G3,G3,G3,G3, G, G, G, G, G, G, G, G, G, G, G, G3,G3,G3,G3,G3],//23
+];
+
+// objects[y][x]  -- objectType  (0 = nothing)
+// prettier-ignore
+const NO = O.NONE;
+const objects = [
+  [O.TREE_OAK ,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,O.TREE_OAK ,NO,NO],//0
+  [NO,O.TREE_PINE,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,O.TREE_PINE,NO],//1
+  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,O.TREE_OAK],//2
+  [NO,O.BUSH,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,O.BUSH,NO],//3
+  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,O.FLOWER,NO,NO],//4
+  [NO,O.ROCK,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,O.ROCK,NO],//5
+  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,O.TREE_PINE,NO],//6
+  [O.TREE_OAK,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,O.TREE_OAK,NO,NO,NO],//7
+  [NO,NO,O.MUSHROOM_RED,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,O.MUSHROOM_BROWN, NO,NO,NO,NO,NO],//8
+  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//9
+  [NO,NO,O.TREE_OAK,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,O.TREE_PINE,NO,NO],//10
+  [NO,NO,NO,O.SIGN, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//11
+  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//12
+  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//13
+  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, O.MUSHROOM_RED,NO,NO,NO,NO],//14
+  [NO,O.TREE_OAK,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,O.FLOWER, NO,NO,O.TREE_OAK,NO,NO],//15
+  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//16
+  [NO,NO,NO,NO, NO,O.WELL,NO,NO,NO,O.HOUSE,NO,NO,NO,NO,NO, NO,NO,O.CHEST,NO,NO],//17
+  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//18
+  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,O.MUSHROOM_RED,NO,NO,NO,NO, NO,NO,NO,NO,NO],//19
+  [NO,NO,O.ROCK,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,O.STUMP,NO, NO,NO,O.ROCK,NO,NO],//20
+  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//21
+  [O.TREE_PINE,NO,NO,O.BUSH, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,O.BUSH, NO,NO,NO,O.TREE_PINE,NO],//22
+  [NO,O.TREE_OAK,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,O.TREE_OAK,NO,NO,O.TREE_PINE],//23
+];
+
+// ============================================================
+// CANVAS SETUP
+// ============================================================
+const canvas = document.getElementById('farm-canvas');
+const ctx = canvas.getContext('2d');
+const minimapCanvas = document.getElementById('minimap-canvas');
+const mmCtx = minimapCanvas.getContext('2d');
+
+let W_px, H_px;
+let camX = 0, camY = 0;
+let animFrame = 0;
+let lastTime = 0;
+
+function resize() {
+  W_px = window.innerWidth;
+  H_px = window.innerHeight;
+  canvas.width = W_px;
+  canvas.height = H_px;
+  // Center on house
+  camX = 9 * TILE - W_px / 2 + TILE / 2;
+  camY = 17 * TILE - H_px / 2 + TILE / 2;
+  clampCam();
+}
+
+function clampCam() {
+  const maxX = MAP_W * TILE - W_px;
+  const maxY = MAP_H * TILE - H_px;
+  camX = Math.max(0, Math.min(camX, maxX));
+  camY = Math.max(0, Math.min(camY, maxY));
+}
+
+// ============================================================
+// PIXEL ART TILE RENDERER
+// ============================================================
+function drawTile(tileType, px, py, frame) {
+  switch(tileType) {
+    case T.GRASS:        drawGrass(px, py, 0, frame); break;
+    case T.GRASS2:       drawGrass(px, py, 1, frame); break;
+    case T.GRASS3:       drawGrass(px, py, 2, frame); break;
+    case T.DIRT:         drawDirt(px, py); break;
+    case T.DIRT_PATH:    drawDirtPath(px, py); break;
+    case T.WATER:        drawWater(px, py, false, frame); break;
+    case T.WATER2:       drawWater(px, py, true, frame); break;
+    case T.WATER_EDGE_N: drawWaterEdge(px,py,'N',frame); break;
+    case T.WATER_EDGE_S: drawWaterEdge(px,py,'S',frame); break;
+    case T.WATER_EDGE_E: drawWaterEdge(px,py,'E',frame); break;
+    case T.WATER_EDGE_W: drawWaterEdge(px,py,'W',frame); break;
+    case T.WATER_CORNER_NE: drawWaterCorner(px,py,'NE',frame); break;
+    case T.WATER_CORNER_NW: drawWaterCorner(px,py,'NW',frame); break;
+    case T.WATER_CORNER_SE: drawWaterCorner(px,py,'SE',frame); break;
+    case T.WATER_CORNER_SW: drawWaterCorner(px,py,'SW',frame); break;
+    case T.SAND:         drawSand(px, py); break;
+    case T.STONE:        drawStone(px, py); break;
+    case T.FARMPLOT:     drawFarmPlot(px, py, false); break;
+    case T.FARMPLOT_WET: drawFarmPlot(px, py, true); break;
+    default:             drawGrass(px, py, 0, frame);
+  }
+}
+
+function drawGrass(px, py, variant, frame) {
+  const cols = [['#4a8c2a','#5aa030','#3d7520'],
+                ['#52993a','#62aa40','#458028'],
+                ['#3a7020','#4a8028','#305518']];
+  const c = cols[variant];
+  ctx.fillStyle = c[0]; ctx.fillRect(px, py, TILE, TILE);
+  // detail patches
+  ctx.fillStyle = c[1];
+  ctx.fillRect(px+4, py+4, 6, 4);
+  ctx.fillRect(px+18, py+14, 8, 5);
+  ctx.fillRect(px+8, py+22, 5, 4);
+  ctx.fillStyle = c[2];
+  ctx.fillRect(px+24, py+6, 4, 3);
+  ctx.fillRect(px+2, py+20, 3, 4);
+  // random blades
+  if (variant !== 2) {
+    ctx.fillStyle = c[1];
+    const offX = (frame % 4 < 2) ? 0 : 1;
+    ctx.fillRect(px+12+offX, py+2, 1, 4);
+    ctx.fillRect(px+22, py+18, 1, 3);
+  }
+}
+
+function drawDirt(px, py) {
+  ctx.fillStyle = '#8b6340'; ctx.fillRect(px, py, TILE, TILE);
+  ctx.fillStyle = '#7a5530';
+  ctx.fillRect(px+3, py+5, 8, 3);
+  ctx.fillRect(px+18, py+16, 6, 4);
+  ctx.fillStyle = '#9a7050';
+  ctx.fillRect(px+12, py+10, 5, 3);
+  ctx.fillRect(px+2, py+22, 4, 3);
+}
+
+function drawDirtPath(px, py) {
+  ctx.fillStyle = '#a07848'; ctx.fillRect(px, py, TILE, TILE);
+  ctx.fillStyle = '#907040';
+  ctx.fillRect(px+1, py+1, TILE-2, 2);
+  ctx.fillRect(px+1, py+TILE-3, TILE-2, 2);
+  ctx.fillStyle = '#b08858';
+  ctx.fillRect(px+8, py+8, 6, 4);
+  ctx.fillRect(px+16, py+18, 5, 3);
+}
+
+function drawWater(px, py, deep, frame) {
+  const base = deep ? '#1a4a8a' : '#2060b0';
+  const light = deep ? '#2460a0' : '#3080cc';
+  const foam  = deep ? '#3070b0' : '#50a0e0';
+  ctx.fillStyle = base; ctx.fillRect(px, py, TILE, TILE);
+  // animated shimmer
+  const o = (frame % 8 < 4) ? 0 : 2;
+  ctx.fillStyle = light;
+  ctx.fillRect(px+2+o, py+6, 10, 2);
+  ctx.fillRect(px+16-o, py+18, 8, 2);
+  ctx.fillRect(px+5, py+24+o%2, 6, 2);
+  ctx.fillStyle = foam;
+  ctx.fillRect(px+6+o, py+4, 4, 1);
+  ctx.fillRect(px+18, py+14-o%2, 5, 1);
+}
+
+function drawWaterEdge(px, py, dir, frame) {
+  drawGrass(px, py, 0, frame);
+  drawWater(px, py, false, frame);
+  ctx.fillStyle = '#4a8c2a';
+  if (dir === 'N') { ctx.fillRect(px, py, TILE, 10); drawGrassEdge(px, py, 'S'); }
+  if (dir === 'S') { ctx.fillRect(px, py+TILE-10, TILE, 10); drawGrassEdge(px, py, 'N'); }
+  if (dir === 'E') { ctx.fillRect(px+TILE-10, py, 10, TILE); drawGrassEdge(px, py, 'W'); }
+  if (dir === 'W') { ctx.fillRect(px, py, 10, TILE); drawGrassEdge(px, py, 'E'); }
+}
+
+function drawGrassEdge(px, py, side) {
+  ctx.fillStyle = '#5aa030';
+  if (side === 'N') {
+    for(let i=0;i<MAP_W;i+=4) { ctx.fillRect(px+i%TILE, py, 2, 6); }
+  }
+  if (side === 'S') {
+    for(let i=0;i<TILE;i+=4) { ctx.fillRect(px+i, py+TILE-6, 2, 6); }
+  }
+  if (side === 'W') {
+    for(let i=0;i<TILE;i+=4) { ctx.fillRect(px, py+i, 6, 2); }
+  }
+  if (side === 'E') {
+    for(let i=0;i<TILE;i+=4) { ctx.fillRect(px+TILE-6, py+i, 6, 2); }
+  }
+}
+
+function drawWaterCorner(px, py, dir, frame) {
+  drawGrass(px, py, 0, frame);
+  // just blend grass+water
+  ctx.fillStyle = 'rgba(32,96,176,0.6)';
+  if (dir === 'NE') { ctx.fillRect(px+16, py, 16, 16); }
+  if (dir === 'NW') { ctx.fillRect(px, py, 16, 16); }
+  if (dir === 'SE') { ctx.fillRect(px+16, py+16, 16, 16); }
+  if (dir === 'SW') { ctx.fillRect(px, py+16, 16, 16); }
+}
+
+function drawSand(px, py) {
+  ctx.fillStyle = '#d4b878'; ctx.fillRect(px, py, TILE, TILE);
+  ctx.fillStyle = '#c8aa6a';
+  ctx.fillRect(px+4, py+8, 7, 3);
+  ctx.fillRect(px+18, py+20, 6, 4);
+  ctx.fillStyle = '#e0c888';
+  ctx.fillRect(px+14, py+5, 4, 3);
+  ctx.fillRect(px+2, py+22, 5, 3);
+}
+
+function drawStone(px, py) {
+  ctx.fillStyle = '#787878'; ctx.fillRect(px, py, TILE, TILE);
+  // stone bricks
+  ctx.fillStyle = '#686868';
+  ctx.fillRect(px, py, TILE, 1); ctx.fillRect(px, py+16, TILE, 1);
+  ctx.fillRect(px, py, 1, 16); ctx.fillRect(px+16, py+1, 1, 15);
+  ctx.fillRect(px+8, py+17, 1, 15);
+  ctx.fillStyle = '#888';
+  ctx.fillRect(px+2, py+2, 12, 12);
+  ctx.fillRect(px+10, py+18, 8, 12);
+  ctx.fillStyle = '#909090';
+  ctx.fillRect(px+3, py+3, 4, 4);
+}
+
+function drawFarmPlot(px, py, wet) {
+  ctx.fillStyle = wet ? '#5a3010' : '#7a5030';
+  ctx.fillRect(px, py, TILE, TILE);
+  // furrows
+  ctx.fillStyle = wet ? '#3d2008' : '#5a3a20';
+  for(let r=0; r<4; r++) {
+    ctx.fillRect(px+2, py+4+r*7, TILE-4, 2);
+  }
+  if (wet) {
+    ctx.fillStyle = 'rgba(50,120,200,0.25)';
+    ctx.fillRect(px, py, TILE, TILE);
+  }
+}
+
+// ============================================================
+// OBJECT RENDERER
+// ============================================================
+function drawObject(objType, px, py, frame) {
+  if (!objType || objType === O.NONE) return;
+  switch(objType) {
+    case O.TREE_OAK:       drawTreeOak(px,py,frame); break;
+    case O.TREE_PINE:      drawTreePine(px,py,frame); break;
+    case O.MUSHROOM_RED:   drawMushroom(px,py,'red',frame); break;
+    case O.MUSHROOM_BROWN: drawMushroom(px,py,'brown',frame); break;
+    case O.HOUSE:          drawHouse(px,py); break;
+    case O.FENCE_H:        drawFence(px,py,'H'); break;
+    case O.FENCE_V:        drawFence(px,py,'V'); break;
+    case O.FLOWER:         drawFlower(px,py,frame); break;
+    case O.ROCK:           drawRock(px,py); break;
+    case O.WELL:           drawWell(px,py); break;
+    case O.CHEST:          drawChest(px,py); break;
+    case O.STUMP:          drawStump(px,py); break;
+    case O.BUSH:           drawBush(px,py,frame); break;
+    case O.SIGN:           drawSign(px,py); break;
+  }
+}
+
+function drawTreeOak(px, py, frame) {
+  // shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.fillRect(px+8, py+TILE-4, 16, 4);
+  // trunk
+  ctx.fillStyle = '#5c3a1a';
+  ctx.fillRect(px+13, py+18, 6, 14);
+  ctx.fillStyle = '#7a5030';
+  ctx.fillRect(px+14, py+18, 3, 12);
+  // canopy layers
+  const sway = (frame % 12 < 6) ? 0 : 1;
+  ctx.fillStyle = '#2a6010';
+  ctx.fillRect(px+4+sway, py+2, 24-sway, 20);
+  ctx.fillStyle = '#3a8020';
+  ctx.fillRect(px+6+sway, py+0, 20-sway, 18);
+  ctx.fillStyle = '#4a9828';
+  ctx.fillRect(px+8, py+2, 14, 12);
+  ctx.fillStyle = '#5aaa30';
+  ctx.fillRect(px+10, py+2, 4, 4);
+  ctx.fillRect(px+16, py+6, 4, 3);
+}
+
+function drawTreePine(px, py, frame) {
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.fillRect(px+10, py+TILE-4, 12, 4);
+  // trunk
+  ctx.fillStyle = '#5c3a1a';
+  ctx.fillRect(px+14, py+22, 4, 10);
+  // layers of pine
+  const sway = (frame % 16 < 8) ? 0 : 1;
+  ctx.fillStyle = '#1a5010';
+  ctx.fillRect(px+8+sway, py+16, 16, 10);
+  ctx.fillStyle = '#1e6014';
+  ctx.fillRect(px+10+sway, py+10, 12, 10);
+  ctx.fillStyle = '#248018';
+  ctx.fillRect(px+12, py+4, 8, 10);
+  ctx.fillStyle = '#2a901e';
+  ctx.fillRect(px+13, py+0, 6, 8);
+  ctx.fillStyle = '#3aaa28';
+  ctx.fillRect(px+14, py+2, 2, 2);
+}
+
+function drawMushroom(px, py, color, frame) {
+  const bob = (frame % 10 < 5) ? 0 : 1;
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  ctx.fillRect(px+10, py+TILE-3, 12, 3);
+  // stem
+  ctx.fillStyle = '#e8ddc8';
+  ctx.fillRect(px+13, py+18-bob, 6, 10);
+  ctx.fillStyle = '#d8cdb8';
+  ctx.fillRect(px+15, py+19-bob, 3, 8);
+  // cap
+  const capColor = color === 'red' ? '#cc2010' : '#8b5e30';
+  const spotColor = color === 'red' ? '#ff6050' : '#c49050';
+  ctx.fillStyle = capColor;
+  ctx.fillRect(px+6, py+10-bob, 20, 10);
+  ctx.fillRect(px+8, py+6-bob, 16, 8);
+  ctx.fillRect(px+11, py+4-bob, 10, 6);
+  // spots
+  ctx.fillStyle = spotColor;
+  ctx.fillRect(px+9, py+10-bob, 4, 4);
+  ctx.fillRect(px+18, py+12-bob, 3, 3);
+  ctx.fillRect(px+14, py+7-bob, 3, 3);
+}
+
+function drawHouse(px, py) {
+  // house is 2x2 tiles but draw on one cell as a bigger sprite centered
+  const hx = px - 16;
+  const hy = py - 24;
+  // shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.fillRect(hx+8, hy+72, 56, 6);
+  // walls
+  ctx.fillStyle = '#e8d0a0';
+  ctx.fillRect(hx+4, hy+30, 56, 42);
+  // wall detail
+  ctx.fillStyle = '#d8c090';
+  ctx.fillRect(hx+4, hy+50, 56, 2);
+  ctx.fillRect(hx+4, hy+60, 56, 2);
+  // roof
+  ctx.fillStyle = '#8b3010';
+  // roof body
+  ctx.fillRect(hx+2, hy+16, 60, 16);
+  // roof peak
+  ctx.fillStyle = '#7a2808';
+  ctx.fillRect(hx+6, hy+10, 52, 10);
+  ctx.fillRect(hx+12, hy+4, 40, 10);
+  ctx.fillRect(hx+18, hy+0, 28, 8);
+  // chimney
+  ctx.fillStyle = '#c04020';
+  ctx.fillRect(hx+44, hy-4, 8, 18);
+  ctx.fillStyle = '#404040';
+  ctx.fillRect(hx+43, hy-6, 10, 4);
+  // smoke puff
+  ctx.fillStyle = 'rgba(200,200,200,0.5)';
+  ctx.fillRect(hx+44, hy-14, 8, 8);
+  ctx.fillRect(hx+42, hy-20, 6, 7);
+  // door
+  ctx.fillStyle = '#6a3010';
+  ctx.fillRect(hx+24, hy+50, 16, 22);
+  ctx.fillStyle = '#8a4820';
+  ctx.fillRect(hx+25, hy+51, 14, 18);
+  ctx.fillStyle = '#d4aa40';
+  ctx.fillRect(hx+36, hy+61, 3, 3);
+  // windows
+  ctx.fillStyle = '#8ab8e0';
+  ctx.fillRect(hx+8, hy+38, 14, 12);
+  ctx.fillRect(hx+42, hy+38, 14, 12);
+  // window frames
+  ctx.fillStyle = '#e8d0a0';
+  ctx.fillRect(hx+14, hy+38, 2, 12);
+  ctx.fillRect(hx+8, hy+43, 14, 2);
+  ctx.fillRect(hx+48, hy+38, 2, 12);
+  ctx.fillRect(hx+42, hy+43, 14, 2);
+  // mushroom decals on wall
+  ctx.fillStyle = '#cc3020';
+  ctx.fillRect(hx+16, hy+62, 6, 6);
+  ctx.fillRect(hx+17, hy+60, 4, 4);
+  ctx.fillStyle = '#ff8070';
+  ctx.fillRect(hx+17, hy+62, 2, 2);
+}
+
+function drawWell(px, py) {
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.fillRect(px+6, py+TILE-4, 20, 4);
+  // base
+  ctx.fillStyle = '#909090';
+  ctx.fillRect(px+6, py+18, 20, 10);
+  ctx.fillStyle = '#787878';
+  ctx.fillRect(px+6, py+18, 20, 2);
+  // water inside
+  ctx.fillStyle = '#3080c0';
+  ctx.fillRect(px+8, py+20, 16, 6);
+  // pillars
+  ctx.fillStyle = '#a0a0a0';
+  ctx.fillRect(px+6, py+6, 4, 14);
+  ctx.fillRect(px+22, py+6, 4, 14);
+  // beam
+  ctx.fillStyle = '#5c3a1a';
+  ctx.fillRect(px+4, py+4, 24, 4);
+  // rope
+  ctx.fillStyle = '#c8a840';
+  ctx.fillRect(px+14, py+8, 2, 10);
+}
+
+function drawRock(px, py) {
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.fillRect(px+8, py+TILE-4, 16, 4);
+  ctx.fillStyle = '#888';
+  ctx.fillRect(px+8, py+16, 16, 12);
+  ctx.fillRect(px+10, py+12, 12, 8);
+  ctx.fillRect(px+12, py+10, 8, 6);
+  ctx.fillStyle = '#a0a0a0';
+  ctx.fillRect(px+10, py+12, 6, 4);
+  ctx.fillStyle = '#666';
+  ctx.fillRect(px+18, py+22, 6, 4);
+}
+
+function drawChest(px, py) {
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.fillRect(px+8, py+TILE-3, 16, 3);
+  // body
+  ctx.fillStyle = '#8b5e20';
+  ctx.fillRect(px+6, py+18, 20, 12);
+  // lid
+  ctx.fillStyle = '#7a5018';
+  ctx.fillRect(px+6, py+14, 20, 6);
+  ctx.fillRect(px+7, py+12, 18, 4);
+  // metal bands
+  ctx.fillStyle = '#d4aa40';
+  ctx.fillRect(px+6, py+20, 20, 2);
+  ctx.fillRect(px+14, py+14, 4, 16);
+  // lock
+  ctx.fillStyle = '#e0c040';
+  ctx.fillRect(px+13, py+19, 6, 5);
+  ctx.fillStyle = '#c8a820';
+  ctx.fillRect(px+14, py+21, 4, 2);
+}
+
+function drawStump(px, py) {
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  ctx.fillRect(px+8, py+TILE-4, 16, 4);
+  ctx.fillStyle = '#6a4020';
+  ctx.fillRect(px+8, py+20, 16, 10);
+  ctx.fillStyle = '#8a5828';
+  ctx.fillRect(px+8, py+18, 16, 4);
+  // rings
+  ctx.fillStyle = '#7a4c22';
+  ctx.fillRect(px+12, py+19, 8, 1);
+  ctx.fillRect(px+14, py+20, 4, 1);
+  // moss
+  ctx.fillStyle = '#3a8020';
+  ctx.fillRect(px+9, py+18, 3, 2);
+  ctx.fillRect(px+19, py+18, 3, 2);
+}
+
+function drawBush(px, py, frame) {
+  const sway = (frame % 20 < 10) ? 0 : 1;
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  ctx.fillRect(px+6, py+TILE-4, 20, 4);
+  ctx.fillStyle = '#2a6010';
+  ctx.fillRect(px+4+sway, py+16, 24, 14);
+  ctx.fillStyle = '#3a8020';
+  ctx.fillRect(px+6+sway, py+12, 20, 12);
+  ctx.fillStyle = '#4a9830';
+  ctx.fillRect(px+8, py+14, 16, 8);
+  // berries
+  ctx.fillStyle = '#cc2020';
+  ctx.fillRect(px+10, py+16, 3, 3);
+  ctx.fillRect(px+18, py+18, 3, 3);
+  ctx.fillRect(px+14, py+14, 3, 3);
+}
+
+function drawFlower(px, py, frame) {
+  const bob = (frame % 14 < 7) ? 0 : 1;
+  // stem
+  ctx.fillStyle = '#3a8020';
+  ctx.fillRect(px+15, py+20-bob, 2, 10);
+  // petals
+  const pColors = ['#e040c0','#e8a020','#40a0e0','#e04040'];
+  const pc = pColors[(px+py) % 4];
+  ctx.fillStyle = pc;
+  ctx.fillRect(px+12, py+14-bob, 8, 3);
+  ctx.fillRect(px+14, py+12-bob, 4, 7);
+  // center
+  ctx.fillStyle = '#f8e020';
+  ctx.fillRect(px+14, py+15-bob, 4, 3);
+}
+
+function drawSign(px, py) {
+  ctx.fillStyle = '#6a4020';
+  ctx.fillRect(px+15, py+18, 2, 12);
+  ctx.fillStyle = '#8a5828';
+  ctx.fillRect(px+10, py+12, 12, 8);
+  ctx.fillStyle = '#d4aa70';
+  ctx.fillRect(px+11, py+13, 10, 6);
+  // text lines
+  ctx.fillStyle = '#5a3010';
+  ctx.fillRect(px+12, py+15, 8, 1);
+  ctx.fillRect(px+12, py+17, 5, 1);
+}
+
+function drawFence(px, py, dir) {
+  ctx.fillStyle = '#c8a060';
+  if (dir === 'H') {
+    ctx.fillRect(px, py+14, TILE, 3);
+    ctx.fillRect(px+4, py+10, 3, 12);
+    ctx.fillRect(px+24, py+10, 3, 12);
+  } else {
+    ctx.fillRect(px+14, py, 3, TILE);
+    ctx.fillRect(px+10, py+4, 12, 3);
+    ctx.fillRect(px+10, py+24, 12, 3);
+  }
+}
+
+// ============================================================
+// MAIN DRAW
+// ============================================================
+function draw(ts) {
+  animFrame = Math.floor(ts / 250) % 64;
+
+  ctx.clearRect(0, 0, W_px, H_px);
+
+  // dark bg for outside map
+  ctx.fillStyle = '#0a0a18';
+  ctx.fillRect(0, 0, W_px, H_px);
+
+  const startTX = Math.max(0, Math.floor(camX / TILE));
+  const startTY = Math.max(0, Math.floor(camY / TILE));
+  const endTX   = Math.min(MAP_W, Math.ceil((camX + W_px) / TILE));
+  const endTY   = Math.min(MAP_H, Math.ceil((camY + H_px) / TILE));
+
+  // pass 1: tiles
+  for (let ty = startTY; ty < endTY; ty++) {
+    for (let tx = startTX; tx < endTX; tx++) {
+      const px = tx * TILE - camX;
+      const py = ty * TILE - camY;
+      drawTile(tiles[ty][tx], px, py, animFrame);
+    }
+  }
+
+  // pass 2: objects (sorted Y for depth)
+  for (let ty = startTY; ty < endTY; ty++) {
+    for (let tx = startTX; tx < endTX; tx++) {
+      const obj = objects[ty][tx];
+      if (obj && obj !== O.NONE) {
+        const px = tx * TILE - camX;
+        const py = ty * TILE - camY;
+        drawObject(obj, px, py, animFrame);
+      }
+    }
+  }
+
+  drawMinimap();
+  requestAnimationFrame(draw);
+}
+
+// ============================================================
+// MINIMAP
+// ============================================================
+function drawMinimap() {
+  const mw = 80, mh = 80;
+  const tw = mw / MAP_W, th = mh / MAP_H;
+  mmCtx.clearRect(0, 0, mw, mh);
+
+  for (let ty = 0; ty < MAP_H; ty++) {
+    for (let tx = 0; tx < MAP_W; tx++) {
+      const t = tiles[ty][tx];
+      let col = '#3a7020';
+      if (t === T.WATER || t === T.WATER2 || t >= T.WATER_EDGE_N && t <= T.WATER_CORNER_SW) col = '#2060b0';
+      else if (t === T.SAND) col = '#d4b878';
+      else if (t === T.DIRT || t === T.DIRT_PATH) col = '#8b6340';
+      else if (t === T.STONE) col = '#787878';
+      else if (t === T.FARMPLOT || t === T.FARMPLOT_WET) col = '#5a3010';
+      mmCtx.fillStyle = col;
+      mmCtx.fillRect(tx*tw, ty*th, tw+0.5, th+0.5);
+    }
+  }
+
+  // objects
+  for (let ty = 0; ty < MAP_H; ty++) {
+    for (let tx = 0; tx < MAP_W; tx++) {
+      const o = objects[ty][tx];
+      if (!o) continue;
+      let col = null;
+      if (o === O.TREE_OAK || o === O.TREE_PINE || o === O.BUSH) col = '#1a5010';
+      else if (o === O.HOUSE) col = '#e8d0a0';
+      else if (o === O.MUSHROOM_RED || o === O.MUSHROOM_BROWN) col = '#cc3020';
+      if (col) {
+        mmCtx.fillStyle = col;
+        mmCtx.fillRect(tx*tw, ty*th, tw+0.5, th+0.5);
+      }
+    }
+  }
+
+  // viewport rect
+  const vx = (camX / TILE) * tw;
+  const vy = (camY / TILE) * th;
+  const vw = (W_px / TILE) * tw;
+  const vh = (H_px / TILE) * th;
+  mmCtx.strokeStyle = 'rgba(168,255,120,0.7)';
+  mmCtx.lineWidth = 1;
+  mmCtx.strokeRect(vx, vy, Math.min(vw, mw), Math.min(vh, mh));
+}
+
+// ============================================================
+// PAN INPUT
+// ============================================================
+let drag = { active: false, startX: 0, startY: 0, camStartX: 0, camStartY: 0 };
+let touchStart = null;
+
+canvas.addEventListener('mousedown', e => {
+  drag = { active: true, startX: e.clientX, startY: e.clientY, camStartX: camX, camStartY: camY };
+});
+canvas.addEventListener('mousemove', e => {
+  if (!drag.active) return;
+  camX = drag.camStartX - (e.clientX - drag.startX);
+  camY = drag.camStartY - (e.clientY - drag.startY);
+  clampCam();
+  updateCoord(e.clientX, e.clientY);
+});
+canvas.addEventListener('mouseup', () => { drag.active = false; });
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (e.touches.length === 1) {
+    const t = e.touches[0];
+    drag = { active: true, startX: t.clientX, startY: t.clientY, camStartX: camX, camStartY: camY };
+    touchStart = { x: t.clientX, y: t.clientY, time: Date.now() };
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!drag.active || e.touches.length !== 1) return;
+  const t = e.touches[0];
+  camX = drag.camStartX - (t.clientX - drag.startX);
+  camY = drag.camStartY - (t.clientY - drag.startY);
+  clampCam();
+  updateCoord(t.clientX, t.clientY);
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  if (touchStart && Date.now() - touchStart.time < 200) {
+    const t = e.changedTouches[0];
+    handleTap(t.clientX, t.clientY);
+  }
+  drag.active = false;
+  touchStart = null;
+}, { passive: false });
+
+canvas.addEventListener('click', e => {
+  if (!drag.active) handleTap(e.clientX, e.clientY);
+});
+
+function updateCoord(cx, cy) {
+  const tx = Math.floor((cx + camX) / TILE);
+  const ty = Math.floor((cy + camY) / TILE);
+  document.getElementById('coord-display').textContent = tx + ', ' + ty;
+}
+
+function handleTap(cx, cy) {
+  const tx = Math.floor((cx + camX) / TILE);
+  const ty = Math.floor((cy + camY) / TILE);
+  if (tx < 0 || tx >= MAP_W || ty < 0 || ty >= MAP_H) return;
+  const obj = objects[ty][tx];
+  const tile = tiles[ty][tx];
+  const label = (obj && OBJ_LABELS[obj]) ? OBJ_LABELS[obj] : (TILE_LABELS[tile] || 'Land');
+  showTooltip(label, cx, cy);
+}
+
+// ============================================================
+// TOOLTIP
+// ============================================================
+const tooltip = document.getElementById('tile-tooltip');
+let tooltipTimer = null;
+function showTooltip(text, x, y) {
+  tooltip.textContent = text;
+  const tx = Math.min(x, W_px - 180);
+  const ty = Math.max(y - 40, 60);
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top  = ty + 'px';
+  tooltip.classList.add('visible');
+  clearTimeout(tooltipTimer);
+  tooltipTimer = setTimeout(() => tooltip.classList.remove('visible'), 2000);
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+window.addEventListener('resize', () => { resize(); });
+resize();
+requestAnimationFrame(ts => {
+  // hide loading
+  setTimeout(() => {
+    document.getElementById('loading').classList.add('hidden');
+    setTimeout(() => { document.getElementById('loading').style.display = 'none'; }, 500);
+  }, 600);
+  requestAnimationFrame(draw);
+});
+</script>
+</body>
+</html>

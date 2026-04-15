@@ -103,10 +103,11 @@
     :root {
       --cream: #ffffe1;
       --yellow: #fece00;
+      --violent: #ad9df5;
       --red: #fd464f;
       --blue: #4fa8fd;
       --green: #22c55e;
-      --purple: #c084fc;
+      --purple: #af74eb;
       --dark: #0f0f0f;
       --dark2: #1a1a1a;
       --dark3: #242424;
@@ -286,6 +287,7 @@
     .sp-val.red    { color: var(--red); }
     .sp-val.purple { color: var(--purple); }
     .sp-val.red    { color: var(--red); }
+    .sp-val.violent { color: var(--violent); }
 
     /* ---- TABS ---- */
     .tab-bar {
@@ -750,7 +752,7 @@
       </div>
       <div class="stat-pill">
         <span class="sp-label">Staked SPORES</span>
-        <span class="sp-val blue" id="qs-staked">—</span>
+        <span class="sp-val violent" id="qs-staked">—</span>
       </div>
       <div class="stat-pill">
         <span class="sp-label">MVP Score</span>
@@ -1136,8 +1138,7 @@
             <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
             <span class="dr-val r" id="w-shroom">—</span>
           </div>
-          <div class="data-row">
-            <span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
+          <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
             <span class="dr-val b" id="w-spore">—</span>
           </div>
           <div class="data-row">
@@ -1164,14 +1165,15 @@
         </div>
         <div>
           <div class="data-row"><span class="dr-label"><img src="/images/blockchain.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Wallet Address</span><span class="dr-val" id="w-addr" onclick="copyWalletAddr()" style="cursor:pointer;transition:color 0.2s;" title="Click to copy">—</span></div>
+          
           <div class="data-row">
             <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
             <span class="dr-val r" id="w-oc-shroom">—</span>
           </div>
-          <div class="data-row">
-            <span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
+          <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
             <span class="dr-val b" id="w-oc-spore">—</span>
           </div>
+          <div class="data-row" style="margin-top:0.5rem;border-bottom:none;"><span class="dr-label"></span><button id="refresh-onchain-btn" onclick="refreshOnchain()" style="font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.3em 0.9em;border-radius:999px;border:1px solid rgba(79,168,253,0.3);background:rgba(79,168,253,0.07);color:var(--blue);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.35rem;"><img src="/images/blockchain.png" style="width:11px;height:11px;object-fit:contain;" onerror="this.style.display='none'">Refresh Onchain</button></div>
         </div>
       </div>
       <div class="info-card reveal" style="margin-top:1rem;">
@@ -1594,6 +1596,45 @@ var MSG_MAX = 50;
 var _msgActiveTab = 'messages';
 var _inboxMessages  = {};
 var _inboxArchived  = {};
+
+async function refreshOnchain() {
+  if (!currentUser || !currentUser.discord_id) return;
+  var btn = document.getElementById('refresh-onchain-btn');
+  if (btn) { btn.textContent = 'Refreshing...'; btn.disabled = true; }
+  try {
+    var res = await fetch(API_BASE + '/api/user/' + currentUser.discord_id + '/refresh-onchain', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+      credentials: 'include',
+    });
+    var data = await res.json();
+    if (data.ok) {
+      setEl('w-oc-shroom', fmt(data.shroom_balance));
+      setEl('w-oc-spore',  fmt(data.spore_balance));
+      if (profileData && profileData.pixie) {
+        profileData.pixie.Wallet = profileData.pixie.Wallet || {};
+        profileData.pixie.Wallet.Onchain = profileData.pixie.Wallet.Onchain || {};
+        profileData.pixie.Wallet.Onchain.shroom_balance = data.shroom_balance;
+        profileData.pixie.Wallet.Onchain.spore_balance  = data.spore_balance;
+        profileData.pixie.Wallet.Onchain.Days_Over_500k = data.days_over_500k;
+      }
+      var nowStr = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      var lastRefEl = document.getElementById('onchain-last-refresh');
+      if (lastRefEl) lastRefEl.textContent = 'Last refreshed: ' + nowStr;
+      if (btn) { btn.textContent = 'Updated!'; btn.style.color = 'var(--green)'; btn.style.borderColor = 'rgba(34,197,94,0.3)'; }
+      setTimeout(function() {
+        if (btn) { btn.textContent = 'Refresh Onchain'; btn.style.color = ''; btn.style.borderColor = ''; btn.disabled = false; }
+      }, 2000);
+    } else {
+      if (btn) { btn.textContent = data.message || 'Error'; btn.style.color = 'var(--red)'; btn.disabled = false; }
+      setTimeout(function() { if (btn) { btn.textContent = 'Refresh Onchain'; btn.style.color = ''; btn.disabled = false; } }, 3000);
+    }
+  } catch(e) {
+    console.error('[refreshOnchain]', e);
+    if (btn) { btn.textContent = 'Error'; btn.disabled = false; }
+  }
+}
+window.refreshOnchain = refreshOnchain;
 
 async function loadMessages() {
   if (!currentUser || !currentUser.discord_id) return;
@@ -2482,7 +2523,8 @@ function renderBrewStation(s) {
   var extraBrews = parseInt(activePot.Extra_Brews || activePot['Extra Brews'] || 0);
   var maxBrews   = 3 + extraBrews;
   var potionCount = Object.keys(potions).filter(function(k){ return k.startsWith('Potion_') && !['Potion_Cooldown','Potion_Timer'].includes(k) && typeof potions[k] === 'object'; }).length;
-  var maxSlots = 5;
+  var extraSlots = Math.min(parseInt(potions.Extra_Slots || 0), 3);
+  var maxSlots = 5 + extraSlots;
 
   var RANK_LIMITS = {BRONZE:2,SILVER:3,GOLD:3,EMERALD:4,DIAMOND:4,MASTER:4,GRANDMASTER:4,LEGEND:4};
   var ingLimit = RANK_LIMITS[farmRank] || 2;
@@ -2642,6 +2684,133 @@ async function doBrew() {
 }
 window.doBrew = doBrew;
 window.activatePotion = activatePotion;
+
+async function swapCompanion(petKey) {
+  if (!currentUser || !currentUser.discord_id) return;
+  var petName = petKey.charAt(0).toUpperCase() + petKey.slice(1);
+  if (!confirm('Swap to ' + petName + ' as your active companion?\n\nNote: 3-day cooldown applies.')) return;
+  try {
+    var res = await fetch(API_BASE + '/api/actions/swap-companion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+      credentials: 'include',
+      body: JSON.stringify({ pet_key: petKey }),
+    });
+    var data = await res.json();
+    if (data.ok) {
+      // Patch profileData and re-render
+      if (profileData && profileData.sporebot) {
+        profileData.sporebot.Companion = data.companion;
+      }
+      renderCompanion(profileData.sporebot || {});
+      var t = document.createElement('div');
+      t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(34,197,94,0.3);border-radius:0.75rem;padding:0.65rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.72rem;color:var(--green);z-index:99999;';
+      t.textContent = petName + ' is now your active companion!';
+      document.body.appendChild(t); setTimeout(function(){t.remove();},3000);
+    } else {
+      var t2 = document.createElement('div');
+      t2.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(253,70,79,0.3);border-radius:0.75rem;padding:0.65rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.72rem;color:var(--red);z-index:99999;';
+      t2.textContent = data.message || 'Swap failed.';
+      document.body.appendChild(t2); setTimeout(function(){t2.remove();},4000);
+    }
+  } catch(e) { console.error('[swapCompanion]', e); }
+}
+window.swapCompanion = swapCompanion;
+
+var _flippedPotSlot = null;
+function potFlip(safeKey) {
+  var inner = document.getElementById('pslot_inner_' + safeKey);
+  if (!inner) return;
+  if (_flippedPotSlot && _flippedPotSlot !== safeKey) {
+    var prev = document.getElementById('pslot_inner_' + _flippedPotSlot);
+    if (prev) prev.style.transform = '';
+  }
+  var isFlipped = inner.style.transform === 'rotateY(180deg)';
+  inner.style.transform = isFlipped ? '' : 'rotateY(180deg)';
+  _flippedPotSlot = isFlipped ? null : safeKey;
+}
+window.potFlip = potFlip;
+
+var _openPotionSlot = null;
+function togglePotionSlot(safeKey) {
+  var detail = document.getElementById('potion-slot-detail');
+  if (!detail) return;
+  var d = window._potionSlotData && window._potionSlotData[safeKey];
+  if (_openPotionSlot === safeKey) {
+    detail.style.display = 'none';
+    _openPotionSlot = null;
+    return;
+  }
+  _openPotionSlot = safeKey;
+  if (!d) { detail.style.display = 'none'; return; }
+  var v = d.potion; var k = d.key;
+  var potions = (profileData && profileData.sporebot && profileData.sporebot.Inventory && profileData.sporebot.Inventory.Potions) || {};
+  var potionCdRemaining2 = null;
+  var potionCooldown2 = potions.Potion_Cooldown || false;
+  var potionTimerStr2 = potions.Potion_Timer || null;
+  if (potionCooldown2 && potionTimerStr2) {
+    try {
+      var timerMs2 = new Date(potionTimerStr2.replace(' ','T') + (potionTimerStr2.includes('Z')?'':'Z')).getTime();
+      var cdDiff2 = (timerMs2 + 3*86400000) - Date.now();
+      if (cdDiff2 > 0) { var cdD2=Math.floor(cdDiff2/86400000); var cdH2=Math.floor((cdDiff2%86400000)/3600000); var cdM2=Math.floor((cdDiff2%3600000)/60000); potionCdRemaining2 = (cdD2>0?cdD2+'d ':'')+cdH2+'h '+cdM2+'m'; }
+    } catch(e) {}
+  }
+  var score = v['Potion Score'] ? Number(v['Potion Score']).toFixed(1) : '?';
+  var potionId = (v.emoji||'').match(/:potion(\d+):/)?.[1]||(v.emoji||'').match(/:(\d+)>/)?.[1];
+  var pImg = potionId ? '/images/potion'+potionId+'.png' : '/images/potion2.png';
+  var stats = Object.entries(v).filter(([sk])=>!['name','emoji','Potion Score','Potion_Score'].includes(sk))
+    .map(([sk,val])=>{const sl=sk.replace(/_/g,' ');return '<div class="data-row" style="padding:0.3rem 0;"><span class="dr-label" style="font-size:0.75rem;">'+(STAT_EMOJI[sl]||STAT_EMOJI[sk]||'')+sl+'</span><span class="dr-val g" style="font-size:0.75rem;">'+(typeof val==='number'?val+(sl.includes('Limit')||sl.includes('Brews')?'':'%'):val)+'</span></div>';}).join('');
+  var activateBtn2 = potionCdRemaining2
+    ? '<button disabled style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.7rem;padding:0.5rem;border-radius:0.75rem;border:1px solid rgba(253,70,79,0.2);background:none;color:rgba(253,70,79,0.5);cursor:not-allowed;">CD: '+potionCdRemaining2+'</button>'
+    : '<button id="actpot_'+safeKey+'" onclick="event.stopPropagation();activatePotion(\''+safeKey+'\',\''+k+'\')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.7rem;font-weight:700;padding:0.5rem;border-radius:0.75rem;border:1px solid rgba(254,206,0,0.35);background:rgba(254,206,0,0.08);color:var(--yellow);cursor:pointer;">Activate</button>';
+  var discardBtn2 = '<button id="discpot_'+safeKey+'" onclick="event.stopPropagation();discardPotion(\''+safeKey+'\',\''+k+'\')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.7rem;font-weight:700;padding:0.5rem;border-radius:0.75rem;border:1px solid rgba(253,70,79,0.2);background:rgba(253,70,79,0.05);color:rgba(253,70,79,0.7);cursor:pointer;">Discard</button>';
+  detail.style.display = 'block';
+  detail.innerHTML = '<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">'
+    + '<img src="'+pImg+'" style="width:36px;height:36px;object-fit:contain;" onerror="this.src=\'/images/potion2.png\'">'
+    + '<div><div style="font-family:Space Grotesk,sans-serif;font-size:0.85rem;font-weight:700;color:var(--purple);">'+cleanEmoji(v.name||'Potion')+'</div>'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.35);">Score: '+score+'/10</div></div></div>'
+    + stats
+    + '<div style="display:flex;gap:0.5rem;margin-top:0.75rem;">'+activateBtn2+discardBtn2+'</div>';
+}
+window.togglePotionSlot = togglePotionSlot;
+
+async function buyPotionSlot(price) {
+  if (!currentUser || !currentUser.discord_id) return;
+  var sporeWallet = (profileData && profileData.pixie && profileData.pixie.Wallet && profileData.pixie.Wallet.spore_wallet) || 0;
+  if (sporeWallet < price) {
+    var t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(253,70,79,0.3);border-radius:0.75rem;padding:0.65rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(253,70,79,0.9);z-index:99999;';
+    t.textContent = 'Not enough SPORE! Need ' + price.toLocaleString() + ', have ' + sporeWallet.toLocaleString();
+    document.body.appendChild(t); setTimeout(function(){t.remove();},3500); return;
+  }
+  if (!confirm('Buy 1 extra potion slot for ' + price.toLocaleString() + ' SPORE?')) return;
+  try {
+    var res = await fetch(API_BASE + '/api/actions/buy-potion-slot', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+      credentials: 'include',
+      body: JSON.stringify({}),
+    });
+    var data = await res.json();
+    if (data.ok) {
+      profileData.sporebot = profileData.sporebot || {};
+      profileData.sporebot.Inventory = profileData.sporebot.Inventory || {};
+      profileData.sporebot.Inventory.Potions = profileData.sporebot.Inventory.Potions || {};
+      profileData.sporebot.Inventory.Potions.Extra_Slots = data.extra_slots;
+      if (profileData.pixie && profileData.pixie.Wallet) {
+        profileData.pixie.Wallet.spore_wallet = data.spore_remaining;
+      }
+      renderBrewing(profileData.sporebot || {});
+      var t2 = document.createElement('div');
+      t2.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(34,197,94,0.3);border-radius:0.75rem;padding:0.65rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.72rem;color:var(--green);z-index:99999;';
+      t2.textContent = 'Slot ' + data.new_max_slots + ' unlocked! (' + data.spore_spent.toLocaleString() + ' SPORE spent)';
+      document.body.appendChild(t2); setTimeout(function(){t2.remove();},3000);
+    } else {
+      alert(data.message || 'Purchase failed.');
+    }
+  } catch(e) { console.error('[buyPotionSlot]', e); alert('Error purchasing slot.'); }
+}
+window.buyPotionSlot = buyPotionSlot;
 // ================================================================
 // PUSH NOTIFICATION MODAL
 // ================================================================
@@ -3884,6 +4053,15 @@ function renderWallet(s, p) {
   setEl('w-addr',       addr ? addr.slice(0,6) + '...' + addr.slice(-4) : 'Not registered');
   setEl('w-oc-shroom',  onchain.shroom_balance != null ? fmt(onchain.shroom_balance) : 'Not synced');
   setEl('w-oc-spore',   onchain.spore_balance  != null ? fmt(onchain.spore_balance)  : 'Not synced');
+  var ocFooter = document.getElementById('onchain-footer');
+  if (ocFooter) {
+    var lastVerified = onchain.last_verified || null;
+    var lastRefText = lastVerified ? 'Last synced: ' + lastVerified : '';
+    ocFooter.innerHTML = '<div style="display:flex;align-items:center;justify-content:flex-end;gap:0.75rem;margin-top:0.5rem;">'
+      + '<span id="onchain-last-refresh" style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.25);">' + lastRefText + '</span>'
+      + '<button id="refresh-onchain-btn" onclick="refreshOnchain()" style="font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.3em 0.9em;border-radius:999px;border:1px solid rgba(79,168,253,0.3);background:rgba(79,168,253,0.07);color:var(--blue);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.35rem;"><img src="/images/blockchain.png" style="width:11px;height:11px;object-fit:contain;" onerror="this.style.display=\'none\'">Refresh Onchain</button>'
+      + '</div>';
+  }
 }
 function copyWalletAddr() {
   const p = (profileData?.pixie?.Wallet?.Address) || '';
@@ -5454,7 +5632,11 @@ function renderCompanion(s) {
           : '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.55);">Feed ' + (UNLOCK_FEED[k]||0).toLocaleString() + ' SHROOM to unlock</div>'
         )
       + '</div>'
-      + (isActive ? '<span style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:var(--green);padding:0.15em 0.5em;border:1px solid rgba(34,197,94,0.3);border-radius:999px;">ACTIVE</span>' : '')
+      + (isActive
+          ? '<span style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:var(--green);padding:0.15em 0.5em;border:1px solid rgba(34,197,94,0.3);border-radius:999px;">ACTIVE</span>'
+          : (unlocked
+              ? '<button onclick="swapCompanion(\'' + k + '\')" style="font-family:Space Grotesk,monospace;font-size:0.58rem;padding:0.15em 0.6em;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:none;color:rgba(255,255,225,0.4);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor=\'rgba(254,206,0,0.4)\';this.style.color=\'var(--yellow)\'" onmouseout="this.style.borderColor=\'rgba(255,255,225,0.15)\';this.style.color=\'rgba(255,255,225,0.4)\'">Swap</button>'
+              : ''))
       + '</div>';
   }).join('');
 }
@@ -5719,39 +5901,91 @@ function renderBrewing(s) {
     activeEl.innerHTML = h;
   } else { activeEl.innerHTML = '<div class="empty-hint">No active potion. Use !potion in Discord.</div>'; }
 
-  // Stored potions
+  // Stored potions - slot grid UI
   const storedEl = document.getElementById('brew-stored-content');
+  const extraSlots = parseInt(potions.Extra_Slots || 0);
+  const maxSlots = 5 + Math.min(extraSlots, 3);
+  const SLOT_PRICES = [2500000, 5000000, 10000000];
   const stored = Object.entries(potions).filter(([k,v])=>k.startsWith('Potion_') && !['Potion_Cooldown','Potion_Timer'].includes(k) && typeof v === 'object' && v !== null);
-  if(stored.length){
-    storedEl.innerHTML = stored.map(([k,v],i)=>{
-      if(typeof v !== 'object') return '';
-      const score = v['Potion Score'] ? Number(v['Potion Score']).toFixed(1) : null;
-      const stats = Object.entries(v)
-        .filter(([sk])=>!['name','emoji','Potion Score','Potion_Score'].includes(sk))
-        .map(([sk,val])=>{const sl=sk.replace(/_/g,' ');return '<div style="display:flex;justify-content:space-between;padding:0.25rem 0 0.25rem 0.75rem;font-size:0.75rem;border-top:1px solid rgba(255,255,225,0.04);">'
-          +'<span style="color:rgba(255,255,225,0.55);display:flex;align-items:center;">'+(STAT_EMOJI[sl]||STAT_EMOJI[sk]||'')+sl+'</span>'
-          +'<span style="font-family:Space Grotesk,monospace;color:var(--green);">'+(typeof val==='number'?val+'%':val)+'</span>'
-          +'</div>';}).join('');
-      var safeKey = k.replace(/[^a-zA-Z0-9_]/g,'');
-      var discardBtn = '<button id="discpot_' + safeKey + '" onclick="event.stopPropagation();discardPotion(\'' + safeKey + '\',\'' + k + '\')" style="font-family:\'Space Grotesk\',sans-serif;font-size:0.62rem;padding:0.25em 0.85em;border-radius:999px;border:1px solid rgba(253,70,79,0.2);background:none;color:rgba(253,70,79,0.5);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.3rem;" onmouseover="this.style.borderColor=\'rgba(253,70,79,0.5)\';this.style.color=\'var(--red)\'" onmouseout="this.style.borderColor=\'rgba(253,70,79,0.2)\';this.style.color=\'rgba(253,70,79,0.5)\'"><img src="/images/trash.png" style="width:11px;height:11px;object-fit:contain;opacity:0.7;" onerror="this.style.display=\'none\'">Discard</button>';
-      var activateBtn = potionCdRemaining
-        ? '<button disabled style="font-family:Space Grotesk,monospace;font-size:0.62rem;padding:0.25em 0.85em;border-radius:999px;border:1px solid rgba(253,70,79,0.2);background:none;color:rgba(253,70,79,0.5);cursor:not-allowed;">CD: ' + potionCdRemaining + '</button>'
-        : '<button id="actpot_' + safeKey + '" onclick="event.stopPropagation();activatePotion(\'' + safeKey + '\',\'' + k + '\')" style="font-family:Space Grotesk,monospace;font-size:0.62rem;padding:0.25em 0.85em;border-radius:999px;border:1px solid rgba(254,206,0,0.35);background:rgba(254,206,0,0.08);color:var(--yellow);cursor:pointer;transition:all 0.2s;">Activate</button>';
-      var actionBtns = '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">' + activateBtn + discardBtn + '</div>';
-      return '<div style="border-bottom:1px solid rgba(255,255,225,0.05);padding-bottom:0.25rem;margin-bottom:0.25rem;">'
-        +'<div class="data-row" style="cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'
-        +(function(){const id=(v.emoji||'').match(/:potion(\d+):/)?.[1]||(v.emoji||'').match(/:(\d+)>/)?.[1];const src=id?'/images/potion'+id+'.png':'/images/potion2.png';return '<img src="'+src+'" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:6px;" onerror="this.src=\'/images/potion2.png\'">';})()
-        +'<span class="dr-label">'+(i+1)+'. '+cleanEmoji(v.name||'Potion')+'</span>'
-        +'<span class="dr-val" style="display:flex;align-items:center;gap:0.5rem;">'
-        +(score?'<span style="color:rgba(255,255,225,0.3);">'+score+'/10</span>':'')
-        +'<span style="color:rgba(255,255,225,0.25);font-size:0.65rem;">tap</span>'
-        +'</span></div>'
-        +'<div style="display:none;padding:0.25rem 0;">'
-        +stats
-        +'<div style="padding:0.5rem 0 0.25rem 0.75rem;">'+actionBtns+'</div>'
-        +'</div>'
-        +'</div>';
-    }).join('');
+  const sortedStored = stored.sort(([,a],[,b]) => (b['Potion Score']||0) - (a['Potion Score']||0));
+  if(stored.length || true){
+    // Build 8-slot grid (4 per row desktop, 2 per row mobile)
+    var slotCells = '';
+    for (var si = 0; si < 8; si++) {
+      var slotNum = si + 1;
+      var isUnlocked = slotNum <= maxSlots;
+      var isBuyable = slotNum === maxSlots + 1 && slotNum <= 8;
+      var potionEntry = sortedStored[si] || null;
+      var slotKey2 = potionEntry ? potionEntry[0] : null;
+      var v2 = potionEntry ? potionEntry[1] : null;
+
+      if (!isUnlocked) {
+        // Locked purchasable slot
+        var slotIdx = slotNum - 6; // 0-3 for slots 6-9
+        var price2 = SLOT_PRICES[slotIdx];
+        var nextToBuy = (maxSlots - 5); // how many already bought
+        slotCells += '<div onclick="' + (isBuyable ? 'buyPotionSlot('+price2+')' : '') + '" style="border-radius:0.875rem;border:1px dashed rgba(255,255,225,' + (isBuyable ? '0.2' : '0.07') + ');background:rgba(255,255,255,0.02);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;cursor:' + (isBuyable ? 'pointer' : 'default') + ';transition:all 0.2s;padding:0.75rem 0.5rem;" ' + (isBuyable ? 'onmouseover="this.style.borderColor=\'rgba(79,168,253,0.4)\'" onmouseout="this.style.borderColor=\'rgba(255,255,225,0.2)\'"' : '') + '>'
+          + '<img src="/images/lock.png" style="width:18px;height:18px;object-fit:contain;opacity:' + (isBuyable ? '0.5' : '0.12') + ';" onerror="this.textContent=\'L\'">'
+          + '<div style="font-family:Space Grotesk,monospace;font-size:0.52rem;color:rgba(255,255,225,' + (isBuyable ? '0.5' : '0.15') + ');text-align:center;">Slot ' + slotNum + '</div>'
+          + (isBuyable ? '<div style="font-family:Space Grotesk,monospace;font-size:0.55rem;color:var(--blue);text-align:center;margin-top:0.1rem;">' + (price2 >= 1000000 ? (price2/1000000).toFixed(1).replace('.0','') + 'M' : (price2/1000).toFixed(0) + 'K') + ' SPORE</div><div style="font-family:Space Grotesk,monospace;font-size:0.48rem;color:rgba(255,255,225,0.3);text-align:center;">tap to buy</div>' : '')
+          + '</div>';
+      } else if (!v2) {
+        // Unlocked empty slot
+        slotCells += '<div style="border-radius:0.875rem;border:1px dashed rgba(255,255,225,0.08);background:rgba(255,255,255,0.02);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;padding:0.75rem 0.5rem;">'
+          + '<div style="font-size:1.2rem;opacity:0.12;">🧪</div>'
+          + '<div style="font-family:Space Grotesk,monospace;font-size:0.5rem;color:rgba(255,255,225,0.18);text-align:center;">Empty</div>'
+          + '</div>';
+      } else {
+        // Filled slot with potion
+        var score2 = v2['Potion Score'] ? Number(v2['Potion Score']).toFixed(1) : '?';
+        var potionId2 = (v2.emoji||'').match(/:potion(\d+):/)?.[1] || (v2.emoji||'').match(/:(\d+)>/)?.[1];
+        var pImg2 = potionId2 ? '/images/potion'+potionId2+'.png' : '/images/potion2.png';
+        var safeKey2 = slotKey2.replace(/[^a-zA-Z0-9_]/g,'');
+        var scoreColor = score2 >= 9 ? 'var(--yellow)' : score2 >= 7 ? 'var(--green)' : 'rgba(255,255,225,0.5)';
+        var statLines2 = Object.entries(v2).filter(function(e2){return !['name','emoji','Potion Score','Potion_Score'].includes(e2[0]);})
+          .map(function(e2){
+            var sl2=e2[0].replace(/_/g,' ');
+            var sv2=typeof e2[1]==='number'?(e2[1]+(sl2.includes('Limit')||sl2.includes('Brews')?'':'%')):e2[1];
+            return '<div style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:0.1rem 0;border-top:1px solid rgba(255,255,225,0.05);">'
+              +'<span style="font-family:Space Grotesk,monospace;font-size:0.5rem;color:rgba(255,255,225,0.5);display:flex;align-items:center;gap:2px;">'+(STAT_EMOJI[sl2]||STAT_EMOJI[e2[0]]||'')+sl2+'</span>'
+              +'<span style="font-family:Space Grotesk,monospace;font-size:0.52rem;font-weight:700;color:var(--green);">'+sv2+'</span>'
+              +'</div>';
+          }).join('');
+        var cdNote = potionCdRemaining
+          ? '<div style="font-family:Space Grotesk,monospace;font-size:0.5rem;color:rgba(253,70,79,0.8);text-align:center;margin-top:0.3rem;">Swap CD: ' + potionCdRemaining + '</div>'
+          : '<div style="font-family:Space Grotesk,monospace;font-size:0.5rem;color:rgba(255,255,225,0.3);text-align:center;margin-top:0.3rem;">Swap once per 3 days</div>';
+        var actBtn2 = potionCdRemaining
+          ? '<button disabled style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:700;padding:0.45rem 0;border-radius:0.5rem;border:1px solid rgba(253,70,79,0.2);background:none;color:rgba(253,70,79,0.4);cursor:not-allowed;">On Cooldown</button>'
+          : '<button onclick="event.stopPropagation();activatePotion(\'' + safeKey2 + '\',\'' + slotKey2 + '\')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:700;padding:0.45rem 0;border-radius:0.5rem;border:1px solid rgba(254,206,0,0.35);background:rgba(254,206,0,0.08);color:var(--yellow);cursor:pointer;transition:all 0.2s;">Activate</button>';
+        var discardBtn2 = '<button onclick="event.stopPropagation();discardPotion(\'' + safeKey2 + '\',\'' + slotKey2 + '\')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:700;padding:0.45rem 0;border-radius:0.5rem;border:1px solid rgba(253,70,79,0.2);background:rgba(253,70,79,0.05);color:rgba(253,70,79,0.7);cursor:pointer;transition:all 0.2s;">Discard</button>';
+        slotCells += '<div class="pot-flip" id="pslot_' + safeKey2 + '" onclick="potFlip(\'' + safeKey2 + '\')" style="border-radius:0.875rem;cursor:pointer;perspective:600px;height:100%;">'
+          + '<div class="pot-flip-inner" id="pslot_inner_' + safeKey2 + '" style="position:relative;width:100%;height:100%;transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);transform-style:preserve-3d;">'
+          // FRONT
+          + '<div style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:0.875rem;border:1px solid rgba(192,132,252,0.25);background:rgba(192,132,252,0.06);display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:0.6rem 0.5rem;">'
+          + '<div style="display:flex;align-items:center;gap:0.35rem;width:100%;margin-bottom:0.3rem;">'
+          + '<img src="' + pImg2 + '" style="width:20px;height:20px;object-fit:contain;flex-shrink:0;" onerror="this.src=\'/images/potion2.png\'">'
+          + '<div style="font-family:Space Grotesk,sans-serif;font-size:0.58rem;font-weight:700;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;">' + cleanEmoji(v2.name||'Potion') + '</div>'
+          + '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;font-weight:700;color:' + scoreColor + ';flex-shrink:0;">' + score2 + '</div>'
+          + '</div>'
+          + '<div style="width:100%;flex:1;">' + statLines2 + '</div>'
+          + '</div>'
+          // BACK
+          + '<div style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);border-radius:0.875rem;border:1px solid rgba(254,206,0,0.25);background:rgba(254,206,0,0.05);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.4rem;padding:0.6rem 0.5rem;">'
+          + '<div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.25rem;">'
+          + '<img src="' + pImg2 + '" style="width:16px;height:16px;object-fit:contain;flex-shrink:0;" onerror="this.src=\'/images/potion2.png\'">'
+          + '<div style="font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:700;color:var(--cream);">' + cleanEmoji(v2.name||'Potion') + '</div>'
+          + '</div>'
+          + '<div style="display:flex;gap:0.3rem;width:100%;">' + actBtn2 + discardBtn2 + '</div>'
+          + cdNote
+          + '</div>'
+          + '</div>'
+          + '</div>';
+      }
+    }
+
+    // Detail expand area (hidden, shown on tap)
+    storedEl.innerHTML = '<style>.potion-slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-bottom:0.5rem;grid-auto-rows:1fr;}@media(max-width:600px){.potion-slot-grid{grid-template-columns:repeat(2,1fr);}}@media(display-mode:standalone){.potion-slot-grid{grid-template-columns:repeat(2,1fr);}}</style>'
+      + '<div class="potion-slot-grid">' + slotCells + '</div>';
   } else { storedEl.innerHTML = '<div class="empty-hint">No stored potions.</div>'; }
   
 
