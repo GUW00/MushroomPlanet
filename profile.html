@@ -2542,7 +2542,7 @@ function renderBrewStation(s) {
     Bloodberry:'DIAMOND',Elderbloom:'DIAMOND',Woobud:'DIAMOND',
     Voidspore:'MYTHIC',
   };
-  var TIER_COLOR = {BRONZE:'rgba(180,130,80,0.8)',GOLD:'rgba(254,206,0,0.8)',DIAMOND:'rgba(79,168,253,0.8)',MYTHIC:'rgba(192,132,252,0.9)'};
+  var TIER_COLOR = {BRONZE:'rgba(255,255,255,0.55)',GOLD:'rgba(34,197,94,0.9)',DIAMOND:'rgba(79,168,253,0.9)',MYTHIC:'rgba(254,206,0,0.95)'};
 
   // Info bar
   var atLimit = brews >= maxBrews;
@@ -2585,7 +2585,12 @@ function renderBrewStation(s) {
         && !(isVoid && voidSelected >= 1)
         && !(!isVoid && nonVoidSelected >= ingLimit);
       var dimmed = !canAdd && selCount === 0;
-      ingGridHtml += '<div onclick="' + (canAdd ? 'brewSelect(\'' + ing + '\')' : '') + '" style="display:flex;flex-direction:column;align-items:center;gap:0.25rem;padding:0.5rem 0.25rem;border-radius:0.625rem;border:1px solid ' + (selCount > 0 ? tc : 'rgba(255,255,225,0.08)') + ';background:' + (selCount > 0 ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.02)') + ';cursor:' + (canAdd ? 'pointer' : 'default') + ';opacity:' + (dimmed ? '0.35' : '1') + ';transition:all 0.15s;" title="' + ing + '">'
+      var TIER_BG = {BRONZE:'rgba(255,255,255,0.05)',GOLD:'rgba(34,197,94,0.08)',DIAMOND:'rgba(79,168,253,0.09)',MYTHIC:'rgba(254,206,0,0.09)'};
+      var TIER_BDR = {BRONZE:'rgba(255,255,255,0.18)',GOLD:'rgba(34,197,94,0.35)',DIAMOND:'rgba(79,168,253,0.35)',MYTHIC:'rgba(254,206,0,0.4)'};
+      var tierKey = ING_TIER[ing] || 'BRONZE';
+      var baseBg  = TIER_BG[tierKey]  || 'rgba(255,255,255,0.02)';
+      var baseBdr = TIER_BDR[tierKey] || 'rgba(255,255,225,0.08)';
+      ingGridHtml += '<div onclick="' + (canAdd ? 'brewSelect(\'' + ing + '\')' : '') + '" style="display:flex;flex-direction:column;align-items:center;gap:0.25rem;padding:0.5rem 0.25rem;border-radius:0.625rem;border:1px solid ' + (selCount > 0 ? tc : baseBdr) + ';background:' + (selCount > 0 ? 'rgba(255,255,255,0.06)' : baseBg) + ';cursor:' + (canAdd ? 'pointer' : 'default') + ';opacity:' + (dimmed ? '0.35' : '1') + ';transition:all 0.15s;" title="' + ing + '">'
         + '<img src="' + (ING_IMGS[ing]||'') + '" style="width:24px;height:24px;object-fit:contain;">'
         + '<div style="font-family:Space Grotesk,monospace;font-size:0.55rem;color:' + tc + ';text-align:center;">' + ing + '</div>'
         + '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.4);">x' + qty + (selCount > 0 ? ' <span style="color:var(--yellow);">(+' + selCount + ')</span>' : '') + '</div>'
@@ -6001,28 +6006,28 @@ function renderBrewing(s) {
     'Bloodberry':'/images/bloodberry.png','Woobud':'/images/woobud.png',
   };
   const TIER_COLOR = {
-    'Sunspore':'rgba(254,206,0,0.12)',
-    'Ashroot':'rgba(214, 170, 127, 0.1)',
-    'Glowcap':'rgba(212, 86, 240, 0.1)',
-    'Frostmoss':'rgba(34,197,94,0.12)',
-    'Veilfruit':'rgba(154, 139, 199,0.12)',
-    'Dreamdust':'rgba(79,168,253,0.12)',
-    'Bloodberry':'rgba(253,70,79,0.12)',
-    'Elderbloom':'rgba(236, 125, 54,0.12)',
-    'Woobud':'rgba(34,197,94,0.1)',
-    'Voidspore':'rgba(192,132,252,0.18)',
+    'Sunspore':'rgba(255,255,255,0.05)',
+    'Ashroot':'rgba(255,255,255,0.05)',
+    'Glowcap':'rgba(255,255,255,0.05)',
+    'Frostmoss':'rgba(34,197,94,0.08)',
+    'Veilfruit':'rgba(34,197,94,0.08)',
+    'Dreamdust':'rgba(34,197,94,0.08)',
+    'Bloodberry':'rgba(79,168,253,0.09)',
+    'Elderbloom':'rgba(79,168,253,0.09)',
+    'Woobud':'rgba(79,168,253,0.09)',
+    'Voidspore':'rgba(192,132,252,0.11)',
   };
   const TIER_BORDER = {
-    'Sunspore':'rgba(254,206,0,0.4)',
-    'Ashroot':'rgba(229, 205, 181, 0.3)',
-    'Glowcap':'rgba(247, 179, 248,0.3)',
-    'Frostmoss':'rgba(189, 250, 144,0.35)',
-    'Veilfruit':'rgba(247, 179, 248,0.4)',
-    'Dreamdust':'rgba(79,168,253,0.35)',
-    'Bloodberry':'rgba(253,70,79,0.4)',
-    'Elderbloom':'rgba(108, 197, 196,0.35)',
-    'Woobud':'rgba(34,197,94,0.3)',
-    'Voidspore':'rgba(192,132,252,0.5)',
+    'Sunspore':'rgba(255,255,255,0.18)',
+    'Ashroot':'rgba(255,255,255,0.18)',
+    'Glowcap':'rgba(255,255,255,0.18)',
+    'Frostmoss':'rgba(34,197,94,0.35)',
+    'Veilfruit':'rgba(34,197,94,0.35)',
+    'Dreamdust':'rgba(34,197,94,0.35)',
+    'Bloodberry':'rgba(79,168,253,0.35)',
+    'Elderbloom':'rgba(79,168,253,0.35)',
+    'Woobud':'rgba(79,168,253,0.35)',
+    'Voidspore':'rgba(192,132,252,0.45)',
   };
   if(owned.length){
     const BRONZE_KEYS   = ['Sunspore','Ashroot','Glowcap'];
@@ -6048,11 +6053,11 @@ function renderBrewing(s) {
       if (!chips) return '';
       return '<div style="display:flex;flex-direction:column;">' + colHdr(label, color) + chips + '</div>';
     };
-    const bronzeCol  = col('BRONZE',  'rgba(180,130,80,0.9)',   BRONZE_KEYS);
-    const goldCol    = col('GOLD',    'rgba(254,206,0,0.8)',    GOLD_KEYS);
-    const diamondCol = col('DIAMOND', 'rgba(79,168,253,0.8)',   DIAMOND_KEYS);
+    const bronzeCol  = col('COMMON',  'rgba(255,255,255,0.4)',  BRONZE_KEYS);
+    const goldCol    = col('RARE',    'rgba(34,197,94,0.9)',    GOLD_KEYS);
+    const diamondCol = col('EPIC',    'rgba(79,168,253,0.9)',   DIAMOND_KEYS);
     const voidChip   = chip('Voidspore');
-    const voidCol = voidChip ? '<div style="display:flex;flex-direction:column;">' + colHdr('MYTHIC', 'rgba(192,132,252,0.9)') + voidChip + '</div>' : '';
+    const voidCol = voidChip ? '<div style="display:flex;flex-direction:column;">' + colHdr('MYTHICAL', 'rgba(192,132,252,0.9)') + voidChip + '</div>' : '';
     ingEl.innerHTML = '<div style="margin-top:0.5rem;">'
       + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;" class="ing-grid">'
       + bronzeCol + goldCol + diamondCol + voidCol
