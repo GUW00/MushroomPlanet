@@ -325,6 +325,7 @@ app.post('/api/actions/brew',          (req, res) => proxyToFastAPI('brew',     
 app.post('/api/actions/equip-potion',  (req, res) => proxyToFastAPI('equip-potion',  req, res, 'EQUIP-POTION'));
 app.post('/api/actions/discard-potion',(req, res) => proxyToFastAPI('discard-potion',req, res, 'DISCARD-POTION'));
 app.post('/api/actions/craft-herbs', (req, res) => proxyToFastAPI('craft-herbs', req, res, 'CRAFT-HERBS'));
+app.post('/api/actions/buy-herb', (req, res) => proxyToFastAPI('buy-herb', req, res, 'BUY-HERB'));
 
 // ----------------------------------------------------------------
 // Firebase listener - fires push when raffle winner is recorded

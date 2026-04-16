@@ -1020,6 +1020,10 @@
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/herbs.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Ingredients</div>
           <div id="brew-ingredients-content"><div class="empty-hint">No ingredients.</div></div>
+          <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(255,255,225,0.06);">
+            <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.35);margin-bottom:0.5rem;">BUY COMMON HERBS - 10,000 SPORES EACH</div>
+            <div id="brew-buy-herbs-content"><div class="empty-hint" style="font-size:0.65rem;">Loading...</div></div>
+          </div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/herbs.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Herb Crafting</div>
@@ -6183,6 +6187,90 @@ async function doCraftHerbs(tier, output, amount) {
 }
 window.doCraftHerbs = doCraftHerbs;
 
+function renderBuyHerbs(s, p) {
+  var el = document.getElementById('brew-buy-herbs-content');
+  if (!el) return;
+  var sporeWallet = ((p.Wallet || {}).spore_wallet) || 0;
+  var inv = (s.Inventory || {}).Ingredients || {};
+  var PRICE = 10000;
+  var HERBS = [
+    { name: 'Sunspore', img: 'sunspore' },
+    { name: 'Ashroot',  img: 'ashroot'  },
+    { name: 'Glowcap',  img: 'glowcap'  },
+  ];
+  var canAfford = sporeWallet >= PRICE;
+
+  var html = '<div style="display:flex;flex-direction:column;gap:0.35rem;">';
+  HERBS.forEach(function(h) {
+    var have = inv[h.name] || 0;
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.4rem 0.6rem;border-radius:0.6rem;'
+      + 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);">'
+      + '<div style="display:flex;align-items:center;gap:0.5rem;">'
+      + '<img src="/images/' + h.img + '.png" style="width:16px;height:16px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+      + '<span style="font-size:0.78rem;font-weight:600;color:rgba(255,255,225,0.8);">' + h.name + '</span>'
+      + '<span style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);">×' + have + '</span>'
+      + '</div>'
+      + '<div style="display:flex;align-items:center;gap:0.4rem;">'
+      + '<span style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(79,168,253,0.7);">10K SPORES</span>'
+      + '<button onclick="doBuyHerb(\'' + h.name + '\',1)" ' + (canAfford ? '' : 'disabled ')
+      + 'style="font-family:Space Grotesk,monospace;font-size:0.6rem;font-weight:700;padding:0.25rem 0.5rem;border-radius:0.45rem;cursor:' + (canAfford?'pointer':'not-allowed') + ';'
+      + 'border:1px solid ' + (canAfford?'rgba(79,168,253,0.4)':'rgba(255,255,225,0.08)') + ';'
+      + 'background:' + (canAfford?'rgba(79,168,253,0.1)':'rgba(255,255,255,0.02)') + ';'
+      + 'color:' + (canAfford?'rgba(79,168,253,0.9)':'rgba(255,255,225,0.2)') + ';">+1</button>'
+      + '<button onclick="doBuyHerb(\'' + h.name + '\',10)" ' + (sporeWallet >= PRICE*10 ? '' : 'disabled ')
+      + 'style="font-family:Space Grotesk,monospace;font-size:0.6rem;font-weight:700;padding:0.25rem 0.5rem;border-radius:0.45rem;cursor:' + (sporeWallet>=PRICE*10?'pointer':'not-allowed') + ';'
+      + 'border:1px solid ' + (sporeWallet>=PRICE*10?'rgba(79,168,253,0.5)':'rgba(255,255,225,0.08)') + ';'
+      + 'background:' + (sporeWallet>=PRICE*10?'rgba(79,168,253,0.15)':'rgba(255,255,255,0.02)') + ';'
+      + 'color:' + (sporeWallet>=PRICE*10?'rgba(79,168,253,1.0)':'rgba(255,255,225,0.2)') + ';">+10</button>'
+      + '</div>'
+      + '</div>';
+  });
+  html += '</div>';
+  html += '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.25);margin-top:0.4rem;text-align:right;">'
+    + 'Balance: <span style="color:rgba(79,168,253,0.7);">' + fmt(sporeWallet) + ' SPORES</span></div>';
+  el.innerHTML = html;
+}
+window.renderBuyHerbs = renderBuyHerbs;
+
+async function doBuyHerb(ingredient, qty) {
+  if (!currentUser || !currentUser.discord_id) return;
+  try {
+    var res = await fetch(API_BASE + '/api/actions/buy-herb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+      credentials: 'include',
+      body: JSON.stringify({ ingredient: ingredient, quantity: qty }),
+    });
+    var data = await res.json();
+    if (data.ok) {
+      if (profileData && profileData.sporebot) {
+        profileData.sporebot.Inventory = profileData.sporebot.Inventory || {};
+        profileData.sporebot.Inventory.Ingredients = data.new_inventory;
+      }
+      if (profileData && profileData.pixie) {
+        profileData.pixie.Wallet = profileData.pixie.Wallet || {};
+        profileData.pixie.Wallet.spore_wallet = data.new_spore_balance;
+      }
+      renderBrewing(profileData.sporebot || {});
+      var _t = document.createElement('div');
+      _t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(79,168,253,0.3);border-radius:0.75rem;padding:0.65rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.72rem;color:var(--cream);z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.5);text-align:center;';
+      _t.innerHTML = '<div style="color:rgba(79,168,253,0.9);font-weight:700;margin-bottom:0.2rem;">Purchased!</div>'
+        + '<div style="font-size:0.65rem;color:rgba(255,255,225,0.6);">' + qty + 'x ' + ingredient + ' for ' + (qty*10000).toLocaleString() + ' SPORES</div>';
+      document.body.appendChild(_t);
+      setTimeout(function(){ _t.style.transition='opacity 0.3s'; _t.style.opacity='0'; setTimeout(function(){ _t.remove(); },300); }, 3000);
+    } else {
+      var _t2 = document.createElement('div');
+      _t2.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(253,70,79,0.3);border-radius:0.75rem;padding:0.65rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.7rem;color:rgba(253,70,79,0.9);z-index:99999;';
+      _t2.textContent = data.message || 'Purchase failed.';
+      document.body.appendChild(_t2);
+      setTimeout(function(){ _t2.remove(); }, 3000);
+    }
+  } catch(e) {
+    console.error('[doBuyHerb]', e);
+  }
+}
+window.doBuyHerb = doBuyHerb;
+
 function renderBrewing(s) {
   const inv = s.Inventory || {};
   const potions = inv.Potions || {};
@@ -6190,6 +6278,7 @@ function renderBrewing(s) {
   function cleanEmoji(str){ return str ? String(str).replace(/<:[^:]+:\d+>/g,'').trim() : ''; }
   renderBrewStation(s);
   renderHerbCrafting(s);
+  renderBuyHerbs(s, profileData.pixie || {});
 
   // Cooldown calculation - must be first so both active card and stored buttons can use it
   var potionCooldown = potions.Potion_Cooldown || false;
