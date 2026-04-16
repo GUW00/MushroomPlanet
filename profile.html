@@ -2499,12 +2499,22 @@ async function discardPotion(safeKey, slotKey) {
         }
       }
       renderBrewing(profileData.sporebot || {});
-      if (data.recovered && Object.keys(data.recovered).length > 0) {
-        var lines = Object.entries(data.recovered).map(function(e){ return e[1]+'x '+e[0]; }).join(', ');
-        showToast('Recovered: ' + lines, 'green');
+      var _toast = document.createElement('div');
+      _toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(192,132,252,0.3);border-radius:0.75rem;padding:0.75rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.72rem;color:var(--cream);z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.5);max-width:300px;text-align:center;';
+      var _rec = data.recovered || {};
+      var _recKeys = Object.keys(_rec);
+      if (_recKeys.length > 0) {
+        var _lines = _recKeys.map(function(k){ return _rec[k]+'x '+k; }).join(', ');
+        _toast.innerHTML = '<div style="color:var(--green);font-weight:700;margin-bottom:0.3rem;">Potion Discarded</div>'
+          + '<div style="color:rgba(255,255,225,0.7);font-size:0.65rem;">Recovered: ' + _lines + '</div>'
+          + '<div style="color:rgba(255,255,225,0.35);font-size:0.6rem;margin-top:0.2rem;">Brewing Lv.' + (data.brewing_level||1) + ' (' + (data.recovery_rate||0) + '% rate)</div>';
       } else {
-        showToast('Potion discarded. Nothing recovered.', null);
+        _toast.innerHTML = '<div style="color:rgba(255,255,225,0.6);font-weight:700;margin-bottom:0.3rem;">Potion Discarded</div>'
+          + '<div style="color:rgba(255,255,225,0.4);font-size:0.65rem;">No ingredients recovered</div>'
+          + '<div style="color:rgba(255,255,225,0.35);font-size:0.6rem;margin-top:0.2rem;">Brewing Lv.' + (data.brewing_level||1) + ' (' + (data.recovery_rate||0) + '% rate)</div>';
       }
+      document.body.appendChild(_toast);
+      setTimeout(function(){ _toast.style.transition='opacity 0.3s'; _toast.style.opacity='0'; setTimeout(function(){ _toast.remove(); },300); }, 5000);
     } else {
       if (btn) { btn.textContent = 'Error'; btn.disabled = false; }
     }
@@ -2557,8 +2567,8 @@ function renderBrewStation(s) {
   // Info bar
   var atLimit = brews >= maxBrews;
   var infoHtml = '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.875rem;padding:0.6rem 0.875rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:0.75rem;">'
-    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.5);display:flex;align-items:center;gap:0.35rem;"><img src="/images/potionrecipe.png" style="width:12px;height:12px;object-fit:contain;">Brewing Lv.' + brewLvl + '</div>'
-    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:' + (atLimit ? 'var(--red)' : 'rgba(255,255,225,0.5)') + ';display:flex;align-items:center;gap:0.35rem;margin-left:auto;"><img src="/images/cooldown.png" style="width:12px;height:12px;object-fit:contain;">Brews: ' + brews + '/' + maxBrews + '</div>'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(192,132,252,0.9);display:flex;align-items:center;gap:0.35rem;"><img src="/images/potionrecipe.png" style="width:12px;height:12px;object-fit:contain;">Brewing Lv.' + brewLvl + '</div>'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:' + (atLimit ? 'var(--red)' : 'rgba(255,255,225,0.5)') + ';display:flex;align-items:center;gap:0.35rem;"><img src="/images/cooldown.png" style="width:12px;height:12px;object-fit:contain;">Brews: ' + brews + '/' + maxBrews + '</div>'
     + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:' + (potionCount >= maxSlots ? 'var(--red)' : 'rgba(255,255,225,0.5)') + ';display:flex;align-items:center;gap:0.35rem;"><img src="/images/backpack1.png" style="width:12px;height:12px;object-fit:contain;">Slots: ' + potionCount + '/' + maxSlots + '</div>'
     + '<div style="width:100%;font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);">Select 2-' + ingLimit + ' ingredients (Voidspore adds a bonus stat). Rank: <span style="color:var(--yellow);">' + farmRank + '</span></div>'
     + '</div>';
