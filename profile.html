@@ -2547,9 +2547,33 @@ function renderBrewStation(s) {
   var farmRank   = (farm.farm_rank || 'BRONZE').toUpperCase();
   var brewLvl    = (skills.Brewing || {}).level || 1;
   var brews      = potions.Brews || 0;
-  var activePot  = potions.Active_Potion || {};
-  var extraBrews = parseInt(activePot.Extra_Brews || activePot['Extra Brews'] || 0);
-  var maxBrews   = 3 + extraBrews;
+  var activePot  = (typeof (potions.Active_Potion) === 'object' && potions.Active_Potion) ? potions.Active_Potion : {};
+  var extraBrewsPotion = parseInt(activePot.Extra_Brews || activePot['Extra Brews'] || 0);
+
+  // Sporebot NFT bonus - inlined to avoid const hoisting issue
+  var activeSb   = (s.Inventory || {}).Active_Sporebot || s.Active_Sporebot || {};
+  var sbTraits   = activeSb.traits || {};
+  var extraBrewsNft = 0;
+  var _BREW_ITEM_BONUSES  = {'Blue-Potion-(Rare)':2,'Red-Potion-(Rare)':3};
+  var _BREW_MOUTH_BONUSES = {'Upset-(Rare)':2};
+  if (_BREW_ITEM_BONUSES[sbTraits.Item   || '']) extraBrewsNft += _BREW_ITEM_BONUSES[sbTraits.Item];
+  if (_BREW_MOUTH_BONUSES[sbTraits.Mouth || '']) extraBrewsNft += _BREW_MOUTH_BONUSES[sbTraits.Mouth];
+
+  // Companion bonus (Frog)
+  var extraBrewsComp = 0;
+  var _comp = s.Companion || {};
+  if (_comp.active === 'frog') {
+    var _frogDays = ((_comp.pets || {}).frog || {}).total_days || 0;
+    if (_comp.adopted_at) { try { _frogDays += Math.floor((Date.now() - new Date(_comp.adopted_at.replace(' ','T')+'Z').getTime()) / 86400000); } catch(e){} }
+    var _frogBl = 1;
+    var _BOND = {1:0,2:7,3:15,4:25,5:42};
+    for (var _bl in _BOND) { if (_frogDays >= _BOND[_bl]) _frogBl = parseInt(_bl); }
+    extraBrewsComp = _frogBl >= 5 ? 5 : Math.floor(1 + (5 - 1) * ((_frogBl - 1) / 4));
+  }
+
+  // Also read from Stats.Extra_Brews as fallback (already calculated server-side)
+  var statsExtraBrews = parseInt((s.Stats || {}).Extra_Brews || 0);
+  var maxBrews = 3 + Math.max(extraBrewsPotion + extraBrewsNft + extraBrewsComp, statsExtraBrews);
   var potionCount = Object.keys(potions).filter(function(k){ return k.startsWith('Potion_') && !['Potion_Cooldown','Potion_Timer'].includes(k) && typeof potions[k] === 'object'; }).length;
   var extraSlots = Math.min(parseInt(potions.Extra_Slots || 0), 3);
   var maxSlots = 5 + extraSlots;
