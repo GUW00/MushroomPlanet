@@ -897,6 +897,8 @@
               <button class="sb-sort-btn" onclick="sbSetSort('id',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(255,255,225,0.4);background:rgba(255,255,225,0.07);color:var(--cream);cursor:pointer;opacity:1;"># ID</button>
               <button class="sb-sort-btn" onclick="sbSetSort('rarity',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(255,255,225,0.12);background:rgba(255,255,225,0.07);color:var(--cream);cursor:pointer;opacity:0.45;">Rarity</button>
               <button class="sb-sort-btn" onclick="sbSetSort('traits',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(255,255,225,0.12);background:rgba(255,255,225,0.07);color:var(--cream);cursor:pointer;opacity:0.45;">Traits</button>
+              <button class="sb-sort-btn" id="sb-favs-btn" onclick="sbSetSort('favs',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(252,211,0,0.2);background:rgba(252,211,0,0.06);color:rgba(252,211,0,0.7);cursor:pointer;opacity:0.55;">&#11088; Favs</button>
+              <button onclick="sbFlipAll()" id="sb-flip-all-btn" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(79,168,253,0.25);background:rgba(79,168,253,0.06);color:rgba(79,168,253,0.8);cursor:pointer;">Flip All</button>
               <select id="sb-bonus-select" onchange="sbSetBonusSort(this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.4rem;border-radius:5px;border:1px solid rgba(255,255,225,0.12);background:rgba(30,30,30,0.9);color:var(--cream);cursor:pointer;">
                 <option value="">Bonus...</option>
                 <option value="Spore Yield">Spore Yield</option>
@@ -1016,6 +1018,10 @@
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/herbs.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Ingredients</div>
           <div id="brew-ingredients-content"><div class="empty-hint">No ingredients.</div></div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><img src="/images/herbs.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Herb Crafting</div>
+          <div id="herb-crafting-content"><div class="empty-hint">Loading...</div></div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/gemstones.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Shop Quest Progress</div>
@@ -4282,8 +4288,11 @@ function sbGetPerPage() {
   return window.innerWidth >= 768 ? 12 : 10;
 }
 var _sbFavourites = {};
-var _sbSortMode = 'id'; // 'id' | 'rarity' | 'traits'
+var _sbSortMode = 'id'; // 'id' | 'rarity' | 'traits' | 'favs'
+var _sbShowFavsOnly = false;
+var _sbAllFlipped = false;
 function sbSetSort(mode, btn) {
+  _sbShowFavsOnly = (mode === 'favs');
   _sbSortMode = mode;
   _sbBonusFilter = '';
   var sel = document.getElementById('sb-bonus-select');
@@ -4292,11 +4301,30 @@ function sbSetSort(mode, btn) {
     b.style.opacity = '0.45';
     b.style.borderColor = 'rgba(255,255,225,0.12)';
   });
-  if (btn) { btn.style.opacity = '1'; btn.style.borderColor = 'rgba(255,255,225,0.4)'; }
+  if (btn) {
+    btn.style.opacity = '1';
+    btn.style.borderColor = _sbShowFavsOnly ? 'rgba(252,211,0,0.6)' : 'rgba(255,255,225,0.4)';
+  }
   _sbCurrentPage = 0;
   sbRenderPage();
 }
 window.sbSetSort = sbSetSort;
+
+function sbFlipAll() {
+  _sbAllFlipped = !_sbAllFlipped;
+  var btn = document.getElementById('sb-flip-all-btn');
+  if (btn) {
+    btn.textContent = _sbAllFlipped ? 'Unflip All' : 'Flip All';
+    btn.style.borderColor = _sbAllFlipped ? 'rgba(192,132,252,0.5)' : 'rgba(79,168,253,0.25)';
+    btn.style.color = _sbAllFlipped ? 'rgba(192,132,252,0.9)' : 'rgba(79,168,253,0.8)';
+    btn.style.background = _sbAllFlipped ? 'rgba(192,132,252,0.08)' : 'rgba(79,168,253,0.06)';
+  }
+  document.querySelectorAll('.sb-card-flip').forEach(function(card) {
+    if (_sbAllFlipped) { card.classList.add('flipped'); }
+    else { card.classList.remove('flipped'); }
+  });
+}
+window.sbFlipAll = sbFlipAll;
 
 var _sbBonusFilter = '';
 function sbSetBonusSort(sel) {
@@ -4551,7 +4579,17 @@ function sbRenderPage() {
     return count;
   }
 
-  var sorted = _sbNfts.slice().sort(function(a, b) {
+  var baseList = _sbShowFavsOnly
+    ? _sbNfts.filter(function(b) { return !!_sbFavourites[b.tokenId]; })
+    : _sbNfts.slice();
+
+  if (_sbShowFavsOnly && baseList.length === 0) {
+    el.innerHTML = '<div class="empty-hint">No favourited Sporebots. Star some first!</div>';
+    if (pag) pag.style.display = 'none';
+    return;
+  }
+
+  var sorted = baseList.sort(function(a, b) {
     var fa = _sbFavourites[a.tokenId] ? 0 : 1;
     var fb = _sbFavourites[b.tokenId] ? 0 : 1;
     if (fa !== fb) return fa - fb;
@@ -5910,12 +5948,186 @@ function renderItemsOrganized(s) {
   itemsEl.innerHTML = html;
 }
 
+function renderHerbCrafting(s) {
+  var el = document.getElementById('herb-crafting-content');
+  if (!el) return;
+  var inv = (s.Inventory || {}).Ingredients || {};
+
+  var T1_TO_T2 = {
+    Frostmoss: {Sunspore: 3},
+    Dreamdust:  {Glowcap: 3},
+    Veilfruit:  {Ashroot: 3},
+  };
+  var T2_TO_T3 = {
+    Woobud:     {Dreamdust: 2, Veilfruit: 1},
+    Elderbloom: {Frostmoss: 2, Dreamdust: 1},
+    Bloodberry: {Veilfruit: 2, Frostmoss: 1},
+  };
+  var ING_IMGS = {Sunspore:'sunspore',Ashroot:'ashroot',Glowcap:'glowcap',Frostmoss:'frostmoss',Veilfruit:'veilfruit',Dreamdust:'dreamdust',Woobud:'woobud',Elderbloom:'elderbloom',Bloodberry:'bloodberry'};
+
+  function maxCraftable(recipe, inventory) {
+    return Math.floor(Math.min.apply(null, Object.entries(recipe).map(function(e){ return Math.floor((inventory[e[0]]||0) / e[1]); })));
+  }
+
+  function simulateAll(recipes) {
+    var sim = Object.assign({}, inv);
+    var crafted = {};
+    for (var out in recipes) {
+      var recipe = recipes[out];
+      while (Object.keys(recipe).every(function(i){ return (sim[i]||0) >= recipe[i]; })) {
+        Object.keys(recipe).forEach(function(i){ sim[i] = (sim[i]||0) - recipe[i]; });
+        sim[out] = (sim[out]||0) + 1;
+        crafted[out] = (crafted[out]||0) + 1;
+      }
+    }
+    return crafted;
+  }
+
+  function herbCard(output, recipe, tier, tierColor, tierBg) {
+    var max = maxCraftable(recipe, inv);
+    var canCraft = max > 0;
+    var imgKey = ING_IMGS[output] || 'herbs';
+
+    var ING_TIER_COLOR = {
+      Sunspore:'rgba(255,255,255,0.18)', Ashroot:'rgba(255,255,255,0.18)', Glowcap:'rgba(255,255,255,0.18)',
+      Frostmoss:'rgba(34,197,94,0.35)',  Veilfruit:'rgba(34,197,94,0.35)', Dreamdust:'rgba(34,197,94,0.35)',
+      Bloodberry:'rgba(79,168,253,0.35)',Elderbloom:'rgba(79,168,253,0.35)',Woobud:'rgba(79,168,253,0.35)',
+    };
+    var ING_TIER_BG = {
+      Sunspore:'rgba(255,255,255,0.04)', Ashroot:'rgba(255,255,255,0.04)', Glowcap:'rgba(255,255,255,0.04)',
+      Frostmoss:'rgba(34,197,94,0.07)',  Veilfruit:'rgba(34,197,94,0.07)', Dreamdust:'rgba(34,197,94,0.07)',
+      Bloodberry:'rgba(79,168,253,0.07)',Elderbloom:'rgba(79,168,253,0.07)',Woobud:'rgba(79,168,253,0.07)',
+    };
+    var ingBadges = Object.entries(recipe).map(function(e) {
+      var have = inv[e[0]] || 0;
+      var ok = have >= e[1];
+      var eImg = ING_IMGS[e[0]] || 'herbs';
+      var pillBorder = ok ? (ING_TIER_COLOR[e[0]] || 'rgba(255,255,225,0.18)') : 'rgba(253,70,79,0.35)';
+      var pillBg     = ok ? (ING_TIER_BG[e[0]]    || 'rgba(255,255,255,0.03)') : 'rgba(253,70,79,0.07)';
+      var textColor  = ok ? 'rgba(255,255,225,0.75)' : 'rgba(253,70,79,0.85)';
+      return '<div style="display:inline-flex;align-items:center;gap:0.25rem;padding:0.2rem 0.45rem;border-radius:999px;'
+        + 'background:' + pillBg + ';border:1px solid ' + pillBorder + ';'
+        + 'font-family:Space Grotesk,monospace;font-size:0.6rem;">'
+        + '<img src="/images/' + eImg + '.png" style="width:11px;height:11px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+        + '<span style="color:' + textColor + ';">' + e[1] + 'x ' + e[0] + '</span>'
+        + '<span style="color:rgba(255,255,225,0.25);">(' + have + ')</span>'
+        + '</div>';
+    }).join('');
+
+    return '<div style="border:1px solid ' + (canCraft ? tierColor.replace('0.9','0.2') : 'rgba(255,255,225,0.06)') + ';'
+      + 'background:' + (canCraft ? tierBg : 'rgba(255,255,255,0.01)') + ';'
+      + 'border-radius:0.75rem;padding:0.65rem 0.75rem;display:flex;align-items:center;justify-content:space-between;gap:0.75rem;">'
+      // Left: icon + name + badges
+      + '<div style="display:flex;flex-direction:column;gap:0.35rem;min-width:0;">'
+      + '<div style="display:flex;align-items:center;gap:0.4rem;">'
+      + '<img src="/images/' + imgKey + '.png" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+      + '<span style="font-size:0.8rem;font-weight:700;color:' + (canCraft ? tierColor : 'rgba(255,255,225,0.3)') + ';">' + output + '</span>'
+      + (canCraft ? '<span style="font-family:Space Grotesk,monospace;font-size:0.58rem;padding:0.1rem 0.4rem;border-radius:999px;background:' + tierBg + ';border:1px solid ' + tierColor.replace('0.9','0.35') + ';color:' + tierColor + ';">x' + max + ' max</span>' : '')
+      + '</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:0.25rem;">' + ingBadges + '</div>'
+      + '</div>'
+      // Right: craft buttons
+      + '<div style="display:flex;flex-direction:column;gap:0.3rem;flex-shrink:0;">'
+      + '<button onclick="doCraftHerbs(\'' + tier + '\',\'' + output + '\',1)" '
+      + (canCraft ? '' : 'disabled ')
+      + 'style="font-family:Space Grotesk,monospace;font-size:0.62rem;font-weight:700;padding:0.3rem 0.6rem;border-radius:0.5rem;cursor:' + (canCraft?'pointer':'not-allowed') + ';white-space:nowrap;'
+      + 'border:1px solid ' + (canCraft ? tierColor.replace('0.9','0.4') : 'rgba(255,255,225,0.08)') + ';'
+      + 'background:' + (canCraft ? tierColor.replace('0.9','0.12') : 'rgba(255,255,255,0.02)') + ';'
+      + 'color:' + (canCraft ? tierColor : 'rgba(255,255,225,0.2)') + ';">+1</button>'
+      + (max > 1 ? '<button onclick="doCraftHerbs(\'' + tier + '\',\'' + output + '\',' + max + ')" '
+        + 'style="font-family:Space Grotesk,monospace;font-size:0.62rem;font-weight:700;padding:0.3rem 0.6rem;border-radius:0.5rem;cursor:pointer;white-space:nowrap;'
+        + 'border:1px solid ' + tierColor.replace('0.9','0.5') + ';'
+        + 'background:' + tierColor.replace('0.9','0.18') + ';'
+        + 'color:' + tierColor + ';">Max</button>' : '')
+      + '</div>'
+      + '</div>';
+  }
+
+  var goldColor = 'rgba(34,197,94,0.9)';
+  var goldBg    = 'rgba(34,197,94,0.04)';
+  var diaColor  = 'rgba(79,168,253,0.9)';
+  var diaBg     = 'rgba(79,168,253,0.04)';
+
+  var goldAll   = simulateAll(T1_TO_T2);
+  var diaAll    = simulateAll(T2_TO_T3);
+  var canGoldAll   = Object.keys(goldAll).length > 0;
+  var canDiaAll    = Object.keys(diaAll).length > 0;
+
+  var goldSummary = canGoldAll ? Object.entries(goldAll).map(function(e){ return e[1]+'x '+e[0]; }).join(', ') : null;
+  var diaSummary  = canDiaAll  ? Object.entries(diaAll).map(function(e){ return e[1]+'x '+e[0]; }).join(', ')  : null;
+
+  var craftAllBtn = function(tier, can, color, summary) {
+    return '<button onclick="doCraftHerbs(\'' + tier + '\',\'\',0)" ' + (can ? '' : 'disabled ')
+      + 'style="width:100%;font-family:Space Grotesk,monospace;font-size:0.72rem;font-weight:700;padding:0.6rem;border-radius:0.65rem;margin-top:0.5rem;cursor:' + (can?'pointer':'not-allowed') + ';'
+      + 'border:1px solid ' + (can ? color.replace('0.9','0.35') : 'rgba(255,255,225,0.07)') + ';'
+      + 'background:' + (can ? color.replace('0.9','0.1') : 'rgba(255,255,255,0.02)') + ';'
+      + 'color:' + (can ? color : 'rgba(255,255,225,0.2)') + ';">'
+      + (can ? 'Craft All (' + summary + ')' : 'Not enough ingredients')
+      + '</button>';
+  };
+
+  el.innerHTML =
+    '<div style="margin-bottom:1rem;">'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.12em;color:' + goldColor + ';margin-bottom:0.5rem;">RARE HERBS (COMMON -> RARE)</div>'
+    + '<div style="display:flex;flex-direction:column;gap:0.4rem;">'
+    + Object.entries(T1_TO_T2).map(function(e){ return herbCard(e[0], e[1], 'gold', goldColor, goldBg); }).join('')
+    + '</div>'
+    + craftAllBtn('gold', canGoldAll, goldColor, goldSummary)
+    + '</div>'
+    + '<div>'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.12em;color:' + diaColor + ';margin-bottom:0.5rem;">EPIC HERBS (RARE -> EPIC)</div>'
+    + '<div style="display:flex;flex-direction:column;gap:0.4rem;">'
+    + Object.entries(T2_TO_T3).map(function(e){ return herbCard(e[0], e[1], 'diamond', diaColor, diaBg); }).join('')
+    + '</div>'
+    + craftAllBtn('diamond', canDiaAll, diaColor, diaSummary)
+    + '</div>';
+}
+window.renderHerbCrafting = renderHerbCrafting;
+
+async function doCraftHerbs(tier, output, amount) {
+  if (!currentUser || !currentUser.discord_id) return;
+  try {
+    var res = await fetch(API_BASE + '/api/actions/craft-herbs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+      credentials: 'include',
+      body: JSON.stringify({ tier: tier, output: output || '', amount: amount || 0 }),
+    });
+    var data = await res.json();
+    if (data.ok) {
+      if (profileData && profileData.sporebot) {
+        profileData.sporebot.Inventory = profileData.sporebot.Inventory || {};
+        profileData.sporebot.Inventory.Ingredients = data.new_inventory;
+      }
+      renderBrewing(profileData.sporebot || {});
+      var _t = document.createElement('div');
+      _t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(192,132,252,0.3);border-radius:0.75rem;padding:0.75rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.72rem;color:var(--cream);z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.5);max-width:320px;text-align:center;';
+      var lines = Object.entries(data.crafted).map(function(e){ return e[1]+'x '+e[0]; }).join(', ');
+      var color = tier === 'gold' ? 'rgba(34,197,94,0.9)' : 'rgba(79,168,253,0.9)';
+      _t.innerHTML = '<div style="color:' + color + ';font-weight:700;margin-bottom:0.3rem;">' + (tier==='gold'?'Rare':'Epic') + ' Herbs Crafted!</div>'
+        + '<div style="color:rgba(255,255,225,0.7);font-size:0.65rem;">' + lines + '</div>';
+      document.body.appendChild(_t);
+      setTimeout(function(){ _t.style.transition='opacity 0.3s'; _t.style.opacity='0'; setTimeout(function(){ _t.remove(); },300); }, 4000);
+    } else {
+      var _t2 = document.createElement('div');
+      _t2.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(253,70,79,0.3);border-radius:0.75rem;padding:0.65rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.7rem;color:rgba(253,70,79,0.9);z-index:99999;';
+      _t2.textContent = data.message || 'Not enough ingredients.';
+      document.body.appendChild(_t2);
+      setTimeout(function(){ _t2.remove(); }, 3000);
+    }
+  } catch(e) {
+    console.error('[doCraftHerbs]', e);
+  }
+}
+window.doCraftHerbs = doCraftHerbs;
+
 function renderBrewing(s) {
   const inv = s.Inventory || {};
   const potions = inv.Potions || {};
   const ingredients = inv.Ingredients || {};
   function cleanEmoji(str){ return str ? String(str).replace(/<:[^:]+:\d+>/g,'').trim() : ''; }
   renderBrewStation(s);
+  renderHerbCrafting(s);
 
   // Cooldown calculation - must be first so both active card and stored buttons can use it
   var potionCooldown = potions.Potion_Cooldown || false;

@@ -137,6 +137,8 @@ app.post('/api/user/:id/refresh-onchain', async (req, res) => {
   }
 });
 
+app.post('/api/actions/craft-herbs', (req, res) => proxyToFastAPI('craft-herbs', req, res, 'CRAFT-HERBS'));
+
 app.post('/api/actions/brew', async (req, res) => {
   const sessionUser = getSessionUser(req);
   if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
@@ -315,6 +317,7 @@ async function proxyToFastAPI(route, req, res, label) {
 app.post('/api/actions/brew',          (req, res) => proxyToFastAPI('brew',          req, res, 'BREW'));
 app.post('/api/actions/equip-potion',  (req, res) => proxyToFastAPI('equip-potion',  req, res, 'EQUIP-POTION'));
 app.post('/api/actions/discard-potion',(req, res) => proxyToFastAPI('discard-potion',req, res, 'DISCARD-POTION'));
+app.post('/api/actions/craft-herbs', (req, res) => proxyToFastAPI('craft-herbs', req, res, 'CRAFT-HERBS'));
 
 // ----------------------------------------------------------------
 // Firebase listener - fires push when raffle winner is recorded
