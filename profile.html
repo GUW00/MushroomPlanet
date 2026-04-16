@@ -890,16 +890,18 @@
         </div>
         <!-- Sporebot NFT Collection -->
         <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title" style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-            <img src="/images/sporebot_helper.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Sporebot NFTs
-            <span id="sb-nft-count" style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.35);margin-left:0.25rem;"></span>
-            <div style="margin-left:auto;display:flex;gap:0.35rem;">
-              <button class="sb-sort-btn" onclick="sbSetSort('id',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(255,255,225,0.4);background:rgba(255,255,225,0.07);color:var(--cream);cursor:pointer;opacity:1;"># ID</button>
-              <button class="sb-sort-btn" onclick="sbSetSort('rarity',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(255,255,225,0.12);background:rgba(255,255,225,0.07);color:var(--cream);cursor:pointer;opacity:0.45;">Rarity</button>
-              <button class="sb-sort-btn" onclick="sbSetSort('traits',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(255,255,225,0.12);background:rgba(255,255,225,0.07);color:var(--cream);cursor:pointer;opacity:0.45;">Traits</button>
-              <button class="sb-sort-btn" id="sb-favs-btn" onclick="sbSetSort('favs',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(252,211,0,0.2);background:rgba(252,211,0,0.06);color:rgba(252,211,0,0.7);cursor:pointer;opacity:0.55;">&#11088; Favs</button>
-              <button onclick="sbFlipAll()" id="sb-flip-all-btn" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid rgba(79,168,253,0.25);background:rgba(79,168,253,0.06);color:rgba(79,168,253,0.8);cursor:pointer;">Flip All</button>
-              <select id="sb-bonus-select" onchange="sbSetBonusSort(this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.2rem 0.4rem;border-radius:5px;border:1px solid rgba(255,255,225,0.12);background:rgba(30,30,30,0.9);color:var(--cream);cursor:pointer;">
+          <div class="card-title" style="display:flex;flex-direction:column;gap:0.5rem;">
+            <div style="display:flex;align-items:center;gap:0.4rem;">
+              <img src="/images/sporebot_helper.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Sporebot NFTs
+              <span id="sb-nft-count" style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.35);margin-left:0.25rem;"></span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;">
+              <button class="sb-sort-btn" onclick="sbSetSort('id',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25rem 0.5rem;border-radius:5px;border:1px solid rgba(255,255,225,0.4);background:rgba(255,255,225,0.07);color:var(--cream);cursor:pointer;opacity:1;"># ID</button>
+              <button class="sb-sort-btn" onclick="sbSetSort('rarity',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25rem 0.5rem;border-radius:5px;border:1px solid rgba(255,255,225,0.12);background:rgba(255,255,225,0.07);color:var(--cream);cursor:pointer;opacity:0.45;">Rarity</button>
+              <button class="sb-sort-btn" onclick="sbSetSort('traits',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25rem 0.5rem;border-radius:5px;border:1px solid rgba(255,255,225,0.12);background:rgba(255,255,225,0.07);color:var(--cream);cursor:pointer;opacity:0.45;">Traits</button>
+              <button class="sb-sort-btn" id="sb-favs-btn" onclick="sbSetSort('favs',this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25rem 0.5rem;border-radius:5px;border:1px solid rgba(252,211,0,0.2);background:rgba(252,211,0,0.06);color:rgba(252,211,0,0.7);cursor:pointer;opacity:0.55;">&#11088; Favs</button>
+              <button onclick="sbFlipAll()" id="sb-flip-all-btn" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25rem 0.5rem;border-radius:5px;border:1px solid rgba(79,168,253,0.25);background:rgba(79,168,253,0.06);color:rgba(79,168,253,0.8);cursor:pointer;">Flip All</button>
+              <select id="sb-bonus-select" onchange="sbSetBonusSort(this)" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.25rem 0.4rem;border-radius:5px;border:1px solid rgba(255,255,225,0.12);background:rgba(30,30,30,0.9);color:var(--cream);cursor:pointer;">
                 <option value="">Bonus...</option>
                 <option value="Spore Yield">Spore Yield</option>
                 <option value="Harvest Bonus">Harvest Bonus</option>
