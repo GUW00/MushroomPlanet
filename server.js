@@ -292,6 +292,31 @@ app.post('/api/actions/swap-companion', async (req, res) => {
 });
 
 // ----------------------------------------------------------------
+// Brewing action proxies -> FastAPI port 5001
+// ----------------------------------------------------------------
+async function proxyToFastAPI(route, req, res, label) {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+  try {
+    const r = await fetch('http://localhost:5001/actions/' + route, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': sessionUser.discord_id },
+      body: JSON.stringify(req.body),
+    });
+    const text = await r.text();
+    try { res.json(JSON.parse(text)); }
+    catch(e) { console.error('[' + label + '] Non-JSON from port 5001:', text); res.status(500).json({ ok: false, message: 'Server error' }); }
+  } catch(err) {
+    console.error('[' + label + ']', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+}
+
+app.post('/api/actions/brew',          (req, res) => proxyToFastAPI('brew',          req, res, 'BREW'));
+app.post('/api/actions/equip-potion',  (req, res) => proxyToFastAPI('equip-potion',  req, res, 'EQUIP-POTION'));
+app.post('/api/actions/discard-potion',(req, res) => proxyToFastAPI('discard-potion',req, res, 'DISCARD-POTION'));
+
+// ----------------------------------------------------------------
 // Firebase listener - fires push when raffle winner is recorded
 // ----------------------------------------------------------------
 app.post('/api/push-subscribe', async (req, res) => {

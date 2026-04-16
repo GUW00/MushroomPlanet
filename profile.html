@@ -2493,8 +2493,18 @@ async function discardPotion(safeKey, slotKey) {
         var pots = profileData.sporebot.Inventory = profileData.sporebot.Inventory || {};
         pots.Potions = pots.Potions || {};
         delete pots.Potions[slotKey];
+        if (data.recovered && Object.keys(data.recovered).length > 0) {
+          var ing = pots.Ingredients = pots.Ingredients || {};
+          Object.entries(data.recovered).forEach(function(e){ ing[e[0]] = (ing[e[0]] || 0) + e[1]; });
+        }
       }
       renderBrewing(profileData.sporebot || {});
+      if (data.recovered && Object.keys(data.recovered).length > 0) {
+        var lines = Object.entries(data.recovered).map(function(e){ return e[1]+'x '+e[0]; }).join(', ');
+        showToast('Recovered: ' + lines, 'green');
+      } else {
+        showToast('Potion discarded. Nothing recovered.', null);
+      }
     } else {
       if (btn) { btn.textContent = 'Error'; btn.disabled = false; }
     }
@@ -3730,6 +3740,47 @@ const gatherCD = hourlyCooldown(daily.last_gather, turtleUniqueActive ? 1800000 
   const caveCD   = hourlyCooldown(daily.last_cave);
   const feedCD   = hourlyCooldown(misc.last_hourly_feed);
 
+  // Pipe cooldown (14-day, pipe_bonus reduces it, min 1 day)
+  var pipeOwned = !!((s.Inventory || {}).Items || {}).Elder_Pipe;
+  var pipeStatus = null;
+  var pipeCdRemaining = null;
+  if (pipeOwned) {
+    var lastPipeStr = misc.last_pipe || null;
+    if (lastPipeStr) {
+      var lastPipeMs = null;
+      var pipeFmts = ['%m-%d-%Y %I:%M %p', '%Y-%m-%d %I:%M %p'];
+      // JS parse: handle both MM-DD-YYYY and YYYY-MM-DD with 12h time
+      var pmatch = lastPipeStr.trim().match(/^(\d{2})-(\d{2})-(\d{4}) (\d{1,2}):(\d{2}) ([AP]M)/i);
+      var pmatch2 = lastPipeStr.trim().match(/^(\d{4})-(\d{2})-(\d{2}) (\d{1,2}):(\d{2}) ([AP]M)/i);
+      if (pmatch) {
+        var ph = parseInt(pmatch[4]); var pam = pmatch[6].toUpperCase();
+        if (pam === 'PM' && ph !== 12) ph += 12; if (pam === 'AM' && ph === 12) ph = 0;
+        lastPipeMs = new Date(pmatch[3]+'-'+pmatch[1]+'-'+pmatch[2]+'T'+String(ph).padStart(2,'0')+':'+pmatch[5]+':00Z').getTime();
+      } else if (pmatch2) {
+        var ph2 = parseInt(pmatch2[4]); var pam2 = pmatch2[6].toUpperCase();
+        if (pam2 === 'PM' && ph2 !== 12) ph2 += 12; if (pam2 === 'AM' && ph2 === 12) ph2 = 0;
+        lastPipeMs = new Date(pmatch2[1]+'-'+pmatch2[2]+'-'+pmatch2[3]+'T'+String(ph2).padStart(2,'0')+':'+pmatch2[5]+':00Z').getTime();
+      }
+      if (lastPipeMs) {
+        var pipeCdMs = 14 * 86400000;
+        var pipeDiff = (lastPipeMs + pipeCdMs) - Date.now();
+        if (pipeDiff > 0) {
+          var pd = Math.floor(pipeDiff/86400000);
+          var ph3 = Math.floor((pipeDiff%86400000)/3600000);
+          var pm3 = Math.floor((pipeDiff%3600000)/60000);
+          pipeCdRemaining = (pd > 0 ? pd+'d ' : '') + ph3+'h '+pm3+'m';
+          pipeStatus = 'cooldown';
+        } else {
+          pipeStatus = 'ready';
+        }
+      } else {
+        pipeStatus = 'ready';
+      }
+    } else {
+      pipeStatus = 'ready';
+    }
+  }
+
   const DAILY_ACTIONS = [
     { label: 'Forage',  img:'forage.png',    done: daily.daily_forage  === true, cadence: 'Daily',
       info: 'Forage for Shrooms Daily & builds your streak to unlock powerful items.' },
@@ -3747,8 +3798,11 @@ const gatherCD = hourlyCooldown(daily.last_gather, turtleUniqueActive ? 1800000 
       info: 'Visit Wimblecap the mushroom NPC daily. Visiting multiple times earns Items and Shrooms.' },
     { label: 'Social',  img:'pixie.png',     done: (p.Message_XP || {}).daily_limit >= 100, cadence: 'Daily',
       info: 'Earn 100 Pixie XP by chatting in Discord. XP from messages, reactions, and community participation.' },
-    { label: 'Quest',   img:'scroll.png',    done: (s.Quests || {}).Daily_Quest === true || (profileData.reddit || {}).Quests?.Daily_Quest === true, cadence: 'Daily',
-      info: 'Complete the daily Reddit quest posted in r/MushroomPlanet.' },
+    ...(pipeOwned ? [{ label: 'Pipe', img:'pipe.png',
+      done: pipeStatus === 'ready',
+      cadence: 'Hourly',
+      cooldown: pipeCdRemaining || 'Use Now!',
+      info: 'Elder Pipe - Resets all daily cooldowns. 14-day cooldown. Use !pipe in Discord.' }] : []),
     { label: 'Gather',  img:'herbs.png',     done: gatherCD === 'Ready', cadence: 'Hourly', cooldown: gatherCD,
   info: turtleUniqueActive
     ? '⚡ Quick Gather active! Gather herbs every 30 minutes. Unique bonus from Turtle (Bond Lv.5).'
@@ -3758,7 +3812,7 @@ const gatherCD = hourlyCooldown(daily.last_gather, turtleUniqueActive ? 1800000 
     { label: 'Feed',    img:'shroomfarm.png',done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD,
       info: 'Feed the farm animals once per hour. Total fed SHROOM unlocks companions, forage boosts, and more.' },
   ];
-  const DAILY_ONLY = DAILY_ACTIONS.filter(a => a.cadence !== 'Hourly');
+  const DAILY_ONLY = DAILY_ACTIONS.filter(a => a.cadence !== 'Hourly' && a.label !== 'Pipe');
   const doneCount = DAILY_ONLY.filter(a => a.done).length;
   const totalCount = DAILY_ONLY.length;
   const barPct = Math.round((doneCount / totalCount) * 100);
@@ -5895,7 +5949,9 @@ function renderBrewing(s) {
     Object.entries(active).filter(([k])=>!['name','emoji','Potion Score','Potion_Score'].includes(k)).forEach(([k,v])=>{
       const statLabel = k.replace(/_/g,' ');
       const statImg = STAT_EMOJI[statLabel] || STAT_EMOJI[k] || '';
-      h += '<div class="data-row"><span class="dr-label">' + statImg + statLabel + '</span><span class="dr-val g">' + (typeof v==='number'?v+'%':v) + '</span></div>';
+      var noPercent = ['Extra Brews','Extra_Brews','Plant Limit','Plant_Limit'];
+      var valFmt = (typeof v==='number') ? (noPercent.includes(k) ? v.toLocaleString() : v+'%') : v;
+      h += '<div class="data-row"><span class="dr-label">' + statImg + statLabel + '</span><span class="dr-val g">' + valFmt + '</span></div>';
     });
     if (potionCdRemaining) {
       h += '<div style="margin-top:0.75rem;padding:0.5rem 0.75rem;background:rgba(253,70,79,0.07);border:1px solid rgba(253,70,79,0.2);border-radius:0.5rem;display:flex;align-items:center;gap:0.5rem;font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(253,70,79,0.85);">'
