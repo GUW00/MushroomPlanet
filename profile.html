@@ -4408,6 +4408,41 @@ function sbToggleFav(tokenId, e) {
 window.sbToggleFav = sbToggleFav;
 sbLoadFavourites();
 
+async function sbRenamePrompt(tokenId, e) {
+  if (e) e.stopPropagation();
+  if (!currentUser || !currentUser.discord_id) return;
+  var current = ((profileData.sporebot.Misc || {}).SporeBot_Names || {})[tokenId] || '';
+  var newName = window.prompt('Rename Sporebot #' + tokenId + ' (max 30 chars, leave blank to clear):', current);
+  if (newName === null) return; // cancelled
+  newName = newName.trim().slice(0, 30);
+  try {
+    var res = await fetch(API_BASE + '/api/user/' + currentUser.discord_id + '/rename-sporebot', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+      credentials: 'include',
+      body: JSON.stringify({ token_id: tokenId, name: newName }),
+    });
+    var data = await res.json();
+    if (data.ok) {
+      // Update local data
+      profileData.sporebot.Misc = profileData.sporebot.Misc || {};
+      profileData.sporebot.Misc.SporeBot_Names = profileData.sporebot.Misc.SporeBot_Names || {};
+      if (newName) {
+        profileData.sporebot.Misc.SporeBot_Names[tokenId] = newName;
+      } else {
+        delete profileData.sporebot.Misc.SporeBot_Names[tokenId];
+      }
+      // Update label in _sbNfts
+      var bot = _sbNfts.find(function(b){ return b.tokenId === tokenId; });
+      if (bot) bot.label = newName ? newName + ' #' + tokenId : 'Sporebot #' + tokenId;
+      sbRenderPage();
+    }
+  } catch(err) {
+    console.error('[sbRenamePrompt]', err);
+  }
+}
+window.sbRenamePrompt = sbRenamePrompt;
+
 function renderSporebots(s, p) {
   sbLoadFavourites();
   var wallet  = (p && p.Wallet) || {};
@@ -4675,6 +4710,7 @@ function sbRenderPage() {
     html += '<div class="sb-card-front" style="position:relative;">';
     html += '<button onclick="sbToggleFav(\'' + item.tokenId + '\',event)" title="' + (isFav ? 'Unfavourite' : 'Favourite') + '" style="position:absolute;top:4px;right:4px;z-index:2;background:' + (isFav ? 'rgba(252,211,0,0.18)' : 'rgba(0,0,0,0.35)') + ';border:1px solid ' + (isFav ? 'rgba(252,211,0,0.6)' : 'rgba(255,255,225,0.12)') + ';border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.7rem;line-height:1;padding:0;">'
       + (isFav ? '&#11088;' : '&#9734;') + '</button>';
+    html += '<button onclick="sbRenamePrompt(\'' + item.tokenId + '\',event)" title="Rename" style="position:absolute;top:4px;left:4px;z-index:2;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,225,0.12);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.65rem;line-height:1;padding:0;">&#9998;</button>';
     if (item.image) {
       html += '<img src="' + fixIpfs(item.image) + '" alt="' + item.label + '" loading="lazy" style="width:100%;height:auto;display:block;" onerror="this.style.display=\'none\'">';
     } else {
