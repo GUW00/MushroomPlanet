@@ -17,6 +17,8 @@
   <script type="module" src="config.js?v=2"></script>
 
   <style>
+    #cv-amount::-webkit-outer-spin-button,
+#cv-amount::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
     .sb-card-flip { perspective: 600px; cursor: pointer; }
 .sb-card-inner { position:relative; width:100%; transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); transform-style:preserve-3d; aspect-ratio:1/1.15; }
 .sb-card-flip.flipped .sb-card-inner { transform:rotateY(180deg); }
@@ -1005,33 +1007,52 @@
 
       <!-- BREWING TAB -->
       <div class="tab-panel reveal" id="tab-brewing">
-        <div class="info-card" id="brew-station-card">
-          <div class="card-title"><img src="/images/potionrecipe.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Brew Station</div>
-          <div id="brew-station-content"><div class="empty-hint">Loading...</div></div>
+        <!-- Sub-tab nav -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem;">
+          <button class="brew-sub-tab active" onclick="brewSubTab('station',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;font-weight:700;padding:0.65rem 0.5rem;border-radius:12px;border:1px solid rgba(192,132,252,0.45);background:rgba(192,132,252,0.12);color:rgba(192,132,252,0.95);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+            <img src="/images/potionrecipe.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">
+            Brewing Station
+          </button>
+          <button class="brew-sub-tab" onclick="brewSubTab('herbs',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;font-weight:700;padding:0.65rem 0.5rem;border-radius:12px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,225,0.45);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+            <img src="/images/herbs.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">
+            Herbs
+          </button>
         </div>
-        <div class="info-card">
-          <div class="card-title"><img src="/images/potionrecipe.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Active Potion</div>
-          <div id="brew-active-content"><div class="empty-hint">No active potion.</div></div>
-        </div>
-        <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><img src="/images/potionrecipe.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Stored Potions</div>
-          <div id="brew-stored-content"><div class="empty-hint">No stored potions.</div></div>
-        </div>
-        <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><img src="/images/herbs.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Ingredients</div>
-          <div id="brew-ingredients-content"><div class="empty-hint">No ingredients.</div></div>
-          <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(255,255,225,0.06);">
-            <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.35);margin-bottom:0.5rem;">BUY COMMON HERBS - 10,000 SPORES EACH</div>
-            <div id="brew-buy-herbs-content"><div class="empty-hint" style="font-size:0.65rem;">Loading...</div></div>
+
+        <!-- Brewing Station sub-panel -->
+        <div id="brew-sub-station">
+          <div class="info-card" id="brew-station-card">
+            <div class="card-title"><img src="/images/potionrecipe.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Brew Station</div>
+            <div id="brew-station-content"><div class="empty-hint">Loading...</div></div>
+          </div>
+          <div class="info-card" style="margin-top:1rem;">
+            <div class="card-title"><img src="/images/potionrecipe.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Active Potion</div>
+            <div id="brew-active-content"><div class="empty-hint">No active potion.</div></div>
+          </div>
+          <div class="info-card" style="margin-top:1rem;">
+            <div class="card-title"><img src="/images/potionrecipe.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Stored Potions</div>
+            <div id="brew-stored-content"><div class="empty-hint">No stored potions.</div></div>
+          </div>
+          <div class="info-card" style="margin-top:1rem;">
+            <div class="card-title"><img src="/images/gemstones.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Shop Quest Progress</div>
+            <div id="brew-shop-quests"><div class="empty-hint">Loading...</div></div>
           </div>
         </div>
-        <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><img src="/images/herbs.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Herb Crafting</div>
-          <div id="herb-crafting-content"><div class="empty-hint">Loading...</div></div>
-        </div>
-        <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><img src="/images/gemstones.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Shop Quest Progress</div>
-          <div id="brew-shop-quests"><div class="empty-hint">Loading...</div></div>
+
+        <!-- Herbs sub-panel -->
+        <div id="brew-sub-herbs" style="display:none;">
+          <div class="info-card">
+            <div class="card-title"><img src="/images/herbs.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Ingredients</div>
+            <div id="brew-ingredients-content"><div class="empty-hint">No ingredients.</div></div>
+            <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(255,255,225,0.06);">
+              <div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.35);margin-bottom:0.5rem;">BUY COMMON HERBS - 10,000 SPORES EACH</div>
+              <div id="brew-buy-herbs-content"><div class="empty-hint" style="font-size:0.65rem;">Loading...</div></div>
+            </div>
+          </div>
+          <div class="info-card" style="margin-top:1rem;">
+            <div class="card-title"><img src="/images/herbs.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Herb Crafting</div>
+            <div id="herb-crafting-content"><div class="empty-hint">Loading...</div></div>
+          </div>
         </div>
       </div>
       <div class="tab-panel reveal" id="tab-pixie">
@@ -1056,21 +1077,34 @@
         </div>
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/gift.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Tipping & Community</div>
-          <div class="data-grid force-2col" style="grid-template-columns:1fr 1fr;align-items:start;">
-            <div>
-              <div class="data-row"><span class="dr-label">Tips Given</span><span class="dr-val" id="px-tip-given">—</span></div>
-              <div class="data-row"><span class="dr-label">Tips Received</span><span class="dr-val" id="px-tip-recv">—</span></div>
-              <div class="data-row"><span class="dr-label">Raffles Given</span><span class="dr-val" id="px-raf-given">—</span></div>
-              <div class="data-row"><span class="dr-label">Raffles Received</span><span class="dr-val" id="px-raf-recv">—</span></div>
-            </div>
-            <div>
-              <div class="data-row"><span class="dr-label">Airdrops Given</span><span class="dr-val" id="px-air-given">—</span></div>
-              <div class="data-row"><span class="dr-label">Airdrops Received</span><span class="dr-val" id="px-air-recv">—</span></div>
-              <div class="data-row"><span class="dr-label">Total Given</span><span class="dr-val" id="px-total-given">—</span></div>
-              <div class="data-row"><span class="dr-label">Total Received</span><span class="dr-val" id="px-total-rec">—</span></div>
-            </div>
-          </div>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.25rem;">
+            <!-- Given breakdown: 4 equal tiles -->
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;">
+              <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.65rem;padding:0.6rem 0.75rem;">
+                <div style="font-family:Space Grotesk,monospace;font-size:0.55rem;letter-spacing:0.1em;color:rgba(255,255,225,0.3);margin-bottom:0.3rem;">TIPS GIVEN</div>
+                <div id="px-tip-given" style="font-size:0.75rem;">—</div>
               </div>
+              <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.65rem;padding:0.6rem 0.75rem;">
+                <div style="font-family:Space Grotesk,monospace;font-size:0.55rem;letter-spacing:0.1em;color:rgba(255,255,225,0.3);margin-bottom:0.3rem;">RAFFLES GIVEN</div>
+                <div id="px-raf-given" style="font-size:0.75rem;">—</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.06);border-radius:0.65rem;padding:0.6rem 0.75rem;">
+                <div style="font-family:Space Grotesk,monospace;font-size:0.55rem;letter-spacing:0.1em;color:rgba(255,255,225,0.3);margin-bottom:0.3rem;">AIRDROPS GIVEN</div>
+                <div id="px-air-given" style="font-size:0.75rem;">—</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(34,197,94,0.15);border-radius:0.65rem;padding:0.6rem 0.75rem;">
+                <div style="font-family:Space Grotesk,monospace;font-size:0.55rem;letter-spacing:0.1em;color:rgba(34,197,94,0.5);margin-bottom:0.3rem;">TOTAL GIVEN</div>
+                <div id="px-total-given" style="font-size:0.75rem;font-weight:700;">—</div>
+              </div>
+            </div>
+            <!-- Received row: full width total -->
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(79,168,253,0.15);border-radius:0.65rem;padding:0.6rem 0.75rem;">
+              <div style="font-family:Space Grotesk,monospace;font-size:0.55rem;letter-spacing:0.1em;color:rgba(79,168,253,0.5);margin-bottom:0.3rem;">TOTAL RECEIVED (Tips + Raffles + Airdrops)</div>
+              <div id="px-total-rec" style="font-size:0.75rem;font-weight:700;">—</div>
+            </div>
+            <div style="display:none;"><div id="px-tip-recv"></div></div>
+          </div>
+        </div>
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/badge.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Achievements</div>
           <div id="achievements-content"><div class="empty-hint">No achievements yet.</div></div>
@@ -1140,6 +1174,45 @@
           </div>
         </div>
       </div>
+      <!-- CONVERT SECTION -->
+      <div class="info-card reveal" id="convert-panel" style="margin-top:1rem;">
+        <div class="card-title">
+          <img src="/images/swaps.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Convert
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.25rem;">
+          <div style="font-size:0.65rem;color:rgba(255,255,225,0.4);text-align:center;">100 SPORE = 1 SHROOM &nbsp;|&nbsp; fixed rate</div>
+          <div style="display:flex;gap:0.5rem;">
+            <button id="cv-dir-s2s" onclick="setCvDir('spore_to_shroom')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.62rem;font-weight:700;padding:0.45em 0;border-radius:999px;border:none;background:linear-gradient(90deg,rgba(79,168,253,0.85) 0%,rgba(253,70,79,0.85) 100%);color:#fff;cursor:pointer;transition:opacity 0.2s;text-shadow:0 1px 2px rgba(0,0,0,0.3);">SPORE -> SHROOM</button>
+            <button id="cv-dir-h2s" onclick="setCvDir('shroom_to_spore')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.62rem;font-weight:700;padding:0.45em 0;border-radius:999px;border:none;background:linear-gradient(90deg,rgba(253,70,79,0.85) 0%,rgba(79,168,253,0.85) 100%);color:#fff;cursor:pointer;transition:opacity 0.2s;opacity:0.35;text-shadow:0 1px 2px rgba(0,0,0,0.3);">SHROOM -> SPORE</button>
+          </div>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <input id="cv-amount" type="number" min="1" placeholder="Amount" style="flex:1;background:rgba(255,255,225,0.05);border:1px solid rgba(255,255,225,0.12);border-radius:0.5rem;padding:0.4rem 0.6rem;color:var(--cream);font-family:Space Grotesk,sans-serif;font-size:0.75rem;outline:none;">
+            <button onclick="cvSetMax()" style="font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:600;padding:0.35em 0.8em;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:rgba(255,255,225,0.04);color:rgba(255,255,225,0.5);cursor:pointer;">MAX</button>
+            <button onclick="doConvert()" id="cv-submit-btn" style="font-family:Space Grotesk,sans-serif;font-size:0.7rem;font-weight:700;padding:0.35em 1.1em;border-radius:999px;border:none;background:var(--yellow);color:#111;cursor:pointer;transition:all 0.2s;white-space:nowrap;">Convert</button>
+          </div>
+          <div id="cv-preview" style="font-size:0.68rem;color:rgba(255,255,225,0.4);text-align:center;min-height:1.2em;"></div>
+          <div id="cv-result" style="font-size:0.68rem;text-align:center;min-height:1.2em;"></div>
+        </div>
+      </div>
+      <!-- FARM WALLET -->
+      <div class="info-card reveal" style="margin-top:1rem;">
+        <div class="card-title">
+          <img src="/images/shroomfarm.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Farm Wallet
+        </div>
+        <div>
+          <div class="data-row">
+            <span class="dr-label"><img src="/images/shroomfarm.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOMS Planted</span>
+            <span class="dr-val g" id="w-planted">—</span>
+          </div>
+          <div class="data-row" style="border-bottom:none;">
+            <span class="dr-label"><img src="/images/sgr1.webp" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORES Generated</span>
+            <span class="dr-val b" id="w-spore-farm">—</span>
+          </div>
+        </div>
+      </div>
+      <!-- DISCORD WALLET -->
       <div class="info-card reveal" style="margin-top:1rem;">
         <div class="card-title">
           <img src="/images/discord.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
@@ -1150,16 +1223,9 @@
             <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
             <span class="dr-val r" id="w-shroom">—</span>
           </div>
-          <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
+          <div class="data-row" style="border-bottom:none;">
+            <span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
             <span class="dr-val b" id="w-spore">—</span>
-          </div>
-          <div class="data-row">
-            <span class="dr-label"><img src="/images/shroomfarm.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOMS Planted</span>
-            <span class="dr-val g" id="w-planted">—</span>
-          </div>
-          <div class="data-row">
-            <span class="dr-label"><img src="/images/sgr1.webp" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORES Generated</span>
-            <span class="dr-val b" id="w-spore-farm">—</span>
           </div>
         </div>
       </div>
@@ -1171,22 +1237,24 @@
         <div id="wallet-reddit-content"><div class="empty-hint">No Reddit wallet linked.</div></div>
       </div>
             <div class="info-card reveal" style="margin-top:1rem;">
-        <div class="card-title">
-          <img src="/images/wallet.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-          Onchain Balances
+        <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="display:flex;align-items:center;gap:0.4rem;">
+            <img src="/images/wallet.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+            Onchain Balances
+          </span>
+          <button id="refresh-onchain-btn" onclick="refreshOnchain()" style="font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.3em 0.9em;border-radius:999px;border:1px solid rgba(79,168,253,0.3);background:rgba(79,168,253,0.07);color:var(--blue);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.35rem;"><img src="/images/blockchain.png" style="width:11px;height:11px;object-fit:contain;" onerror="this.style.display='none'">Refresh Onchain</button>
         </div>
         <div>
           <div class="data-row"><span class="dr-label"><img src="/images/blockchain.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Wallet Address</span><span class="dr-val" id="w-addr" onclick="copyWalletAddr()" style="cursor:pointer;transition:color 0.2s;" title="Click to copy">—</span></div>
-          
           <div class="data-row">
             <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
             <span class="dr-val r" id="w-oc-shroom">—</span>
           </div>
-          <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
+          <div class="data-row" style="border-bottom:none;"><span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
             <span class="dr-val b" id="w-oc-spore">—</span>
           </div>
-          <div class="data-row" style="margin-top:0.5rem;border-bottom:none;"><span class="dr-label"></span><button id="refresh-onchain-btn" onclick="refreshOnchain()" style="font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.3em 0.9em;border-radius:999px;border:1px solid rgba(79,168,253,0.3);background:rgba(79,168,253,0.07);color:var(--blue);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.35rem;"><img src="/images/blockchain.png" style="width:11px;height:11px;object-fit:contain;" onerror="this.style.display='none'">Refresh Onchain</button></div>
         </div>
+        <div id="onchain-footer"></div>
       </div>
       <div class="info-card reveal" style="margin-top:1rem;">
         <div class="card-title">
@@ -2550,6 +2618,7 @@ function renderBrewStation(s) {
   var skills     = s.Skills || {};
   var farmRank   = (farm.farm_rank || 'BRONZE').toUpperCase();
   var brewLvl    = (skills.Brewing || {}).level || 1;
+  var brewXp     = (skills.Brewing || {}).xp    || 0;
   var brews      = potions.Brews || 0;
   var activePot  = (typeof (potions.Active_Potion) === 'object' && potions.Active_Potion) ? potions.Active_Potion : {};
   var extraBrewsPotion = parseInt(activePot.Extra_Brews || activePot['Extra Brews'] || 0);
@@ -2606,7 +2675,18 @@ function renderBrewStation(s) {
     + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(192,132,252,0.9);display:flex;align-items:center;gap:0.35rem;"><img src="/images/potionrecipe.png" style="width:12px;height:12px;object-fit:contain;">Brewing Lv.' + brewLvl + '</div>'
     + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:' + (atLimit ? 'var(--red)' : 'rgba(255,255,225,0.5)') + ';display:flex;align-items:center;gap:0.35rem;"><img src="/images/cooldown.png" style="width:12px;height:12px;object-fit:contain;">Brews: ' + brews + '/' + maxBrews + '</div>'
     + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:' + (potionCount >= maxSlots ? 'var(--red)' : 'rgba(255,255,225,0.5)') + ';display:flex;align-items:center;gap:0.35rem;"><img src="/images/backpack1.png" style="width:12px;height:12px;object-fit:contain;">Slots: ' + potionCount + '/' + maxSlots + '</div>'
-    + '<div style="width:100%;font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);">Select 2-' + ingLimit + ' ingredients (Voidspore adds a bonus stat). Rank: <span style="color:var(--yellow);">' + farmRank + '</span></div>'
+    + (brewLvl < 100
+      ? '<div style="width:100%;margin-top:0.1rem;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;">'
+        + '<span style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.3);">XP: ' + brewXp.toLocaleString() + ' / ' + (brewLvl * 100).toLocaleString() + '</span>'
+        + '<span style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(192,132,252,0.6);">Lv.' + brewLvl + ' → ' + (brewLvl + 1) + '</span>'
+        + '</div>'
+        + '<div style="height:4px;background:rgba(255,255,255,0.07);border-radius:999px;overflow:hidden;">'
+        + '<div style="height:100%;width:' + Math.min(brewXp / (brewLvl * 100) * 100, 100).toFixed(1) + '%;background:linear-gradient(90deg,rgba(192,132,252,0.7),rgba(192,132,252,1));border-radius:999px;transition:width 0.5s ease;"></div>'
+        + '</div>'
+        + '</div>'
+      : '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:var(--yellow);width:100%;margin-top:0.1rem;">MAX LEVEL (100)</div>')
+    + '<div style="width:100%;font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.3);margin-top:0.3rem;">Select 2-' + ingLimit + ' ingredients (Voidspore adds a bonus stat). Rank: <span style="color:var(--yellow);">' + farmRank + '</span></div>'
     + '</div>';
 
   // Selected chips
@@ -2730,7 +2810,7 @@ async function doBrew() {
         + '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">'
         + '<img src="' + pImg + '" style="width:24px;height:24px;object-fit:contain;" onerror="this.style.display=\'none\'">'
         + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.9rem;font-weight:700;color:var(--purple);">' + (p.name||'Potion') + '</span>'
-        + '<span style="font-family:Space Grotesk,monospace;font-size:0.7rem;color:rgba(255,255,225,0.4);">' + (p['Potion Score']||'').toString().slice(0,4) + '/10</span>'
+        + '<span style="font-family:Space Grotesk,monospace;font-size:0.7rem;color:rgba(255,255,225,0.4);">' + (p['Potion Score'] != null ? Number(p['Potion Score']).toFixed(2) : '?') + '/10</span>'
         + '</div>'
         + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.6);line-height:1.8;">' + statLines + '</div>'
         + (data.leveled_up ? '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:var(--yellow);margin-top:0.35rem;">Brewing Level Up! Now Lv.' + data.brewing_level + '</div>' : '')
@@ -2816,7 +2896,7 @@ function togglePotionSlot(safeKey) {
       if (cdDiff2 > 0) { var cdD2=Math.floor(cdDiff2/86400000); var cdH2=Math.floor((cdDiff2%86400000)/3600000); var cdM2=Math.floor((cdDiff2%3600000)/60000); potionCdRemaining2 = (cdD2>0?cdD2+'d ':'')+cdH2+'h '+cdM2+'m'; }
     } catch(e) {}
   }
-  var score = v['Potion Score'] ? Number(v['Potion Score']).toFixed(1) : '?';
+  var score = v['Potion Score'] != null ? Number(v['Potion Score']).toFixed(2) : '?';
   var potionId = (v.emoji||'').match(/:potion(\d+):/)?.[1]||(v.emoji||'').match(/:(\d+)>/)?.[1];
   var pImg = potionId ? '/images/potion'+potionId+'.png' : '/images/potion2.png';
   var stats = Object.entries(v).filter(([sk])=>!['name','emoji','Potion Score','Potion_Score'].includes(sk))
@@ -3369,6 +3449,22 @@ function switchTab(name, btn) {
 }
 window.switchTab = switchTab;
 
+function brewSubTab(name, btn) {
+  document.querySelectorAll('.brew-sub-tab').forEach(function(b) {
+    b.style.background = 'rgba(255,255,255,0.03)';
+    b.style.borderColor = 'rgba(255,255,225,0.1)';
+    b.style.color = 'rgba(255,255,225,0.45)';
+    b.classList.remove('active');
+  });
+  btn.style.background = 'rgba(192,132,252,0.12)';
+  btn.style.borderColor = 'rgba(192,132,252,0.45)';
+  btn.style.color = 'rgba(192,132,252,0.95)';
+  btn.classList.add('active');
+  document.getElementById('brew-sub-station').style.display = name === 'station' ? 'block' : 'none';
+  document.getElementById('brew-sub-herbs').style.display   = name === 'herbs'   ? 'block' : 'none';
+}
+window.brewSubTab = brewSubTab;
+
 function setPlatform(plat) {
   currentPlatform = plat;
   document.getElementById('plat-discord').classList.toggle('active', plat === 'discord');
@@ -3745,9 +3841,15 @@ function renderFarm(s, p) {
       + (first ? '' : 'border-top:1px solid rgba(255,255,225,0.08);margin-top:0.25rem;')
       + '"><img src="/images/' + img + '" style="width:13px;height:13px;object-fit:contain;" onerror="this.style.display=\'none\'">'
       + label + '</div>';
-    const row = r =>
-      '<div class="data-row"><span style="color:rgba(255,255,225,0.8);font-size:0.82rem;display:flex;align-items:center;">' + r.emoji + r.label + '</span>'
-      + '<span style="font-family:Space Grotesk,monospace;font-size:0.82rem;font-weight:600;color:' + r.color + ';">+' + Number(apy[r.key]).toFixed(1) + r.suffix + '</span></div>';
+    const row = r => {
+      const isIngame = r.key === 'ingame_sporebot_bonus';
+      const clickAttr = isIngame ? ' onclick="showIngameSporebotModal()" style="cursor:pointer;" title="Click for breakdown"' : '';
+      const labelHtml = isIngame
+        ? r.emoji + r.label + ' <span style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(79,168,253,0.6);margin-left:0.25rem;">tap</span>'
+        : r.emoji + r.label;
+      return '<div class="data-row"' + clickAttr + '><span style="color:rgba(255,255,225,0.8);font-size:0.82rem;display:flex;align-items:center;">' + labelHtml + '</span>'
+        + '<span style="font-family:Space Grotesk,monospace;font-size:0.82rem;font-weight:600;color:' + r.color + ';">+' + Number(apy[r.key]).toFixed(1) + r.suffix + '</span></div>';
+    };
     const mooshieRowsHtml = mooshieSubRows.length && apy.mooshie_bonus > 0
       ? mooshieSubRows.map(r => '<div class="data-row"><span style="color:rgba(255,255,225,0.8);font-size:0.82rem;display:flex;align-items:center;">' + r.emoji + r.label + '</span><span style="font-family:Space Grotesk,monospace;font-size:0.82rem;font-weight:600;color:' + r.color + ';">+' + r.val + '%</span></div>').join('')
       : (apy.mooshie_bonus > 0 ? row({ label:'LP NFTs', key:'mooshie_bonus', suffix:'%', color:'var(--yellow)', emoji:sgrI('portrait_nft.png') }) : '');
@@ -4162,12 +4264,100 @@ function renderWallet(s, p) {
   if (ocFooter) {
     var lastVerified = onchain.last_verified || null;
     var lastRefText = lastVerified ? 'Last synced: ' + lastVerified : '';
-    ocFooter.innerHTML = '<div style="display:flex;align-items:center;justify-content:flex-end;gap:0.75rem;margin-top:0.5rem;">'
-      + '<span id="onchain-last-refresh" style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.25);">' + lastRefText + '</span>'
-      + '<button id="refresh-onchain-btn" onclick="refreshOnchain()" style="font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.3em 0.9em;border-radius:999px;border:1px solid rgba(79,168,253,0.3);background:rgba(79,168,253,0.07);color:var(--blue);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.35rem;"><img src="/images/blockchain.png" style="width:11px;height:11px;object-fit:contain;" onerror="this.style.display=\'none\'">Refresh Onchain</button>'
-      + '</div>';
+    ocFooter.innerHTML = lastRefText
+      ? '<div style="text-align:right;margin-top:0.35rem;"><span id="onchain-last-refresh" style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.25);">' + lastRefText + '</span></div>'
+      : '';
   }
 }
+// ---- Convert panel ----
+var _cvDir = 'spore_to_shroom';
+function toggleConvertPanel() {
+  var panel = document.getElementById('convert-panel');
+  if (!panel) return;
+  var open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'block';
+  if (!open) {
+    document.getElementById('cv-amount').value = '';
+    document.getElementById('cv-preview').textContent = '';
+    document.getElementById('cv-result').textContent = '';
+    setCvDir('spore_to_shroom');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+function setCvDir(dir) {
+  _cvDir = dir;
+  var s2s = document.getElementById('cv-dir-s2s');
+  var h2s = document.getElementById('cv-dir-h2s');
+  if (s2s) s2s.style.opacity = dir === 'spore_to_shroom' ? '1' : '0.35';
+  if (h2s) h2s.style.opacity = dir === 'shroom_to_spore' ? '1' : '0.35';
+  updateCvPreview();
+}
+function updateCvPreview() {
+  var amt = parseInt(document.getElementById('cv-amount').value || '0', 10);
+  var el = document.getElementById('cv-preview');
+  if (!el || isNaN(amt) || amt <= 0) { if (el) el.textContent = ''; return; }
+  if (_cvDir === 'spore_to_shroom') {
+    if (amt % 100 !== 0) { el.textContent = 'SPORE must be a multiple of 100'; el.style.color = 'var(--red)'; return; }
+    el.textContent = 'You receive: ' + (amt / 100).toLocaleString() + ' SHROOM';
+  } else {
+    el.textContent = 'You receive: ' + (amt * 100).toLocaleString() + ' SPORE';
+  }
+  el.style.color = 'rgba(255,255,225,0.55)';
+}
+function cvSetMax() {
+  var wallet = (profileData && profileData.pixie && profileData.pixie.Wallet) || {};
+  var max = _cvDir === 'spore_to_shroom'
+    ? Math.floor(parseInt(wallet.spore_wallet || 0, 10) / 100) * 100
+    : parseInt(wallet.shroom_wallet || 0, 10);
+  document.getElementById('cv-amount').value = max;
+  updateCvPreview();
+}
+async function doConvert() {
+  var amt = parseInt(document.getElementById('cv-amount').value || '0', 10);
+  var resultEl = document.getElementById('cv-result');
+  var btn = document.getElementById('cv-submit-btn');
+  if (isNaN(amt) || amt <= 0) { resultEl.textContent = 'Enter a valid amount.'; resultEl.style.color = 'var(--red)'; return; }
+  if (_cvDir === 'spore_to_shroom' && amt % 100 !== 0) { resultEl.textContent = 'Must be a multiple of 100.'; resultEl.style.color = 'var(--red)'; return; }
+  btn.disabled = true; btn.textContent = 'Converting...';
+  resultEl.textContent = ''; resultEl.style.color = '';
+  var discordId = (profileData && profileData.pixie && profileData.pixie.Misc && profileData.pixie.Misc.discord_id)
+    || (profileData && profileData.sporebot && profileData.sporebot.discord_id) || '';
+  try {
+    var resp = await fetch('/api/wallet/convert', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': discordId },
+      credentials: 'include',
+      body: JSON.stringify({ amount: amt, direction: _cvDir })
+    });
+    var data = await resp.json();
+    if (data.ok) {
+      resultEl.textContent = data.message;
+      resultEl.style.color = 'var(--green)';
+      if (profileData && profileData.pixie && profileData.pixie.Wallet) {
+        profileData.pixie.Wallet.shroom_wallet = data.shroom_wallet;
+        profileData.pixie.Wallet.spore_wallet  = data.spore_wallet;
+      }
+      setEl('w-shroom', fmt(data.shroom_wallet));
+      setEl('w-spore',  fmt(data.spore_wallet));
+      document.getElementById('cv-amount').value = '';
+      document.getElementById('cv-preview').textContent = '';
+    } else {
+      resultEl.textContent = data.message || 'Conversion failed.';
+      resultEl.style.color = 'var(--red)';
+    }
+  } catch(e) {
+    resultEl.textContent = 'Network error. Try again.';
+    resultEl.style.color = 'var(--red)';
+  }
+  btn.disabled = false; btn.textContent = 'Convert';
+}
+document.addEventListener('input', function(e) { if (e.target && e.target.id === 'cv-amount') updateCvPreview(); });
+window.toggleConvertPanel = toggleConvertPanel;
+window.setCvDir = setCvDir;
+window.cvSetMax = cvSetMax;
+window.doConvert = doConvert;
+// ---- end convert ----
+
 function copyWalletAddr() {
   const p = (profileData?.pixie?.Wallet?.Address) || '';
   if (!p) return;
@@ -4760,6 +4950,13 @@ function sbRenderPage() {
   });
   html += '</div>';
   el.innerHTML = html;
+
+  // Re-apply flip-all state after DOM rebuild
+  if (_sbAllFlipped) {
+    setTimeout(function() {
+      document.querySelectorAll('.sb-card-flip').forEach(function(card) { card.classList.add('flipped'); });
+    }, 0);
+  }
 
   if (pag) {
     if (totalPages > 1) {
@@ -5538,14 +5735,14 @@ function renderStaking(s, p) {
     return;
   }
   const categories = [
-    { key: 'mycelium_nodes',   label: 'Mycelium Nodes',  max: 25, img: 'mycelium_node.png' },
-    { key: 'staked_spore',     label: 'Staked SPORE',    max: 20, img: 'spore.png' },
+    { key: 'mycelium_nodes',   label: 'Mycelium Nodes',  max: 100, img: 'mycelium_node.png' },
+    { key: 'staked_spore',     label: 'Staked SPORE',    max: 25, img: 'spore.png' },
     { key: 'planted_shroom',   label: 'Planted SHROOM',  max: 15, img: 'shroom.png' },
     { key: 'onchain_spore',    label: 'Onchain SPORE',   max: 10, img: 'blockchain.png' },
-    { key: 'farm_rank',        label: 'Farm Rank',       max: 10, img: 'shroomfarm.png' },
-    { key: 'pixie_xp',         label: 'Pixie XP',        max: 10, img: 'pixie.png' },
-    { key: 'onchain_shroom',   label: 'Onchain SHROOM',  max: 5,  img: 'blockchain.png' },
-    { key: 'nfts',             label: 'NFTs',             max: 5,  img: 'nft.png' },
+    { key: 'farm_rank',        label: 'Farm Rank',       max: 15, img: 'shroomfarm.png' },
+    { key: 'pixie_xp',         label: 'Pixie XP',        max: 15, img: 'pixie.png' },
+    { key: 'onchain_shroom',   label: 'Onchain SHROOM',  max: 10,  img: 'blockchain.png' },
+    { key: 'nfts',             label: 'NFTs',             max: 10,  img: 'nft.png' },
   ];
   mbEl.innerHTML = categories.map(cat => {
     const val = breakdown[cat.key] || 0;
@@ -6271,6 +6468,90 @@ async function doBuyHerb(ingredient, qty) {
 }
 window.doBuyHerb = doBuyHerb;
 
+function showIngameSporebotModal() {
+  var p = profileData.pixie || {};
+  var s = profileData.sporebot || {};
+  var apy = (s.Farm || {}).APY_Breakdown || {};
+  var totalPct = Number(apy.ingame_sporebot_bonus || 0).toFixed(2);
+
+  // Read raw values from pixie data
+  var shroomGiven   = ((p.Tipping || {}).Total || {}).Given?.Total_Shrooms || 0;
+  var sporeGiven    = ((p.Tipping || {}).Total || {}).Given?.Total_Spores  || 0;
+  var pixieLevel    = (p.Pixie || {}).LvL || 1;
+  var messageXp     = (p.Message_XP || {}).Total_Message_XP || 0;
+  var gsReceived    = (p.GoodShroom || {}).Received || 0;
+
+  // Caps
+  var SHROOM_CAP = 5000000, SPORE_CAP = 500000000, LEVEL_CAP = 420, XP_CAP = 500000, GS_CAP = 100;
+
+  function catPct(val, cap) { return Math.min(val / cap * 5, 5).toFixed(2); }
+  function bar(val, cap) {
+    var pct = Math.min(val / cap * 100, 100);
+    return '<div style="height:6px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;margin:0.2rem 0;">'
+      + '<div style="height:100%;width:' + pct.toFixed(1) + '%;background:var(--blue);border-radius:999px;transition:width 0.5s ease;"></div>'
+      + '</div>';
+  }
+  function nextMilestone(val, step, cap) {
+    if (val >= cap) return null;
+    var next = Math.ceil(val / step) * step;
+    if (next <= val) next += step;
+    return Math.min(next, cap);
+  }
+
+  function catRow(label, img, val, cap, step) {
+    var pct = catPct(val, cap);
+    var maxed = val >= cap;
+    var next = nextMilestone(val, step, cap);
+    var nextPct = next ? catPct(next, cap) : '5.00';
+    return '<div style="margin-bottom:0.75rem;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;">'
+      + '<span style="font-size:0.78rem;font-weight:700;color:rgba(255,255,225,0.85);display:flex;align-items:center;gap:0.35rem;">'
+      + '<img src="/images/' + img + '" style="width:13px;height:13px;object-fit:contain;" onerror="this.style.display=\'none\'">' + label + '</span>'
+      + '<span style="font-family:Space Grotesk,monospace;font-size:0.75rem;font-weight:700;color:var(--blue);">+' + pct + '%</span>'
+      + '</div>'
+      + '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">' + fmt(val) + ' / ' + fmt(cap) + '</div>'
+      + bar(val, cap)
+      + (maxed
+        ? '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:var(--green);margin-top:0.15rem;">MAXED</div>'
+        : '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.25);margin-top:0.15rem;">Next: ' + fmt(next - val) + ' more → ' + nextPct + '%</div>')
+      + '</div>';
+  }
+
+  var maxPct = Math.round(parseFloat(totalPct) / 25 * 100);
+  var mainBar = '<div style="height:7px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;margin:0.3rem 0;">'
+    + '<div style="height:100%;width:' + Math.min(maxPct,100) + '%;background:var(--blue);border-radius:999px;"></div>'
+    + '</div>';
+
+  var body = '<div style="margin-bottom:1rem;padding:0.75rem;background:rgba(79,168,253,0.06);border:1px solid rgba(79,168,253,0.15);border-radius:0.75rem;">'
+    + '<div style="font-size:0.85rem;font-weight:700;color:var(--blue);margin-bottom:0.3rem;">Total SGR Boost: +' + totalPct + '% / 25%</div>'
+    + mainBar
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.4);margin-top:0.1rem;">' + maxPct + '%</div>'
+    + '</div>'
+    + catRow('SHROOM Given',        'shroom.png',      shroomGiven, SHROOM_CAP, 1000000)
+    + catRow('SPORE Given',         'spore.png',       sporeGiven,  SPORE_CAP,  100000000)
+    + catRow('Pixie Level',         'pixie.png',       pixieLevel,  LEVEL_CAP,  84)
+    + catRow('Message XP',          'xp.png',          messageXp,   XP_CAP,     100000)
+    + catRow('Good Shrooms Received','goodshroom.png',  gsReceived,  GS_CAP,     20)
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.25);text-align:center;padding-top:0.5rem;border-top:1px solid rgba(255,255,225,0.06);">Earned through Shroomunity activity. Max +5% per category.</div>';
+
+  // Reuse or create modal
+  var existing = document.getElementById('ingame-sb-modal');
+  if (existing) existing.remove();
+  var modal = document.createElement('div');
+  modal.id = 'ingame-sb-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:1rem;';
+  modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = '<div style="background:var(--dark2);border:1px solid rgba(79,168,253,0.25);border-radius:1.25rem;max-width:380px;width:100%;padding:1.25rem;max-height:85vh;overflow-y:auto;">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;letter-spacing:0.15em;color:var(--blue);">IN-GAME SPOREBOT BREAKDOWN</div>'
+    + '<button onclick="document.getElementById(\'ingame-sb-modal\').remove()" style="background:none;border:none;color:rgba(255,255,225,0.4);font-size:1rem;cursor:pointer;padding:0;">✕</button>'
+    + '</div>'
+    + body
+    + '</div>';
+  document.body.appendChild(modal);
+}
+window.showIngameSporebotModal = showIngameSporebotModal;
+
 function renderBrewing(s) {
   const inv = s.Inventory || {};
   const potions = inv.Potions || {};
@@ -6371,7 +6652,7 @@ function renderBrewing(s) {
           + '</div>';
       } else {
         // Filled slot with potion
-        var score2 = v2['Potion Score'] ? Number(v2['Potion Score']).toFixed(1) : '?';
+        var score2 = v2['Potion Score'] != null ? Number(v2['Potion Score']).toFixed(2) : '?';
         var potionId2 = (v2.emoji||'').match(/:potion(\d+):/)?.[1] || (v2.emoji||'').match(/:(\d+)>/)?.[1];
         var pImg2 = potionId2 ? '/images/potion'+potionId2+'.png' : '/images/potion2.png';
         var safeKey2 = slotKey2.replace(/[^a-zA-Z0-9_]/g,'');
@@ -6550,7 +6831,7 @@ function renderShopQuests(s, p) {
         hasSunspore ? 'Gemstone owned (+5% SGR)' : 'Herbology Level ' + herbLvl + ' / 100 - reach Lv.100 to unlock',
         herbPct, 'var(--yellow)', hasSunspore)
     + questBlock(img('spirit_gemstone.png'), 'Spirit Gemstone',
-        hasSpirit ? 'Gemstone owned (+5% SGR)' : 'Best stored potion score: ' + bestScore.toFixed(1) + ' / 10',
+        hasSpirit ? 'Gemstone owned (+5% SGR)' : 'Best stored potion score: ' + bestScore.toFixed(2) + ' / 10',
         spiritPct, 'var(--purple)', hasSpirit);
 }
 
@@ -7139,12 +7420,14 @@ function renderPixie(p) {
   setEl('px-gs-given',    gsStats.Given    || 0);
   setEl('px-gs-received', gsStats.Received || 0);
   const fmtKp = v => { v = Number(v||0); if(v>=1e6) return (v/1e6).toFixed(2)+'M'; if(v>=1e3) return (v/1e3).toFixed(0)+'K'; return v.toLocaleString(); };
-  const tipRecvShroom = tipping.Total?.Received?.Total_Shrooms || 0;
-  const tipRecvSpore  = tipping.Total?.Received?.Total_Spores  || 0;
-  const rafRecvShroom = tipping.Raffle?.Received?.Total_Shrooms || 0;
-  const rafRecvSpore  = tipping.Raffle?.Received?.Total_Spores  || 0;
-  const airRecvShroom = tipping.Airdrop?.Received?.Total_Shrooms || 0;
-  const airRecvSpore  = tipping.Airdrop?.Received?.Total_Spores  || 0;
+  const totalRecvShroom = tipping.Total?.Received?.Total_Shrooms || 0;
+  const totalRecvSpore  = tipping.Total?.Received?.Total_Spores  || 0;
+  const rafRecvShroom   = tipping.Raffle?.Received?.Total_Shrooms  || 0;
+  const rafRecvSpore    = tipping.Raffle?.Received?.Total_Spores   || 0;
+  const airRecvShroom   = tipping.Airdrop?.Received?.Total_Shrooms || 0;
+  const airRecvSpore    = tipping.Airdrop?.Received?.Total_Spores  || 0;
+  const tipRecvShroom   = Math.max(0, totalRecvShroom - rafRecvShroom - airRecvShroom);
+  const tipRecvSpore    = Math.max(0, totalRecvSpore  - rafRecvSpore  - airRecvSpore);
   const tipVal = (s, sp) =>
     '<img src="/images/shroom.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display=\'none\'">'
     + '<span style="color:var(--red);">' + fmtKp(s) + '</span>'
@@ -7152,14 +7435,12 @@ function renderPixie(p) {
     + '<img src="/images/spore.png" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;" onerror="this.style.display=\'none\'">'
     + '<span style="color:var(--blue);">' + fmtKp(sp) + '</span>';
   const setTip = (id, s, sp) => { const e = document.getElementById(id); if(e) e.innerHTML = tipVal(s, sp); };
-  setTip('px-tip-given',   tipGiven,      tipSpore);
-  setTip('px-tip-recv',    tipRecvShroom, tipRecvSpore);
-  setTip('px-raf-given',   rafShroom,     rafSpore);
-  setTip('px-raf-recv',    rafRecvShroom, rafRecvSpore);
-  setTip('px-air-given',   airShroom,     airSpore);
-  setTip('px-air-recv',    airRecvShroom, airRecvSpore);
+  setTip('px-tip-given',   tipGiven,         tipSpore);
+  setTip('px-tip-recv',    tipRecvShroom,    tipRecvSpore);
+  setTip('px-raf-given',   rafShroom,        rafSpore);
+  setTip('px-air-given',   airShroom,        airSpore);
   setTip('px-total-given', totalGivenShroom, totalGivenSpore);
-  setTip('px-total-rec',   tipRecvShroom,    tipRecvSpore);
+  setTip('px-total-rec',   totalRecvShroom,  totalRecvSpore);
 
   // Achievements
   const achEl = document.getElementById('achievements-content');

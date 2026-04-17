@@ -1738,6 +1738,56 @@ app.post('/api/proposals/:id/vote', async (req, res) => {
 });
 
 // ----------------------------------------------------------------
+// POST /api/wallet/convert
+// Auth required. Converts SHROOM<->SPORE at 100:1 in Discord wallet.
+// ----------------------------------------------------------------
+app.post('/api/wallet/convert', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+
+  const { amount, direction } = req.body;
+  // direction: 'shroom_to_spore' or 'spore_to_shroom'
+  if (!amount || !direction) return res.status(400).json({ ok: false, message: 'Missing amount or direction' });
+
+  const amt = parseInt(amount, 10);
+  if (isNaN(amt) || amt <= 0) return res.status(400).json({ ok: false, message: 'Invalid amount' });
+
+  try {
+    const walletRef = db.ref(`Pixie/Users/${sessionUser.discord_id}/Wallet`);
+    const walletSnap = await walletRef.get();
+    const wallet = walletSnap.val() || {};
+    const shroom = parseInt(wallet.shroom_wallet || 0, 10);
+    const spore  = parseInt(wallet.spore_wallet  || 0, 10);
+
+    let newShroom = shroom;
+    let newSpore  = spore;
+    let resultMsg = '';
+
+    if (direction === 'shroom_to_spore') {
+      if (amt > shroom) return res.status(400).json({ ok: false, message: `Not enough SHROOM. You have ${shroom.toLocaleString()}.` });
+      newShroom = shroom - amt;
+      newSpore  = spore  + (amt * 100);
+      resultMsg = `Converted ${amt.toLocaleString()} SHROOM -> ${(amt * 100).toLocaleString()} SPORE`;
+    } else if (direction === 'spore_to_shroom') {
+      if (amt > spore) return res.status(400).json({ ok: false, message: `Not enough SPORE. You have ${spore.toLocaleString()}.` });
+      if (amt % 100 !== 0) return res.status(400).json({ ok: false, message: 'SPORE amount must be a multiple of 100.' });
+      newSpore  = spore  - amt;
+      newShroom = shroom + (amt / 100);
+      resultMsg = `Converted ${amt.toLocaleString()} SPORE -> ${(amt / 100).toLocaleString()} SHROOM`;
+    } else {
+      return res.status(400).json({ ok: false, message: 'Invalid direction' });
+    }
+
+    await walletRef.update({ shroom_wallet: newShroom, spore_wallet: newSpore });
+    console.log(`[CONVERT] ${sessionUser.discord_id} | ${resultMsg}`);
+    res.json({ ok: true, message: resultMsg, shroom_wallet: newShroom, spore_wallet: newSpore });
+  } catch (err) {
+    console.error('[CONVERT] Error:', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
+// ----------------------------------------------------------------
 // POST /api/proposals/create
 // Auth required. Burns SPORE from Discord wallet, creates proposal.
 // ----------------------------------------------------------------
@@ -2355,6 +2405,41 @@ app.get('/api/leaderboard/snapshot', async (req, res) => {
     res.json({ ok: true, data });
   } catch (err) {
     console.error('[LB-SNAPSHOT]', err);
+    res.status(500).json({ ok: false });
+  }
+});
+
+// GET /api/cave/public - jackpot + top explorers
+app.get('/api/cave/public', async (req, res) => {
+  try {
+    const [jackpotSnap, statsSnap] = await Promise.all([
+      db.ref('Sporebot/Admin/Cave/Jackpot').get(),
+      db.ref('Sporebot/Admin/Cave/Stats').get(),
+    ]);
+
+    const jackpot = jackpotSnap.val() || 0;
+    const allStats = statsSnap.val() || {};
+
+    const leaderboard = Object.entries(allStats)
+      .filter(([, d]) => d.best_streak > 0 && d.user && !String(d.user).match(/^\d+$/))
+      .sort((a, b) => (b[1].best_streak || 0) - (a[1].best_streak || 0))
+      .slice(0, 5)
+      .map(([, d]) => ({ name: d.user, streak: d.best_streak }));
+
+    res.json({ ok: true, jackpot, leaderboard });
+  } catch (err) {
+    console.error('[CAVE-PUBLIC]', err);
+    res.status(500).json({ ok: false });
+  }
+});
+
+// GET /api/cave/stats/:discord_id
+app.get('/api/cave/stats/:discord_id', async (req, res) => {
+  try {
+    const snap = await db.ref(`Sporebot/Admin/Cave/Stats/${req.params.discord_id}`).get();
+    res.json({ ok: true, stats: snap.val() || {} });
+  } catch (err) {
+    console.error('[CAVE-STATS]', err);
     res.status(500).json({ ok: false });
   }
 });
