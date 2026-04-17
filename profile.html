@@ -19,6 +19,8 @@
   <style>
     #cv-amount::-webkit-outer-spin-button,
 #cv-amount::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+    #cv-amount::-webkit-outer-spin-button,
+#cv-amount::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
     .sb-card-flip { perspective: 600px; cursor: pointer; }
 .sb-card-inner { position:relative; width:100%; transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); transform-style:preserve-3d; aspect-ratio:1/1.15; }
 .sb-card-flip.flipped .sb-card-inner { transform:rotateY(180deg); }
@@ -1130,139 +1132,159 @@
 
     <!-- WALLET PANEL -->
     <div id="panel-wallet" style="display:none;">
-      <div class="info-card reveal">
-        <div class="card-title">
-          <img src="/images/blockchain.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-          Token Contracts
-        </div>
-        <div id="tc-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.25rem;">
-          <div style="background:rgba(253,70,79,0.04);border:1px solid rgba(253,70,79,0.18);border-radius:1rem;padding:1rem;">
-            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
-              <img src="/images/shroom.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
-              <span style="font-size:0.95rem;font-weight:700;color:var(--red);letter-spacing:0.05em;">SHROOM</span>
-            </div>
-            <div onclick="navigator.clipboard.writeText('0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1').then(()=>{this.querySelector('.copy-hint').textContent='Copied!';this.style.borderColor='rgba(34,197,94,0.4)';setTimeout(()=>{this.querySelector('.copy-hint').textContent='Tap to copy';this.style.borderColor='rgba(255,255,225,0.08)';},1500)})" style="font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.5);margin-bottom:0.6rem;word-break:break-all;line-height:1.5;background:rgba(255,255,225,0.04);padding:0.4rem 0.6rem;border-radius:0.5rem;cursor:pointer;border:1px solid rgba(255,255,225,0.08);transition:all 0.2s;display:flex;align-items:flex-start;justify-content:space-between;gap:0.4rem;">
-              <span>0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1</span>
-              <span class="copy-hint" style="font-size:0.58rem;color:rgba(255,255,225,0.25);white-space:nowrap;flex-shrink:0;margin-top:1px;">Tap to copy</span>
-            </div>
-            <div style="margin-bottom:0.75rem;">
-              <div style="font-family:Space Grotesk,monospace;font-size:1.35rem;font-weight:700;color:var(--red);" id="tc-shroom-price">...</div>
-              <div style="font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.45);margin-top:0.15rem;" id="tc-shroom-1m">1M = ...</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:0.4rem;">
-              <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(253,70,79,0.35);background:rgba(253,70,79,0.06);color:var(--red);text-decoration:none;text-align:center;transition:all 0.2s;">Buy SHROOM ↗</a>
-              <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,225,0.03);color:rgba(255,255,225,0.4);text-decoration:none;text-align:center;transition:all 0.2s;">Polygonscan ↗</a>
-            </div>
-          </div>
-          <div style="background:rgba(79,168,253,0.04);border:1px solid rgba(79,168,253,0.18);border-radius:1rem;padding:1rem;">
-            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
-              <img src="/images/spore.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
-              <span style="font-size:0.95rem;font-weight:700;color:var(--blue);letter-spacing:0.05em;">SPORE</span>
-            </div>
-            <div onclick="navigator.clipboard.writeText('0x089582AC20ea563c69408a79E1061de594b61bED').then(()=>{this.querySelector('.copy-hint').textContent='Copied!';this.style.borderColor='rgba(34,197,94,0.4)';setTimeout(()=>{this.querySelector('.copy-hint').textContent='Tap to copy';this.style.borderColor='rgba(255,255,225,0.08)';},1500)})" style="font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.5);margin-bottom:0.6rem;word-break:break-all;line-height:1.5;background:rgba(255,255,225,0.04);padding:0.4rem 0.6rem;border-radius:0.5rem;cursor:pointer;border:1px solid rgba(255,255,225,0.08);transition:all 0.2s;display:flex;align-items:flex-start;justify-content:space-between;gap:0.4rem;">
-              <span>0x089582AC20ea563c69408a79E1061de594b61bED</span>
-              <span class="copy-hint" style="font-size:0.58rem;color:rgba(255,255,225,0.25);white-space:nowrap;flex-shrink:0;margin-top:1px;">Tap to copy</span>
-            </div>
-            <div style="margin-bottom:0.75rem;">
-              <div style="font-family:Space Grotesk,monospace;font-size:1.35rem;font-weight:700;color:var(--blue);" id="tc-spore-price">...</div>
-              <div style="font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.45);margin-top:0.15rem;" id="tc-spore-100m">100M = ...</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:0.4rem;">
-              <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(79,168,253,0.35);background:rgba(79,168,253,0.06);color:var(--blue);text-decoration:none;text-align:center;transition:all 0.2s;">Buy SPORE ↗</a>
-              <a href="https://polygonscan.com/token/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,225,0.03);color:rgba(255,255,225,0.4);text-decoration:none;text-align:center;transition:all 0.2s;">Polygonscan ↗</a>
-            </div>
-          </div>
-        </div>
+
+      <div class="tab-bar" style="margin-bottom:1rem;">
+        <button class="tab active" id="wtab-offchain" onclick="switchWalletTab('offchain',this)">Off-Chain</button>
+        <button class="tab" id="wtab-onchain" onclick="switchWalletTab('onchain',this)">On-Chain</button>
       </div>
-      <!-- CONVERT SECTION -->
-      <div class="info-card reveal" id="convert-panel" style="margin-top:1rem;">
-        <div class="card-title">
-          <img src="/images/swaps.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-          Convert
-        </div>
-        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.25rem;">
-          <div style="font-size:0.65rem;color:rgba(255,255,225,0.4);text-align:center;">100 SPORE = 1 SHROOM &nbsp;|&nbsp; fixed rate</div>
-          <div style="display:flex;gap:0.5rem;">
-            <button id="cv-dir-s2s" onclick="setCvDir('spore_to_shroom')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.62rem;font-weight:700;padding:0.45em 0;border-radius:999px;border:none;background:linear-gradient(90deg,rgba(79,168,253,0.85) 0%,rgba(253,70,79,0.85) 100%);color:#fff;cursor:pointer;transition:opacity 0.2s;text-shadow:0 1px 2px rgba(0,0,0,0.3);">SPORE -> SHROOM</button>
-            <button id="cv-dir-h2s" onclick="setCvDir('shroom_to_spore')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.62rem;font-weight:700;padding:0.45em 0;border-radius:999px;border:none;background:linear-gradient(90deg,rgba(253,70,79,0.85) 0%,rgba(79,168,253,0.85) 100%);color:#fff;cursor:pointer;transition:opacity 0.2s;opacity:0.35;text-shadow:0 1px 2px rgba(0,0,0,0.3);">SHROOM -> SPORE</button>
+
+      <!-- OFF-CHAIN -->
+      <div id="wpanel-offchain">
+
+        <div class="info-card reveal">
+          <div class="card-title">
+            <img src="/images/swaps.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+            Convert
           </div>
-          <div style="display:flex;gap:0.5rem;align-items:center;">
-            <input id="cv-amount" type="number" min="1" placeholder="Amount" style="flex:1;background:rgba(255,255,225,0.05);border:1px solid rgba(255,255,225,0.12);border-radius:0.5rem;padding:0.4rem 0.6rem;color:var(--cream);font-family:Space Grotesk,sans-serif;font-size:0.75rem;outline:none;">
-            <button onclick="cvSetMax()" style="font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:600;padding:0.35em 0.8em;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:rgba(255,255,225,0.04);color:rgba(255,255,225,0.5);cursor:pointer;">MAX</button>
-            <button onclick="doConvert()" id="cv-submit-btn" style="font-family:Space Grotesk,sans-serif;font-size:0.7rem;font-weight:700;padding:0.35em 1.1em;border-radius:999px;border:none;background:var(--yellow);color:#111;cursor:pointer;transition:all 0.2s;white-space:nowrap;">Convert</button>
-          </div>
-          <div id="cv-preview" style="font-size:0.68rem;color:rgba(255,255,225,0.4);text-align:center;min-height:1.2em;"></div>
-          <div id="cv-result" style="font-size:0.68rem;text-align:center;min-height:1.2em;"></div>
-        </div>
-      </div>
-      <!-- FARM WALLET -->
-      <div class="info-card reveal" style="margin-top:1rem;">
-        <div class="card-title">
-          <img src="/images/shroomfarm.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-          Farm Wallet
-        </div>
-        <div>
-          <div class="data-row">
-            <span class="dr-label"><img src="/images/shroomfarm.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOMS Planted</span>
-            <span class="dr-val g" id="w-planted">—</span>
-          </div>
-          <div class="data-row" style="border-bottom:none;">
-            <span class="dr-label"><img src="/images/sgr1.webp" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORES Generated</span>
-            <span class="dr-val b" id="w-spore-farm">—</span>
+          <div style="margin-top:0.5rem;display:flex;flex-direction:column;gap:0.6rem;">
+            <div style="font-size:0.65rem;color:rgba(255,255,225,0.35);text-align:center;letter-spacing:0.04em;">100 SPORE = 1 SHROOM &nbsp;|&nbsp; fixed rate</div>
+            <div style="display:flex;gap:0.5rem;">
+              <button id="cv-dir-s2s" onclick="setCvDir('spore_to_shroom')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:700;padding:0.5em 0;border-radius:999px;border:none;background:linear-gradient(90deg,#4fa8fd 0%,#fd464f 100%);color:#fff;cursor:pointer;transition:opacity 0.2s;text-shadow:0 1px 3px rgba(0,0,0,0.4);">SPORE -> SHROOM</button>
+              <button id="cv-dir-h2s" onclick="setCvDir('shroom_to_spore')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:700;padding:0.5em 0;border-radius:999px;border:none;background:linear-gradient(90deg,#fd464f 0%,#4fa8fd 100%);color:#fff;cursor:pointer;transition:opacity 0.2s;opacity:0.35;text-shadow:0 1px 3px rgba(0,0,0,0.4);">SHROOM -> SPORE</button>
+            </div>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <input id="cv-amount" type="number" min="1" placeholder="Amount" style="width:130px;flex:none;background:rgba(255,255,225,0.05);border:1px solid rgba(255,255,225,0.12);border-radius:0.5rem;padding:0.4rem 0.6rem;color:var(--cream);font-family:Space Grotesk,sans-serif;font-size:0.8rem;outline:none;-moz-appearance:textfield;">
+              <button onclick="cvSetMax()" style="font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:600;padding:0.35em 0.75em;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:rgba(255,255,225,0.04);color:rgba(255,255,225,0.45);cursor:pointer;white-space:nowrap;">MAX</button>
+              <button onclick="doConvert()" id="cv-submit-btn" style="font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.38em 1.2em;border-radius:999px;border:none;background:var(--yellow);color:#111;cursor:pointer;transition:opacity 0.2s;white-space:nowrap;">Convert</button>
+            </div>
+            <div id="cv-preview" style="font-size:0.68rem;color:rgba(255,255,225,0.4);min-height:1.1em;"></div>
+            <div id="cv-result" style="font-size:0.68rem;min-height:1.1em;"></div>
           </div>
         </div>
-      </div>
-      <!-- DISCORD WALLET -->
-      <div class="info-card reveal" style="margin-top:1rem;">
-        <div class="card-title">
-          <img src="/images/discord.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-          Discord Wallet
-        </div>
-        <div>
-          <div class="data-row">
-            <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
-            <span class="dr-val r" id="w-shroom">—</span>
+
+        <div class="info-card reveal" style="margin-top:1rem;">
+          <div class="card-title">
+            <img src="/images/shroomfarm.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+            Farm Wallet
           </div>
-          <div class="data-row" style="border-bottom:none;">
-            <span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
-            <span class="dr-val b" id="w-spore">—</span>
-          </div>
-        </div>
-      </div>
-      <div class="info-card reveal" style="margin-top:1rem;">
-        <div class="card-title">
-          <img src="/images/reddit.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-          Reddit Wallet
-        </div>
-        <div id="wallet-reddit-content"><div class="empty-hint">No Reddit wallet linked.</div></div>
-      </div>
-            <div class="info-card reveal" style="margin-top:1rem;">
-        <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
-          <span style="display:flex;align-items:center;gap:0.4rem;">
-            <img src="/images/wallet.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-            Onchain Balances
-          </span>
-          <button id="refresh-onchain-btn" onclick="refreshOnchain()" style="font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.3em 0.9em;border-radius:999px;border:1px solid rgba(79,168,253,0.3);background:rgba(79,168,253,0.07);color:var(--blue);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.35rem;"><img src="/images/blockchain.png" style="width:11px;height:11px;object-fit:contain;" onerror="this.style.display='none'">Refresh Onchain</button>
-        </div>
-        <div>
-          <div class="data-row"><span class="dr-label"><img src="/images/blockchain.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Wallet Address</span><span class="dr-val" id="w-addr" onclick="copyWalletAddr()" style="cursor:pointer;transition:color 0.2s;" title="Click to copy">—</span></div>
-          <div class="data-row">
-            <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
-            <span class="dr-val r" id="w-oc-shroom">—</span>
-          </div>
-          <div class="data-row" style="border-bottom:none;"><span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
-            <span class="dr-val b" id="w-oc-spore">—</span>
+          <div>
+            <div class="data-row">
+              <span class="dr-label"><img src="/images/shroomfarm.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOMS Planted</span>
+              <span class="dr-val g" id="w-planted">—</span>
+            </div>
+            <div class="data-row" style="border-bottom:none;">
+              <span class="dr-label"><img src="/images/sgr1.webp" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORES Generated</span>
+              <span class="dr-val b" id="w-spore-farm">—</span>
+            </div>
           </div>
         </div>
-        <div id="onchain-footer"></div>
-      </div>
-      <div class="info-card reveal" style="margin-top:1rem;">
-        <div class="card-title">
-          <img src="/images/sporulation1.webp" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-          LP Positions
+
+        <div class="info-card reveal" style="margin-top:1rem;">
+          <div class="card-title">
+            <img src="/images/discord.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+            Discord Wallet
+          </div>
+          <div>
+            <div class="data-row">
+              <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
+              <span class="dr-val r" id="w-shroom">—</span>
+            </div>
+            <div class="data-row" style="border-bottom:none;">
+              <span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
+              <span class="dr-val b" id="w-spore">—</span>
+            </div>
+          </div>
         </div>
-        <div id="w-lp-content"><div class="empty-hint" style="padding:1rem 0;">No wallet registered.</div></div>
-      </div>
+
+        <div class="info-card reveal" style="margin-top:1rem;">
+          <div class="card-title">
+            <img src="/images/reddit.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+            Reddit Wallet
+          </div>
+          <div id="wallet-reddit-content"><div class="empty-hint">No Reddit wallet linked.</div></div>
+        </div>
+
+      </div><!-- /wpanel-offchain -->
+
+      <!-- ON-CHAIN -->
+      <div id="wpanel-onchain" style="display:none;">
+
+        <div class="info-card reveal">
+          <div class="card-title">
+            <img src="/images/blockchain.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+            Token Contracts
+          </div>
+          <div id="tc-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.25rem;">
+            <div style="background:rgba(253,70,79,0.04);border:1px solid rgba(253,70,79,0.18);border-radius:1rem;padding:1rem;">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                <img src="/images/shroom.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
+                <span style="font-size:0.95rem;font-weight:700;color:var(--red);letter-spacing:0.05em;">SHROOM</span>
+              </div>
+              <div onclick="navigator.clipboard.writeText('0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1').then(()=>{this.querySelector('.copy-hint').textContent='Copied!';this.style.borderColor='rgba(34,197,94,0.4)';setTimeout(()=>{this.querySelector('.copy-hint').textContent='Tap to copy';this.style.borderColor='rgba(255,255,225,0.08)';},1500)})" style="font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.5);margin-bottom:0.6rem;word-break:break-all;line-height:1.5;background:rgba(255,255,225,0.04);padding:0.4rem 0.6rem;border-radius:0.5rem;cursor:pointer;border:1px solid rgba(255,255,225,0.08);transition:all 0.2s;display:flex;align-items:flex-start;justify-content:space-between;gap:0.4rem;">
+                <span>0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1</span>
+                <span class="copy-hint" style="font-size:0.58rem;color:rgba(255,255,225,0.25);white-space:nowrap;flex-shrink:0;margin-top:1px;">Tap to copy</span>
+              </div>
+              <div style="margin-bottom:0.75rem;">
+                <div style="font-family:Space Grotesk,monospace;font-size:1.35rem;font-weight:700;color:var(--red);" id="tc-shroom-price">...</div>
+                <div style="font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.45);margin-top:0.15rem;" id="tc-shroom-1m">1M = ...</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:0.4rem;">
+                <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(253,70,79,0.35);background:rgba(253,70,79,0.06);color:var(--red);text-decoration:none;text-align:center;transition:all 0.2s;">Buy SHROOM ↗</a>
+                <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,225,0.03);color:rgba(255,255,225,0.4);text-decoration:none;text-align:center;transition:all 0.2s;">Polygonscan ↗</a>
+              </div>
+            </div>
+            <div style="background:rgba(79,168,253,0.04);border:1px solid rgba(79,168,253,0.18);border-radius:1rem;padding:1rem;">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                <img src="/images/spore.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
+                <span style="font-size:0.95rem;font-weight:700;color:var(--blue);letter-spacing:0.05em;">SPORE</span>
+              </div>
+              <div onclick="navigator.clipboard.writeText('0x089582AC20ea563c69408a79E1061de594b61bED').then(()=>{this.querySelector('.copy-hint').textContent='Copied!';this.style.borderColor='rgba(34,197,94,0.4)';setTimeout(()=>{this.querySelector('.copy-hint').textContent='Tap to copy';this.style.borderColor='rgba(255,255,225,0.08)';},1500)})" style="font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.5);margin-bottom:0.6rem;word-break:break-all;line-height:1.5;background:rgba(255,255,225,0.04);padding:0.4rem 0.6rem;border-radius:0.5rem;cursor:pointer;border:1px solid rgba(255,255,225,0.08);transition:all 0.2s;display:flex;align-items:flex-start;justify-content:space-between;gap:0.4rem;">
+                <span>0x089582AC20ea563c69408a79E1061de594b61bED</span>
+                <span class="copy-hint" style="font-size:0.58rem;color:rgba(255,255,225,0.25);white-space:nowrap;flex-shrink:0;margin-top:1px;">Tap to copy</span>
+              </div>
+              <div style="margin-bottom:0.75rem;">
+                <div style="font-family:Space Grotesk,monospace;font-size:1.35rem;font-weight:700;color:var(--blue);" id="tc-spore-price">...</div>
+                <div style="font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.45);margin-top:0.15rem;" id="tc-spore-100m">100M = ...</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:0.4rem;">
+                <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(79,168,253,0.35);background:rgba(79,168,253,0.06);color:var(--blue);text-decoration:none;text-align:center;transition:all 0.2s;">Buy SPORE ↗</a>
+                <a href="https://polygonscan.com/token/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,225,0.03);color:rgba(255,255,225,0.4);text-decoration:none;text-align:center;transition:all 0.2s;">Polygonscan ↗</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card reveal" style="margin-top:1rem;">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="display:flex;align-items:center;gap:0.4rem;">
+              <img src="/images/wallet.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+              Onchain Balances
+            </span>
+            <button id="refresh-onchain-btn" onclick="refreshOnchain()" style="font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.3em 0.9em;border-radius:999px;border:1px solid rgba(79,168,253,0.3);background:rgba(79,168,253,0.07);color:var(--blue);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.35rem;"><img src="/images/blockchain.png" style="width:11px;height:11px;object-fit:contain;" onerror="this.style.display='none'">Refresh Onchain</button>
+          </div>
+          <div>
+            <div class="data-row"><span class="dr-label"><img src="/images/blockchain.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Wallet Address</span><span class="dr-val" id="w-addr" onclick="copyWalletAddr()" style="cursor:pointer;transition:color 0.2s;" title="Click to copy">—</span></div>
+            <div class="data-row">
+              <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
+              <span class="dr-val r" id="w-oc-shroom">—</span>
+            </div>
+            <div class="data-row" style="border-bottom:none;">
+              <span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
+              <span class="dr-val b" id="w-oc-spore">—</span>
+            </div>
+          </div>
+          <div id="onchain-footer"></div>
+        </div>
+
+        <div class="info-card reveal" style="margin-top:1rem;">
+          <div class="card-title">
+            <img src="/images/sporulation1.webp" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+            LP Positions
+          </div>
+          <div id="w-lp-content"><div class="empty-hint" style="padding:1rem 0;">No wallet registered.</div></div>
+        </div>
+
+      </div><!-- /wpanel-onchain -->
 
     </div><!-- /panel-wallet -->
 
@@ -1754,32 +1776,7 @@ function saveInboxMeta() {
     })
   }).catch(function(e) { console.warn('[inbox-meta] save failed', e); });
 }
-var _inboxMeta = { read: {}, archived: {} };
 
-async function loadInboxMeta() {
-  if (!currentUser || !currentUser.discord_id) return;
-  try {
-    var r = await fetch(API_BASE + '/api/inbox-meta/' + currentUser.discord_id);
-    var data = await r.json();
-    if (data.ok) {
-      _inboxMeta.read     = data.read     || {};
-      _inboxMeta.archived = data.archived || {};
-    }
-  } catch(e) {}
-}
-
-function saveInboxMeta() {
-  if (!currentUser || !currentUser.discord_id) return;
-  fetch(API_BASE + '/api/inbox-meta', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      discord_id: currentUser.discord_id,
-      read:     _inboxMeta.read     || {},
-      archived: _inboxMeta.archived || {},
-    })
-  }).catch(function(e) { console.warn('[inbox-meta] save failed', e); });
-}
 
 function switchMsgTab(tab) {
   _msgActiveTab = tab;
@@ -2604,10 +2601,130 @@ async function discardPotion(safeKey, slotKey) {
   }
 }
 window.discardPotion = discardPotion;
+function potionToggleSelect(safeKey, slotKey) {
+  if (_potionSelected[safeKey]) {
+    delete _potionSelected[safeKey];
+  } else {
+    _potionSelected[safeKey] = slotKey;
+  }
+  potionUpdateActionBar();
+  // Update card visual
+  var card = document.getElementById('pcard_'+safeKey);
+  if (card) {
+    var sel = !!_potionSelected[safeKey];
+    card.style.border = '2px solid ' + (sel ? 'rgba(192,132,252,0.7)' : 'rgba(192,132,252,0.2)');
+    card.style.background = sel ? 'rgba(192,132,252,0.1)' : 'rgba(192,132,252,0.04)';
+  }
+}
+window.potionToggleSelect = potionToggleSelect;
+
+function potionClearSelect() {
+  _potionSelected = {};
+  potionUpdateActionBar();
+  document.querySelectorAll('[id^="pcard_"]').forEach(function(c) {
+    c.style.border = '2px solid rgba(192,132,252,0.2)';
+    c.style.background = 'rgba(192,132,252,0.04)';
+  });
+}
+window.potionClearSelect = potionClearSelect;
+
+function potionUpdateActionBar() {
+  var bar = document.getElementById('potion-action-bar');
+  var lbl = document.getElementById('potion-sel-label');
+  var actBtn = document.getElementById('potion-activate-btn');
+  var count = Object.keys(_potionSelected).length;
+  if (!bar) return;
+  if (count === 0) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  if (lbl) lbl.textContent = count + ' potion' + (count > 1 ? 's' : '') + ' selected';
+  if (actBtn) {
+    var canActivate = count === 1;
+    actBtn.disabled = !canActivate;
+    actBtn.style.opacity = canActivate ? '1' : '0.35';
+    actBtn.style.cursor = canActivate ? 'pointer' : 'not-allowed';
+  }
+}
+window.potionUpdateActionBar = potionUpdateActionBar;
+
+function potionActivateSelected() {
+  var keys = Object.keys(_potionSelected);
+  if (keys.length !== 1) return;
+  var safeKey = keys[0];
+  var slotKey = _potionSelected[safeKey];
+  _potionSelected = {};
+  activatePotion(safeKey, slotKey);
+}
+window.potionActivateSelected = potionActivateSelected;
+
+async function potionDiscardSelected() {
+  var keys = Object.keys(_potionSelected);
+  if (!keys.length) return;
+  var count = keys.length;
+  if (!confirm('Discard ' + count + ' potion' + (count>1?'s':'') + '? This cannot be undone.')) return;
+  if (!currentUser || !currentUser.discord_id) return;
+
+  var totalRecovered = {};
+  var lastBrewLevel = 1;
+  var lastRate = 0;
+
+  for (var i = 0; i < keys.length; i++) {
+    var safeKey = keys[i];
+    var slotKey = _potionSelected[safeKey];
+    try {
+      var res = await fetch(API_BASE + '/api/actions/discard-potion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+        credentials: 'include',
+        body: JSON.stringify({ slot_key: slotKey }),
+      });
+      var data = await res.json();
+      if (data.ok) {
+        lastBrewLevel = data.brewing_level || lastBrewLevel;
+        lastRate = data.recovery_rate || lastRate;
+        if (data.recovered) {
+          Object.entries(data.recovered).forEach(function(e) {
+            totalRecovered[e[0]] = (totalRecovered[e[0]] || 0) + e[1];
+          });
+        }
+        if (profileData && profileData.sporebot) {
+          var pots = profileData.sporebot.Inventory = profileData.sporebot.Inventory || {};
+          pots.Potions = pots.Potions || {};
+          delete pots.Potions[slotKey];
+          if (data.recovered) {
+            var ing = pots.Ingredients = pots.Ingredients || {};
+            Object.entries(data.recovered).forEach(function(e){ ing[e[0]] = (ing[e[0]]||0) + e[1]; });
+          }
+        }
+      }
+    } catch(e) { console.error('[potionDiscardSelected]', e); }
+  }
+
+  _potionSelected = {};
+  renderBrewing(profileData.sporebot || {});
+
+  // Show combined recovery toast
+  var _t = document.createElement('div');
+  _t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(192,132,252,0.3);border-radius:0.75rem;padding:0.75rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.72rem;color:var(--cream);z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.5);max-width:300px;text-align:center;';
+  var recKeys = Object.keys(totalRecovered);
+  if (recKeys.length > 0) {
+    var lines = recKeys.map(function(k){ return totalRecovered[k]+'x '+k; }).join(', ');
+    _t.innerHTML = '<div style="color:var(--green);font-weight:700;margin-bottom:0.3rem;">' + count + ' Potion' + (count>1?'s':'') + ' Discarded</div>'
+      + '<div style="color:rgba(255,255,225,0.7);font-size:0.65rem;">Recovered: ' + lines + '</div>'
+      + '<div style="color:rgba(255,255,225,0.35);font-size:0.6rem;margin-top:0.2rem;">Brewing Lv.' + lastBrewLevel + ' (' + lastRate + '% rate)</div>';
+  } else {
+    _t.innerHTML = '<div style="color:rgba(255,255,225,0.6);font-weight:700;margin-bottom:0.3rem;">' + count + ' Potion' + (count>1?'s':'') + ' Discarded</div>'
+      + '<div style="color:rgba(255,255,225,0.4);font-size:0.65rem;">No ingredients recovered</div>';
+  }
+  document.body.appendChild(_t);
+  setTimeout(function(){ _t.style.transition='opacity 0.3s'; _t.style.opacity='0'; setTimeout(function(){ _t.remove(); },300); }, 5000);
+}
+window.potionDiscardSelected = potionDiscardSelected;
+
 // ================================================================
 // BREW STATION
 // ================================================================
 var _brewSelected = []; // array of ingredient name strings
+var _potionSelected = {}; // { safeKey: slotKey } of selected stored potions
 
 function renderBrewStation(s) {
   var el = document.getElementById('brew-station-content');
@@ -2791,8 +2908,16 @@ async function doBrew() {
       var p = data.potion;
       var potionId = (p.emoji||'').match(/:potion(\d+):/)?.[1];
       var pImg = (potionId && parseInt(potionId) < 100) ? '/images/potion' + potionId + '.png' : '/images/potion2.png';
+      var noPercent2 = ['Extra Brews','Extra_Brews','Plant Limit','Plant_Limit'];
       var statLines = Object.entries(p).filter(function(e){ return !['name','emoji','Potion Score','Potion_Score'].includes(e[0]); })
-        .map(function(e){ return e[0].replace(/_/g,' ') + ': ' + (typeof e[1]==='number' ? e[1]+'%' : e[1]); }).join(' | ');
+        .map(function(e){
+          var sl = e[0].replace(/_/g,' ');
+          var sv = typeof e[1]==='number' ? (noPercent2.includes(e[0]) ? e[1].toLocaleString() : e[1]+'%') : e[1];
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.2rem 0;border-top:1px solid rgba(255,255,225,0.05);">'
+            +'<span style="display:flex;align-items:center;gap:4px;font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.65);">'+(STAT_EMOJI[sl]||STAT_EMOJI[e[0]]||'')+sl+'</span>'
+            +'<span style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:700;color:var(--green);">'+sv+'</span>'
+            +'</div>';
+        }).join('');
       var resultEl = document.getElementById('brew-result-banner');
       if (!resultEl) {
         resultEl = document.createElement('div');
@@ -2812,9 +2937,9 @@ async function doBrew() {
         + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.9rem;font-weight:700;color:var(--purple);">' + (p.name||'Potion') + '</span>'
         + '<span style="font-family:Space Grotesk,monospace;font-size:0.7rem;color:rgba(255,255,225,0.4);">' + (p['Potion Score'] != null ? Number(p['Potion Score']).toFixed(2) : '?') + '/10</span>'
         + '</div>'
-        + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.6);line-height:1.8;">' + statLines + '</div>'
+        + '<div style="margin-top:0.25rem;">' + statLines + '</div>'
         + (data.leveled_up ? '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:var(--yellow);margin-top:0.35rem;">Brewing Level Up! Now Lv.' + data.brewing_level + '</div>' : '')
-        + '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.25);margin-top:0.25rem;">+' + data.xp_gain + ' Brewing XP | Saved to ' + data.slot + '</div>';
+        + '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.25);margin-top:0.25rem;">+' + data.xp_gain + ' Brewing XP | Saved to Potion Slot</div>';
     } else {
       if (btn) { btn.textContent = 'Error: ' + (data.message||'Failed'); btn.style.color='var(--red)'; btn.disabled=false; setTimeout(function(){ renderBrewStation(profileData.sporebot||{}); },3000); }
     }
@@ -4263,27 +4388,13 @@ function renderWallet(s, p) {
   var ocFooter = document.getElementById('onchain-footer');
   if (ocFooter) {
     var lastVerified = onchain.last_verified || null;
-    var lastRefText = lastVerified ? 'Last synced: ' + lastVerified : '';
-    ocFooter.innerHTML = lastRefText
-      ? '<div style="text-align:right;margin-top:0.35rem;"><span id="onchain-last-refresh" style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.25);">' + lastRefText + '</span></div>'
+    ocFooter.innerHTML = lastVerified
+      ? '<div style="text-align:right;margin-top:0.35rem;"><span style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.25);">Last synced: ' + lastVerified + '</span></div>'
       : '';
   }
 }
 // ---- Convert panel ----
 var _cvDir = 'spore_to_shroom';
-function toggleConvertPanel() {
-  var panel = document.getElementById('convert-panel');
-  if (!panel) return;
-  var open = panel.style.display !== 'none';
-  panel.style.display = open ? 'none' : 'block';
-  if (!open) {
-    document.getElementById('cv-amount').value = '';
-    document.getElementById('cv-preview').textContent = '';
-    document.getElementById('cv-result').textContent = '';
-    setCvDir('spore_to_shroom');
-    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-}
 function setCvDir(dir) {
   _cvDir = dir;
   var s2s = document.getElementById('cv-dir-s2s');
@@ -4352,7 +4463,6 @@ async function doConvert() {
   btn.disabled = false; btn.textContent = 'Convert';
 }
 document.addEventListener('input', function(e) { if (e.target && e.target.id === 'cv-amount') updateCvPreview(); });
-window.toggleConvertPanel = toggleConvertPanel;
 window.setCvDir = setCvDir;
 window.cvSetMax = cvSetMax;
 window.doConvert = doConvert;
@@ -6651,56 +6761,50 @@ function renderBrewing(s) {
           + '<div style="font-family:Space Grotesk,monospace;font-size:0.5rem;color:rgba(255,255,225,0.18);text-align:center;">Empty</div>'
           + '</div>';
       } else {
-        // Filled slot with potion
+        // Filled slot - selectable card
         var score2 = v2['Potion Score'] != null ? Number(v2['Potion Score']).toFixed(2) : '?';
         var potionId2 = (v2.emoji||'').match(/:potion(\d+):/)?.[1] || (v2.emoji||'').match(/:(\d+)>/)?.[1];
         var pImg2 = potionId2 ? '/images/potion'+potionId2+'.png' : '/images/potion2.png';
         var safeKey2 = slotKey2.replace(/[^a-zA-Z0-9_]/g,'');
         var scoreColor = score2 >= 9 ? 'var(--yellow)' : score2 >= 7 ? 'var(--green)' : 'rgba(255,255,225,0.5)';
+        var isSelected = !!_potionSelected[safeKey2];
         var statLines2 = Object.entries(v2).filter(function(e2){return !['name','emoji','Potion Score','Potion_Score'].includes(e2[0]);})
           .map(function(e2){
-            var sl2=e2[0].replace(/_/g,' ');
-            var sv2=typeof e2[1]==='number'?(e2[1]+(sl2.includes('Limit')||sl2.includes('Brews')?'':'%')):e2[1];
-            return '<div style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:0.1rem 0;border-top:1px solid rgba(255,255,225,0.05);">'
-              +'<span style="font-family:Space Grotesk,monospace;font-size:0.5rem;color:rgba(255,255,225,0.5);display:flex;align-items:center;gap:2px;">'+(STAT_EMOJI[sl2]||STAT_EMOJI[e2[0]]||'')+sl2+'</span>'
-              +'<span style="font-family:Space Grotesk,monospace;font-size:0.52rem;font-weight:700;color:var(--green);">'+sv2+'</span>'
+            var sl2 = e2[0].replace(/_/g,' ');
+            var noPercent = ['Extra Brews','Extra_Brews','Plant Limit','Plant_Limit'];
+            var sv2 = typeof e2[1]==='number' ? (noPercent.includes(e2[0]) ? e2[1].toLocaleString() : e2[1]+'%') : e2[1];
+            return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.2rem 0;border-top:1px solid rgba(255,255,225,0.05);">'
+              +'<span style="font-family:Space Grotesk,monospace;font-size:0.55rem;color:rgba(255,255,225,0.55);display:flex;align-items:center;gap:3px;">'+(STAT_EMOJI[sl2]||STAT_EMOJI[e2[0]]||'')+sl2+'</span>'
+              +'<span style="font-family:Space Grotesk,monospace;font-size:0.58rem;font-weight:700;color:var(--green);">'+sv2+'</span>'
               +'</div>';
           }).join('');
-        var cdNote = potionCdRemaining
-          ? '<div style="font-family:Space Grotesk,monospace;font-size:0.5rem;color:rgba(253,70,79,0.8);text-align:center;margin-top:0.3rem;">Swap CD: ' + potionCdRemaining + '</div>'
-          : '<div style="font-family:Space Grotesk,monospace;font-size:0.5rem;color:rgba(255,255,225,0.3);text-align:center;margin-top:0.3rem;">Swap once per 3 days</div>';
-        var actBtn2 = potionCdRemaining
-          ? '<button disabled style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:700;padding:0.45rem 0;border-radius:0.5rem;border:1px solid rgba(253,70,79,0.2);background:none;color:rgba(253,70,79,0.4);cursor:not-allowed;">On Cooldown</button>'
-          : '<button onclick="event.stopPropagation();activatePotion(\'' + safeKey2 + '\',\'' + slotKey2 + '\')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:700;padding:0.45rem 0;border-radius:0.5rem;border:1px solid rgba(254,206,0,0.35);background:rgba(254,206,0,0.08);color:var(--yellow);cursor:pointer;transition:all 0.2s;">Activate</button>';
-        var discardBtn2 = '<button onclick="event.stopPropagation();discardPotion(\'' + safeKey2 + '\',\'' + slotKey2 + '\')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:700;padding:0.45rem 0;border-radius:0.5rem;border:1px solid rgba(253,70,79,0.2);background:rgba(253,70,79,0.05);color:rgba(253,70,79,0.7);cursor:pointer;transition:all 0.2s;">Discard</button>';
-        slotCells += '<div class="pot-flip" id="pslot_' + safeKey2 + '" onclick="potFlip(\'' + safeKey2 + '\')" style="border-radius:0.875rem;cursor:pointer;perspective:600px;height:100%;min-height:120px;">'
-          + '<div class="pot-flip-inner" id="pslot_inner_' + safeKey2 + '" style="position:relative;width:100%;height:100%;transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);transform-style:preserve-3d;">'
-          // FRONT
-          + '<div style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:0.875rem;border:1px solid rgba(192,132,252,0.25);background:rgba(192,132,252,0.06);display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:0.6rem 0.5rem;">'
-          + '<div style="display:flex;align-items:center;gap:0.35rem;width:100%;margin-bottom:0.3rem;">'
-          + '<img src="' + pImg2 + '" style="width:20px;height:20px;object-fit:contain;flex-shrink:0;" onerror="this.src=\'/images/potion2.png\'">'
-          + '<div style="font-family:Space Grotesk,sans-serif;font-size:0.58rem;font-weight:700;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;">' + cleanEmoji(v2.name||'Potion') + '</div>'
-          + '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;font-weight:700;color:' + scoreColor + ';flex-shrink:0;">' + score2 + '</div>'
+        slotCells += '<div id="pcard_'+safeKey2+'" onclick="potionToggleSelect(\''+safeKey2+'\',\''+slotKey2+'\')" style="border-radius:0.875rem;cursor:pointer;border:2px solid '+(isSelected?'rgba(192,132,252,0.7)':'rgba(192,132,252,0.2)')+';background:'+(isSelected?'rgba(192,132,252,0.1)':'rgba(192,132,252,0.04)')+';display:flex;flex-direction:column;padding:0.65rem 0.6rem;gap:0;transition:all 0.15s;">'
+          + '<div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.35rem;">'
+          + '<img src="'+pImg2+'" style="width:20px;height:20px;object-fit:contain;flex-shrink:0;" onerror="this.src=\'/images/potion2.png\'">'
+          + '<div style="font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:700;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;">'+cleanEmoji(v2.name||'Potion')+'</div>'
+          + '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;font-weight:700;color:'+scoreColor+';flex-shrink:0;">'+score2+'</div>'
+          + (isSelected ? '<div style="width:14px;height:14px;border-radius:50%;background:rgba(192,132,252,0.9);display:flex;align-items:center;justify-content:center;font-size:0.55rem;flex-shrink:0;margin-left:2px;">✓</div>' : '')
           + '</div>'
-          + '<div style="width:100%;flex:1;">' + statLines2 + '</div>'
-          + '</div>'
-          // BACK
-          + '<div style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);border-radius:0.875rem;border:1px solid rgba(254,206,0,0.25);background:rgba(254,206,0,0.05);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.4rem;padding:0.6rem 0.5rem;">'
-          + '<div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.25rem;">'
-          + '<img src="' + pImg2 + '" style="width:16px;height:16px;object-fit:contain;flex-shrink:0;" onerror="this.src=\'/images/potion2.png\'">'
-          + '<div style="font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:700;color:var(--cream);">' + cleanEmoji(v2.name||'Potion') + '</div>'
-          + '</div>'
-          + '<div style="display:flex;gap:0.3rem;width:100%;">' + actBtn2 + discardBtn2 + '</div>'
-          + cdNote
-          + '</div>'
-          + '</div>'
+          + '<div style="flex:1;">'+statLines2+'</div>'
           + '</div>';
       }
     }
 
+    // Action bar (shown when potions selected)
+    var actionBar = '<div id="potion-action-bar" style="display:none;margin-top:0.65rem;padding:0.6rem 0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,225,0.08);border-radius:0.75rem;display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">'
+      + '<span id="potion-sel-label" style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.4);flex:1;">0 selected</span>'
+      + '<button id="potion-activate-btn" onclick="potionActivateSelected()" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:700;padding:0.35rem 0.75rem;border-radius:0.5rem;border:1px solid rgba(254,206,0,0.35);background:rgba(254,206,0,0.08);color:var(--yellow);cursor:pointer;">Activate</button>'
+      + '<button id="potion-discard-btn" onclick="potionDiscardSelected()" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:700;padding:0.35rem 0.75rem;border-radius:0.5rem;border:1px solid rgba(253,70,79,0.3);background:rgba(253,70,79,0.06);color:rgba(253,70,79,0.8);cursor:pointer;">Discard Selected</button>'
+      + '<button onclick="potionClearSelect()" style="font-family:Space Grotesk,monospace;font-size:0.6rem;padding:0.35rem 0.5rem;border-radius:0.5rem;border:1px solid rgba(255,255,225,0.1);background:none;color:rgba(255,255,225,0.3);cursor:pointer;">Clear</button>'
+      + '</div>';
+
     // Detail expand area (hidden, shown on tap)
     storedEl.innerHTML = '<style>.potion-slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-bottom:0.5rem;}.potion-slot-grid>div{min-height:120px;}.pot-flip{display:flex;flex-direction:column;}.pot-flip-inner{flex:1;}@media(max-width:600px){.potion-slot-grid{grid-template-columns:repeat(2,1fr);}}@media(display-mode:standalone){.potion-slot-grid{grid-template-columns:repeat(2,1fr);}}</style>'
-      + '<div class="potion-slot-grid">' + slotCells + '</div>';
+      + '<style>.potion-slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;}.potion-slot-grid>div{min-height:120px;}@media(max-width:600px){.potion-slot-grid{grid-template-columns:repeat(2,1fr);}}@media(display-mode:standalone){.potion-slot-grid{grid-template-columns:repeat(2,1fr);}}</style>'
+      + '<div class="potion-slot-grid">' + slotCells + '</div>'
+      + actionBar;
+    // Restore action bar visibility if selections exist
+    setTimeout(function(){ potionUpdateActionBar(); }, 0);
   } else { storedEl.innerHTML = '<div class="empty-hint">No stored potions.</div>'; }
   
 
@@ -7798,6 +7902,16 @@ async function _revalidateLbSnapshot() {
 })();
 
 var _currentLbTab = 'pixie';
+
+function switchWalletTab(tab, btn) {
+  var off = document.getElementById('wpanel-offchain');
+  var on  = document.getElementById('wpanel-onchain');
+  if (off) off.style.display = tab === 'offchain' ? 'block' : 'none';
+  if (on)  on.style.display  = tab === 'onchain'  ? 'block' : 'none';
+  document.querySelectorAll('#panel-wallet .tab-bar .tab').forEach(function(t) { t.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+}
+window.switchWalletTab = switchWalletTab;
 
 function switchLbTab(tab, btn) {
   _currentLbTab = tab;
