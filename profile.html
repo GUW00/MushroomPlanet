@@ -19,8 +19,6 @@
   <style>
     #cv-amount::-webkit-outer-spin-button,
 #cv-amount::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
-    #cv-amount::-webkit-outer-spin-button,
-#cv-amount::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
     .sb-card-flip { perspective: 600px; cursor: pointer; }
 .sb-card-inner { position:relative; width:100%; transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); transform-style:preserve-3d; aspect-ratio:1/1.15; }
 .sb-card-flip.flipped .sb-card-inner { transform:rotateY(180deg); }
@@ -1132,160 +1130,160 @@
 
     <!-- WALLET PANEL -->
     <div id="panel-wallet" style="display:none;">
-
-      <div class="tab-bar" style="margin-bottom:1rem;">
-        <button class="tab active" id="wtab-offchain" onclick="switchWalletTab('offchain',this)">Off-Chain</button>
-        <button class="tab" id="wtab-onchain" onclick="switchWalletTab('onchain',this)">On-Chain</button>
+      <!-- Wallet sub-tab nav -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem;">
+        <button class="wallet-sub-tab active" onclick="walletSubTab('offchain',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;font-weight:700;padding:0.65rem 0.5rem;border-radius:12px;border:1px solid rgba(253,200,79,0.45);background:rgba(253,200,79,0.12);color:rgba(253,200,79,0.95);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+          <img src="/images/wallet.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">
+          Off-Chain Wallet
+        </button>
+        <button class="wallet-sub-tab" onclick="walletSubTab('onchain',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;font-weight:700;padding:0.65rem 0.5rem;border-radius:12px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,225,0.45);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+          <img src="/images/blockchain.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">
+          On-Chain Wallet
+        </button>
       </div>
 
-      <!-- OFF-CHAIN -->
-      <div id="wpanel-offchain">
-
-        <div class="info-card reveal">
-          <div class="card-title">
-            <img src="/images/swaps.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-            Convert
+      <!-- OFF-CHAIN sub-panel -->
+      <div id="wallet-sub-offchain">
+      <!-- CONVERT SECTION -->
+      <div class="info-card reveal" id="convert-panel" style="margin-top:1rem;">
+        <div class="card-title">
+          <img src="/images/swaps.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Off-Chain Convert
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.3rem;">
+          <div style="font-size:0.63rem;color:rgba(255,255,225,0.35);text-align:center;letter-spacing:0.04em;">100 SPORE = 1 SHROOM &nbsp;|&nbsp; fixed rate</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;min-width:0;">
+            <button id="cv-dir-s2s" onclick="setCvDir('spore_to_shroom')" style="font-family:Space Grotesk,sans-serif;font-size:clamp(0.55rem,1.8vw,0.68rem);font-weight:700;padding:0.65em 0.4em;border-radius:8px;border:1px solid rgba(79,168,253,0.3);background:rgba(255,255,255,0.03);color:var(--cream);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.25rem;min-width:0;overflow:hidden;"><img src="/images/spore.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"><span style="color:var(--blue);font-weight:700;">SPORE</span><img src="/images/arrow.png" style="width:11px;height:11px;object-fit:contain;opacity:0.6;flex-shrink:0;" onerror="this.style.display='none'"><span style="color:var(--red);font-weight:700;">SHROOM</span><img src="/images/shroom.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"></button>
+            <button id="cv-dir-h2s" onclick="setCvDir('shroom_to_spore')" style="font-family:Space Grotesk,sans-serif;font-size:clamp(0.55rem,1.8vw,0.68rem);font-weight:700;padding:0.65em 0.4em;border-radius:8px;border:1px solid rgba(255,255,225,0.08);background:rgba(255,255,255,0.03);color:var(--cream);cursor:pointer;transition:all 0.2s;opacity:0.4;display:flex;align-items:center;justify-content:center;gap:0.25rem;min-width:0;overflow:hidden;"><img src="/images/shroom.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"><span style="color:var(--red);font-weight:700;">SHROOM</span><img src="/images/arrow.png" style="width:11px;height:11px;object-fit:contain;opacity:0.6;flex-shrink:0;" onerror="this.style.display='none'"><span style="color:var(--blue);font-weight:700;">SPORE</span><img src="/images/spore.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"></button>
           </div>
-          <div style="margin-top:0.5rem;display:flex;flex-direction:column;gap:0.6rem;">
-            <div style="font-size:0.65rem;color:rgba(255,255,225,0.35);text-align:center;letter-spacing:0.04em;">100 SPORE = 1 SHROOM &nbsp;|&nbsp; fixed rate</div>
-            <div style="display:flex;gap:0.5rem;">
-              <button id="cv-dir-s2s" onclick="setCvDir('spore_to_shroom')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:700;padding:0.5em 0;border-radius:999px;border:none;background:linear-gradient(90deg,#4fa8fd 0%,#fd464f 100%);color:#fff;cursor:pointer;transition:opacity 0.2s;text-shadow:0 1px 3px rgba(0,0,0,0.4);">SPORE -> SHROOM</button>
-              <button id="cv-dir-h2s" onclick="setCvDir('shroom_to_spore')" style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:700;padding:0.5em 0;border-radius:999px;border:none;background:linear-gradient(90deg,#fd464f 0%,#4fa8fd 100%);color:#fff;cursor:pointer;transition:opacity 0.2s;opacity:0.35;text-shadow:0 1px 3px rgba(0,0,0,0.4);">SHROOM -> SPORE</button>
-            </div>
-            <div style="display:flex;gap:0.5rem;align-items:center;">
-              <input id="cv-amount" type="number" min="1" placeholder="Amount" style="width:130px;flex:none;background:rgba(255,255,225,0.05);border:1px solid rgba(255,255,225,0.12);border-radius:0.5rem;padding:0.4rem 0.6rem;color:var(--cream);font-family:Space Grotesk,sans-serif;font-size:0.8rem;outline:none;-moz-appearance:textfield;">
-              <button onclick="cvSetMax()" style="font-family:Space Grotesk,sans-serif;font-size:0.6rem;font-weight:600;padding:0.35em 0.75em;border-radius:999px;border:1px solid rgba(255,255,225,0.15);background:rgba(255,255,225,0.04);color:rgba(255,255,225,0.45);cursor:pointer;white-space:nowrap;">MAX</button>
-              <button onclick="doConvert()" id="cv-submit-btn" style="font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.38em 1.2em;border-radius:999px;border:none;background:var(--yellow);color:#111;cursor:pointer;transition:opacity 0.2s;white-space:nowrap;">Convert</button>
-            </div>
-            <div id="cv-preview" style="font-size:0.68rem;color:rgba(255,255,225,0.4);min-height:1.1em;"></div>
-            <div id="cv-result" style="font-size:0.68rem;min-height:1.1em;"></div>
+          <div style="display:flex;gap:0.4rem;align-items:center;margin-top:0.1rem;">
+            <input id="cv-amount" type="number" min="1" placeholder="Amount" style="flex:1;background:rgba(255,255,225,0.05);border:1px solid rgba(255,255,225,0.12);border-radius:8px;padding:0.5rem 0.75rem;color:var(--cream);font-family:Space Grotesk,sans-serif;font-size:0.78rem;outline:none;">
+            <button onclick="cvSetMax()" style="font-family:Space Grotesk,sans-serif;font-size:0.62rem;font-weight:600;padding:0.45em 0.9em;border-radius:8px;border:1px solid rgba(255,255,225,0.15);background:rgba(255,255,225,0.05);color:rgba(255,255,225,0.55);cursor:pointer;white-space:nowrap;">MAX</button>
+            <button onclick="doConvert()" id="cv-submit-btn" style="font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.45em 1.2em;border-radius:8px;border:none;background:var(--yellow);color:#111;cursor:pointer;transition:all 0.2s;white-space:nowrap;">Convert</button>
+          </div>
+          <div id="cv-preview" style="font-size:0.68rem;color:rgba(255,255,225,0.4);text-align:center;min-height:1em;"></div>
+          <div id="cv-result" style="font-size:0.68rem;text-align:center;min-height:1em;"></div>
+        </div>
+      </div>
+
+      <!-- DISCORD WALLET -->
+      <div class="info-card reveal" style="margin-top:1rem;">
+        <div class="card-title">
+          <img src="/images/discord.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Discord Wallet
+        </div>
+        <div>
+          <div class="data-row">
+            <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
+            <span class="dr-val r" id="w-shroom">—</span>
+          </div>
+          <div class="data-row" style="border-bottom:none;">
+            <span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
+            <span class="dr-val b" id="w-spore">—</span>
           </div>
         </div>
-
-        <div class="info-card reveal" style="margin-top:1rem;">
-          <div class="card-title">
-            <img src="/images/shroomfarm.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-            Farm Wallet
+      </div>
+            <!-- FARM WALLET -->
+      <div class="info-card reveal" style="margin-top:1rem;">
+        <div class="card-title">
+          <img src="/images/shroomfarm.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Farm Wallet
+        </div>
+        <div>
+          <div class="data-row">
+            <span class="dr-label"><img src="/images/shroomfarm.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOMS Planted</span>
+            <span class="dr-val g" id="w-planted">—</span>
           </div>
-          <div>
-            <div class="data-row">
-              <span class="dr-label"><img src="/images/shroomfarm.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOMS Planted</span>
-              <span class="dr-val g" id="w-planted">—</span>
-            </div>
-            <div class="data-row" style="border-bottom:none;">
-              <span class="dr-label"><img src="/images/sgr1.webp" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORES Generated</span>
-              <span class="dr-val b" id="w-spore-farm">—</span>
-            </div>
+          <div class="data-row" style="border-bottom:none;">
+            <span class="dr-label"><img src="/images/sgr1.webp" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORES Generated</span>
+            <span class="dr-val b" id="w-spore-farm">—</span>
           </div>
         </div>
-
-        <div class="info-card reveal" style="margin-top:1rem;">
-          <div class="card-title">
-            <img src="/images/discord.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-            Discord Wallet
-          </div>
-          <div>
-            <div class="data-row">
-              <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
-              <span class="dr-val r" id="w-shroom">—</span>
-            </div>
-            <div class="data-row" style="border-bottom:none;">
-              <span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
-              <span class="dr-val b" id="w-spore">—</span>
-            </div>
-          </div>
+      </div>
+      <div class="info-card reveal" style="margin-top:1rem;">
+        <div class="card-title">
+          <img src="/images/reddit.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Reddit Wallet
         </div>
+        <div id="wallet-reddit-content"><div class="empty-hint">No Reddit wallet linked.</div></div>
+      </div>
+            </div><!-- /wallet-sub-offchain -->
 
-        <div class="info-card reveal" style="margin-top:1rem;">
-          <div class="card-title">
-            <img src="/images/reddit.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-            Reddit Wallet
-          </div>
-          <div id="wallet-reddit-content"><div class="empty-hint">No Reddit wallet linked.</div></div>
+      <!-- ON-CHAIN sub-panel -->
+      <div id="wallet-sub-onchain" style="display:none;">
+      <div class="info-card reveal">
+        <div class="card-title">
+          <img src="/images/blockchain.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Token Contracts
         </div>
-
-      </div><!-- /wpanel-offchain -->
-
-      <!-- ON-CHAIN -->
-      <div id="wpanel-onchain" style="display:none;">
-
-        <div class="info-card reveal">
-          <div class="card-title">
-            <img src="/images/blockchain.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-            Token Contracts
-          </div>
-          <div id="tc-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.25rem;">
-            <div style="background:rgba(253,70,79,0.04);border:1px solid rgba(253,70,79,0.18);border-radius:1rem;padding:1rem;">
-              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
-                <img src="/images/shroom.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
-                <span style="font-size:0.95rem;font-weight:700;color:var(--red);letter-spacing:0.05em;">SHROOM</span>
-              </div>
-              <div onclick="navigator.clipboard.writeText('0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1').then(()=>{this.querySelector('.copy-hint').textContent='Copied!';this.style.borderColor='rgba(34,197,94,0.4)';setTimeout(()=>{this.querySelector('.copy-hint').textContent='Tap to copy';this.style.borderColor='rgba(255,255,225,0.08)';},1500)})" style="font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.5);margin-bottom:0.6rem;word-break:break-all;line-height:1.5;background:rgba(255,255,225,0.04);padding:0.4rem 0.6rem;border-radius:0.5rem;cursor:pointer;border:1px solid rgba(255,255,225,0.08);transition:all 0.2s;display:flex;align-items:flex-start;justify-content:space-between;gap:0.4rem;">
-                <span>0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1</span>
-                <span class="copy-hint" style="font-size:0.58rem;color:rgba(255,255,225,0.25);white-space:nowrap;flex-shrink:0;margin-top:1px;">Tap to copy</span>
-              </div>
-              <div style="margin-bottom:0.75rem;">
-                <div style="font-family:Space Grotesk,monospace;font-size:1.35rem;font-weight:700;color:var(--red);" id="tc-shroom-price">...</div>
-                <div style="font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.45);margin-top:0.15rem;" id="tc-shroom-1m">1M = ...</div>
-              </div>
-              <div style="display:flex;flex-direction:column;gap:0.4rem;">
-                <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(253,70,79,0.35);background:rgba(253,70,79,0.06);color:var(--red);text-decoration:none;text-align:center;transition:all 0.2s;">Buy SHROOM ↗</a>
-                <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,225,0.03);color:rgba(255,255,225,0.4);text-decoration:none;text-align:center;transition:all 0.2s;">Polygonscan ↗</a>
-              </div>
+        <div id="tc-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.25rem;">
+          <div style="background:rgba(253,70,79,0.04);border:1px solid rgba(253,70,79,0.18);border-radius:1rem;padding:1rem;">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+              <img src="/images/shroom.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
+              <span style="font-size:0.95rem;font-weight:700;color:var(--red);letter-spacing:0.05em;">SHROOM</span>
             </div>
-            <div style="background:rgba(79,168,253,0.04);border:1px solid rgba(79,168,253,0.18);border-radius:1rem;padding:1rem;">
-              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
-                <img src="/images/spore.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
-                <span style="font-size:0.95rem;font-weight:700;color:var(--blue);letter-spacing:0.05em;">SPORE</span>
-              </div>
-              <div onclick="navigator.clipboard.writeText('0x089582AC20ea563c69408a79E1061de594b61bED').then(()=>{this.querySelector('.copy-hint').textContent='Copied!';this.style.borderColor='rgba(34,197,94,0.4)';setTimeout(()=>{this.querySelector('.copy-hint').textContent='Tap to copy';this.style.borderColor='rgba(255,255,225,0.08)';},1500)})" style="font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.5);margin-bottom:0.6rem;word-break:break-all;line-height:1.5;background:rgba(255,255,225,0.04);padding:0.4rem 0.6rem;border-radius:0.5rem;cursor:pointer;border:1px solid rgba(255,255,225,0.08);transition:all 0.2s;display:flex;align-items:flex-start;justify-content:space-between;gap:0.4rem;">
-                <span>0x089582AC20ea563c69408a79E1061de594b61bED</span>
-                <span class="copy-hint" style="font-size:0.58rem;color:rgba(255,255,225,0.25);white-space:nowrap;flex-shrink:0;margin-top:1px;">Tap to copy</span>
-              </div>
-              <div style="margin-bottom:0.75rem;">
-                <div style="font-family:Space Grotesk,monospace;font-size:1.35rem;font-weight:700;color:var(--blue);" id="tc-spore-price">...</div>
-                <div style="font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.45);margin-top:0.15rem;" id="tc-spore-100m">100M = ...</div>
-              </div>
-              <div style="display:flex;flex-direction:column;gap:0.4rem;">
-                <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(79,168,253,0.35);background:rgba(79,168,253,0.06);color:var(--blue);text-decoration:none;text-align:center;transition:all 0.2s;">Buy SPORE ↗</a>
-                <a href="https://polygonscan.com/token/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,225,0.03);color:rgba(255,255,225,0.4);text-decoration:none;text-align:center;transition:all 0.2s;">Polygonscan ↗</a>
-              </div>
+            <div onclick="navigator.clipboard.writeText('0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1').then(()=>{this.querySelector('.copy-hint').textContent='Copied!';this.style.borderColor='rgba(34,197,94,0.4)';setTimeout(()=>{this.querySelector('.copy-hint').textContent='Tap to copy';this.style.borderColor='rgba(255,255,225,0.08)';},1500)})" style="font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.5);margin-bottom:0.6rem;word-break:break-all;line-height:1.5;background:rgba(255,255,225,0.04);padding:0.4rem 0.6rem;border-radius:0.5rem;cursor:pointer;border:1px solid rgba(255,255,225,0.08);transition:all 0.2s;display:flex;align-items:flex-start;justify-content:space-between;gap:0.4rem;">
+              <span>0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1</span>
+              <span class="copy-hint" style="font-size:0.58rem;color:rgba(255,255,225,0.25);white-space:nowrap;flex-shrink:0;margin-top:1px;">Tap to copy</span>
+            </div>
+            <div style="margin-bottom:0.75rem;">
+              <div style="font-family:Space Grotesk,monospace;font-size:1.35rem;font-weight:700;color:var(--red);" id="tc-shroom-price">...</div>
+              <div style="font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.45);margin-top:0.15rem;" id="tc-shroom-1m">1M = ...</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.4rem;">
+              <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(253,70,79,0.35);background:rgba(253,70,79,0.06);color:var(--red);text-decoration:none;text-align:center;transition:all 0.2s;">Buy SHROOM</a>
+              <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,225,0.03);color:rgba(255,255,225,0.4);text-decoration:none;text-align:center;transition:all 0.2s;">Polygonscan</a>
+            </div>
+          </div>
+          <div style="background:rgba(79,168,253,0.04);border:1px solid rgba(79,168,253,0.18);border-radius:1rem;padding:1rem;">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+              <img src="/images/spore.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
+              <span style="font-size:0.95rem;font-weight:700;color:var(--blue);letter-spacing:0.05em;">SPORE</span>
+            </div>
+            <div onclick="navigator.clipboard.writeText('0x089582AC20ea563c69408a79E1061de594b61bED').then(()=>{this.querySelector('.copy-hint').textContent='Copied!';this.style.borderColor='rgba(34,197,94,0.4)';setTimeout(()=>{this.querySelector('.copy-hint').textContent='Tap to copy';this.style.borderColor='rgba(255,255,225,0.08)';},1500)})" style="font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.5);margin-bottom:0.6rem;word-break:break-all;line-height:1.5;background:rgba(255,255,225,0.04);padding:0.4rem 0.6rem;border-radius:0.5rem;cursor:pointer;border:1px solid rgba(255,255,225,0.08);transition:all 0.2s;display:flex;align-items:flex-start;justify-content:space-between;gap:0.4rem;">
+              <span>0x089582AC20ea563c69408a79E1061de594b61bED</span>
+              <span class="copy-hint" style="font-size:0.58rem;color:rgba(255,255,225,0.25);white-space:nowrap;flex-shrink:0;margin-top:1px;">Tap to copy</span>
+            </div>
+            <div style="margin-bottom:0.75rem;">
+              <div style="font-family:Space Grotesk,monospace;font-size:1.35rem;font-weight:700;color:var(--blue);" id="tc-spore-price">...</div>
+              <div style="font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(255,255,225,0.45);margin-top:0.15rem;" id="tc-spore-100m">100M = ...</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.4rem;">
+              <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(79,168,253,0.35);background:rgba(79,168,253,0.06);color:var(--blue);text-decoration:none;text-align:center;transition:all 0.2s;">Buy SPORE</a>
+              <a href="https://polygonscan.com/token/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,225,0.03);color:rgba(255,255,225,0.4);text-decoration:none;text-align:center;transition:all 0.2s;">Polygonscan</a>
             </div>
           </div>
         </div>
-
-        <div class="info-card reveal" style="margin-top:1rem;">
-          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
-            <span style="display:flex;align-items:center;gap:0.4rem;">
-              <img src="/images/wallet.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-              Onchain Balances
-            </span>
-            <button id="refresh-onchain-btn" onclick="refreshOnchain()" style="font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.3em 0.9em;border-radius:999px;border:1px solid rgba(79,168,253,0.3);background:rgba(79,168,253,0.07);color:var(--blue);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.35rem;"><img src="/images/blockchain.png" style="width:11px;height:11px;object-fit:contain;" onerror="this.style.display='none'">Refresh Onchain</button>
-          </div>
-          <div>
-            <div class="data-row"><span class="dr-label"><img src="/images/blockchain.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Wallet Address</span><span class="dr-val" id="w-addr" onclick="copyWalletAddr()" style="cursor:pointer;transition:color 0.2s;" title="Click to copy">—</span></div>
-            <div class="data-row">
-              <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
-              <span class="dr-val r" id="w-oc-shroom">—</span>
-            </div>
-            <div class="data-row" style="border-bottom:none;">
-              <span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
-              <span class="dr-val b" id="w-oc-spore">—</span>
-            </div>
-          </div>
-          <div id="onchain-footer"></div>
+      </div>
+      <div class="info-card reveal" style="margin-top:1rem;">
+        <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="display:flex;align-items:center;gap:0.4rem;">
+            <img src="/images/wallet.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+            Onchain Balances
+          </span>
+          <button id="refresh-onchain-btn" onclick="refreshOnchain()" style="font-family:Space Grotesk,sans-serif;font-size:0.65rem;font-weight:600;padding:0.3em 0.9em;border-radius:999px;border:1px solid rgba(79,168,253,0.3);background:rgba(79,168,253,0.07);color:var(--blue);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.35rem;"><img src="/images/blockchain.png" style="width:11px;height:11px;object-fit:contain;" onerror="this.style.display='none'">Refresh Onchain</button>
         </div>
-
-        <div class="info-card reveal" style="margin-top:1rem;">
-          <div class="card-title">
-            <img src="/images/sporulation1.webp" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
-            LP Positions
+        <div>
+          <div class="data-row"><span class="dr-label"><img src="/images/blockchain.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Wallet Address</span><span class="dr-val" id="w-addr" onclick="copyWalletAddr()" style="cursor:pointer;transition:color 0.2s;" title="Click to copy">—</span></div>
+          <div class="data-row">
+            <span class="dr-label"><img src="/images/shroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SHROOM</span>
+            <span class="dr-val r" id="w-oc-shroom">—</span>
           </div>
-          <div id="w-lp-content"><div class="empty-hint" style="padding:1rem 0;">No wallet registered.</div></div>
+          <div class="data-row" style="border-bottom:none;"><span class="dr-label"><img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SPORE</span>
+            <span class="dr-val b" id="w-oc-spore">—</span>
+          </div>
         </div>
+        <div id="onchain-footer"></div>
+      </div>
+      <div class="info-card reveal" style="margin-top:1rem;">
+        <div class="card-title">
+          <img src="/images/sporulation1.webp" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          LP Positions
+        </div>
+        <div id="w-lp-content"><div class="empty-hint" style="padding:1rem 0;">No wallet registered.</div></div>
+      </div>
 
-      </div><!-- /wpanel-onchain -->
-
+    </div><!-- /wallet-sub-onchain -->
     </div><!-- /panel-wallet -->
 
     <!-- LEADERBOARD PANEL -->
@@ -1776,7 +1774,32 @@ function saveInboxMeta() {
     })
   }).catch(function(e) { console.warn('[inbox-meta] save failed', e); });
 }
+var _inboxMeta = { read: {}, archived: {} };
 
+async function loadInboxMeta() {
+  if (!currentUser || !currentUser.discord_id) return;
+  try {
+    var r = await fetch(API_BASE + '/api/inbox-meta/' + currentUser.discord_id);
+    var data = await r.json();
+    if (data.ok) {
+      _inboxMeta.read     = data.read     || {};
+      _inboxMeta.archived = data.archived || {};
+    }
+  } catch(e) {}
+}
+
+function saveInboxMeta() {
+  if (!currentUser || !currentUser.discord_id) return;
+  fetch(API_BASE + '/api/inbox-meta', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      discord_id: currentUser.discord_id,
+      read:     _inboxMeta.read     || {},
+      archived: _inboxMeta.archived || {},
+    })
+  }).catch(function(e) { console.warn('[inbox-meta] save failed', e); });
+}
 
 function switchMsgTab(tab) {
   _msgActiveTab = tab;
@@ -3574,6 +3597,22 @@ function switchTab(name, btn) {
 }
 window.switchTab = switchTab;
 
+function walletSubTab(name, btn) {
+  document.querySelectorAll('.wallet-sub-tab').forEach(function(b) {
+    b.style.background = 'rgba(255,255,255,0.03)';
+    b.style.borderColor = 'rgba(255,255,225,0.1)';
+    b.style.color = 'rgba(255,255,225,0.45)';
+    b.classList.remove('active');
+  });
+  btn.style.background = 'rgba(253,200,79,0.12)';
+  btn.style.borderColor = 'rgba(253,200,79,0.45)';
+  btn.style.color = 'rgba(253,200,79,0.95)';
+  btn.classList.add('active');
+  document.getElementById('wallet-sub-offchain').style.display = name === 'offchain' ? 'block' : 'none';
+  document.getElementById('wallet-sub-onchain').style.display  = name === 'onchain'  ? 'block' : 'none';
+}
+window.walletSubTab = walletSubTab;
+
 function brewSubTab(name, btn) {
   document.querySelectorAll('.brew-sub-tab').forEach(function(b) {
     b.style.background = 'rgba(255,255,255,0.03)';
@@ -4388,13 +4427,27 @@ function renderWallet(s, p) {
   var ocFooter = document.getElementById('onchain-footer');
   if (ocFooter) {
     var lastVerified = onchain.last_verified || null;
-    ocFooter.innerHTML = lastVerified
-      ? '<div style="text-align:right;margin-top:0.35rem;"><span style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.25);">Last synced: ' + lastVerified + '</span></div>'
+    var lastRefText = lastVerified ? 'Last synced: ' + lastVerified : '';
+    ocFooter.innerHTML = lastRefText
+      ? '<div style="text-align:right;margin-top:0.35rem;"><span id="onchain-last-refresh" style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.25);">' + lastRefText + '</span></div>'
       : '';
   }
 }
 // ---- Convert panel ----
 var _cvDir = 'spore_to_shroom';
+function toggleConvertPanel() {
+  var panel = document.getElementById('convert-panel');
+  if (!panel) return;
+  var open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'block';
+  if (!open) {
+    document.getElementById('cv-amount').value = '';
+    document.getElementById('cv-preview').textContent = '';
+    document.getElementById('cv-result').textContent = '';
+    setCvDir('spore_to_shroom');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
 function setCvDir(dir) {
   _cvDir = dir;
   var s2s = document.getElementById('cv-dir-s2s');
@@ -4431,10 +4484,13 @@ async function doConvert() {
   if (_cvDir === 'spore_to_shroom' && amt % 100 !== 0) { resultEl.textContent = 'Must be a multiple of 100.'; resultEl.style.color = 'var(--red)'; return; }
   btn.disabled = true; btn.textContent = 'Converting...';
   resultEl.textContent = ''; resultEl.style.color = '';
-  var discordId = (profileData && profileData.pixie && profileData.pixie.Misc && profileData.pixie.Misc.discord_id)
+  var stored = {};
+  try { stored = JSON.parse(localStorage.getItem('mp_profile_user') || '{}'); } catch(e) {}
+  var discordId = stored.discord_id
+    || (profileData && profileData.pixie && profileData.pixie.Misc && profileData.pixie.Misc.discord_id)
     || (profileData && profileData.sporebot && profileData.sporebot.discord_id) || '';
   try {
-    var resp = await fetch('/api/wallet/convert', {
+    var resp = await fetch((window.API_BASE || '') + '/api/wallet/convert', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-discord-id': discordId },
       credentials: 'include',
@@ -4463,6 +4519,7 @@ async function doConvert() {
   btn.disabled = false; btn.textContent = 'Convert';
 }
 document.addEventListener('input', function(e) { if (e.target && e.target.id === 'cv-amount') updateCvPreview(); });
+window.toggleConvertPanel = toggleConvertPanel;
 window.setCvDir = setCvDir;
 window.cvSetMax = cvSetMax;
 window.doConvert = doConvert;
@@ -7902,16 +7959,6 @@ async function _revalidateLbSnapshot() {
 })();
 
 var _currentLbTab = 'pixie';
-
-function switchWalletTab(tab, btn) {
-  var off = document.getElementById('wpanel-offchain');
-  var on  = document.getElementById('wpanel-onchain');
-  if (off) off.style.display = tab === 'offchain' ? 'block' : 'none';
-  if (on)  on.style.display  = tab === 'onchain'  ? 'block' : 'none';
-  document.querySelectorAll('#panel-wallet .tab-bar .tab').forEach(function(t) { t.classList.remove('active'); });
-  if (btn) btn.classList.add('active');
-}
-window.switchWalletTab = switchWalletTab;
 
 function switchLbTab(tab, btn) {
   _currentLbTab = tab;
