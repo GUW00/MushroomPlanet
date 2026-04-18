@@ -2238,11 +2238,10 @@ function msgRenderPage() {
 
   var FILTERS = [
     { key: 'all',    label: 'All',     border: 'rgba(255,255,225,0.3)',  bg: 'rgba(255,255,225,0.06)', text: 'rgba(255,255,225,0.7)'  },
-    { key: 'shroom', label: 'SHROOM',  border: 'rgba(234,179,8,0.5)',    bg: 'rgba(234,179,8,0.1)',    text: 'rgba(234,179,8,0.95)'   },
+    { key: 'shroom', label: 'SHROOM',  border: 'rgba(253,70,79,0.5)',    bg: 'rgba(253,70,79,0.1)',    text: 'rgba(253,70,79,0.95)'   },
     { key: 'spore',  label: 'SPORE',   border: 'rgba(96,165,250,0.5)',   bg: 'rgba(96,165,250,0.1)',   text: 'rgba(96,165,250,0.95)'  },
-    { key: 'earned', label: 'Earned',  border: 'rgba(74,222,128,0.5)',   bg: 'rgba(74,222,128,0.1)',   text: 'rgba(74,222,128,0.95)'  },
     { key: 'web',    label: 'Web',     border: 'rgba(192,132,252,0.5)',  bg: 'rgba(192,132,252,0.1)',  text: 'rgba(192,132,252,0.95)' },
-    { key: 'tip',    label: 'Tips',    border: 'rgba(236,72,153,0.5)',   bg: 'rgba(236,72,153,0.1)',   text: 'rgba(236,72,153,0.95)'  },
+    { key: 'tip',    label: 'Tips',    border: 'rgba(234,179,8,0.5)',    bg: 'rgba(234,179,8,0.1)',    text: 'rgba(234,179,8,0.95)'   },
     { key: 'potion', label: 'Potions', border: 'rgba(99,212,180,0.5)',   bg: 'rgba(99,212,180,0.1)',   text: 'rgba(99,212,180,0.95)'  },
   ];
 
@@ -2259,11 +2258,10 @@ function msgRenderPage() {
   var filtered = _msgAllLogs.filter(function(entry) {
     if (_logsFilter === 'all') return true;
     var t = entry.text.toLowerCase();
-    if (_logsFilter === 'shroom')  return t.includes('shroom') && !t.includes('spore');
+    if (_logsFilter === 'shroom')  return /\bshrooms?\b/.test(t) && !t.includes('spore') && !t.includes('shroomstone');
     if (_logsFilter === 'spore')   return t.includes('spore') || t.includes('staked') || t.includes('planted');
-    if (_logsFilter === 'earned')  return t.includes('earned') || t.includes('found') || t.includes('won') || t.includes('received') || t.includes('foraged') || t.includes('misted') || t.includes('fanned');
     if (_logsFilter === 'web')     return t.includes('[web]');
-    if (_logsFilter === 'tip')     return t.includes('tip') || t.includes('gave') || t.includes('sent') || t.includes('received') || t.includes('gs token') || t.includes('jackpot') || t.includes('secret garden') || t.includes('king mooshie') || t.includes('granted');
+    if (_logsFilter === 'tip')     return t.includes('tip') || t.includes('gave') || t.includes('gs token') || t.includes('king mooshie') || t.includes('granted') || (t.includes('received') && t.includes('from'));
     if (_logsFilter === 'potion')  return t.includes('potion') || t.includes('brewed') || t.includes('brew') || t.includes('herb') || t.includes('ingredient');
     if (_logsFilter === 'cave')    return t.includes('cave') || t.includes('gem') || t.includes('dungeon');
     return true;
@@ -2284,14 +2282,21 @@ function msgRenderPage() {
 
   // Color classifier
   function logColor(t) {
-    if (t.includes('[web]'))                                                         return 'rgba(192,132,252,0.9)';
-    if (t.includes('tip') || t.includes('gave') || t.includes('sent') || t.includes('received') || t.includes('gs token') || t.includes('jackpot') || t.includes('secret garden') || t.includes('king mooshie') || t.includes('granted')) return 'rgba(236,72,153,0.85)';
-    if (t.includes('potion') || t.includes('brewed') || t.includes('herb'))         return 'rgba(99,212,180,0.85)';
-    if (t.includes('cave') || t.includes('gem') || t.includes('dungeon'))           return 'rgba(253,70,79,0.8)';
-    if (t.includes('spore') || t.includes('staked') || t.includes('planted'))       return 'var(--blue)';
-    if (t.includes('shroom') && (t.includes('earned') || t.includes('foraged') || t.includes('misted') || t.includes('fanned') || t.includes('won') || t.includes('fresh air') || t.includes('fed') || t.includes('tossed') || t.includes('explored') || t.includes('visited'))) return 'rgba(234,179,8,0.85)';
-    if (t.includes('earned') || t.includes('found') || t.includes('won') || t.includes('received')) return 'var(--green)';
-    if (t.includes('used') || t.includes('paid') || t.includes('lost'))             return 'rgba(253,70,79,0.6)';
+    // Purple - web actions (check first)
+    if (t.includes('[web]')) return 'rgba(192,132,252,0.9)';
+    // Green - herbs, potions, gathered, brewed, discard, ingredients
+    if (t.includes('herb') || t.includes('gathered') || t.includes('potion') || t.includes('brewed') || t.includes('discarded') || t.includes('ingredient') || t.includes('brewing') || t.includes('explored') || t.includes('found')) return 'rgba(99,212,180,0.85)';
+    // Yellow - tips and GS ONLY
+    if (t.includes('tip') || t.includes('gave') || t.includes('gs token') || t.includes('tipped')) return 'rgba(234,179,8,0.9)';
+    // Orange - cave, used, entered, fed, tossed, vacation, jackpot, streak, daily, quest, milestone, quartz, king mooshie, granted, round, added, goodshroom
+    if (t.includes('cave') || t.includes('tossed') || t.includes('vacation') || t.includes('goodshroom') || t.includes('used') || t.includes('entered') || t.includes('fed the animal') || t.includes('jackpot') || t.includes('added') || t.includes('streak') || t.includes('daily') || t.includes('quest') || t.includes('milestone') || t.includes('quartz') || t.includes('king mooshie') || t.includes('granted') || t.includes('round')) return 'rgba(249,115,22,0.9)';
+    // Red - earned + shroom (SHROOM earnings)
+    if ((t.includes('shroom') || t.includes('shrooms')) && (t.includes('earned') || t.includes('foraged') || t.includes('misted') || t.includes('fanned') || t.includes('fresh air') || t.includes('fed') || t.includes('explored') || t.includes('dug') || t.includes('received') || t.includes('found') || t.includes('provided') || t.includes('transferred') || t.includes('tossed') || t.includes('visited'))) return 'rgba(253,70,79,0.9)';
+    // Blue - spore related
+    if (t.includes('spore') || t.includes('staked') || t.includes('planted') || t.includes('converted')) return 'var(--blue)';
+    // Red - farm regression
+    if (t.includes('regressed') || t.includes('reverted') || t.includes('delayed') || t.includes('penalt')) return 'rgba(253,70,79,0.8)';
+    // Fallback
     return 'rgba(255,255,225,0.65)';
   }
 
