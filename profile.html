@@ -855,23 +855,25 @@
           <div class="data-grid force-2col" style="grid-template-columns:1fr 1fr;">
             <div>
               <div class="data-row"><span class="dr-label"><img src="/images/spore.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Staked SPORE</span><span class="dr-val g" id="s-staked">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/sgr1.webp" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Pending Rewards</span><span class="dr-val g" id="s-pending">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/sporulation1.webp" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Total Earned</span><span class="dr-val g" id="s-total-earned">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/sgr1.webp" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Claimable Now</span><span class="dr-val g" id="s-pending">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/sporulation1.webp" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Lifetime Earned</span><span class="dr-val g" id="s-total-earned">—</span></div>
+          
             </div>
             <div>
               <div class="data-row"><span class="dr-label"><img src="/images/apy1.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Staking APY</span><span class="dr-val y" id="s-apy">—</span></div>
+              <div class="data-row"><span class="dr-label"><img src="/images/rate.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Daily Rate</span><span class="dr-val b" id="s-daily-rate">—</span></div>
               <div class="data-row"><span class="dr-label"><img src="/images/mycelium_node.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Mycelium Nodes</span><span class="dr-val p" id="s-nodes">—</span></div>
-              <div class="data-row"><span class="dr-label"><img src="/images/cooldown.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Next Node At</span><span class="dr-val b" id="s-next-node">—</span></div>
+              
             </div>
           </div>
-        </div>
-        <div class="info-card">
-          <div class="card-title"><img src="/images/mvp.png" style="width:14px;height:14px;object-fit:contain;opacity:0.9;" onerror="this.style.display='none'"> MVP Breakdown</div>
-          <div id="mvp-breakdown"></div>
         </div>
         <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/growing_nodes.png" style="width:14px;height:14px;object-fit:contain;opacity:0.9;" onerror="this.style.display='none'"> Growing Nodes</div>
           <div id="nodes-breakdown"><div class="empty-hint">No nodes yet.</div></div>
+        </div>
+                <div class="info-card">
+          <div class="card-title"><img src="/images/mvp.png" style="width:14px;height:14px;object-fit:contain;opacity:0.9;" onerror="this.style.display='none'"> MVP Breakdown</div>
+          <div id="mvp-breakdown"></div>
         </div>
       </div>
 
@@ -1282,6 +1284,7 @@
             <div style="display:flex;flex-direction:column;gap:0.4rem;">
               <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(253,70,79,0.35);background:rgba(253,70,79,0.06);color:var(--red);text-decoration:none;text-align:center;transition:all 0.2s;">Buy SHROOM</a>
               <a href="https://polygonscan.com/token/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,225,0.03);color:rgba(255,255,225,0.4);text-decoration:none;text-align:center;transition:all 0.2s;">Polygonscan</a>
+              <a href="https://www.geckoterminal.com/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(253,70,79,0.2);background:rgba(253,70,79,0.03);color:rgba(253,70,79,0.6);text-decoration:none;text-align:center;transition:all 0.2s;">Chart</a>
             </div>
           </div>
           <div style="background:rgba(79,168,253,0.04);border:1px solid rgba(79,168,253,0.18);border-radius:1rem;padding:1rem;">
@@ -1300,6 +1303,7 @@
             <div style="display:flex;flex-direction:column;gap:0.4rem;">
               <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(79,168,253,0.35);background:rgba(79,168,253,0.06);color:var(--blue);text-decoration:none;text-align:center;transition:all 0.2s;">Buy SPORE</a>
               <a href="https://polygonscan.com/token/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,225,0.03);color:rgba(255,255,225,0.4);text-decoration:none;text-align:center;transition:all 0.2s;">Polygonscan</a>
+              <a href="https://www.geckoterminal.com/polygon_pos/pools/0x2a91571238303c6700a9336342c754e159243168" target="_blank" rel="noopener noreferrer" style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:600;padding:0.4em 0;border-radius:999px;border:1px solid rgba(79,168,253,0.2);background:rgba(79,168,253,0.03);color:rgba(79,168,253,0.6);text-decoration:none;text-align:center;transition:all 0.2s;">Chart</a>
             </div>
           </div>
         </div>
@@ -6098,26 +6102,52 @@ function renderStaking(s, p) {
   const staked  = staking.staked_spores || 0;
   const nodes   = staked > 0 ? Math.floor(staked / 100_000_000) : 0;
 
-  setEl('s-staked',       fmt(staking.staked_spores || 0));
-  setEl('s-pending',      fmt(staking.pending_rewards || 0));
-  // Count matured nodes (age >= 90 days)
+  setEl('s-staked', fmt(staking.staked_spores || 0));
+
+  // Count matured nodes and find soonest maturing node
   const nodesObj = staking.nodes || {};
-  const now = Date.now();
+  const nowMs = Date.now();
   let maturedNodes = 0;
   let totalMvp = 0;
+  let soonestDays = null;
   Object.values(nodesObj).forEach(n => {
     if (!n.created) return;
     const created = new Date(n.created.replace(' ', 'T') + 'Z');
-    const ageDays = (now - created.getTime()) / 86400000;
+    const ageDays = (nowMs - created.getTime()) / 86400000;
     const cycles = Math.floor(ageDays / 90);
     if (cycles >= 1) maturedNodes++;
     totalMvp += cycles;
+    const daysToNext = 90 - Math.floor(ageDays % 90);
+    if (soonestDays === null || daysToNext < soonestDays) soonestDays = daysToNext;
   });
+
+  // Calculate live claimable (same logic as Discord calculate_rewards)
+  const apr = staking.songbird_apr ? 0.30 : 0.20;
+  let claimable = staking.pending_rewards || 0;
+  if (staking.last_reward_calc && staked > 0) {
+    const lastCalc = new Date(staking.last_reward_calc.replace(' ', 'T') + 'Z');
+    const elapsedDays = Math.min((nowMs - lastCalc.getTime()) / 86400000, 365);
+    claimable += staked * (apr / 365) * elapsedDays;
+  }
+  claimable = Math.floor(claimable);
+
+  const dailyRate = staked > 0 ? Math.floor(staked * (apr / 365)) : 0;
   const nodeApr = staking.songbird_apr ? '30%' : '20%';
+
   setEl('s-nodes',        maturedNodes + ' mature / ' + nodes + ' total');
   setEl('s-apy',          nodeApr);
   setEl('s-total-earned', fmt(staking.lifetime_rewards || 0));
-  setEl('s-pending',      fmt(staking.pending_rewards || 0));
+  setEl('s-pending',      fmt(claimable));
+  setEl('s-daily-rate',   fmt(dailyRate));
+
+  // Next Node Matures: soonest node days remaining
+  if (staked === 0) {
+    setEl('s-next-node', '—');
+  } else if (soonestDays !== null) {
+    setEl('s-next-node', soonestDays <= 0 ? 'Mature!' : soonestDays + ' days');
+  } else {
+    setEl('s-next-node', '—');
+  }
 
   // MVP breakdown
   const mvp = p.MVP || {};
@@ -6128,14 +6158,14 @@ function renderStaking(s, p) {
     return;
   }
   const categories = [
-    { key: 'mycelium_nodes',   label: 'Mycelium Nodes',  max: 100, img: 'mycelium_node.png' },
-    { key: 'staked_spore',     label: 'Staked SPORE',    max: 25, img: 'spore.png' },
-    { key: 'planted_shroom',   label: 'Planted SHROOM',  max: 15, img: 'shroom.png' },
-    { key: 'onchain_spore',    label: 'Onchain SPORE',   max: 10, img: 'blockchain.png' },
-    { key: 'farm_rank',        label: 'Farm Rank',       max: 15, img: 'shroomfarm.png' },
-    { key: 'pixie_xp',         label: 'Pixie XP',        max: 15, img: 'pixie.png' },
-    { key: 'onchain_shroom',   label: 'Onchain SHROOM',  max: 10,  img: 'blockchain.png' },
-    { key: 'nfts',             label: 'NFTs',             max: 10,  img: 'nft.png' },
+    { key: 'mvp_nodes',       label: 'Mycelium Nodes',  max: 100, img: 'mycelium_node.png' },
+    { key: 'staked_spores',   label: 'Staked SPORE',    max: 25,  img: 'spore.png' },
+    { key: 'planted_shroom',  label: 'Planted SHROOM',  max: 15,  img: 'shroom.png' },
+    { key: 'onchain_spore',   label: 'Onchain SPORE',   max: 10,  img: 'blockchain.png' },
+    { key: 'farm_rank',       label: 'Farm Rank',       max: 15,  img: 'shroomfarm.png' },
+    { key: 'pixie_xp',        label: 'Pixie XP',        max: 15,  img: 'pixie.png' },
+    { key: 'onchain_shroom',  label: 'Onchain SHROOM',  max: 10,  img: 'blockchain.png' },
+    { key: 'nfts',            label: 'NFTs',             max: 10,  img: 'nft.png' },
   ];
   mbEl.innerHTML = categories.map(cat => {
     const val = breakdown[cat.key] || 0;
@@ -6148,19 +6178,17 @@ function renderStaking(s, p) {
       + '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
       + '<div style="height:100%;background:var(--purple);border-radius:999px;width:' + pct + '%;transition:width 1s ease;"></div>'
       + '</div></div>';
-  }).join('');
+  }).join('')
+  + '<div style="display:flex;justify-content:space-between;font-size:0.8rem;font-weight:700;padding-top:0.5rem;border-top:1px solid rgba(255,255,225,0.08);margin-top:0.25rem;">'
+  + '<span style="color:rgba(255,255,225,0.9);">TOTAL MVP</span>'
+  + '<span style="font-family:Space Grotesk,monospace;color:var(--yellow);">' + (mvp.total || 0).toFixed(1) + ' / 200</span>'
+  + '</div>';
 
   // Node breakdown
-  const nextNodeNeeded = nodes > 0
-    ? (100_000_000 - (staked % 100_000_000)).toLocaleString() + ' more SPORE'
-    : (100_000_000 - staked).toLocaleString() + ' more SPORE';
-  setEl('s-next-node', staked > 0 && staked % 100_000_000 === 0 ? 'Node active' : nextNodeNeeded);
-
   const nbEl = document.getElementById('nodes-breakdown');
   if (!nodes || !Object.keys(nodesObj).length) {
     nbEl.innerHTML = '<div class="empty-hint">No nodes. Stake 100M SPORE to create your first node.</div>';
   } else {
-    const nowMs = Date.now();
     let nbHtml = '';
     for (let i = 1; i <= nodes; i++) {
       const nd = nodesObj['node_' + i];

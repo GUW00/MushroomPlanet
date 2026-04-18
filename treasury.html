@@ -28,16 +28,15 @@ async function loadSporebotTotals() {
       if (!grid) return;
       const card = document.createElement('div');
       const cards = [
-        { label: 'TOTAL IN-BOT', html: `<div style="color:var(--red);font-weight:700;font-size:1rem;">${fmt(t.grand_total_shrooms)} SHROOM</div><div style="color:var(--blue);font-weight:700;font-size:1rem;">${fmt(t.grand_total_spores)} SPORE</div>` },
-        { label: 'FARM', html: `<div style="color:var(--red);font-weight:600;">${fmt(t.farm_shrooms)} SHROOM</div><div style="color:var(--blue);font-weight:600;">${fmt(t.farm_spores)} SPORE</div>` },
-        { label: 'DISCORD WALLETS', html: `<div style="color:var(--red);font-weight:600;">${fmt(t.discord_shroom_wallet)} SHROOM</div><div style="color:var(--blue);font-weight:600;">${fmt(t.discord_spore_wallet)} SPORE</div>` },
-        { label: 'STAKED', html: `<div style="color:var(--red);font-weight:600;">N/A SHROOM</div><div style="color:var(--blue);font-weight:600;">${fmt(t.staked_spores)} SPORE</div>` },
+        { label: 'TOTAL IN-BOT', html: `<div class="tl-val" style="color:var(--red);">${fmt(t.grand_total_shrooms)}</div><div class="tl-val" style="color:var(--blue);">${fmt(t.grand_total_spores)}</div>` },
+        { label: 'FARM', html: `<div class="tl-val" style="color:var(--red);">${fmt(t.farm_shrooms)}</div><div class="tl-val" style="color:var(--blue);">${fmt(t.farm_spores)}</div>` },
+        { label: 'DISCORD WALLETS', html: `<div class="tl-val" style="color:var(--red);">${fmt(t.discord_shroom_wallet)}</div><div class="tl-val" style="color:var(--blue);">${fmt(t.discord_spore_wallet)}</div>` },
+        { label: 'STAKED', html: `<div class="tl-val" style="color:var(--red);">N/A</div><div class="tl-val" style="color:var(--blue);">${fmt(t.staked_spores)}</div>` },
       ];
       cards.forEach(cd => {
         const el = document.createElement('div');
-        el.className = 'stats-panel';
-        el.style.cssText = 'padding:1.25rem;min-width:0;';
-        el.innerHTML = `<div class="stat-key" style="margin-bottom:0.5rem;">${cd.label}</div>${cd.html}`;
+        el.className = 'tl-token-card';
+        el.innerHTML = `<div class="tl-label">${cd.label}</div>${cd.html}`;
         grid.appendChild(el);
       });
     } catch(e) { console.error('[SPOREBOT-TOTALS]', e); }
@@ -96,7 +95,7 @@ async function loadSporebotTotals() {
     /* ---- HERO ---- */
     .treasury-hero {
       position: relative; z-index: 1; text-align: center;
-      padding: 5rem 1rem 3rem;
+      padding: 5rem 1rem 1rem;
   
     }
     .treasury-hero .eyebrow {
@@ -117,7 +116,7 @@ async function loadSporebotTotals() {
     /* ---- PRICE STRIP ---- */
     .price-strip {
       position: relative; z-index: 1; display: flex; justify-content: center;
-      gap: 2rem; flex-wrap: wrap; padding: 0 1rem 3rem;
+      gap: 0.6rem; flex-wrap: wrap; padding: 0 1rem 1.5rem;
       opacity: 0; animation: fadeUp 0.6s 0.8s forwards;
     }
     .price-pill {
@@ -360,6 +359,104 @@ async function loadSporebotTotals() {
       .price-strip { gap: 0.75rem; padding: 0 0.75rem 2rem; }
     }
     .bar-hover-tip { display: none; }
+
+    /* ---- TREASURY LIVE SECTIONS ---- */
+    .tl-section {
+      background: var(--dark2);
+      border: 1px solid rgba(255,255,225,0.07);
+      border-radius: 1.25rem;
+      padding: 1.25rem 1.5rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .tl-section-head {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-family: 'Space Grotesk', monospace;
+      font-size: 0.6rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: rgba(255,255,225,0.3);
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255,255,225,0.06);
+    }
+    .tl-section-head span { color: var(--yellow); font-size: 0.68rem; font-weight: 700; }
+
+    .tl-token-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.6rem;
+    }
+    .tl-token-card {
+      background: var(--dark3);
+      border: 1px solid rgba(255,255,225,0.05);
+      border-radius: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 0.3rem;
+      text-align: center;
+    }
+    .tl-token-card .tl-label {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 0.55rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: rgba(255,255,225,0.3);
+    }
+    .tl-token-card .tl-val {
+      font-size: 0.9rem; font-weight: 700; line-height: 1.3;
+      overflow-wrap: break-word; word-break: break-word;
+    }
+    .tl-token-card .tl-val + .tl-val { font-size: 0.82rem; font-weight: 600; margin-top: 0.15rem; }
+
+    /* LP row — 3 equal cards with gap matching sections 1 and 3 */
+    .tl-lp-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+    }
+    .tl-lp-card {
+      background: var(--dark3) !important;
+      border: 1px solid rgba(255,255,225,0.05);
+      border-radius: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.2s;
+      color: inherit;
+    }
+    .tl-lp-card:visited { color: inherit; }
+    .tl-lp-card:hover { border-color: rgba(254,206,0,0.2); }
+    .tl-lp-card .tl-lp-title {
+      font-size: 0.82rem; font-weight: 700; color: var(--cream);
+      margin-bottom: 0.2rem;
+    }
+    .tl-lp-card .tl-lp-share {
+      font-family: 'Space Grotesk', monospace; font-size: 0.55rem;
+      color: rgba(255,255,225,0.28); letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 0.5rem;
+    }
+    .tl-lp-card .tl-val { font-size: 0.92rem; font-weight: 600; line-height: 1.6; }
+
+    /* Farm row — same flat divider style */
+    .tl-farm-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.6rem;
+    }
+
+    @media (max-width: 900px) {
+      .tl-token-row { grid-template-columns: repeat(3, 1fr); }
+      .tl-farm-row  { grid-template-columns: repeat(3, 1fr); }
+      .tl-lp-row    { grid-template-columns: 1fr; }
+      .tl-lp-card   { padding: 0.75rem 0.9rem; }
+      .tl-token-card:nth-child(3n) { border-right: none; }
+    }
+    @media (max-width: 480px) {
+      .tl-token-row { grid-template-columns: repeat(3, 1fr); }
+      .tl-farm-row  { grid-template-columns: repeat(3, 1fr); }
+      .tl-section   { padding: 1rem 1.1rem 1.1rem; border-radius: 1rem; }
+      .tl-token-card { padding: 0.4rem 0.75rem 0.4rem 0; }
+      .tl-token-card:nth-child(2n) { border-right: none; }
+      .tl-token-card .tl-val { font-size: 0.88rem; }
+    }
   </style>
 </head>
 <body>
@@ -404,21 +501,39 @@ async function loadSporebotTotals() {
     </div>
   </div>
 
-  <div class="price-strip">
-    <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" style="text-decoration:none;">
-      <div class="price-pill" style="cursor:pointer;">
-        <span class="dot dot-shroom"></span>
-        <span>$HROOM</span>
-        <strong class="price-val" id="shroom-price">Loading...</strong>
-      </div>
-    </a>
-    <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" style="text-decoration:none;">
-      <div class="price-pill spore-pill" style="cursor:pointer;">
-        <span class="dot dot-spore"></span>
-        <span>SPORE</span>
-        <strong class="price-val" id="spore-price">Loading...</strong>
-      </div>
-    </a>
+  <div class="price-strip" style="flex-direction:column;align-items:center;gap:0.5rem;">
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;justify-content:center;">
+      <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1" target="_blank" style="text-decoration:none;">
+        <div class="price-pill" style="cursor:pointer;">
+          <span class="dot dot-shroom"></span>
+          <span>$HROOM</span>
+          <strong class="price-val" id="shroom-price">Loading...</strong>
+        </div>
+      </a>
+      <a href="https://www.geckoterminal.com/polygon_pos/pools/0x28def03d8dc0d186fabae9c46043e8ef9bffcc28" target="_blank" style="text-decoration:none;">
+        <div class="price-pill" style="cursor:pointer;border-color:rgba(253,70,79,0.2);">
+          <span class="dot dot-shroom"></span>
+          <span>SHROOM Chart</span>
+          <span style="color:rgba(255,255,225,0.4);font-size:0.75rem;">GeckoTerminal</span>
+        </div>
+      </a>
+    </div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;justify-content:center;">
+      <a href="https://dapp.quickswap.exchange/swap/best/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x089582AC20ea563c69408a79E1061de594b61bED" target="_blank" style="text-decoration:none;">
+        <div class="price-pill spore-pill" style="cursor:pointer;">
+          <span class="dot dot-spore"></span>
+          <span>SPORE</span>
+          <strong class="price-val" id="spore-price">Loading...</strong>
+        </div>
+      </a>
+      <a href="https://www.geckoterminal.com/polygon_pos/pools/0x2a91571238303c6700a9336342c754e159243168" target="_blank" style="text-decoration:none;">
+        <div class="price-pill spore-pill" style="cursor:pointer;border-color:rgba(79,168,253,0.2);">
+          <span class="dot dot-spore"></span>
+          <span>SPORE Chart</span>
+          <span style="color:rgba(255,255,225,0.4);font-size:0.75rem;">GeckoTerminal</span>
+        </div>
+      </a>
+    </div>
   </div>
 
   <div class="treasury-section">
@@ -428,24 +543,28 @@ async function loadSporebotTotals() {
       <div class="section-label">Current Treasury (LIVE)</div>
       <div class="section-title">Live Treasury Balances</div>
 
-      <div style="margin-bottom:1rem;">
-        <div style="font-family:'Space Grotesk',monospace;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.5rem;">Shroom Treasury Wallet</div>
-        <div id="holdings-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
-          <div class="tx-loading" style="grid-column:1/-1;">Loading balances...</div>
+      <div class="tl-section">
+        <div class="tl-section-head"><span>1</span> Shroom Treasury Wallet</div>
+        <div id="holdings-grid" class="tl-token-row">
+          <div class="tx-loading" style="grid-column:1/-1;font-size:0.75rem;">Loading balances...</div>
         </div>
       </div>
 
-      <div style="margin-top:2rem;margin-bottom:1rem;">
-        <div style="font-family:'Space Grotesk',monospace;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.5rem;">Liquidity Pools (Treasury Share)</div>
-        <div id="lp-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;">
-          <div class="tx-loading" style="grid-column:1/-1;">Loading LP data...</div>
+      <div class="tl-section">
+        <div class="tl-section-head"><span>2</span> Liquidity Pools (Treasury Share)</div>
+        <div id="lp-grid" class="tl-lp-row">
+          <div class="tx-loading" style="grid-column:1/-1;font-size:0.75rem;">Loading LP data...</div>
         </div>
       </div>
 
-      <div style="margin-top:2rem;">
-        <div style="font-family:'Space Grotesk',monospace;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,225,0.35);margin-bottom:0.5rem;">Sporebot Farm Data</div>
-        <div id="sporebot-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
-          <div class="tx-loading" style="grid-column:1/-1;">Loading...</div>
+      <div class="tl-section">
+        <div class="tl-section-head"><span>3</span> Sporebot Farm Data</div>
+        <div style="display:flex;gap:1rem;margin-bottom:0.75rem;font-family:'Space Grotesk',monospace;font-size:0.58rem;letter-spacing:0.1em;">
+          <span style="color:var(--red);">-- SHROOM</span>
+          <span style="color:var(--blue);">-- SPORE</span>
+        </div>
+        <div id="sporebot-grid" class="tl-farm-row">
+          <div class="tx-loading" style="grid-column:1/-1;font-size:0.75rem;">Loading...</div>
         </div>
       </div>
     </div>
@@ -1556,7 +1675,7 @@ async function loadSporebotTotals() {
       grid.innerHTML = '';
       data.balances.forEach(t => {
         const color   = HOLDINGS_COLORS[t.symbol] || 'var(--cream)';
-        const display = fmtBal(t.balance, t.symbol);
+        const display = fmtBal(t.balance, '');
         // Update live SHROOM treasury stat if present
         if (t.symbol === '$HROOM') {
           const el  = document.getElementById('live-shroom-treasury');
@@ -1604,10 +1723,10 @@ async function loadSporebotTotals() {
         };
         const cLink = contractLinks[t.symbol] || '#';
         grid.insertAdjacentHTML('beforeend', `
-          <a href="${cLink}" target="_blank" style="text-decoration:none;">
-            <div class="stats-panel" style="padding:1.25rem;min-width:0;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.07)'">
-              <div class="stat-key">${t.symbol}</div>
-              <div class="stat-val" style="color:${color};font-size:1.1rem;">${display}</div>
+          <a href="${cLink}" target="_blank" style="text-decoration:none;display:contents;">
+            <div class="tl-token-card" style="cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.18)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.05)'">
+              <div class="tl-label">${t.symbol}</div>
+              <div class="tl-val" style="color:${color};">${display}</div>
             </div>
           </a>`);
       });
@@ -1642,12 +1761,11 @@ async function loadSporebotTotals() {
           'lp_spr_weth':    'https://polygonscan.com/token/0xc373382eec590374278534494109a0cdae1fbbc8#balances',
         };
         lpGrid.insertAdjacentHTML('beforeend', `
-          <a href="${lpLinks[p.key] || '#'}" target="_blank" style="text-decoration:none;">
-            <div class="stats-panel" style="padding:1.25rem;min-width:0;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.07)'">
-              <div class="stat-key">${p.label} <span style="opacity:0.4;">(${pct}% share)</span></div>
-              <div class="stat-val" style="color:${t0c};font-size:1rem;">${fmtBal(lp.token0.balance, lp.token0.symbol)}</div>
-              <div class="stat-val" style="color:${t1c};font-size:1rem;">${fmtBal(lp.token1.balance, lp.token1.symbol)}</div>
-            </div>
+          <a href="${lpLinks[p.key] || '#'}" target="_blank" class="tl-lp-card" onmouseover="this.style.borderColor='rgba(254,206,0,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.05)'">
+            <div class="tl-lp-title">${p.label}</div>
+            <div class="tl-lp-share">${pct}% treasury share</div>
+            <div class="tl-val" style="color:${t0c};">${fmtBal(lp.token0.balance, lp.token0.symbol)}</div>
+            <div class="tl-val" style="color:${t1c};">${fmtBal(lp.token1.balance, lp.token1.symbol)}</div>
           </a>`);
       });
 
@@ -1655,12 +1773,12 @@ async function loadSporebotTotals() {
       sbGrid.innerHTML = '';
       const sbc = HOLDINGS_COLORS['$HROOM'] || 'var(--red)';
       sbGrid.insertAdjacentHTML('beforeend', `
-        <a href="https://polygonscan.com/address/0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A" target="_blank" style="text-decoration:none;">
-          <div class="stats-panel" style="padding:2rem;min-width:0;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.07)'">
-            <div class="stat-key">SPOREBOT WALLET</div>
-            <div class="stat-val" style="color:${sbc};font-size:1rem;">${fmtBal(data.sporebot_shroom, '$HROOM')}</div>
-            <div class="stat-val" style="color:var(--blue);font-size:1rem;">${fmtBal(data.sporebot_spore, 'SPORE')}</div>
-            </div>
+        <a href="https://polygonscan.com/address/0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A" target="_blank" style="text-decoration:none;display:contents;">
+          <div class="tl-token-card" style="cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.18)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.05)'">
+            <div class="tl-label">Sporebot Wallet</div>
+            <div class="tl-val" style="color:${sbc};">${fmtBal(data.sporebot_shroom, '')}</div>
+            <div class="tl-val" style="color:var(--blue);">${fmtBal(data.sporebot_spore, '')}</div>
+          </div>
         </a>`);
 
     } catch {
