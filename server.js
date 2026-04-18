@@ -26,6 +26,28 @@ admin.initializeApp({
 
 const TESTING = process.env.TESTING === 'true';
 const db = admin.database();
+
+const LOG_CHANNEL_ID = '1369734531606646864';
+
+async function discordLog(discord_id, message) {
+  const dateKey = new Date().toISOString().slice(0, 10);
+  const timeKey = new Date().toISOString().slice(11, 19);
+  const clean = message.replace(/<:[^:]+:\d+>/g, '').trim();
+  const logEntry = `[${timeKey}] [Web] ${clean}`;
+  try {
+    await db.ref(`Sporebot/Users/${discord_id}/History/${dateKey}`).push(logEntry);
+  } catch(e) { console.error('[DISCORD_LOG] Firebase push failed:', e); }
+  try {
+    await fetch(`https://discord.com/api/v10/channels/${LOG_CHANNEL_ID}/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+      },
+      body: JSON.stringify({ content: `[Web] ${message}`, allowed_mentions: { parse: [] } }),
+    });
+  } catch(e) { console.error('[DISCORD_LOG] Channel post failed:', e); }
+}
 const app = express();
 
 async function getUserNotifPrefs(discord_id) {
@@ -1780,6 +1802,7 @@ app.post('/api/wallet/convert', async (req, res) => {
 
     await walletRef.update({ shroom_wallet: newShroom, spore_wallet: newSpore });
     console.log(`[CONVERT] ${sessionUser.discord_id} | ${resultMsg}`);
+    discordLog(sessionUser.discord_id, resultMsg).catch(() => {});
     res.json({ ok: true, message: resultMsg, shroom_wallet: newShroom, spore_wallet: newSpore });
   } catch (err) {
     console.error('[CONVERT] Error:', err);
@@ -2499,6 +2522,7 @@ app.post('/api/wallet/transfer-reddit', async (req, res) => {
     const nw = newWallet.val() || {};
     const nr = newReddit.val() || {};
     console.log(`[TRANSFER-REDDIT] ${discord_id} | ${msg}`);
+    discordLog(discord_id, msg).catch(() => {});
     res.json({ ok: true, message: msg, shroom_wallet: nw.shroom_wallet || 0, spore_wallet: nw.spore_wallet || 0, reddit_shrooms: nr.reddit_shrooms || 0, reddit_spores: nr.reddit_spores || 0 });
   } catch (err) {
     console.error('[TRANSFER-REDDIT]', err);
@@ -2561,6 +2585,7 @@ app.post('/api/wallet/transfer-to-reddit', async (req, res) => {
     const nw = newWallet.val() || {};
     const nr = newReddit.val() || {};
     console.log(`[TRANSFER-TO-REDDIT] ${discord_id} | ${msg}`);
+    discordLog(discord_id, msg).catch(() => {});
     res.json({ ok: true, message: msg, shroom_wallet: nw.shroom_wallet || 0, spore_wallet: nw.spore_wallet || 0, reddit_shrooms: nr.reddit_shrooms || 0, reddit_spores: nr.reddit_spores || 0 });
   } catch (err) {
     console.error('[TRANSFER-TO-REDDIT]', err);
