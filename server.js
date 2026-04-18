@@ -2444,6 +2444,130 @@ app.get('/api/cave/stats/:discord_id', async (req, res) => {
   }
 });
 
+// ----------------------------------------------------------------
+// POST /api/wallet/transfer-reddit
+// Moves Reddit balance -> Discord wallet
+// ----------------------------------------------------------------
+app.post('/api/wallet/transfer-reddit', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+  const discord_id = sessionUser.discord_id;
+  const { token, amount } = req.body;
+  try {
+    const pixieSnap = await db.ref(`Pixie/Users/${discord_id}`).get();
+    if (!pixieSnap.exists()) return res.status(404).json({ ok: false, message: 'User not found.' });
+    const pixie = pixieSnap.val();
+    const redditName = pixie?.Security?.RedditName;
+    if (!redditName) return res.status(400).json({ ok: false, message: 'No Reddit account linked.' });
+    const [redditSnap, walletSnap] = await Promise.all([
+      db.ref(`Reddit/Users/${redditName}/Balance`).get(),
+      db.ref(`Pixie/Users/${discord_id}/Wallet`).get(),
+    ]);
+    const rBal   = redditSnap.val()  || {};
+    const wallet = walletSnap.val()  || {};
+    const rShroom = parseInt(rBal.reddit_shrooms || 0);
+    const rSpore  = parseInt(rBal.reddit_spores  || 0);
+    const dShroom = parseInt(wallet.shroom_wallet || 0);
+    const dSpore  = parseInt(wallet.spore_wallet  || 0);
+    const updates = {};
+    let msg = '';
+    if (token === 'all') {
+      if (rShroom === 0 && rSpore === 0) return res.status(400).json({ ok: false, message: 'Nothing to transfer.' });
+      updates[`Reddit/Users/${redditName}/Balance/reddit_shrooms`] = 0;
+      updates[`Reddit/Users/${redditName}/Balance/reddit_spores`]  = 0;
+      updates[`Pixie/Users/${discord_id}/Wallet/shroom_wallet`] = dShroom + rShroom;
+      updates[`Pixie/Users/${discord_id}/Wallet/spore_wallet`]  = dSpore  + rSpore;
+      msg = `Transferred ${rShroom.toLocaleString()} SHROOM and ${rSpore.toLocaleString()} SPORE from Reddit`;
+    } else if (token === 'shroom') {
+      const amt = parseInt(amount, 10);
+      if (!amt || amt > rShroom) return res.status(400).json({ ok: false, message: `Not enough Reddit SHROOM. You have ${rShroom.toLocaleString()}.` });
+      updates[`Reddit/Users/${redditName}/Balance/reddit_shrooms`] = rShroom - amt;
+      updates[`Pixie/Users/${discord_id}/Wallet/shroom_wallet`] = dShroom + amt;
+      msg = `Transferred ${amt.toLocaleString()} SHROOM from Reddit`;
+    } else if (token === 'spore') {
+      const amt = parseInt(amount, 10);
+      if (!amt || amt > rSpore) return res.status(400).json({ ok: false, message: `Not enough Reddit SPORE. You have ${rSpore.toLocaleString()}.` });
+      updates[`Reddit/Users/${redditName}/Balance/reddit_spores`] = rSpore - amt;
+      updates[`Pixie/Users/${discord_id}/Wallet/spore_wallet`] = dSpore + amt;
+      msg = `Transferred ${amt.toLocaleString()} SPORE from Reddit`;
+    } else {
+      return res.status(400).json({ ok: false, message: 'Invalid token.' });
+    }
+    await db.ref().update(updates);
+    const newWallet = await db.ref(`Pixie/Users/${discord_id}/Wallet`).get();
+    const newReddit = await db.ref(`Reddit/Users/${redditName}/Balance`).get();
+    const nw = newWallet.val() || {};
+    const nr = newReddit.val() || {};
+    console.log(`[TRANSFER-REDDIT] ${discord_id} | ${msg}`);
+    res.json({ ok: true, message: msg, shroom_wallet: nw.shroom_wallet || 0, spore_wallet: nw.spore_wallet || 0, reddit_shrooms: nr.reddit_shrooms || 0, reddit_spores: nr.reddit_spores || 0 });
+  } catch (err) {
+    console.error('[TRANSFER-REDDIT]', err);
+    res.status(500).json({ ok: false, message: 'Server error.' });
+  }
+});
+
+// ----------------------------------------------------------------
+// POST /api/wallet/transfer-to-reddit
+// Moves Discord wallet -> Reddit balance
+// ----------------------------------------------------------------
+app.post('/api/wallet/transfer-to-reddit', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+  const discord_id = sessionUser.discord_id;
+  const { token, amount } = req.body;
+  try {
+    const pixieSnap = await db.ref(`Pixie/Users/${discord_id}`).get();
+    if (!pixieSnap.exists()) return res.status(404).json({ ok: false, message: 'User not found.' });
+    const pixie = pixieSnap.val();
+    const redditName = pixie?.Security?.RedditName;
+    if (!redditName) return res.status(400).json({ ok: false, message: 'No Reddit account linked.' });
+    const [redditSnap, walletSnap] = await Promise.all([
+      db.ref(`Reddit/Users/${redditName}/Balance`).get(),
+      db.ref(`Pixie/Users/${discord_id}/Wallet`).get(),
+    ]);
+    const rBal   = redditSnap.val()  || {};
+    const wallet = walletSnap.val()  || {};
+    const rShroom = parseInt(rBal.reddit_shrooms || 0);
+    const rSpore  = parseInt(rBal.reddit_spores  || 0);
+    const dShroom = parseInt(wallet.shroom_wallet || 0);
+    const dSpore  = parseInt(wallet.spore_wallet  || 0);
+    const updates = {};
+    let msg = '';
+    if (token === 'all') {
+      if (dShroom === 0 && dSpore === 0) return res.status(400).json({ ok: false, message: 'Nothing to transfer.' });
+      updates[`Pixie/Users/${discord_id}/Wallet/shroom_wallet`] = 0;
+      updates[`Pixie/Users/${discord_id}/Wallet/spore_wallet`]  = 0;
+      updates[`Reddit/Users/${redditName}/Balance/reddit_shrooms`] = rShroom + dShroom;
+      updates[`Reddit/Users/${redditName}/Balance/reddit_spores`]  = rSpore  + dSpore;
+      msg = `Transferred ${dShroom.toLocaleString()} SHROOM and ${dSpore.toLocaleString()} SPORE to Reddit`;
+    } else if (token === 'shroom') {
+      const amt = parseInt(amount, 10);
+      if (!amt || amt > dShroom) return res.status(400).json({ ok: false, message: `Not enough Discord SHROOM. You have ${dShroom.toLocaleString()}.` });
+      updates[`Pixie/Users/${discord_id}/Wallet/shroom_wallet`] = dShroom - amt;
+      updates[`Reddit/Users/${redditName}/Balance/reddit_shrooms`] = rShroom + amt;
+      msg = `Transferred ${amt.toLocaleString()} SHROOM to Reddit`;
+    } else if (token === 'spore') {
+      const amt = parseInt(amount, 10);
+      if (!amt || amt > dSpore) return res.status(400).json({ ok: false, message: `Not enough Discord SPORE. You have ${dSpore.toLocaleString()}.` });
+      updates[`Pixie/Users/${discord_id}/Wallet/spore_wallet`] = dSpore - amt;
+      updates[`Reddit/Users/${redditName}/Balance/reddit_spores`] = rSpore + amt;
+      msg = `Transferred ${amt.toLocaleString()} SPORE to Reddit`;
+    } else {
+      return res.status(400).json({ ok: false, message: 'Invalid token.' });
+    }
+    await db.ref().update(updates);
+    const newWallet = await db.ref(`Pixie/Users/${discord_id}/Wallet`).get();
+    const newReddit = await db.ref(`Reddit/Users/${redditName}/Balance`).get();
+    const nw = newWallet.val() || {};
+    const nr = newReddit.val() || {};
+    console.log(`[TRANSFER-TO-REDDIT] ${discord_id} | ${msg}`);
+    res.json({ ok: true, message: msg, shroom_wallet: nw.shroom_wallet || 0, spore_wallet: nw.spore_wallet || 0, reddit_shrooms: nr.reddit_shrooms || 0, reddit_spores: nr.reddit_spores || 0 });
+  } catch (err) {
+    console.error('[TRANSFER-TO-REDDIT]', err);
+    res.status(500).json({ ok: false, message: 'Server error.' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

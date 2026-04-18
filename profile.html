@@ -320,8 +320,8 @@
     }
     @media(display-mode: standalone) {
       .tab-bar { flex-wrap: wrap; overflow-x: visible; }
-      .tab-bar .tab { flex: 1 1 calc(33.333% - 0.4rem); min-width: 0; justify-content: center; flex-direction: column; align-items: center; padding: 0.5em 0.2em; font-size: 0.58rem; gap: 0.2rem; }
-      .tab-bar .tab img { width: 14px !important; height: 14px !important; margin-right: 0 !important; }
+      .tab-bar .tab { flex: 1 1 calc(33.333% - 0.4rem); min-width: 0; justify-content: center; flex-direction: row; align-items: center; padding: 0.5em 0.3em; font-size: 0.7rem; gap: 0.2rem; }
+      .tab-bar .tab img { width: 13px !important; height: 13px !important; margin-right: 4px !important; }
     }
     .tab {
       font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem;
@@ -338,8 +338,8 @@
     }
     @media(max-width: 480px) {
       .tab-bar { gap: 0.25rem; }
-      .tab { justify-content: center; flex-direction: column; align-items: center; padding: 0.5em 0.25em; font-size: 0.58rem; gap: 0.25rem; min-width: 0; }
-      .tab img { width: 13px !important; height: 13px !important; margin-right: 0 !important; }
+      .tab { justify-content: center; flex-direction: row; align-items: center; padding: 0.5em 0.3em; font-size: 0.68rem; gap: 0.2rem; min-width: 0; }
+      .tab img { width: 13px !important; height: 13px !important; margin-right: 4px !important; }
     }
     .tab.active {
       border-color: var(--yellow); color: var(--yellow);
@@ -1131,15 +1131,64 @@
     <!-- WALLET PANEL -->
     <div id="panel-wallet" style="display:none;">
       <!-- Wallet sub-tab nav -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem;">
-        <button class="wallet-sub-tab active" onclick="walletSubTab('offchain',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;font-weight:700;padding:0.65rem 0.5rem;border-radius:12px;border:1px solid rgba(253,200,79,0.45);background:rgba(253,200,79,0.12);color:rgba(253,200,79,0.95);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
-          <img src="/images/wallet.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">
-          Off-Chain Wallet
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.4rem;margin-bottom:1rem;">
+        <button class="wallet-sub-tab active" onclick="walletSubTab('offchain',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.6rem 0.25rem;border-radius:12px;border:1px solid rgba(253,200,79,0.45);background:rgba(253,200,79,0.12);color:rgba(253,200,79,0.95);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+          <img src="/images/wallet.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
+          Off-Chain
         </button>
-        <button class="wallet-sub-tab" onclick="walletSubTab('onchain',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;font-weight:700;padding:0.65rem 0.5rem;border-radius:12px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,225,0.45);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
-          <img src="/images/blockchain.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">
-          On-Chain Wallet
+        <button class="wallet-sub-tab" onclick="walletSubTab('transfer',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.6rem 0.25rem;border-radius:12px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,225,0.45);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+          <img src="/images/transfer1.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
+          Transfer
         </button>
+        <button class="wallet-sub-tab" onclick="walletSubTab('onchain',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.6rem 0.25rem;border-radius:12px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,225,0.45);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+          <img src="/images/blockchain.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
+          On-Chain
+        </button>
+      </div>
+
+      <!-- TRANSFER sub-panel -->
+      <div id="wallet-sub-transfer" style="display:none;">
+      <div class="info-card reveal">
+        <div class="card-title">
+          <img src="/images/trade.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
+          Transfer
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.3rem;">
+          <div id="tr-desc" style="font-size:0.63rem;color:rgba(255,255,225,0.35);text-align:center;letter-spacing:0.04em;">Move your Reddit SHROOM/SPORE into your Discord wallet</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
+            <button id="tr-flow-r2d" onclick="setTrFlow('r2d',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.68rem;font-weight:700;padding:0.55em 0.4em;border-radius:8px;border:1px solid rgba(253,200,79,0.4);background:rgba(253,200,79,0.1);color:var(--yellow);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.3rem;">
+              <img src="/images/reddit.png" style="width:13px;height:13px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">Reddit
+              <img src="/images/arrow.png" style="width:11px;height:11px;object-fit:contain;opacity:0.6;flex-shrink:0;" onerror="this.style.display='none'">
+              <img src="/images/discord.png" style="width:13px;height:13px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">Discord
+            </button>
+            <button id="tr-flow-d2r" onclick="setTrFlow('d2r',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.68rem;font-weight:700;padding:0.55em 0.4em;border-radius:8px;border:1px solid rgba(255,255,225,0.08);background:rgba(255,255,255,0.03);color:rgba(255,255,225,0.45);cursor:pointer;transition:all 0.2s;opacity:0.5;display:flex;align-items:center;justify-content:center;gap:0.3rem;">
+              <img src="/images/discord.png" style="width:13px;height:13px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">Discord
+              <img src="/images/arrow.png" style="width:11px;height:11px;object-fit:contain;opacity:0.6;flex-shrink:0;" onerror="this.style.display='none'">
+              <img src="/images/reddit.png" style="width:13px;height:13px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">Reddit
+            </button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
+            <button id="tr-dir-shroom" onclick="setTrToken('shroom',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.68rem;font-weight:700;padding:0.55em 0.4em;border-radius:8px;border:1px solid rgba(253,70,79,0.4);background:rgba(253,70,79,0.1);color:var(--red);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.35rem;"><img src="/images/shroom.png" style="width:14px;height:14px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">SHROOM</button>
+            <button id="tr-dir-spore" onclick="setTrToken('spore',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.68rem;font-weight:700;padding:0.55em 0.4em;border-radius:8px;border:1px solid rgba(255,255,225,0.08);background:rgba(255,255,255,0.03);color:rgba(255,255,225,0.45);cursor:pointer;transition:all 0.2s;opacity:0.5;display:flex;align-items:center;justify-content:center;gap:0.35rem;"><img src="/images/spore.png" style="width:14px;height:14px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">SPORE</button>
+          </div>
+          <div id="tr-reddit-balances" style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:8px;padding:0.5rem 0.75rem;text-align:center;">
+              <div id="tr-bal-shroom-label" style="font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Reddit SHROOM</div>
+              <div id="tr-reddit-shroom" style="font-family:Space Grotesk,monospace;font-size:0.85rem;font-weight:700;color:var(--red);">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:8px;padding:0.5rem 0.75rem;text-align:center;">
+              <div id="tr-bal-spore-label" style="font-size:0.58rem;color:rgba(255,255,225,0.35);margin-bottom:0.2rem;">Reddit SPORE</div>
+              <div id="tr-reddit-spore" style="font-family:Space Grotesk,monospace;font-size:0.85rem;font-weight:700;color:var(--blue);">—</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:0.4rem;align-items:center;">
+            <input id="tr-amount" type="number" min="1" placeholder="Amount (or leave blank for ALL)" style="flex:1;background:rgba(255,255,225,0.05);border:1px solid rgba(255,255,225,0.12);border-radius:8px;padding:0.5rem 0.75rem;color:var(--cream);font-family:Space Grotesk,sans-serif;font-size:0.75rem;outline:none;">
+            <button onclick="trSetMax()" style="font-family:Space Grotesk,sans-serif;font-size:0.62rem;font-weight:600;padding:0.5em 0.9em;border-radius:8px;border:1px solid rgba(255,255,225,0.15);background:rgba(255,255,225,0.05);color:rgba(255,255,225,0.55);cursor:pointer;white-space:nowrap;">ALL</button>
+            <button onclick="doTransfer()" id="tr-submit-btn" style="font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.5em 1.1em;border-radius:8px;border:none;background:var(--yellow);color:#111;cursor:pointer;transition:all 0.2s;white-space:nowrap;">Transfer</button>
+          </div>
+          <div id="tr-result" style="font-size:0.68rem;text-align:center;min-height:1em;"></div>
+        </div>
+      </div>
       </div>
 
       <!-- OFF-CHAIN sub-panel -->
@@ -1152,11 +1201,11 @@
         </div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.3rem;">
           <div style="font-size:0.63rem;color:rgba(255,255,225,0.35);text-align:center;letter-spacing:0.04em;">100 SPORE = 1 SHROOM &nbsp;|&nbsp; fixed rate</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;min-width:0;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;min-width:0;max-width:100%;overflow:hidden;">
             <button id="cv-dir-s2s" onclick="setCvDir('spore_to_shroom')" style="font-family:Space Grotesk,sans-serif;font-size:clamp(0.55rem,1.8vw,0.68rem);font-weight:700;padding:0.65em 0.4em;border-radius:8px;border:1px solid rgba(79,168,253,0.3);background:rgba(255,255,255,0.03);color:var(--cream);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.25rem;min-width:0;overflow:hidden;"><img src="/images/spore.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"><span style="color:var(--blue);font-weight:700;">SPORE</span><img src="/images/arrow.png" style="width:11px;height:11px;object-fit:contain;opacity:0.6;flex-shrink:0;" onerror="this.style.display='none'"><span style="color:var(--red);font-weight:700;">SHROOM</span><img src="/images/shroom.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"></button>
             <button id="cv-dir-h2s" onclick="setCvDir('shroom_to_spore')" style="font-family:Space Grotesk,sans-serif;font-size:clamp(0.55rem,1.8vw,0.68rem);font-weight:700;padding:0.65em 0.4em;border-radius:8px;border:1px solid rgba(255,255,225,0.08);background:rgba(255,255,255,0.03);color:var(--cream);cursor:pointer;transition:all 0.2s;opacity:0.4;display:flex;align-items:center;justify-content:center;gap:0.25rem;min-width:0;overflow:hidden;"><img src="/images/shroom.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"><span style="color:var(--red);font-weight:700;">SHROOM</span><img src="/images/arrow.png" style="width:11px;height:11px;object-fit:contain;opacity:0.6;flex-shrink:0;" onerror="this.style.display='none'"><span style="color:var(--blue);font-weight:700;">SPORE</span><img src="/images/spore.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"></button>
           </div>
-          <div style="display:flex;gap:0.4rem;align-items:center;margin-top:0.1rem;">
+          <div style="display:flex;gap:0.4rem;align-items:center;margin-top:0.1rem;flex-wrap:wrap;">
             <input id="cv-amount" type="number" min="1" placeholder="Amount" style="flex:1;background:rgba(255,255,225,0.05);border:1px solid rgba(255,255,225,0.12);border-radius:8px;padding:0.5rem 0.75rem;color:var(--cream);font-family:Space Grotesk,sans-serif;font-size:0.78rem;outline:none;">
             <button onclick="cvSetMax()" style="font-family:Space Grotesk,sans-serif;font-size:0.62rem;font-weight:600;padding:0.45em 0.9em;border-radius:8px;border:1px solid rgba(255,255,225,0.15);background:rgba(255,255,225,0.05);color:rgba(255,255,225,0.55);cursor:pointer;white-space:nowrap;">MAX</button>
             <button onclick="doConvert()" id="cv-submit-btn" style="font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.45em 1.2em;border-radius:8px;border:none;background:var(--yellow);color:#111;cursor:pointer;transition:all 0.2s;white-space:nowrap;">Convert</button>
@@ -1696,6 +1745,7 @@ var MSG_MAX = 50;
 var _msgActiveTab = 'messages';
 var _inboxMessages  = {};
 var _inboxArchived  = {};
+
 
 async function refreshOnchain() {
   if (!currentUser || !currentUser.discord_id) return;
@@ -3608,10 +3658,131 @@ function walletSubTab(name, btn) {
   btn.style.borderColor = 'rgba(253,200,79,0.45)';
   btn.style.color = 'rgba(253,200,79,0.95)';
   btn.classList.add('active');
-  document.getElementById('wallet-sub-offchain').style.display = name === 'offchain' ? 'block' : 'none';
-  document.getElementById('wallet-sub-onchain').style.display  = name === 'onchain'  ? 'block' : 'none';
+  document.getElementById('wallet-sub-offchain').style.display  = name === 'offchain'  ? 'block' : 'none';
+  document.getElementById('wallet-sub-transfer').style.display  = name === 'transfer'  ? 'block' : 'none';
+  if (name === 'transfer') {
+    var flowBtn = document.getElementById('tr-flow-r2d');
+    if (flowBtn) setTrFlow('r2d', flowBtn);
+  }
+  document.getElementById('wallet-sub-onchain').style.display   = name === 'onchain'   ? 'block' : 'none';
 }
 window.walletSubTab = walletSubTab;
+
+var _trToken = 'shroom';
+var _trFlow  = 'r2d';
+
+function setTrFlow(flow, btn) {
+  _trFlow = flow;
+  var r2d = document.getElementById('tr-flow-r2d');
+  var d2r = document.getElementById('tr-flow-d2r');
+  [r2d, d2r].forEach(function(b) {
+    b.style.borderColor = 'rgba(255,255,225,0.08)';
+    b.style.background  = 'rgba(255,255,255,0.03)';
+    b.style.color       = 'rgba(255,255,225,0.45)';
+    b.style.opacity     = '0.5';
+  });
+  btn.style.borderColor = 'rgba(253,200,79,0.4)';
+  btn.style.background  = 'rgba(253,200,79,0.1)';
+  btn.style.color       = 'var(--yellow)';
+  btn.style.opacity     = '1';
+  var rb = (profileData && profileData.reddit && profileData.reddit.Balance) || {};
+  var dw = (profileData && profileData.pixie && profileData.pixie.Wallet) || {};
+  var sl = document.getElementById('tr-bal-shroom-label');
+  var pl = document.getElementById('tr-bal-spore-label');
+  var sv = document.getElementById('tr-reddit-shroom');
+  var pv = document.getElementById('tr-reddit-spore');
+  var desc = document.getElementById('tr-desc');
+  if (flow === 'r2d') {
+    if (sl) sl.textContent = 'Reddit SHROOM';
+    if (pl) pl.textContent = 'Reddit SPORE';
+    if (sv) sv.textContent = fmt(parseInt(rb.reddit_shrooms || 0));
+    if (pv) pv.textContent = fmt(parseInt(rb.reddit_spores  || 0));
+    if (desc) desc.textContent = 'Move your Reddit SHROOM/SPORE into your Discord wallet';
+  } else {
+    if (sl) sl.textContent = 'Discord SHROOM';
+    if (pl) pl.textContent = 'Discord SPORE';
+    if (sv) sv.textContent = fmt(parseInt(dw.shroom_wallet || 0));
+    if (pv) pv.textContent = fmt(parseInt(dw.spore_wallet  || 0));
+    if (desc) desc.textContent = 'Move your Discord SHROOM/SPORE into your Reddit wallet';
+  }
+  document.getElementById('tr-result').textContent = '';
+}
+function setTrToken(token, btn) {
+  _trToken = token;
+  var sb = document.getElementById('tr-dir-shroom');
+  var pb = document.getElementById('tr-dir-spore');
+  if (token === 'shroom') {
+    sb.style.borderColor = 'rgba(253,70,79,0.4)'; sb.style.background = 'rgba(253,70,79,0.1)'; sb.style.color = 'var(--red)'; sb.style.opacity = '1';
+    pb.style.borderColor = 'rgba(255,255,225,0.08)'; pb.style.background = 'rgba(255,255,255,0.03)'; pb.style.color = 'rgba(255,255,225,0.45)'; pb.style.opacity = '0.5';
+  } else {
+    pb.style.borderColor = 'rgba(79,168,253,0.4)'; pb.style.background = 'rgba(79,168,253,0.1)'; pb.style.color = 'var(--blue)'; pb.style.opacity = '1';
+    sb.style.borderColor = 'rgba(255,255,225,0.08)'; sb.style.background = 'rgba(255,255,255,0.03)'; sb.style.color = 'rgba(255,255,225,0.45)'; sb.style.opacity = '0.5';
+  }
+}
+function trSetMax() {
+  var rb = (profileData && profileData.reddit && profileData.reddit.Balance) || {};
+  var dw = (profileData && profileData.pixie  && profileData.pixie.Wallet)   || {};
+  var max;
+  if (_trFlow === 'r2d') {
+    max = _trToken === 'shroom' ? parseInt(rb.reddit_shrooms || 0) : parseInt(rb.reddit_spores || 0);
+  } else {
+    max = _trToken === 'shroom' ? parseInt(dw.shroom_wallet || 0) : parseInt(dw.spore_wallet || 0);
+  }
+  document.getElementById('tr-amount').value = max;
+}
+async function doTransfer() {
+  var amt = document.getElementById('tr-amount').value.trim();
+  var resultEl = document.getElementById('tr-result');
+  var btn = document.getElementById('tr-submit-btn');
+  var amtInt = amt === '' ? null : parseInt(amt, 10);
+  if (amtInt !== null && (isNaN(amtInt) || amtInt <= 0)) {
+    resultEl.textContent = 'Enter a valid amount or leave blank for ALL.';
+    resultEl.style.color = 'var(--red)'; return;
+  }
+  btn.disabled = true; btn.textContent = 'Transferring...';
+  resultEl.textContent = ''; resultEl.style.color = '';
+  var stored2 = {};
+  try { stored2 = JSON.parse(localStorage.getItem('mp_profile_user') || '{}'); } catch(e) {}
+  var discordId = stored2.discord_id || '';
+  var endpoint = _trFlow === 'r2d' ? '/api/wallet/transfer-reddit' : '/api/wallet/transfer-to-reddit';
+  var body = amtInt ? { token: _trToken, amount: amtInt } : { token: 'all' };
+  try {
+    var resp = await fetch((window.API_BASE || '') + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': discordId },
+      credentials: 'include',
+      body: JSON.stringify(body)
+    });
+    var data = await resp.json();
+    if (data.ok) {
+      resultEl.textContent = data.message;
+      resultEl.style.color = 'var(--green)';
+      if (profileData && profileData.reddit && profileData.reddit.Balance) {
+        profileData.reddit.Balance.reddit_shrooms = data.reddit_shrooms;
+        profileData.reddit.Balance.reddit_spores  = data.reddit_spores;
+      }
+      if (profileData && profileData.pixie && profileData.pixie.Wallet) {
+        profileData.pixie.Wallet.shroom_wallet = data.shroom_wallet;
+        profileData.pixie.Wallet.spore_wallet  = data.spore_wallet;
+      }
+      setEl('w-shroom', fmt(data.shroom_wallet));
+      setEl('w-spore',  fmt(data.spore_wallet));
+      setTrFlow(_trFlow, document.getElementById(_trFlow === 'r2d' ? 'tr-flow-r2d' : 'tr-flow-d2r'));
+      document.getElementById('tr-amount').value = '';
+    } else {
+      resultEl.textContent = data.message || 'Transfer failed.';
+      resultEl.style.color = 'var(--red)';
+    }
+  } catch(e) {
+    resultEl.textContent = 'Network error. Try again.';
+    resultEl.style.color = 'var(--red)';
+  }
+  btn.disabled = false; btn.textContent = 'Transfer';
+}
+window.setTrFlow  = setTrFlow;
+window.setTrToken = setTrToken;
+window.trSetMax   = trSetMax;
+window.doTransfer = doTransfer;
 
 function brewSubTab(name, btn) {
   document.querySelectorAll('.brew-sub-tab').forEach(function(b) {
@@ -6857,7 +7028,7 @@ function renderBrewing(s) {
 
     // Detail expand area (hidden, shown on tap)
     storedEl.innerHTML = '<style>.potion-slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-bottom:0.5rem;}.potion-slot-grid>div{min-height:120px;}.pot-flip{display:flex;flex-direction:column;}.pot-flip-inner{flex:1;}@media(max-width:600px){.potion-slot-grid{grid-template-columns:repeat(2,1fr);}}@media(display-mode:standalone){.potion-slot-grid{grid-template-columns:repeat(2,1fr);}}</style>'
-      + '<style>.potion-slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;}.potion-slot-grid>div{min-height:120px;}@media(max-width:600px){.potion-slot-grid{grid-template-columns:repeat(2,1fr);}}@media(display-mode:standalone){.potion-slot-grid{grid-template-columns:repeat(2,1fr);}}</style>'
+      + '<style>.potion-slot-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;}.potion-slot-grid>div{min-height:unset;}@media(display-mode:standalone){.potion-slot-grid{grid-template-columns:1fr;}}</style>'
       + '<div class="potion-slot-grid">' + slotCells + '</div>'
       + actionBar;
     // Restore action bar visibility if selections exist
