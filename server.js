@@ -1387,7 +1387,7 @@ app.get('/api/config/public', (req, res) => {
 const DISCORD_CLIENT_ID     = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const SESSION_SECRET        = process.env.SESSION_SECRET || 'mushroom-planet-secret';
-const PROPOSAL_BURN_AMOUNT  = 1000000; // 10M MVP burn to create proposal
+const PROPOSAL_BURN_AMOUNT  = 10_000_000; // 10M SPORE burn to create proposal
 const PROPOSAL_DURATION_DAYS   = 5;
 const VOTE_DURATION_DAYS       = 5;
 
