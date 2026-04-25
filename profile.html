@@ -1356,13 +1356,13 @@
           <img src="/images/total_xp.png" style="width:14px;height:14px;object-fit:contain;opacity:0.7;" onerror="this.style.display='none'">
           Leaderboard
         </div>
-        <div class="tab-bar" style="margin-bottom:0.4rem;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.35rem;margin-bottom:0.35rem;">
           <button class="tab active" onclick="switchLbTab('pixie',this)"><img src="/images/pixie.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Pixie</button>
           <button class="tab" onclick="switchLbTab('farm',this)"><img src="/images/shroomfarm.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Farm</button>
           <button class="tab" onclick="switchLbTab('plant',this)"><img src="/images/plants.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Planted</button>
           <button class="tab" onclick="switchLbTab('sporebot_nft',this)"><img src="/images/robot.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SporeBots</button>
         </div>
-        <div class="tab-bar" style="margin-bottom:1rem;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.35rem;margin-bottom:1rem;">
           <button class="tab" onclick="switchLbTab('tips',this)"><img src="/images/gift.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Tips</button>
           <button class="tab" onclick="switchLbTab('social',this)"><img src="/images/butterfly.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Social</button>
           <button class="tab" onclick="switchLbTab('staking',this)"><img src="/images/spore.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Staking</button>
@@ -8650,7 +8650,7 @@ async function renderLeaderboard(tab) {
     }
   });
   // Also pull from sporebot/staking arrays (server enriches these too)
-  var _allSbLists = (snap.sporebot ? Object.values(snap.sporebot) : []).flat().concat(snap.staking ? Object.values(snap.staking).flat() : []);
+  var _allSbLists = (snap.sporebot ? Object.values(snap.sporebot) : []).flat().concat(snap.staking ? Object.values(snap.staking).flat() : []).concat(snap.sporebot_nft ? Object.values(snap.sporebot_nft).flat() : []);
   _allSbLists.forEach(function(u) {
     if (u && u.name && u.discord_id && u.avatar && !_avatarMap[u.name]) {
       _avatarMap[u.name] = { discord_id: u.discord_id, avatar: u.avatar };
@@ -8690,7 +8690,7 @@ async function renderLeaderboard(tab) {
   } else if (tab === 'sgr') {
     html += lbSection('apy1.png',        'Highest APY',     s.apy             || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">'+Math.round((u.apy||0)*100)+'%</span>'; });
     html += lbSection('sporulation.png', 'Spores Per Day',  s.spore_rate      || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.spore_rate)+'/day</span>'; });
-    html += lbSection('lifetime.png',    'Lifetime Spores', s.lifetime_spores || [], function(u){ return esc(u.name)+' <span style="color:var(--purple);font-family:Syne Mono,monospace;">'+fmtSpore(u.lifetime_spores)+'</span>'; });
+    html += lbSection('apy1.png',        'Lifetime Spores', s.lifetime_spores || [], function(u){ return esc(u.name)+' <span style="color:var(--purple);font-family:Syne Mono,monospace;">'+fmtSpore(u.lifetime_spores)+'</span>'; });
   } else if (tab === 'sporebot_nft') {
     var sb = snap.sporebot_nft || {};
     html += lbSection('robot.png',      'Sporebot Holders',     sb.sb_count     || [], function(u){ return esc(u.name)+' <span style="color:var(--green);font-family:Syne Mono,monospace;">'+fmtN(u.sb_count)+'</span>'; });
