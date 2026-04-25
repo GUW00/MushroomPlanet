@@ -8672,9 +8672,9 @@ async function renderLeaderboard(tab) {
     html += lbSection('streak.png',  'Max Streak',      s.streak_record || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">'+fmtN(u.streak_record)+'</span>'; });
     html += lbSection('animals.png', 'Total Feedings',  s.feed          || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.feed)+'</span>'; });
   } else if (tab === 'plant') {
-    html += lbSection('shroom.png',     'Most Planted',   s.shroom_farm || [], function(u){ return esc(u.name)+' <span style="color:var(--green);font-family:Syne Mono,monospace;">'+fmtN(u.shroom_farm)+'</span>'; });
-    html += lbSection('apy1.png',       'Highest APY',    s.apy         || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">'+Math.round((u.apy||0)*100)+'%</span>'; });
-    html += lbSection('sporulation.png','Spores Per Day',  s.spore_rate  || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.spore_rate)+'/day</span>'; });
+    html += lbSection('shroom.png',       'Planted (Organic)',   s.shroom_farm   || [], function(u){ return esc(u.name)+' <span style="color:var(--green);font-family:Syne Mono,monospace;">'+fmtN(u.shroom_farm)+'</span>'; });
+    html += lbSection('nft.png',          'Planted (NFT Boost)', s.nft_boost     || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">'+fmtN(u.nft_boost)+'</span>'; });
+    html += lbSection('sporulation1.webp','Total Planted',       s.total_planted || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.total_planted)+'</span>'; });
   } else if (tab === 'tips') {
     html += lbSection('shroom.png',    'Tipped SHROOM', p.tip_shroom || [], function(u){ return esc(u.name)+' <span style="color:var(--yellow);font-family:Syne Mono,monospace;">'+fmtN(u.tip_shroom)+'</span>'; });
     html += lbSection('spore.png',     'Tipped SPORE',  p.tip_spore  || [], function(u){ return esc(u.name)+' <span style="color:var(--blue);font-family:Syne Mono,monospace;">'+fmtN(u.tip_spore)+'</span>'; });
