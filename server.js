@@ -35,7 +35,7 @@ async function discordLog(discord_id, message) {
   const clean = message.replace(/<:[^:]+:\d+>/g, '').trim();
   const logEntry = `[${timeKey}] [Web] ${clean}`;
   try {
-    await db.ref(`Sporebot/Users/${discord_id}/History/${dateKey}`).push(logEntry);
+    await db.ref(`Sporebot/History/${discord_id}/Logs/${dateKey}`).push(logEntry);
   } catch(e) { console.error('[DISCORD_LOG] Firebase push failed:', e); }
   try {
     await fetch(`https://discord.com/api/v10/channels/${LOG_CHANNEL_ID}/messages`, {
@@ -348,6 +348,17 @@ app.post('/api/actions/equip-potion',  (req, res) => proxyToFastAPI('equip-potio
 app.post('/api/actions/discard-potion',(req, res) => proxyToFastAPI('discard-potion',req, res, 'DISCARD-POTION'));
 app.post('/api/actions/craft-herbs', (req, res) => proxyToFastAPI('craft-herbs', req, res, 'CRAFT-HERBS'));
 app.post('/api/actions/buy-herb', (req, res) => proxyToFastAPI('buy-herb', req, res, 'BUY-HERB'));
+
+// GET /api/user/recipes/:discord_id
+app.get('/api/user/:id/recipes', async (req, res) => {
+  try {
+    const snap = await db.ref(`Sporebot/Users/${req.params.id}/Inventory/Recipes`).get();
+    res.json({ ok: true, recipes: snap.val() || {} });
+  } catch (err) {
+    console.error('[RECIPES]', err);
+    res.status(500).json({ ok: false });
+  }
+});
 
 // ----------------------------------------------------------------
 // Firebase listener - fires push when raffle winner is recorded
@@ -750,15 +761,18 @@ app.get('/api/user/:id', async (req, res) => {
   const input = req.params.id;
 
   try {
-    const [pixieSnap, sporebotSnap] = await Promise.all([
+    const [pixieSnap, sporebotSnap, historySnap] = await Promise.all([
       db.ref(`Pixie/Users/${input}`).get(),
       db.ref(`Sporebot/Users/${input}`).get(),
+      db.ref(`Sporebot/History/${input}/Logs`).get(),
     ]);
 
     if (pixieSnap.exists() || sporebotSnap.exists()) {
+      const sporebotVal = sporebotSnap.exists() ? sporebotSnap.val() : null;
+      if (sporebotVal && historySnap.exists()) sporebotVal.History = historySnap.val();
       return res.json({
         pixie: pixieSnap.exists() ? pixieSnap.val() : null,
-        sporebot: sporebotSnap.exists() ? sporebotSnap.val() : null,
+        sporebot: sporebotVal,
       });
     }
 
@@ -785,14 +799,17 @@ app.get('/api/user/:id', async (req, res) => {
 
     if (!matchedId) return res.json({ pixie: null, sporebot: null });
 
-    const [matchedPixie, matchedSporebot] = await Promise.all([
+    const [matchedPixie, matchedSporebot, matchedHistory] = await Promise.all([
       db.ref(`Pixie/Users/${matchedId}`).get(),
       db.ref(`Sporebot/Users/${matchedId}`).get(),
+      db.ref(`Sporebot/History/${matchedId}/Logs`).get(),
     ]);
 
+    const matchedSporebotVal = matchedSporebot.exists() ? matchedSporebot.val() : null;
+    if (matchedSporebotVal && matchedHistory.exists()) matchedSporebotVal.History = matchedHistory.val();
     return res.json({
       pixie: matchedPixie.exists() ? matchedPixie.val() : null,
-      sporebot: matchedSporebot.exists() ? matchedSporebot.val() : null,
+      sporebot: matchedSporebotVal,
     });
 
   } catch (err) {

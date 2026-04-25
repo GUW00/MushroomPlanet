@@ -1020,12 +1020,21 @@
             <img src="/images/herbs.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">
             Herbs
           </button>
+          
         </div>
+
+        
 
         <!-- Brewing Station sub-panel -->
         <div id="brew-sub-station">
           <div class="info-card" id="brew-station-card">
-            <div class="card-title"><img src="/images/potionrecipe.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Brew Station</div>
+            <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="display:flex;align-items:center;gap:0.4rem;"><img src="/images/potionrecipe.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Brew Station</span>
+              <div style="display:flex;gap:0.35rem;">
+                <button id="brew-mode-manual" onclick="setBrewMode('manual')" style="font-family:Space Grotesk,monospace;font-size:0.6rem;font-weight:700;padding:0.25em 0.7em;border-radius:999px;border:1px solid rgba(192,132,252,0.5);background:rgba(192,132,252,0.15);color:rgba(192,132,252,1);cursor:pointer;transition:all 0.2s;">Manual</button>
+                <button id="brew-mode-recipe" onclick="setBrewMode('recipe')" style="font-family:Space Grotesk,monospace;font-size:0.6rem;font-weight:700;padding:0.25em 0.7em;border-radius:999px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,225,0.35);cursor:pointer;transition:all 0.2s;">Recipes</button>
+              </div>
+            </div>
             <div id="brew-station-content"><div class="empty-hint">Loading...</div></div>
           </div>
           <div class="info-card" style="margin-top:1rem;">
@@ -2858,6 +2867,173 @@ window.potionDiscardSelected = potionDiscardSelected;
 // ================================================================
 var _brewSelected = []; // array of ingredient name strings
 var _potionSelected = {}; // { safeKey: slotKey } of selected stored potions
+var _brewMode = 'manual'; // 'manual' | 'recipe'
+
+function setBrewMode(mode) {
+  _brewMode = mode;
+  var manBtn = document.getElementById('brew-mode-manual');
+  var recBtn = document.getElementById('brew-mode-recipe');
+  if (manBtn) {
+    manBtn.style.background = mode === 'manual' ? 'rgba(192,132,252,0.15)' : 'rgba(255,255,255,0.03)';
+    manBtn.style.borderColor = mode === 'manual' ? 'rgba(192,132,252,0.5)' : 'rgba(255,255,225,0.1)';
+    manBtn.style.color = mode === 'manual' ? 'rgba(192,132,252,1)' : 'rgba(255,255,225,0.35)';
+  }
+  if (recBtn) {
+    recBtn.style.background = mode === 'recipe' ? 'rgba(254,206,0,0.12)' : 'rgba(255,255,255,0.03)';
+    recBtn.style.borderColor = mode === 'recipe' ? 'rgba(254,206,0,0.4)' : 'rgba(255,255,225,0.1)';
+    recBtn.style.color = mode === 'recipe' ? 'var(--yellow)' : 'rgba(255,255,225,0.35)';
+  }
+  if (mode === 'manual') {
+    renderBrewStation(profileData && profileData.sporebot ? profileData.sporebot : {});
+  } else {
+    var el = document.getElementById('brew-station-content');
+    if (el) el.innerHTML = '<div class="empty-hint" style="font-size:0.7rem;padding:0.5rem 0;">Loading recipes...</div>';
+    renderRecipesInStation();
+  }
+}
+window.setBrewMode = setBrewMode;
+
+function renderRecipesInStation() {
+  var el = document.getElementById('brew-station-content');
+  if (!el) return;
+  var s = profileData && profileData.sporebot ? profileData.sporebot : {};
+  var inv = (s.Inventory || {}).Ingredients || {};
+  var recipesData = (s.Inventory || {}).Recipes || {};
+  var normal = recipesData.Normal || {};
+  var legendary = recipesData.Legendary || {};
+  var normalKeys = Object.keys(normal);
+  var legKeys = Object.keys(legendary);
+
+  // Store ingredients by key so onclick doesn't need inline JSON
+  window._recipeMap = {};
+
+  if (!normalKeys.length && !legKeys.length) {
+    el.innerHTML = '<div class="empty-hint">No recipes discovered yet. Use !explore to find some!</div>';
+    return;
+  }
+
+  var RANK_LIMITS_S = {BRONZE:2,SILVER:3,GOLD:3,EMERALD:4,DIAMOND:4,MASTER:4,GRANDMASTER:4,LEGEND:4};
+  var farmRankS = ((s.Farm || {}).farm_rank || 'BRONZE').toUpperCase();
+  var ingLimitS = RANK_LIMITS_S[farmRankS] || 2;
+
+  var ING_IMGS_S = {
+    'Sunspore':'/images/sunspore.png','Ashroot':'/images/ashroot.png','Glowcap':'/images/glowcap.png',
+    'Frostmoss':'/images/frostmoss.png','Veilfruit':'/images/veilfruit.png','Dreamdust':'/images/dreamdust.png',
+    'Bloodberry':'/images/bloodberry.png','Elderbloom':'/images/elderbloom.png','Woobud':'/images/woobud.png',
+    'Voidspore':'/images/voidspore.png'
+  };
+
+  function ingCountsS(list) { var c={}; (list||[]).forEach(function(i){c[i]=(c[i]||0)+1;}); return c; }
+  function canBrewS(ingList) {
+    var c = ingCountsS(ingList);
+    return Object.keys(c).every(function(i){ return (inv[i]||0) >= c[i]; });
+  }
+  function ingBadgesS(ingList) {
+    var c = ingCountsS(ingList);
+    return Object.entries(c).map(function(e) {
+      var have = inv[e[0]] || 0;
+      var ok = have >= e[1];
+      return '<div style="display:inline-flex;align-items:center;gap:0.25rem;padding:0.18rem 0.5rem;border-radius:999px;'
+        + 'background:' + (ok ? 'rgba(255,255,255,0.05)' : 'rgba(253,70,79,0.06)') + ';'
+        + 'border:1px solid ' + (ok ? 'rgba(255,255,225,0.15)' : 'rgba(253,70,79,0.35)') + ';'
+        + 'font-family:Space Grotesk,monospace;font-size:0.6rem;color:' + (ok ? 'rgba(255,255,225,0.75)' : 'rgba(253,70,79,0.9)') + ';">'
+        + '<img src="' + (ING_IMGS_S[e[0]]||'') + '" style="width:12px;height:12px;object-fit:contain;">'
+        + e[1] + 'x ' + e[0]
+        + '<span style="opacity:0.45;font-size:0.55rem;">' + have + '</span>'
+        + '</div>';
+    }).join('');
+  }
+
+  function getPotionImg(emojiStr) {
+    if (!emojiStr) return '/images/potion2.png';
+    var m = emojiStr.match(/potion(\d+)/);
+    return m ? '/images/potion' + m[1] + '.png' : '/images/potion2.png';
+  }
+
+  function recipeCard(label, recipeObj, isLegendary, mapKey) {
+    var ingList = recipeObj.ingredients || [];
+    if (!Array.isArray(ingList)) ingList = Object.values(ingList);
+    var can = canBrewS(ingList);
+    var emoji = recipeObj.emoji || '';
+    var discovered = recipeObj.discovered || '';
+    var guaranteed = recipeObj.guaranteed_stats || {};
+    var pImg = getPotionImg(emoji);
+
+    var borderCol = isLegendary
+      ? (can ? 'rgba(251,191,36,0.45)' : 'rgba(251,191,36,0.12)')
+      : (can ? 'rgba(192,132,252,0.4)' : 'rgba(255,255,225,0.07)');
+    var bg = isLegendary ? 'rgba(251,191,36,0.04)' : (can ? 'rgba(192,132,252,0.03)' : 'rgba(255,255,255,0.015)');
+    var labelCol = isLegendary ? 'rgba(251,191,36,0.95)' : 'rgba(192,132,252,0.95)';
+
+    var guarHtml = '';
+    var guarEntries = Object.entries(guaranteed || {});
+    if (guarEntries.length) {
+      guarHtml = '<div style="display:flex;flex-wrap:wrap;gap:0.2rem;margin-top:0.35rem;">'
+        + guarEntries.map(function(e) {
+          var kLabel = String(e[1]).replace(/_/g,' ').trim();
+          if (!kLabel) kLabel = String(e[0]);
+          return '<span style="font-family:Space Grotesk,monospace;font-size:0.55rem;padding:0.1rem 0.5rem;border-radius:999px;'
+            + 'background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:rgba(34,197,94,0.8);">'
+            + kLabel
+            + '</span>';
+        }).join('')
+        + '</div>';
+    }
+
+    var discoverBadge = discovered
+      ? '<span style="font-family:Space Grotesk,monospace;font-size:0.52rem;color:rgba(255,255,225,0.25);margin-left:0.4rem;">found ' + discovered + '</span>'
+      : '';
+
+    var btnStyle = 'font-family:Space Grotesk,monospace;font-size:0.68rem;font-weight:700;padding:0.4rem 0.9rem;border-radius:0.625rem;white-space:nowrap;flex-shrink:0;cursor:'
+      + (can ? 'pointer' : 'not-allowed') + ';'
+      + 'border:1px solid ' + (can ? (isLegendary ? 'rgba(251,191,36,0.5)' : 'rgba(192,132,252,0.5)') : 'rgba(255,255,225,0.07)') + ';'
+      + 'background:' + (can ? (isLegendary ? 'rgba(251,191,36,0.12)' : 'rgba(192,132,252,0.12)') : 'rgba(255,255,255,0.02)') + ';'
+      + 'color:' + (can ? (isLegendary ? 'rgba(251,191,36,1)' : 'var(--purple)') : 'rgba(255,255,225,0.18)') + ';'
+      + 'transition:all 0.15s;';
+
+    return '<div style="border:1px solid ' + borderCol + ';background:' + bg + ';border-radius:0.875rem;padding:0.75rem 0.875rem;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.875rem;">'
+      + '<img src="' + pImg + '" style="width:36px;height:36px;object-fit:contain;flex-shrink:0;opacity:' + (can ? '1' : '0.35') + ';" onerror="this.style.display=\'none\'">'
+      + '<div style="flex:1;min-width:0;">'
+      + '<div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.3rem;flex-wrap:wrap;">'
+      + '<span style="font-size:0.82rem;font-weight:700;color:' + labelCol + ';">' + label + '</span>'
+      + (isLegendary ? '<span style="font-size:0.5rem;padding:0.1em 0.45em;border-radius:999px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:rgba(251,191,36,0.7);">ONE-TIME</span>' : '')
+      + discoverBadge
+      + '</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:0.25rem;">' + ingBadgesS(ingList) + '</div>'
+      + guarHtml
+      + '</div>'
+      + '<button onclick="doBrewWithIngredients(\'' + mapKey + '\')" ' + (can ? '' : 'disabled ') + 'style="' + btnStyle + '">'
+      + (can ? 'Brew' : 'Missing Ings')
+      + '</button>'
+      + '</div>';
+  }
+
+  var html = '';
+  var keyIdx = 0;
+  if (legKeys.length) {
+    html += '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(251,191,36,0.6);margin-bottom:0.5rem;">LEGENDARY</div>';
+    legKeys.forEach(function(key) {
+      var r = legendary[key];
+      var mapKey = 'r' + (keyIdx++);
+      var ings = Array.isArray(r.ingredients) ? r.ingredients : (r.ingredients ? Object.values(r.ingredients) : []);
+      window._recipeMap[mapKey] = ings;
+      html += recipeCard('Legendary #' + key, r, true, mapKey);
+    });
+    html += '<div style="margin:0.6rem 0;border-top:1px solid rgba(255,255,225,0.06);"></div>';
+  }
+  if (normalKeys.length) {
+    html += '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(192,132,252,0.6);margin-bottom:0.5rem;">RECIPES</div>';
+    normalKeys.forEach(function(name) {
+      var r = normal[name];
+      var mapKey = 'r' + (keyIdx++);
+      var ings = Array.isArray(r.ingredients) ? r.ingredients : (r.ingredients ? Object.values(r.ingredients) : []);
+      window._recipeMap[mapKey] = ings;
+      html += recipeCard(name, r, false, mapKey);
+    });
+  }
+  el.innerHTML = html;
+}
+window.renderRecipesInStation = renderRecipesInStation;
 
 function renderBrewStation(s) {
   var el = document.getElementById('brew-station-content');
@@ -3083,6 +3259,79 @@ async function doBrew() {
 }
 window.doBrew = doBrew;
 window.activatePotion = activatePotion;
+
+function cleanEmoji(str){ return str ? String(str).replace(/<:[^:]+:\d+>/g,'').trim() : ''; }
+async function doBrewWithIngredients(ings) {
+  if (!currentUser || !currentUser.discord_id) return;
+  if (typeof ings === 'string') ings = (window._recipeMap && window._recipeMap[ings]) || [];
+  if (!ings || ings.length < 2) return;
+
+  // Show loading state on all recipe buttons
+  document.querySelectorAll('[id^="recipebtn_"]').forEach(function(b) {
+    b.textContent = '...'; b.disabled = true;
+  });
+
+  try {
+    var res = await fetch(API_BASE + '/api/actions/brew', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
+      credentials: 'include',
+      body: JSON.stringify({ ingredients: ings, is_recipe: true }),
+    });
+    var data = await res.json();
+    if (data.ok) {
+      _brewSelected = [];
+      if (profileData && profileData.sporebot) {
+        var invP = profileData.sporebot.Inventory = profileData.sporebot.Inventory || {};
+        invP.Ingredients = data.new_inventory;
+        invP.Potions = invP.Potions || {};
+        invP.Potions[data.slot] = data.potion;
+        invP.Potions.Brews = data.brews_today;
+        profileData.sporebot.Skills = profileData.sporebot.Skills || {};
+        profileData.sporebot.Skills.Brewing = { level: data.brewing_level, xp: data.brewing_xp };
+      }
+      // Show result toast
+      var p = data.potion;
+      var potionId = (p.emoji||'').match(/:potion(\d+):/)?.[1];
+      var pImg = potionId ? '/images/potion'+potionId+'.png' : '/images/potion2.png';
+      var noPercentB = ['Extra Brews','Extra_Brews','Plant Limit','Plant_Limit'];
+      var statLines = Object.entries(p).filter(function(e){ return !['name','emoji','Potion Score','Potion_Score'].includes(e[0]); })
+        .map(function(e){
+          var sl = e[0].replace(/_/g,' ');
+          var sv = typeof e[1]==='number' ? (noPercentB.includes(e[0]) ? e[1].toLocaleString() : e[1]+'%') : e[1];
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.2rem 0;border-top:1px solid rgba(255,255,225,0.05);">'
+            +'<span style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.65);">'+(STAT_EMOJI[sl]||STAT_EMOJI[e[0]]||'')+sl+'</span>'
+            +'<span style="font-family:Space Grotesk,monospace;font-size:0.65rem;font-weight:700;color:var(--green);">'+sv+'</span>'
+            +'</div>';
+        }).join('');
+      var toast = document.createElement('div');
+      toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(192,132,252,0.3);border-radius:0.875rem;padding:0.875rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.72rem;color:var(--cream);z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.5);max-width:320px;width:90%;';
+      toast.innerHTML = '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">'
+        + '<img src="'+pImg+'" style="width:24px;height:24px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+        + '<span style="font-size:0.9rem;font-weight:700;color:var(--purple);">'+cleanEmoji(p.name||'Potion')+'</span>'
+        + '<span style="font-size:0.7rem;color:rgba(255,255,225,0.4);">'+(p['Potion Score']!=null?Number(p['Potion Score']).toFixed(2):'?')+'/10</span>'
+        + '</div>' + statLines
+        + (data.leveled_up ? '<div style="color:var(--yellow);margin-top:0.35rem;font-size:0.65rem;">Brewing Level Up! Now Lv.'+data.brewing_level+'</div>' : '')
+        + '<div style="color:rgba(255,255,225,0.25);font-size:0.6rem;margin-top:0.25rem;">+'+data.xp_gain+' XP | Slot saved</div>';
+      document.body.appendChild(toast);
+      setTimeout(function(){ toast.style.transition='opacity 0.3s'; toast.style.opacity='0'; setTimeout(function(){ toast.remove(); },300); }, 6000);
+      // Re-render recipe view with updated inventory
+      renderBrewing(profileData.sporebot || {});
+      setBrewMode('recipe');
+    } else {
+      var errToast = document.createElement('div');
+      errToast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(253,70,79,0.3);border-radius:0.75rem;padding:0.75rem 1.25rem;font-family:Space Grotesk,monospace;font-size:0.72rem;color:rgba(253,70,79,0.9);z-index:99999;max-width:320px;width:90%;text-align:center;';
+      errToast.textContent = data.message || 'Brew failed.';
+      document.body.appendChild(errToast);
+      setTimeout(function(){ errToast.remove(); }, 4000);
+      renderRecipesInStation();
+    }
+  } catch(e) {
+    console.error('[doBrewWithIngredients]', e);
+    renderRecipesInStation();
+  }
+}
+window.doBrewWithIngredients = doBrewWithIngredients;
 
 async function swapCompanion(petKey) {
   if (!currentUser || !currentUser.discord_id) return;
@@ -3855,10 +4104,158 @@ function brewSubTab(name, btn) {
   btn.style.borderColor = 'rgba(192,132,252,0.45)';
   btn.style.color = 'rgba(192,132,252,0.95)';
   btn.classList.add('active');
-  document.getElementById('brew-sub-station').style.display = name === 'station' ? 'block' : 'none';
-  document.getElementById('brew-sub-herbs').style.display   = name === 'herbs'   ? 'block' : 'none';
+  document.getElementById('brew-sub-station').style.display  = name === 'station'  ? 'block' : 'none';
+  document.getElementById('brew-sub-herbs').style.display    = name === 'herbs'    ? 'block' : 'none';
+  
 }
 window.brewSubTab = brewSubTab;
+
+var _recipesLoaded = false;
+async function loadRecipesTab() {
+  if (!currentUser || !currentUser.discord_id) return;
+  var el = document.getElementById('recipes-content');
+  if (!el) return;
+  el.innerHTML = '<div class="empty-hint">Loading recipes...</div>';
+  try {
+    var res = await fetch(API_BASE + '/api/user/' + currentUser.discord_id + '/recipes', { credentials: 'include' });
+    var data = await res.json();
+    if (!data.ok) { el.innerHTML = '<div class="empty-hint">Could not load recipes.</div>'; return; }
+    renderRecipes(data.recipes, (profileData && profileData.sporebot && profileData.sporebot.Inventory && profileData.sporebot.Inventory.Ingredients) || {});
+  } catch(e) {
+    el.innerHTML = '<div class="empty-hint">Error loading recipes.</div>';
+  }
+}
+window.loadRecipesTab = loadRecipesTab;
+
+function renderRecipes(recipes, inventory) {
+  var el = document.getElementById('recipes-content');
+  if (!el) return;
+
+  var normal   = (recipes && recipes.Normal)    ? recipes.Normal    : {};
+  var legendary = (recipes && recipes.Legendary) ? recipes.Legendary : {};
+  var normalKeys = Object.keys(normal);
+  var legKeys    = Object.keys(legendary);
+
+  if (!normalKeys.length && !legKeys.length) {
+    el.innerHTML = '<div class="empty-hint">No recipes discovered yet. Use !explore to find some!</div>';
+    return;
+  }
+
+  var ING_IMGS_LOCAL = {
+    'Sunspore':'https://mushroomplanet.earth/images/Sunspore.png',
+    'Ashroot':'https://mushroomplanet.earth/images/Ashroot.png',
+    'Glowcap':'https://mushroomplanet.earth/images/Glowcap.png',
+    'Frostmoss':'https://mushroomplanet.earth/images/Frostmoss.png',
+    'Veilfruit':'https://mushroomplanet.earth/images/Veilfruit.png',
+    'Dreamdust':'https://mushroomplanet.earth/images/Dreamdust.png',
+    'Bloodberry':'https://mushroomplanet.earth/images/Bloodberry.png',
+    'Elderbloom':'https://mushroomplanet.earth/images/Elderbloom.png',
+    'Woobud':'https://mushroomplanet.earth/images/Woobud.png',
+    'Voidspore':'https://mushroomplanet.earth/images/Voidspore.png'
+  };
+
+  function ingCountsFromList(list) {
+    var c = {};
+    (list||[]).forEach(function(i){ c[i] = (c[i]||0)+1; });
+    return c;
+  }
+
+  function buildIngRow(ingList) {
+    var counts = ingCountsFromList(ingList);
+    var html = '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin:0.5rem 0;">';
+    Object.keys(counts).forEach(function(ing) {
+      var need = counts[ing];
+      var have = inventory[ing] || 0;
+      var ok   = have >= need;
+      var col  = ok ? 'rgba(134,239,172,0.9)' : 'rgba(248,113,113,0.9)';
+      var bdr  = ok ? 'rgba(134,239,172,0.3)' : 'rgba(248,113,113,0.3)';
+      var img  = ING_IMGS_LOCAL[ing] || '';
+      html += '<div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;padding:0.35rem 0.4rem;border-radius:8px;border:1px solid ' + bdr + ';background:rgba(255,255,255,0.03);min-width:52px;">'
+            + '<img src="' + img + '" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+            + '<div style="font-size:0.5rem;color:rgba(255,255,225,0.7);text-align:center;">' + ing + '</div>'
+            + '<div style="font-size:0.55rem;color:' + col + ';font-weight:700;">' + have + '/' + need + '</div>'
+            + '</div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function buildStatPills(stats) {
+    if (!stats || !stats.length) return '';
+    var html = '<div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.35rem;">';
+    stats.forEach(function(s) {
+      var label = s.replace(/_/g,' ');
+      html += '<span style="font-size:0.55rem;padding:0.2rem 0.45rem;border-radius:20px;background:rgba(192,132,252,0.15);border:1px solid rgba(192,132,252,0.3);color:rgba(192,132,252,0.9);">' + label + '</span>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function canBrewRecipe(ingList) {
+    var c = ingCountsFromList(ingList);
+    return Object.keys(c).every(function(i){ return (inventory[i]||0) >= c[i]; });
+  }
+
+  function buildSelectBtn(ingList, isLegendary) {
+    var canBrew = canBrewRecipe(ingList);
+    var label   = canBrew ? 'Select Ingredients' : 'Missing Ingredients';
+    var bg      = canBrew ? 'rgba(192,132,252,0.18)' : 'rgba(255,255,255,0.04)';
+    var bdr     = canBrew ? 'rgba(192,132,252,0.5)'  : 'rgba(255,255,225,0.1)';
+    var col     = canBrew ? 'rgba(192,132,252,1)'     : 'rgba(255,255,225,0.3)';
+    var cursor  = canBrew ? 'pointer' : 'not-allowed';
+    var encoded = encodeURIComponent(JSON.stringify(ingList));
+    return '<button onclick="recipeAutoSelect(\'' + encoded + '\')" '
+      + (canBrew ? '' : 'disabled ')
+      + 'style="width:100%;margin-top:0.6rem;padding:0.45rem 0.5rem;border-radius:8px;border:1px solid ' + bdr + ';background:' + bg + ';color:' + col + ';font-family:Space Grotesk,sans-serif;font-size:0.7rem;font-weight:700;cursor:' + cursor + ';transition:all 0.2s;">'
+      + label + '</button>';
+  }
+
+  var html = '';
+
+  // --- Normal Recipes ---
+  if (normalKeys.length) {
+    html += '<div style="font-size:0.65rem;color:rgba(192,132,252,0.7);font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;">RECIPES (' + normalKeys.length + ')</div>';
+    normalKeys.forEach(function(name) {
+      var r     = normal[name];
+      var ings  = Array.isArray(r.ingredients) ? r.ingredients : Object.values(r.ingredients||{});
+      var stats = r.guaranteed_stats || [];
+      html += '<div style="border:1px solid rgba(192,132,252,0.2);border-radius:10px;padding:0.7rem;margin-bottom:0.7rem;background:rgba(255,255,255,0.02);">'
+            + '<div style="font-size:0.75rem;font-weight:700;color:rgba(255,255,225,0.9);margin-bottom:0.2rem;">' + name + '</div>'
+            + '<div style="font-size:0.6rem;color:rgba(255,255,225,0.4);">Reusable - Guaranteed stats</div>'
+            + buildStatPills(stats)
+            + buildIngRow(ings)
+            + buildSelectBtn(ings, false)
+            + '</div>';
+    });
+  }
+
+  // --- Legendary Recipes ---
+  if (legKeys.length) {
+    html += '<div style="font-size:0.65rem;color:rgba(251,191,36,0.8);font-weight:700;letter-spacing:0.05em;margin:0.75rem 0 0.5rem;"">LEGENDARY (' + legKeys.length + ')</div>';
+    legKeys.forEach(function(key) {
+      var r    = legendary[key];
+      var ings = Array.isArray(r.ingredients) ? r.ingredients : (r.ingredients ? Object.values(r.ingredients) : []);
+      html += '<div style="border:1px solid rgba(251,191,36,0.3);border-radius:10px;padding:0.7rem;margin-bottom:0.7rem;background:rgba(251,191,36,0.04);">'
+            + '<div style="font-size:0.75rem;font-weight:700;color:rgba(251,191,36,0.95);margin-bottom:0.2rem;">Legendary #' + key + '</div>'
+            + '<div style="font-size:0.6rem;color:rgba(255,255,225,0.4);">One-time use - 4 stats at upper range (70-100%)</div>'
+            + buildIngRow(ings)
+            + buildSelectBtn(ings, true)
+            + '</div>';
+    });
+  }
+
+  el.innerHTML = html;
+}
+window.renderRecipes = renderRecipes;
+
+function recipeAutoSelect(encodedList) {
+  try {
+    var ings = JSON.parse(decodeURIComponent(encodedList));
+    _brewSelected = ings.slice();
+    doBrewWithIngredients(ings);
+  } catch(e) { console.error('[recipeAutoSelect]', e); }
+}
+window.recipeAutoSelect = recipeAutoSelect;
 
 function setPlatform(plat) {
   currentPlatform = plat;
@@ -7119,6 +7516,12 @@ function renderBrewing(s) {
     setTimeout(function(){ potionUpdateActionBar(); }, 0);
   } else { storedEl.innerHTML = '<div class="empty-hint">No stored potions.</div>'; }
   
+
+  // Load recipes (lazy fetch)
+  if (!_recipesLoaded) {
+    _recipesLoaded = true;
+    loadRecipesTab();
+  }
 
   // Ingredients
   const ingEl = document.getElementById('brew-ingredients-content');
