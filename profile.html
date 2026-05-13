@@ -2869,7 +2869,8 @@ window.potionDiscardSelected = potionDiscardSelected;
 // ================================================================
 // BREW STATION
 // ================================================================
-var _brewSelected = []; // array of ingredient name strings
+var _brewSelected = [];
+var _brewRecipeName = ''; // array of ingredient name strings
 var _potionSelected = {}; // { safeKey: slotKey } of selected stored potions
 var _brewMode = 'manual'; // 'manual' | 'recipe'
 
@@ -3200,7 +3201,7 @@ async function doBrew() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
       credentials: 'include',
-      body: JSON.stringify({ ingredients: _brewSelected }),
+      body: JSON.stringify({ ingredients: _brewSelected, recipe_name: _brewRecipeName || '' }),
     });
     var data = await res.json();
     console.log('[doBrew] response:', data);

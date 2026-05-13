@@ -14,10 +14,9 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     html, body {
       width: 100%; height: 100%;
-      background: #1a1a2e;
+      background: #0a0a14;
       font-family: 'Space Grotesk', sans-serif;
       overflow: hidden;
       touch-action: none;
@@ -30,61 +29,37 @@
       background: #0e0e1a;
       z-index: 9999;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      color: #fff;
-      text-align: center;
-      padding: 2rem;
+      align-items: center; justify-content: center;
+      gap: 1rem; color: #fff;
+      text-align: center; padding: 2rem;
     }
     #desktop-block .icon { font-size: 4rem; }
     #desktop-block h2 { font-size: 1.4rem; color: #a8ff78; }
     #desktop-block p { color: rgba(255,255,255,0.6); font-size: 0.9rem; max-width: 320px; line-height: 1.5; }
 
-    /* --- GAME WRAPPER --- */
-    #game-wrap {
+    /* --- LOADING --- */
+    #loading {
       position: fixed; inset: 0;
+      background: #0e0e1a;
       display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem; z-index: 9000;
+      transition: opacity 0.6s;
     }
-
-    /* --- TOP BAR --- */
-    #top-bar {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 52px;
-      background: rgba(10,10,20,0.85);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 1rem;
-      z-index: 100;
-      border-bottom: 1px solid rgba(168,255,120,0.15);
+    #loading.hidden { opacity: 0; pointer-events: none; }
+    #loading .shroom { font-size: 3rem; animation: bob 1s ease-in-out infinite alternate; }
+    @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+    #loading p { color: rgba(255,255,255,0.5); font-size: 0.8rem; letter-spacing: 0.1em; }
+    #load-bar-wrap {
+      width: 160px; height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px; overflow: hidden;
     }
-    #top-bar .farm-name {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #a8ff78;
-      letter-spacing: 0.05em;
-    }
-    #top-bar .back-btn {
-      width: 36px; height: 36px;
-      background: rgba(168,255,120,0.1);
-      border: 1px solid rgba(168,255,120,0.3);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      color: #a8ff78; font-size: 1.1rem;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    #top-bar .coord-badge {
-      font-size: 0.65rem;
-      color: rgba(255,255,255,0.35);
-      font-family: monospace;
-      background: rgba(255,255,255,0.05);
-      padding: 3px 8px;
-      border-radius: 20px;
+    #load-bar {
+      height: 100%; width: 0%;
+      background: #a8ff78;
+      border-radius: 2px;
+      transition: width 0.3s;
     }
 
     /* --- CANVAS --- */
@@ -97,101 +72,146 @@
     }
     #farm-canvas:active { cursor: grabbing; }
 
-    /* --- BOTTOM HUD --- */
-    #bottom-hud {
+    /* --- TOP BAR --- */
+    #top-bar {
       position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 64px;
-      background: rgba(10,10,20,0.85);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border-top: 1px solid rgba(168,255,120,0.15);
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      padding: 0 0.5rem;
+      top: 0; left: 0; right: 0;
+      height: 50px;
+      background: rgba(8,8,20,0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0 0.9rem;
       z-index: 100;
+      border-bottom: 1px solid rgba(168,255,120,0.12);
     }
-    .hud-btn {
-      display: flex; flex-direction: column;
-      align-items: center; gap: 3px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px;
-      padding: 6px 14px;
-      color: rgba(255,255,255,0.5);
-      font-size: 0.6rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      min-width: 56px;
-      cursor: pointer;
-    }
-    .hud-btn .hud-icon { font-size: 1.3rem; line-height: 1; }
-    .hud-btn.active {
-      background: rgba(168,255,120,0.1);
-      border-color: rgba(168,255,120,0.4);
-      color: #a8ff78;
-    }
-
-    /* --- TOOLTIP --- */
-    #tile-tooltip {
-      position: absolute;
-      background: rgba(10,10,20,0.92);
-      border: 1px solid rgba(168,255,120,0.3);
+    .top-back {
+      width: 34px; height: 34px;
+      background: rgba(168,255,120,0.08);
+      border: 1px solid rgba(168,255,120,0.25);
       border-radius: 8px;
-      padding: 6px 12px;
-      font-size: 0.72rem;
-      color: #fff;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s;
-      z-index: 200;
-      white-space: nowrap;
+      display: flex; align-items: center; justify-content: center;
+      color: #a8ff78; font-size: 1rem;
+      text-decoration: none; cursor: pointer;
+      flex-shrink: 0;
     }
-    #tile-tooltip.visible { opacity: 1; }
-
-    /* --- LOADING SCREEN --- */
-    #loading {
-      position: fixed; inset: 0;
-      background: #0e0e1a;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 1rem; z-index: 9000;
-      transition: opacity 0.5s;
+    .top-title {
+      font-size: 0.9rem; font-weight: 700;
+      color: #a8ff78; letter-spacing: 0.06em;
     }
-    #loading.hidden { opacity: 0; pointer-events: none; }
-    #loading .shroom-spin { font-size: 3rem; animation: spin 1.2s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #loading p { color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+    .top-coord {
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.28);
+      font-family: monospace;
+      background: rgba(255,255,255,0.05);
+      padding: 3px 8px; border-radius: 20px;
+    }
 
     /* --- MINIMAP --- */
     #minimap {
       position: absolute;
-      bottom: 76px; right: 12px;
-      width: 80px; height: 80px;
-      border: 1px solid rgba(168,255,120,0.25);
+      bottom: 78px; right: 10px;
+      width: 76px; height: 76px;
+      border: 1px solid rgba(168,255,120,0.22);
       border-radius: 6px;
       overflow: hidden;
       z-index: 100;
-      opacity: 0.75;
+      opacity: 0.8;
+      background: #0a0a14;
     }
     #minimap-canvas {
       width: 100%; height: 100%;
       image-rendering: pixelated;
     }
 
-    /* Stage 1 badge */
+    /* --- TOOLTIP --- */
+    #tooltip {
+      position: absolute;
+      background: rgba(8,8,20,0.92);
+      border: 1px solid rgba(168,255,120,0.3);
+      border-radius: 8px;
+      padding: 5px 11px;
+      font-size: 0.7rem;
+      color: #fff;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 200;
+      white-space: nowrap;
+    }
+    #tooltip.show { opacity: 1; }
+
+    /* --- BOTTOM HUD --- */
+    #bottom-hud {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 62px;
+      background: rgba(8,8,20,0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(168,255,120,0.12);
+      display: flex; align-items: center;
+      justify-content: space-around;
+      padding: 0 0.4rem;
+      z-index: 100;
+    }
+    .hud-btn {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 2px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 9px;
+      padding: 5px 12px;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.58rem; font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      min-width: 52px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .hud-btn .hi { font-size: 1.2rem; line-height: 1; }
+    .hud-btn.active {
+      background: rgba(168,255,120,0.1);
+      border-color: rgba(168,255,120,0.35);
+      color: #a8ff78;
+    }
+
+    /* --- PWA NAV (only in standalone) --- */
+    #pwa-nav {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 62px;
+      background: #0a0a14;
+      border-top: 1px solid rgba(255,255,225,0.08);
+      align-items: stretch;
+      z-index: 300;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .pwa-tab {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0.2rem;
+      text-decoration: none;
+      color: rgba(255,255,225,0.32);
+      font-family: 'Space Grotesk', monospace;
+      font-size: 0.52rem; letter-spacing: 0.05em;
+      transition: color 0.2s;
+    }
+    .pwa-tab span:first-child { font-size: 1.25rem; display: flex; align-items: center; justify-content: center; }
+    .pwa-tab.active { color: #a8ff78; }
+
+    /* stage label */
     #stage-badge {
       position: absolute;
-      top: 60px; left: 50%;
+      top: 58px; left: 50%;
       transform: translateX(-50%);
-      background: rgba(10,10,20,0.7);
-      border: 1px solid rgba(168,255,120,0.2);
+      background: rgba(8,8,20,0.7);
+      border: 1px solid rgba(168,255,120,0.18);
       border-radius: 20px;
-      padding: 4px 14px;
-      font-size: 0.6rem;
-      color: rgba(168,255,120,0.5);
+      padding: 3px 12px;
+      font-size: 0.58rem;
+      color: rgba(168,255,120,0.45);
       letter-spacing: 0.1em;
       text-transform: uppercase;
       z-index: 50;
@@ -201,822 +221,697 @@
 </head>
 <body>
 
-<!-- Desktop block -->
 <div id="desktop-block">
   <div class="icon">📱</div>
   <h2>Mobile & PWA Only</h2>
-  <p>The farm view is designed for mobile devices. Open Mushroom Planet on your phone to explore your farm!</p>
+  <p>Open Mushroom Planet on your phone to explore your farm!</p>
 </div>
 
-<!-- Loading -->
 <div id="loading">
-  <div class="shroom-spin">🍄</div>
-  <p>Growing your farm...</p>
+  <div class="shroom">🍄</div>
+  <p>LOADING FARM...</p>
+  <div id="load-bar-wrap"><div id="load-bar"></div></div>
 </div>
 
-<!-- Game -->
-<div id="game-wrap">
-  <div id="top-bar">
-    <a class="back-btn" href="/profile.html">&#8592;</a>
-    <span class="farm-name">🍄 My Farm</span>
-    <span class="coord-badge" id="coord-display">0, 0</span>
+<div id="top-bar">
+  <a class="top-back" href="/profile.html">&#8592;</a>
+  <span class="top-title">🍄 My Farm</span>
+  <span class="top-coord" id="coord-display">0, 0</span>
+</div>
+
+<div id="stage-badge">Spring Season</div>
+
+<canvas id="farm-canvas"></canvas>
+<div id="minimap"><canvas id="minimap-canvas" width="76" height="76"></canvas></div>
+<div id="tooltip"></div>
+
+<div id="bottom-hud">
+  <div class="hud-btn active" data-tab="farm">
+    <span class="hi">🏡</span><span>Farm</span>
   </div>
-
-  <div id="stage-badge">Stage 1 - Visual Preview</div>
-
-  <canvas id="farm-canvas"></canvas>
-
-  <div id="minimap">
-    <canvas id="minimap-canvas" width="80" height="80"></canvas>
+  <div class="hud-btn" data-tab="animals">
+    <span class="hi">🐄</span><span>Animals</span>
   </div>
-
-  <div id="tile-tooltip"></div>
-
-  <div id="bottom-hud">
-    <div class="hud-btn active">
-      <span class="hud-icon">🏡</span>
-      <span>Farm</span>
-    </div>
-    <div class="hud-btn">
-      <span class="hud-icon">🎒</span>
-      <span>Items</span>
-    </div>
-    <div class="hud-btn">
-      <span class="hud-icon">🌀</span>
-      <span>Spores</span>
-    </div>
-    <div class="hud-btn">
-      <span class="hud-icon">🗺️</span>
-      <span>Map</span>
-    </div>
+  <div class="hud-btn" data-tab="crops">
+    <span class="hi">🌱</span><span>Crops</span>
+  </div>
+  <div class="hud-btn" data-tab="map">
+    <span class="hi">🗺️</span><span>Map</span>
   </div>
 </div>
+
+<!-- PWA nav injected by JS if standalone -->
+<nav id="pwa-nav">
+  <a href="/profile.html" class="pwa-tab">
+    <span><img src="/images/icon-192.png" style="width:20px;height:20px;object-fit:contain;border-radius:50%;"></span>
+    <span>Profile</span>
+  </a>
+  <a href="/earn.html" class="pwa-tab">
+    <span><img src="/images/earn.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Earn</span>
+  </a>
+  <a href="/play.html" class="pwa-tab active">
+    <span><img src="/images/shroomfarm.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Farm</span>
+  </a>
+  <a href="/convert.html" class="pwa-tab">
+    <span><img src="/images/swaps.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Convert</span>
+  </a>
+  <a href="/vote.html" class="pwa-tab">
+    <span><img src="/images/vote.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Vote</span>
+  </a>
+  <a href="/treasury.html" class="pwa-tab">
+    <span><img src="/images/treasury.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Treasury</span>
+  </a>
+</nav>
 
 <script>
 // ============================================================
 // DESKTOP GUARD
 // ============================================================
-function isMobileOrPWA() {
+(function() {
   const ua = navigator.userAgent;
-  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-  const isPWA = window.matchMedia('(display-mode: standalone)').matches
-    || window.navigator.standalone === true;
-  const isSmallScreen = window.innerWidth <= 900;
-  return isMobileUA || isPWA || isSmallScreen;
-}
+  const mob = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  const pwa = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const small = window.innerWidth <= 900;
+  if (!mob && !pwa && !small) {
+    document.getElementById('desktop-block').style.display = 'flex';
+    document.getElementById('loading').style.display = 'none';
+  }
+})();
 
-if (!isMobileOrPWA()) {
-  document.getElementById('desktop-block').style.display = 'flex';
-  document.getElementById('game-wrap').style.display = 'none';
-  document.getElementById('loading').style.display = 'none';
-}
+// PWA nav: show only in standalone, shift bottom-hud up
+(function() {
+  const pwa = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (pwa) {
+    document.getElementById('pwa-nav').style.display = 'flex';
+    document.getElementById('bottom-hud').style.bottom = '62px';
+    document.getElementById('minimap').style.bottom = '134px';
+  }
+})();
 
 // ============================================================
-// TILE ENGINE
+// CONSTANTS
 // ============================================================
-const TILE = 32;
+const TILE   = 16;   // source tile size in spritesheet
+const ZOOM   = 3;    // render at 48px per tile on screen
+const TSIZE  = TILE * ZOOM; // 48px rendered tile
 
-// Tile type IDs
-const T = {
-  GRASS:        0,
-  GRASS2:       1,  // slightly varied
-  GRASS3:       2,  // darker patch
-  DIRT:         3,
-  DIRT_PATH:    4,  // dirt path center
-  DIRT_EDGE_N:  5,
-  DIRT_EDGE_S:  6,
-  DIRT_EDGE_E:  7,
-  DIRT_EDGE_W:  8,
-  WATER:        9,
-  WATER2:       10,
-  WATER_EDGE_N: 11,
-  WATER_EDGE_S: 12,
-  WATER_EDGE_E: 13,
-  WATER_EDGE_W: 14,
-  WATER_CORNER_NE: 15,
-  WATER_CORNER_NW: 16,
-  WATER_CORNER_SE: 17,
-  WATER_CORNER_SW: 18,
-  SAND:         19,
-  STONE:        20,
-  FARMPLOT:     21,
-  FARMPLOT_WET: 22,
-};
+// Character frame dims (from analysis)
+const CHAR_W  = 16;  // walk frame width in source
+const CHAR_H  = 32;  // character height in source (taller than tile)
+const IDLE_W  = 32;  // idle frame width
+const IDLE_H  = 32;  // idle frame height
 
-// Object type IDs (drawn on top of tiles)
-const O = {
-  NONE:           0,
-  TREE_OAK:       1,
-  TREE_PINE:      2,
-  MUSHROOM_RED:   3,
-  MUSHROOM_BROWN: 4,
-  HOUSE:          5,
-  FENCE_H:        6,
-  FENCE_V:        7,
-  FENCE_CORNER:   8,
-  FLOWER:         9,
-  ROCK:           10,
-  WELL:           11,
-  CHEST:          12,
-  STUMP:          13,
-  BUSH:           14,
-  SIGN:           15,
-};
+// Map dimensions
+const MAP_W = 22;
+const MAP_H = 26;
 
-// Tile label for tooltip
-const TILE_LABELS = {
-  [T.GRASS]:        'Grassland',
-  [T.GRASS2]:       'Meadow',
-  [T.GRASS3]:       'Shaded Grass',
-  [T.DIRT]:         'Dirt',
-  [T.DIRT_PATH]:    'Dirt Path',
-  [T.WATER]:        'Water',
-  [T.WATER2]:       'Deep Water',
-  [T.SAND]:         'Sandy Shore',
-  [T.STONE]:        'Stone Path',
-  [T.FARMPLOT]:     'Farm Plot (Dry)',
-  [T.FARMPLOT_WET]: 'Farm Plot (Watered)',
-};
+// ============================================================
+// TILESET TILE COORDS  (col, row in Tileset_Spring.png)
+// Tiles are in the RIGHT half of sheet starting at col 6
+// So actual srcX = (col - 6) * 16,  srcY = row * 16
+// Full sheet is 192px wide, tiles begin at x=96
+// ============================================================
+// From analysis: right 6 cols (96-191px) contain:
+//   rows 0-3:   grass autotile
+//   rows 4-6:   dark ground/cliff
+//   rows 7-10:  dirt/path autotile (orange)
+//   rows 11-12: grass-to-cliff transitions
+//   rows 13-19: grass-cliff-dirt mix
+const TS_OX = 96; // tileset tile region x offset
 
-const OBJ_LABELS = {
-  [O.TREE_OAK]:       'Oak Tree',
-  [O.TREE_PINE]:      'Pine Tree',
-  [O.MUSHROOM_RED]:   '🍄 Mushroom',
-  [O.MUSHROOM_BROWN]: '🍄 Brown Mushroom',
-  [O.HOUSE]:          '🏡 Your Farmhouse',
-  [O.FENCE_H]:        'Fence',
-  [O.FENCE_V]:        'Fence',
-  [O.FENCE_CORNER]:   'Fence Corner',
-  [O.FLOWER]:         'Wildflower',
-  [O.ROCK]:           'Boulder',
-  [O.WELL]:           '💧 Well',
-  [O.CHEST]:          '📦 Chest',
-  [O.STUMP]:          'Tree Stump',
-  [O.BUSH]:           'Berry Bush',
-  [O.SIGN]:           'Signpost',
+// Tile type definitions mapped to tileset source coords [sx, sy]
+const TILES = {
+  GRASS:      [TS_OX + 16, 0],    // solid grass tile (col7, row0)
+  GRASS_TL:   [TS_OX + 0,  0],    // grass top-left corner
+  GRASS_TR:   [TS_OX + 32, 0],
+  GRASS_BL:   [TS_OX + 0,  32],
+  GRASS_BR:   [TS_OX + 32, 32],
+  GRASS2:     [TS_OX + 16, 16],   // inner grass
+  DIRT:       [TS_OX + 16, 7*16], // dirt center
+  DIRT_TL:    [TS_OX + 0,  7*16],
+  DIRT_TR:    [TS_OX + 32, 7*16],
+  DIRT_BL:    [TS_OX + 0,  9*16],
+  DIRT_BR:    [TS_OX + 32, 9*16],
+  DIRT_T:     [TS_OX + 16, 7*16],
+  DIRT_B:     [TS_OX + 16, 9*16],
+  DIRT_L:     [TS_OX + 0,  8*16],
+  DIRT_R:     [TS_OX + 32, 8*16],
+  PATH:       [TS_OX + 16, 8*16], // dirt path center
 };
 
 // ============================================================
-// MAP DEFINITION  (20 wide x 24 tall, Y=0 is north)
+// MAP LAYOUT
+// 0 = grass, 1 = grass variant, 2 = dirt/path, 3 = dirt farm plot
+// Using simple integers, then sprite-mapped in drawTile()
 // ============================================================
-// Each cell: [tileID, objectID]
+const G  = 0; // grass
+const G2 = 1; // grass2
+const D  = 2; // dirt path
+const F  = 3; // farm plot (tilled soil)
+const W  = 4; // water (drawn procedurally)
+
 // prettier-ignore
-const G = T.GRASS, G2 = T.GRASS2, G3 = T.GRASS3;
-const D = T.DIRT, DP = T.DIRT_PATH;
-const W = T.WATER, W2 = T.WATER2;
-const WN = T.WATER_EDGE_N, WS = T.WATER_EDGE_S;
-const WE = T.WATER_EDGE_E, WW = T.WATER_EDGE_W;
-const WNE = T.WATER_CORNER_NE, WNW = T.WATER_CORNER_NW;
-const WSE = T.WATER_CORNER_SE, WSW = T.WATER_CORNER_SW;
-const SA = T.SAND, ST = T.STONE;
-const FP = T.FARMPLOT, FW = T.FARMPLOT_WET;
-
-const MAP_W = 20;
-const MAP_H = 24;
-
-// tiles[y][x]  -- tileType
-// prettier-ignore
-const tiles = [
-  [G3,G3,G3,G3, W2,W2,W2,W2,W2,W2,W2,W2,W2,W2,W2, G3,G3,G3,G3,G3],// 0
-  [G3,G3,G3,WN, W2,W2,W2,W2,W2,W2,W2,W2,W2,W2,W2, WN,G3,G3,G3,G3],// 1
-  [G3,G3,SA,WW, W2,W2,W2,W2,W2, W,W2,W2,W2,W2,W2, WE,SA,G3,G3,G3],// 2
-  [G3,G3,SA,WW, W, W, W, W, W, W, W, W, W, W2,W2, WE,SA,G3,G3,G3],// 3
-  [G3,G3,SA,WSW,WS,WS,WS,WS,WS,WS,WS,WS,WSE,W2,W2,WE,SA,G3,G3,G3],// 4
-  [G3,G ,SA,SA, SA,SA,SA,SA,SA,SA,SA,SA,SA, W2,W2,WE,SA,G3,G3,G3],// 5
-  [G ,G2,G ,SA, SA,SA,SA,SA,SA,SA,SA,SA,SA, WS,WS,WSE,G,G3,G3,G3],// 6
-  [G ,G ,G ,G , G, G, G, G, G, G, G, G, G, G, G, G, G, G3,G3,G3],// 7
-  [G ,G ,G ,G , G, G, G, G, G, G, G, G, G, G, G, G, G, G3,G3,G3],// 8
-  [G ,G ,G ,G , G, G, G, G,DP,DP, G, G, G, G, G, G, G, G ,G ,G ],// 9
-  [G ,G ,G ,G , G, G,FP,FP,FP,FP,FP,FP, G, G, G, G, G, G ,G ,G ],//10
-  [G ,G ,G ,G ,DP,DP,FW,FW,FP,FW,FW,FP, G, G, G, G, G, G ,G ,G ],//11
-  [G ,G ,G ,G , G, G,FP,FP,FP,FP,FP,FP, G, G, G, G, G, G ,G ,G ],//12
-  [G ,G ,G ,G , G, G, G, G,DP,DP, G, G, G, G, G, G, G, G ,G ,G ],//13
-  [G ,G ,G ,G , G, G, G, G,DP, G, G, G, G, G, G, G, G, G ,G ,G ],//14
-  [G ,G3,G ,G , G, G, G, G,DP, G, G, G, G, G, G, G, G, G ,G ,G ],//15
-  [G ,G3,G ,G ,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST, G, G, G, G ,G ,G ],//16
-  [G ,G ,G ,G ,ST, G, G, G,ST, G, G, G,ST, G, G, G, G, G ,G ,G ],//17
-  [G ,G ,G ,G ,ST,ST,ST,ST,ST,ST,ST,ST,ST, G, G, G, G, G ,G ,G ],//18
-  [G ,G ,G ,G , G, G, G, G, G, G, G, G, G, G, G, G, G, G ,G ,G ],//19
-  [G ,G ,G ,G , G, G, G, G, G, G, G, G, G, G, G, G, G, G ,G ,G ],//20
-  [G2,G2,G ,G , G, G, G, G, G, G, G, G, G, G, G, G, G, G ,G ,G ],//21
-  [G2,G2,G2,G , G, G, G, G, G, G, G, G, G, G, G, G, G2,G2,G2,G2],//22
-  [G3,G3,G3,G3, G, G, G, G, G, G, G, G, G, G, G, G3,G3,G3,G3,G3],//23
-];
-
-// objects[y][x]  -- objectType  (0 = nothing)
-// prettier-ignore
-const NO = O.NONE;
-const objects = [
-  [O.TREE_OAK ,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,O.TREE_OAK ,NO,NO],//0
-  [NO,O.TREE_PINE,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,O.TREE_PINE,NO],//1
-  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,O.TREE_OAK],//2
-  [NO,O.BUSH,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,O.BUSH,NO],//3
-  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,O.FLOWER,NO,NO],//4
-  [NO,O.ROCK,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,O.ROCK,NO],//5
-  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,O.TREE_PINE,NO],//6
-  [O.TREE_OAK,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,O.TREE_OAK,NO,NO,NO],//7
-  [NO,NO,O.MUSHROOM_RED,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,O.MUSHROOM_BROWN, NO,NO,NO,NO,NO],//8
-  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//9
-  [NO,NO,O.TREE_OAK,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,O.TREE_PINE,NO,NO],//10
-  [NO,NO,NO,O.SIGN, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//11
-  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//12
-  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//13
-  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, O.MUSHROOM_RED,NO,NO,NO,NO],//14
-  [NO,O.TREE_OAK,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,O.FLOWER, NO,NO,O.TREE_OAK,NO,NO],//15
-  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//16
-  [NO,NO,NO,NO, NO,O.WELL,NO,NO,NO,O.HOUSE,NO,NO,NO,NO,NO, NO,NO,O.CHEST,NO,NO],//17
-  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//18
-  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,O.MUSHROOM_RED,NO,NO,NO,NO, NO,NO,NO,NO,NO],//19
-  [NO,NO,O.ROCK,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,O.STUMP,NO, NO,NO,O.ROCK,NO,NO],//20
-  [NO,NO,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,NO,NO,NO,NO],//21
-  [O.TREE_PINE,NO,NO,O.BUSH, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,O.BUSH, NO,NO,NO,O.TREE_PINE,NO],//22
-  [NO,O.TREE_OAK,NO,NO, NO,NO,NO,NO,NO,NO,NO,NO,NO,NO,NO, NO,O.TREE_OAK,NO,NO,O.TREE_PINE],//23
+const MAP = [
+  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G2,G ,G ,G ,W ,W ,W ,W ,W ,W ,W ,W ,G ,G ,G ,G ,G2,G ,G ,G ,G ],
+  [G ,G ,G ,G ,G ,W ,W ,W ,W ,W ,W ,W ,W ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,G ,W ,W ,W ,W ,W ,W ,W ,W ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G2,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G2,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,D ,D ,D ,D ,D ,D ,D ,D ,D ,D ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,D ,F ,F ,F ,F ,F ,F ,F ,F ,D ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,D ,F ,F ,F ,F ,F ,F ,F ,F ,D ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,D ,F ,F ,F ,F ,F ,F ,F ,F ,D ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,D ,F ,F ,F ,F ,F ,F ,F ,F ,D ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,D ,D ,D ,D ,D ,D ,D ,D ,D ,D ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,D ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,D ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,D ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,D ,D ,D ,D ,D ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G2,G ,G ,G ,G ,G ,G ,G ,G ,G ,D ,G ,G ,G ,G ,G ,G ,G2,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,D ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,D ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G2,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G2,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
+  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
 ];
 
 // ============================================================
-// CANVAS SETUP
+// OBJECTS  (placed on top of tiles)
+// Each entry: { type, tx, ty, label }
 // ============================================================
-const canvas = document.getElementById('farm-canvas');
-const ctx = canvas.getContext('2d');
-const minimapCanvas = document.getElementById('minimap-canvas');
-const mmCtx = minimapCanvas.getContext('2d');
+const OBJECTS = [
+  // Trees around edges
+  { type:'tree', tx:1,  ty:1,  label:'Maple Tree' },
+  { type:'tree', tx:3,  ty:0,  label:'Maple Tree' },
+  { type:'tree', tx:18, ty:1,  label:'Maple Tree' },
+  { type:'tree', tx:20, ty:2,  label:'Maple Tree' },
+  { type:'tree', tx:0,  ty:8,  label:'Maple Tree' },
+  { type:'tree', tx:2,  ty:11, label:'Maple Tree' },
+  { type:'tree', tx:17, ty:7,  label:'Maple Tree' },
+  { type:'tree', tx:19, ty:10, label:'Maple Tree' },
+  { type:'tree', tx:1,  ty:20, label:'Maple Tree' },
+  { type:'tree', tx:20, ty:20, label:'Maple Tree' },
+  { type:'tree', tx:3,  ty:23, label:'Maple Tree' },
+  { type:'tree', tx:18, ty:22, label:'Maple Tree' },
+  // House (4 tiles wide, placed at origin tile, draws full sprite)
+  { type:'house', tx:15, ty:9,  label:'Your Farmhouse' },
+  // Chest
+  { type:'chest', tx:2,  ty:17, label:'Supply Chest' },
+  { type:'chest', tx:19, ty:17, label:'Supply Chest' },
+  // Crops on farm plots
+  { type:'crop', tx:5,  ty:9,  stage:2, label:'Carrot - Growing' },
+  { type:'crop', tx:6,  ty:9,  stage:3, label:'Carrot - Ready!' },
+  { type:'crop', tx:7,  ty:9,  stage:1, label:'Seedling' },
+  { type:'crop', tx:8,  ty:9,  stage:2, label:'Carrot - Growing' },
+  { type:'crop', tx:5,  ty:10, stage:0, label:'Fresh Plot' },
+  { type:'crop', tx:6,  ty:10, stage:1, label:'Seedling' },
+  { type:'crop', tx:7,  ty:10, stage:3, label:'Tomato - Ready!' },
+  { type:'crop', tx:8,  ty:10, stage:2, label:'Tomato - Growing' },
+  { type:'crop', tx:9,  ty:10, stage:1, label:'Seedling' },
+  { type:'crop', tx:10, ty:10, stage:0, label:'Fresh Plot' },
+  { type:'crop', tx:5,  ty:11, stage:3, label:'Mushroom - Ready!' },
+  { type:'crop', tx:6,  ty:11, stage:2, label:'Mushroom - Growing' },
+  { type:'crop', tx:7,  ty:11, stage:1, label:'Seedling' },
+  { type:'crop', tx:9,  ty:11, stage:2, label:'Carrot - Growing' },
+  { type:'crop', tx:10, ty:11, stage:3, label:'Carrot - Ready!' },
+  { type:'crop', tx:11, ty:11, stage:1, label:'Seedling' },
+  // Animals on grass
+  { type:'cow',     tx:16, ty:17, label:'Brown Cow' },
+  { type:'chicken', tx:14, ty:19, label:'Chicken' },
+  { type:'chicken', tx:15, ty:20, label:'Baby Chick' },
+];
 
-let W_px, H_px;
+// ============================================================
+// SPRITES  -- loaded images
+// ============================================================
+const IMG = {};
+const SPRITE_PATHS = {
+  tileset:  '/assets/Tileset/Tileset Spring.png',
+  idle:     '/assets/Character/Idle.png',
+  walk:     '/assets/Character/Walk.png',
+  house:    '/assets/Objects/House.png',
+  tree:     '/assets/Objects/Maple Tree.png',
+  chest:    '/assets/Objects/chest.png',
+  fence:    '/assets/Objects/Fence\'s copiar.png',
+  road:     '/assets/Objects/Road copiar.png',
+  crops:    '/assets/Objects/Spring Crops.png',
+  cow_f:    '/assets/Farm Animals/Female Cow Brown.png',
+  cow_m:    '/assets/Farm Animals/Male Cow Brown.png',
+  chicken:  '/assets/Farm Animals/Chicken Red.png',
+  chick:    '/assets/Farm Animals/Baby Chicken Yellow.png',
+};
+
+function loadSprites() {
+  return new Promise(resolve => {
+    const keys = Object.keys(SPRITE_PATHS);
+    let loaded = 0;
+    const bar = document.getElementById('load-bar');
+    keys.forEach(k => {
+      const img = new Image();
+      img.onload = img.onerror = () => {
+        IMG[k] = img;
+        loaded++;
+        bar.style.width = (loaded / keys.length * 100) + '%';
+        if (loaded === keys.length) resolve();
+      };
+      img.src = SPRITE_PATHS[k];
+    });
+  });
+}
+
+// ============================================================
+// CANVAS + CAMERA
+// ============================================================
+const canvas    = document.getElementById('farm-canvas');
+const ctx       = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+const mmCanvas  = document.getElementById('minimap-canvas');
+const mmCtx     = mmCanvas.getContext('2d');
+mmCtx.imageSmoothingEnabled = false;
+
+let VW, VH;
 let camX = 0, camY = 0;
-let animFrame = 0;
-let lastTime = 0;
+let hudH = 62;
 
 function resize() {
-  W_px = window.innerWidth;
-  H_px = window.innerHeight;
-  canvas.width = W_px;
-  canvas.height = H_px;
-  // Center on house
-  camX = 9 * TILE - W_px / 2 + TILE / 2;
-  camY = 17 * TILE - H_px / 2 + TILE / 2;
+  VW = window.innerWidth;
+  VH = window.innerHeight;
+  canvas.width  = VW;
+  canvas.height = VH;
+  ctx.imageSmoothingEnabled = false;
+  // Center on house initially
+  camX = 15 * TSIZE - VW / 2 + TSIZE;
+  camY = 9  * TSIZE - VH / 2 + TSIZE;
   clampCam();
 }
 
 function clampCam() {
-  const maxX = MAP_W * TILE - W_px;
-  const maxY = MAP_H * TILE - H_px;
-  camX = Math.max(0, Math.min(camX, maxX));
-  camY = Math.max(0, Math.min(camY, maxY));
+  const maxX = MAP_W * TSIZE - VW;
+  const maxY = MAP_H * TSIZE - VH;
+  camX = Math.max(0, Math.min(camX, Math.max(0, maxX)));
+  camY = Math.max(0, Math.min(camY, Math.max(0, maxY)));
+}
+
+window.addEventListener('resize', resize);
+
+// ============================================================
+// ANIMATION STATE
+// ============================================================
+let tick = 0;         // incremented each frame
+let lastTs = 0;
+let frameTimer = 0;
+const FRAME_RATE = 120; // ms per anim frame tick
+
+// Character state
+const player = {
+  tx: 7, ty: 16,       // tile position
+  px: 0, py: 0,        // pixel position (computed)
+  dir: 0,              // 0=down 1=up 2=side
+  moving: false,
+  frame: 0,            // walk frame 0-3
+  animTimer: 0,
+};
+
+// Animal animation states
+const animalStates = {};
+OBJECTS.filter(o => o.type === 'cow' || o.type === 'chicken').forEach((o, i) => {
+  animalStates[i] = { frame: 0, dir: 0, timer: Math.random() * 200, moveTimer: Math.random() * 300 };
+});
+
+// ============================================================
+// DRAW TILE
+// ============================================================
+function drawTile(tx, ty, px, py) {
+  const t = MAP[ty][tx];
+  const ts = IMG.tileset;
+  if (!ts || !ts.complete || ts.naturalWidth === 0) {
+    // fallback solid color
+    const fallback = [['#4a8c2a'],['#52993a'],['#a07848'],['#5a3010'],['#2060b0']];
+    ctx.fillStyle = (fallback[t] || fallback[0])[0];
+    ctx.fillRect(px, py, TSIZE, TSIZE);
+    return;
+  }
+
+  if (t === W) {
+    // Animated water - blue fill
+    ctx.fillStyle = '#2060b0';
+    ctx.fillRect(px, py, TSIZE, TSIZE);
+    // shimmer
+    const o = (tick % 8 < 4) ? 0 : 2;
+    ctx.fillStyle = 'rgba(80,160,220,0.4)';
+    ctx.fillRect(px + 4*ZOOM + o, py + 4*ZOOM, 6*ZOOM, ZOOM);
+    ctx.fillRect(px + 10*ZOOM - o, py + 10*ZOOM, 4*ZOOM, ZOOM);
+    return;
+  }
+
+  // Draw from tileset
+  // Right half of tileset (TS_OX=96) has the tiles
+  // Grass tiles: rows 0-3, cols 6-11 (srcX = 96 + 0..47, srcY = 0..47)
+  // Dirt tiles: rows 7-10
+
+  let sx, sy;
+  if (t === G || t === G2) {
+    // Use center grass tile + variation
+    sx = TS_OX + (t === G2 ? 16 : 16);
+    sy = (t === G2 ? 16 : 0);
+  } else if (t === D) {
+    // Path/dirt - use from dirt region rows 7-9
+    sx = TS_OX + 16;
+    sy = 8 * TILE;
+  } else if (t === F) {
+    // Farm plot tilled soil - use dirt with darker look
+    sx = TS_OX + 0;
+    sy = 8 * TILE;
+  } else {
+    sx = TS_OX + 16; sy = 0;
+  }
+
+  ctx.drawImage(ts, sx, sy, TILE, TILE, px, py, TSIZE, TSIZE);
 }
 
 // ============================================================
-// PIXEL ART TILE RENDERER
+// DRAW OBJECT
 // ============================================================
-function drawTile(tileType, px, py, frame) {
-  switch(tileType) {
-    case T.GRASS:        drawGrass(px, py, 0, frame); break;
-    case T.GRASS2:       drawGrass(px, py, 1, frame); break;
-    case T.GRASS3:       drawGrass(px, py, 2, frame); break;
-    case T.DIRT:         drawDirt(px, py); break;
-    case T.DIRT_PATH:    drawDirtPath(px, py); break;
-    case T.WATER:        drawWater(px, py, false, frame); break;
-    case T.WATER2:       drawWater(px, py, true, frame); break;
-    case T.WATER_EDGE_N: drawWaterEdge(px,py,'N',frame); break;
-    case T.WATER_EDGE_S: drawWaterEdge(px,py,'S',frame); break;
-    case T.WATER_EDGE_E: drawWaterEdge(px,py,'E',frame); break;
-    case T.WATER_EDGE_W: drawWaterEdge(px,py,'W',frame); break;
-    case T.WATER_CORNER_NE: drawWaterCorner(px,py,'NE',frame); break;
-    case T.WATER_CORNER_NW: drawWaterCorner(px,py,'NW',frame); break;
-    case T.WATER_CORNER_SE: drawWaterCorner(px,py,'SE',frame); break;
-    case T.WATER_CORNER_SW: drawWaterCorner(px,py,'SW',frame); break;
-    case T.SAND:         drawSand(px, py); break;
-    case T.STONE:        drawStone(px, py); break;
-    case T.FARMPLOT:     drawFarmPlot(px, py, false); break;
-    case T.FARMPLOT_WET: drawFarmPlot(px, py, true); break;
-    default:             drawGrass(px, py, 0, frame);
+function drawObject(obj, px, py) {
+  switch(obj.type) {
+    case 'tree':    drawTree(px, py); break;
+    case 'house':   drawHouse(px, py); break;
+    case 'chest':   drawChest(px, py); break;
+    case 'crop':    drawCrop(px, py, obj.stage); break;
+    case 'cow':     drawCow(px, py, obj); break;
+    case 'chicken': drawChicken(px, py, obj); break;
   }
 }
 
-function drawGrass(px, py, variant, frame) {
-  const cols = [['#4a8c2a','#5aa030','#3d7520'],
-                ['#52993a','#62aa40','#458028'],
-                ['#3a7020','#4a8028','#305518']];
-  const c = cols[variant];
-  ctx.fillStyle = c[0]; ctx.fillRect(px, py, TILE, TILE);
-  // detail patches
-  ctx.fillStyle = c[1];
-  ctx.fillRect(px+4, py+4, 6, 4);
-  ctx.fillRect(px+18, py+14, 8, 5);
-  ctx.fillRect(px+8, py+22, 5, 4);
-  ctx.fillStyle = c[2];
-  ctx.fillRect(px+24, py+6, 4, 3);
-  ctx.fillRect(px+2, py+20, 3, 4);
-  // random blades
-  if (variant !== 2) {
-    ctx.fillStyle = c[1];
-    const offX = (frame % 4 < 2) ? 0 : 1;
-    ctx.fillRect(px+12+offX, py+2, 1, 4);
-    ctx.fillRect(px+22, py+18, 1, 3);
+function drawTree(px, py) {
+  const img = IMG.tree;
+  if (!img || !img.complete || img.naturalWidth === 0) {
+    // fallback
+    ctx.fillStyle = '#2a6010';
+    ctx.fillRect(px - TSIZE/2, py - TSIZE, TSIZE*2, TSIZE*2);
+    return;
   }
-}
-
-function drawDirt(px, py) {
-  ctx.fillStyle = '#8b6340'; ctx.fillRect(px, py, TILE, TILE);
-  ctx.fillStyle = '#7a5530';
-  ctx.fillRect(px+3, py+5, 8, 3);
-  ctx.fillRect(px+18, py+16, 6, 4);
-  ctx.fillStyle = '#9a7050';
-  ctx.fillRect(px+12, py+10, 5, 3);
-  ctx.fillRect(px+2, py+22, 4, 3);
-}
-
-function drawDirtPath(px, py) {
-  ctx.fillStyle = '#a07848'; ctx.fillRect(px, py, TILE, TILE);
-  ctx.fillStyle = '#907040';
-  ctx.fillRect(px+1, py+1, TILE-2, 2);
-  ctx.fillRect(px+1, py+TILE-3, TILE-2, 2);
-  ctx.fillStyle = '#b08858';
-  ctx.fillRect(px+8, py+8, 6, 4);
-  ctx.fillRect(px+16, py+18, 5, 3);
-}
-
-function drawWater(px, py, deep, frame) {
-  const base = deep ? '#1a4a8a' : '#2060b0';
-  const light = deep ? '#2460a0' : '#3080cc';
-  const foam  = deep ? '#3070b0' : '#50a0e0';
-  ctx.fillStyle = base; ctx.fillRect(px, py, TILE, TILE);
-  // animated shimmer
-  const o = (frame % 8 < 4) ? 0 : 2;
-  ctx.fillStyle = light;
-  ctx.fillRect(px+2+o, py+6, 10, 2);
-  ctx.fillRect(px+16-o, py+18, 8, 2);
-  ctx.fillRect(px+5, py+24+o%2, 6, 2);
-  ctx.fillStyle = foam;
-  ctx.fillRect(px+6+o, py+4, 4, 1);
-  ctx.fillRect(px+18, py+14-o%2, 5, 1);
-}
-
-function drawWaterEdge(px, py, dir, frame) {
-  drawGrass(px, py, 0, frame);
-  drawWater(px, py, false, frame);
-  ctx.fillStyle = '#4a8c2a';
-  if (dir === 'N') { ctx.fillRect(px, py, TILE, 10); drawGrassEdge(px, py, 'S'); }
-  if (dir === 'S') { ctx.fillRect(px, py+TILE-10, TILE, 10); drawGrassEdge(px, py, 'N'); }
-  if (dir === 'E') { ctx.fillRect(px+TILE-10, py, 10, TILE); drawGrassEdge(px, py, 'W'); }
-  if (dir === 'W') { ctx.fillRect(px, py, 10, TILE); drawGrassEdge(px, py, 'E'); }
-}
-
-function drawGrassEdge(px, py, side) {
-  ctx.fillStyle = '#5aa030';
-  if (side === 'N') {
-    for(let i=0;i<MAP_W;i+=4) { ctx.fillRect(px+i%TILE, py, 2, 6); }
-  }
-  if (side === 'S') {
-    for(let i=0;i<TILE;i+=4) { ctx.fillRect(px+i, py+TILE-6, 2, 6); }
-  }
-  if (side === 'W') {
-    for(let i=0;i<TILE;i+=4) { ctx.fillRect(px, py+i, 6, 2); }
-  }
-  if (side === 'E') {
-    for(let i=0;i<TILE;i+=4) { ctx.fillRect(px+TILE-6, py+i, 6, 2); }
-  }
-}
-
-function drawWaterCorner(px, py, dir, frame) {
-  drawGrass(px, py, 0, frame);
-  // just blend grass+water
-  ctx.fillStyle = 'rgba(32,96,176,0.6)';
-  if (dir === 'NE') { ctx.fillRect(px+16, py, 16, 16); }
-  if (dir === 'NW') { ctx.fillRect(px, py, 16, 16); }
-  if (dir === 'SE') { ctx.fillRect(px+16, py+16, 16, 16); }
-  if (dir === 'SW') { ctx.fillRect(px, py+16, 16, 16); }
-}
-
-function drawSand(px, py) {
-  ctx.fillStyle = '#d4b878'; ctx.fillRect(px, py, TILE, TILE);
-  ctx.fillStyle = '#c8aa6a';
-  ctx.fillRect(px+4, py+8, 7, 3);
-  ctx.fillRect(px+18, py+20, 6, 4);
-  ctx.fillStyle = '#e0c888';
-  ctx.fillRect(px+14, py+5, 4, 3);
-  ctx.fillRect(px+2, py+22, 5, 3);
-}
-
-function drawStone(px, py) {
-  ctx.fillStyle = '#787878'; ctx.fillRect(px, py, TILE, TILE);
-  // stone bricks
-  ctx.fillStyle = '#686868';
-  ctx.fillRect(px, py, TILE, 1); ctx.fillRect(px, py+16, TILE, 1);
-  ctx.fillRect(px, py, 1, 16); ctx.fillRect(px+16, py+1, 1, 15);
-  ctx.fillRect(px+8, py+17, 1, 15);
-  ctx.fillStyle = '#888';
-  ctx.fillRect(px+2, py+2, 12, 12);
-  ctx.fillRect(px+10, py+18, 8, 12);
-  ctx.fillStyle = '#909090';
-  ctx.fillRect(px+3, py+3, 4, 4);
-}
-
-function drawFarmPlot(px, py, wet) {
-  ctx.fillStyle = wet ? '#5a3010' : '#7a5030';
-  ctx.fillRect(px, py, TILE, TILE);
-  // furrows
-  ctx.fillStyle = wet ? '#3d2008' : '#5a3a20';
-  for(let r=0; r<4; r++) {
-    ctx.fillRect(px+2, py+4+r*7, TILE-4, 2);
-  }
-  if (wet) {
-    ctx.fillStyle = 'rgba(50,120,200,0.25)';
-    ctx.fillRect(px, py, TILE, TILE);
-  }
-}
-
-// ============================================================
-// OBJECT RENDERER
-// ============================================================
-function drawObject(objType, px, py, frame) {
-  if (!objType || objType === O.NONE) return;
-  switch(objType) {
-    case O.TREE_OAK:       drawTreeOak(px,py,frame); break;
-    case O.TREE_PINE:      drawTreePine(px,py,frame); break;
-    case O.MUSHROOM_RED:   drawMushroom(px,py,'red',frame); break;
-    case O.MUSHROOM_BROWN: drawMushroom(px,py,'brown',frame); break;
-    case O.HOUSE:          drawHouse(px,py); break;
-    case O.FENCE_H:        drawFence(px,py,'H'); break;
-    case O.FENCE_V:        drawFence(px,py,'V'); break;
-    case O.FLOWER:         drawFlower(px,py,frame); break;
-    case O.ROCK:           drawRock(px,py); break;
-    case O.WELL:           drawWell(px,py); break;
-    case O.CHEST:          drawChest(px,py); break;
-    case O.STUMP:          drawStump(px,py); break;
-    case O.BUSH:           drawBush(px,py,frame); break;
-    case O.SIGN:           drawSign(px,py); break;
-  }
-}
-
-function drawTreeOak(px, py, frame) {
-  // shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
-  ctx.fillRect(px+8, py+TILE-4, 16, 4);
-  // trunk
-  ctx.fillStyle = '#5c3a1a';
-  ctx.fillRect(px+13, py+18, 6, 14);
-  ctx.fillStyle = '#7a5030';
-  ctx.fillRect(px+14, py+18, 3, 12);
-  // canopy layers
-  const sway = (frame % 12 < 6) ? 0 : 1;
-  ctx.fillStyle = '#2a6010';
-  ctx.fillRect(px+4+sway, py+2, 24-sway, 20);
-  ctx.fillStyle = '#3a8020';
-  ctx.fillRect(px+6+sway, py+0, 20-sway, 18);
-  ctx.fillStyle = '#4a9828';
-  ctx.fillRect(px+8, py+2, 14, 12);
-  ctx.fillStyle = '#5aaa30';
-  ctx.fillRect(px+10, py+2, 4, 4);
-  ctx.fillRect(px+16, py+6, 4, 3);
-}
-
-function drawTreePine(px, py, frame) {
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
-  ctx.fillRect(px+10, py+TILE-4, 12, 4);
-  // trunk
-  ctx.fillStyle = '#5c3a1a';
-  ctx.fillRect(px+14, py+22, 4, 10);
-  // layers of pine
-  const sway = (frame % 16 < 8) ? 0 : 1;
-  ctx.fillStyle = '#1a5010';
-  ctx.fillRect(px+8+sway, py+16, 16, 10);
-  ctx.fillStyle = '#1e6014';
-  ctx.fillRect(px+10+sway, py+10, 12, 10);
-  ctx.fillStyle = '#248018';
-  ctx.fillRect(px+12, py+4, 8, 10);
-  ctx.fillStyle = '#2a901e';
-  ctx.fillRect(px+13, py+0, 6, 8);
-  ctx.fillStyle = '#3aaa28';
-  ctx.fillRect(px+14, py+2, 2, 2);
-}
-
-function drawMushroom(px, py, color, frame) {
-  const bob = (frame % 10 < 5) ? 0 : 1;
-  ctx.fillStyle = 'rgba(0,0,0,0.15)';
-  ctx.fillRect(px+10, py+TILE-3, 12, 3);
-  // stem
-  ctx.fillStyle = '#e8ddc8';
-  ctx.fillRect(px+13, py+18-bob, 6, 10);
-  ctx.fillStyle = '#d8cdb8';
-  ctx.fillRect(px+15, py+19-bob, 3, 8);
-  // cap
-  const capColor = color === 'red' ? '#cc2010' : '#8b5e30';
-  const spotColor = color === 'red' ? '#ff6050' : '#c49050';
-  ctx.fillStyle = capColor;
-  ctx.fillRect(px+6, py+10-bob, 20, 10);
-  ctx.fillRect(px+8, py+6-bob, 16, 8);
-  ctx.fillRect(px+11, py+4-bob, 10, 6);
-  // spots
-  ctx.fillStyle = spotColor;
-  ctx.fillRect(px+9, py+10-bob, 4, 4);
-  ctx.fillRect(px+18, py+12-bob, 3, 3);
-  ctx.fillRect(px+14, py+7-bob, 3, 3);
+  // Tree sprite sheet: 160x48, 10 cols x 3 rows
+  // Full grown tree is at cols 4-5 (2 wide x 2 tall = 32x32 source)
+  // It's a growth animation - stage 3 (biggest) starts at col 6
+  // From image: seedling col0, small col1-2, medium col3-4, big col5-7, full col6-9
+  // Use the full grown tree: source at x=6*16=96, y=0, w=32, h=32
+  const sx = 6 * TILE;
+  const sy = 0;
+  const sw = 32; const sh = 32;
+  // Draw at double size, offset up so roots sit on tile
+  ctx.drawImage(img, sx, sy, sw, sh, px - TSIZE, py - TSIZE, TSIZE*2, TSIZE*2);
 }
 
 function drawHouse(px, py) {
-  // house is 2x2 tiles but draw on one cell as a bigger sprite centered
-  const hx = px - 16;
-  const hy = py - 24;
-  // shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.25)';
-  ctx.fillRect(hx+8, hy+72, 56, 6);
-  // walls
-  ctx.fillStyle = '#e8d0a0';
-  ctx.fillRect(hx+4, hy+30, 56, 42);
-  // wall detail
-  ctx.fillStyle = '#d8c090';
-  ctx.fillRect(hx+4, hy+50, 56, 2);
-  ctx.fillRect(hx+4, hy+60, 56, 2);
-  // roof
-  ctx.fillStyle = '#8b3010';
-  // roof body
-  ctx.fillRect(hx+2, hy+16, 60, 16);
-  // roof peak
-  ctx.fillStyle = '#7a2808';
-  ctx.fillRect(hx+6, hy+10, 52, 10);
-  ctx.fillRect(hx+12, hy+4, 40, 10);
-  ctx.fillRect(hx+18, hy+0, 28, 8);
-  // chimney
-  ctx.fillStyle = '#c04020';
-  ctx.fillRect(hx+44, hy-4, 8, 18);
-  ctx.fillStyle = '#404040';
-  ctx.fillRect(hx+43, hy-6, 10, 4);
-  // smoke puff
-  ctx.fillStyle = 'rgba(200,200,200,0.5)';
-  ctx.fillRect(hx+44, hy-14, 8, 8);
-  ctx.fillRect(hx+42, hy-20, 6, 7);
-  // door
-  ctx.fillStyle = '#6a3010';
-  ctx.fillRect(hx+24, hy+50, 16, 22);
-  ctx.fillStyle = '#8a4820';
-  ctx.fillRect(hx+25, hy+51, 14, 18);
-  ctx.fillStyle = '#d4aa40';
-  ctx.fillRect(hx+36, hy+61, 3, 3);
-  // windows
-  ctx.fillStyle = '#8ab8e0';
-  ctx.fillRect(hx+8, hy+38, 14, 12);
-  ctx.fillRect(hx+42, hy+38, 14, 12);
-  // window frames
-  ctx.fillStyle = '#e8d0a0';
-  ctx.fillRect(hx+14, hy+38, 2, 12);
-  ctx.fillRect(hx+8, hy+43, 14, 2);
-  ctx.fillRect(hx+48, hy+38, 2, 12);
-  ctx.fillRect(hx+42, hy+43, 14, 2);
-  // mushroom decals on wall
-  ctx.fillStyle = '#cc3020';
-  ctx.fillRect(hx+16, hy+62, 6, 6);
-  ctx.fillRect(hx+17, hy+60, 4, 4);
-  ctx.fillStyle = '#ff8070';
-  ctx.fillRect(hx+17, hy+62, 2, 2);
-}
-
-function drawWell(px, py) {
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
-  ctx.fillRect(px+6, py+TILE-4, 20, 4);
-  // base
-  ctx.fillStyle = '#909090';
-  ctx.fillRect(px+6, py+18, 20, 10);
-  ctx.fillStyle = '#787878';
-  ctx.fillRect(px+6, py+18, 20, 2);
-  // water inside
-  ctx.fillStyle = '#3080c0';
-  ctx.fillRect(px+8, py+20, 16, 6);
-  // pillars
-  ctx.fillStyle = '#a0a0a0';
-  ctx.fillRect(px+6, py+6, 4, 14);
-  ctx.fillRect(px+22, py+6, 4, 14);
-  // beam
-  ctx.fillStyle = '#5c3a1a';
-  ctx.fillRect(px+4, py+4, 24, 4);
-  // rope
-  ctx.fillStyle = '#c8a840';
-  ctx.fillRect(px+14, py+8, 2, 10);
-}
-
-function drawRock(px, py) {
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
-  ctx.fillRect(px+8, py+TILE-4, 16, 4);
-  ctx.fillStyle = '#888';
-  ctx.fillRect(px+8, py+16, 16, 12);
-  ctx.fillRect(px+10, py+12, 12, 8);
-  ctx.fillRect(px+12, py+10, 8, 6);
-  ctx.fillStyle = '#a0a0a0';
-  ctx.fillRect(px+10, py+12, 6, 4);
-  ctx.fillStyle = '#666';
-  ctx.fillRect(px+18, py+22, 6, 4);
+  const img = IMG.house;
+  if (!img || !img.complete || img.naturalWidth === 0) {
+    ctx.fillStyle = '#c0784a';
+    ctx.fillRect(px, py - TSIZE*2, TSIZE*3, TSIZE*3);
+    return;
+  }
+  // House.png: 224x112 = 14 cols x 7 rows
+  // Left house (complete) occupies roughly cols 0-5, rows 0-6
+  // Right house (complete) occupies cols 8-13, rows 0-6
+  // Use RIGHT house: sx=8*16=128, sy=0, sw=6*16=96, sh=7*16=112
+  // Actually from the grid image the right house starts around col 8
+  const sx = 8 * TILE; const sy = 0;
+  const sw = 6 * TILE; const sh = 7 * TILE;
+  // Draw 3x tall, 3x wide, offset up
+  ctx.drawImage(img, sx, sy, sw, sh, px - TSIZE, py - TSIZE*3, sw * ZOOM, sh * ZOOM);
 }
 
 function drawChest(px, py) {
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
-  ctx.fillRect(px+8, py+TILE-3, 16, 3);
-  // body
-  ctx.fillStyle = '#8b5e20';
-  ctx.fillRect(px+6, py+18, 20, 12);
-  // lid
-  ctx.fillStyle = '#7a5018';
-  ctx.fillRect(px+6, py+14, 20, 6);
-  ctx.fillRect(px+7, py+12, 18, 4);
-  // metal bands
-  ctx.fillStyle = '#d4aa40';
-  ctx.fillRect(px+6, py+20, 20, 2);
-  ctx.fillRect(px+14, py+14, 4, 16);
-  // lock
-  ctx.fillStyle = '#e0c040';
-  ctx.fillRect(px+13, py+19, 6, 5);
-  ctx.fillStyle = '#c8a820';
-  ctx.fillRect(px+14, py+21, 4, 2);
+  const img = IMG.chest;
+  if (!img || !img.complete || img.naturalWidth === 0) {
+    ctx.fillStyle = '#8b5e20';
+    ctx.fillRect(px + 4, py + 8, TSIZE - 8, TSIZE - 8);
+    return;
+  }
+  // chest.png: 32x32 = 2 cols x 2 rows
+  // Top row = closed, bottom = open. Use closed (row 0)
+  const bob = (tick % 16 < 8) ? 0 : -ZOOM;
+  ctx.drawImage(img, 0, 0, 16, 16, px + 4, py + 4 + bob, TSIZE - 8, TSIZE - 8);
 }
 
-function drawStump(px, py) {
-  ctx.fillStyle = 'rgba(0,0,0,0.15)';
-  ctx.fillRect(px+8, py+TILE-4, 16, 4);
-  ctx.fillStyle = '#6a4020';
-  ctx.fillRect(px+8, py+20, 16, 10);
-  ctx.fillStyle = '#8a5828';
-  ctx.fillRect(px+8, py+18, 16, 4);
-  // rings
-  ctx.fillStyle = '#7a4c22';
-  ctx.fillRect(px+12, py+19, 8, 1);
-  ctx.fillRect(px+14, py+20, 4, 1);
-  // moss
-  ctx.fillStyle = '#3a8020';
-  ctx.fillRect(px+9, py+18, 3, 2);
-  ctx.fillRect(px+19, py+18, 3, 2);
+function drawCrop(px, py, stage) {
+  const img = IMG.crops;
+  if (!img || !img.complete || img.naturalWidth === 0) {
+    ctx.fillStyle = stage >= 3 ? '#22c55e' : '#a8ff78';
+    ctx.fillRect(px + 8, py + 8, TSIZE - 16, TSIZE - 16);
+    return;
+  }
+  // Spring_Crops.png: 224x128 = 14 cols x 8 rows
+  // Each crop type is in a row, growth stages in cols
+  // Row 0 = carrot stages, row 2 = tomato, row 4 = mushroom-ish
+  // Stage 0=bare,1=sprout,2=growing,3=ready  -> cols 0,1,2,3
+  const cropRow = 0; // carrot row for now
+  const sx = Math.min(stage, 3) * TILE;
+  const sy = cropRow * TILE;
+  // Small crop drawn centered in tile
+  const bob = (tick % 20 < 10) ? 0 : -1;
+  ctx.drawImage(img, sx, sy, TILE, TILE, px + 4, py + 4 + bob * ZOOM, TSIZE - 8, TSIZE - 8);
 }
 
-function drawBush(px, py, frame) {
-  const sway = (frame % 20 < 10) ? 0 : 1;
-  ctx.fillStyle = 'rgba(0,0,0,0.15)';
-  ctx.fillRect(px+6, py+TILE-4, 20, 4);
-  ctx.fillStyle = '#2a6010';
-  ctx.fillRect(px+4+sway, py+16, 24, 14);
-  ctx.fillStyle = '#3a8020';
-  ctx.fillRect(px+6+sway, py+12, 20, 12);
-  ctx.fillStyle = '#4a9830';
-  ctx.fillRect(px+8, py+14, 16, 8);
-  // berries
-  ctx.fillStyle = '#cc2020';
-  ctx.fillRect(px+10, py+16, 3, 3);
-  ctx.fillRect(px+18, py+18, 3, 3);
-  ctx.fillRect(px+14, py+14, 3, 3);
+function drawCow(px, py, obj) {
+  const img = IMG.cow_f;
+  if (!img || !img.complete || img.naturalWidth === 0) {
+    ctx.fillStyle = '#c8a078';
+    ctx.fillRect(px, py + 8, TSIZE + 8, TSIZE - 8);
+    return;
+  }
+  // Female_Cow_Brown.png: 128x96 = 8 cols x 6 rows
+  // Rows: 0=down, 1=?, 2=side1, 3=side2, 4=up, 5=?
+  // 4 frames per direction (cols 0-3 per anim)
+  const idx = OBJECTS.findIndex(o => o === obj);
+  const st = animalStates[idx] || { frame: 0, dir: 0 };
+  const row = st.dir * 2; // each dir takes 2 rows? let's use row 0 for idle
+  const frame = st.frame % 4;
+  ctx.drawImage(img, frame * TILE, row * TILE, TILE, TILE*2,
+    px - 4, py - TSIZE/2, TSIZE + 8, TSIZE * 2);
 }
 
-function drawFlower(px, py, frame) {
-  const bob = (frame % 14 < 7) ? 0 : 1;
-  // stem
-  ctx.fillStyle = '#3a8020';
-  ctx.fillRect(px+15, py+20-bob, 2, 10);
-  // petals
-  const pColors = ['#e040c0','#e8a020','#40a0e0','#e04040'];
-  const pc = pColors[(px+py) % 4];
-  ctx.fillStyle = pc;
-  ctx.fillRect(px+12, py+14-bob, 8, 3);
-  ctx.fillRect(px+14, py+12-bob, 4, 7);
-  // center
-  ctx.fillStyle = '#f8e020';
-  ctx.fillRect(px+14, py+15-bob, 4, 3);
+function drawChicken(px, py, obj) {
+  const img = IMG.chicken;
+  if (!img || !img.complete || img.naturalWidth === 0) {
+    ctx.fillStyle = '#e84020';
+    ctx.fillRect(px + 8, py + 12, TSIZE - 16, TSIZE - 16);
+    return;
+  }
+  // Chicken_Red.png: 64x32 = 4 cols x 2 rows
+  const idx = OBJECTS.findIndex(o => o === obj);
+  const st = animalStates[idx] || { frame: 0, dir: 0 };
+  const frame = st.frame % 4;
+  const row = st.dir % 2;
+  ctx.drawImage(img, frame * TILE, row * TILE, TILE, TILE,
+    px + 8, py + 12, TSIZE - 16, TSIZE - 16);
 }
 
-function drawSign(px, py) {
-  ctx.fillStyle = '#6a4020';
-  ctx.fillRect(px+15, py+18, 2, 12);
-  ctx.fillStyle = '#8a5828';
-  ctx.fillRect(px+10, py+12, 12, 8);
-  ctx.fillStyle = '#d4aa70';
-  ctx.fillRect(px+11, py+13, 10, 6);
-  // text lines
-  ctx.fillStyle = '#5a3010';
-  ctx.fillRect(px+12, py+15, 8, 1);
-  ctx.fillRect(px+12, py+17, 5, 1);
-}
+// ============================================================
+// DRAW PLAYER
+// ============================================================
+function drawPlayer() {
+  const px = player.tx * TSIZE - camX;
+  const py = player.ty * TSIZE - camY;
 
-function drawFence(px, py, dir) {
-  ctx.fillStyle = '#c8a060';
-  if (dir === 'H') {
-    ctx.fillRect(px, py+14, TILE, 3);
-    ctx.fillRect(px+4, py+10, 3, 12);
-    ctx.fillRect(px+24, py+10, 3, 12);
+  if (player.moving && IMG.walk && IMG.walk.complete && IMG.walk.naturalWidth > 0) {
+    // Walk.png: 192x96, 16w x 32h per frame, 12 cols x 3 rows
+    // Row 0 = down, row 1 = up, row 2 = side
+    const frame = player.frame % 6; // 6 walk frames per dir? use % 4 safely
+    const col   = (player.frame % 4) * 2; // each "frame" is 2 cols of 16px? 
+    // Actually: 12 cols / 3 rows = 4 frames per direction
+    const f = player.frame % 4;
+    const row = player.dir; // 0=down,1=up,2=side
+    // flip if going right (dir=2 side)
+    const flip = player.flipX;
+
+    ctx.save();
+    if (flip) {
+      ctx.translate(px + TSIZE, py);
+      ctx.scale(-1, 1);
+      ctx.drawImage(IMG.walk, f * CHAR_W, row * CHAR_H, CHAR_W, CHAR_H,
+        0, -TSIZE, TSIZE, TSIZE * 2);
+    } else {
+      ctx.drawImage(IMG.walk, f * CHAR_W, row * CHAR_H, CHAR_W, CHAR_H,
+        px, py - TSIZE, TSIZE, TSIZE * 2);
+    }
+    ctx.restore();
+  } else if (IMG.idle && IMG.idle.complete && IMG.idle.naturalWidth > 0) {
+    // Idle.png: 128x96, 32w x 32h per frame, 4 cols x 3 rows
+    // Row 0=down, row1=up, row2=side
+    const f = Math.floor(tick / 6) % 4;
+    const row = player.dir;
+
+    ctx.save();
+    if (player.flipX) {
+      ctx.translate(px + TSIZE, py);
+      ctx.scale(-1, 1);
+      ctx.drawImage(IMG.idle, f * IDLE_W, row * IDLE_H, IDLE_W, IDLE_H,
+        0, -TSIZE, TSIZE * 2, TSIZE * 2);
+    } else {
+      ctx.drawImage(IMG.idle, f * IDLE_W, row * IDLE_H, IDLE_W, IDLE_H,
+        px - TSIZE/2, py - TSIZE, TSIZE * 2, TSIZE * 2);
+    }
+    ctx.restore();
   } else {
-    ctx.fillRect(px+14, py, 3, TILE);
-    ctx.fillRect(px+10, py+4, 12, 3);
-    ctx.fillRect(px+10, py+24, 12, 3);
+    // fallback square
+    ctx.fillStyle = '#4fa8fd';
+    ctx.fillRect(px + 8, py, TSIZE - 16, TSIZE);
   }
 }
 
 // ============================================================
-// MAIN DRAW
+// MAIN DRAW LOOP
 // ============================================================
 function draw(ts) {
-  animFrame = Math.floor(ts / 250) % 64;
-
-  ctx.clearRect(0, 0, W_px, H_px);
-
-  // dark bg for outside map
-  ctx.fillStyle = '#0a0a18';
-  ctx.fillRect(0, 0, W_px, H_px);
-
-  const startTX = Math.max(0, Math.floor(camX / TILE));
-  const startTY = Math.max(0, Math.floor(camY / TILE));
-  const endTX   = Math.min(MAP_W, Math.ceil((camX + W_px) / TILE));
-  const endTY   = Math.min(MAP_H, Math.ceil((camY + H_px) / TILE));
-
-  // pass 1: tiles
-  for (let ty = startTY; ty < endTY; ty++) {
-    for (let tx = startTX; tx < endTX; tx++) {
-      const px = tx * TILE - camX;
-      const py = ty * TILE - camY;
-      drawTile(tiles[ty][tx], px, py, animFrame);
-    }
-  }
-
-  // pass 2: objects (sorted Y for depth)
-  for (let ty = startTY; ty < endTY; ty++) {
-    for (let tx = startTX; tx < endTX; tx++) {
-      const obj = objects[ty][tx];
-      if (obj && obj !== O.NONE) {
-        const px = tx * TILE - camX;
-        const py = ty * TILE - camY;
-        drawObject(obj, px, py, animFrame);
-      }
-    }
-  }
-
-  drawMinimap();
   requestAnimationFrame(draw);
+
+  const dt = ts - lastTs;
+  lastTs = ts;
+
+  frameTimer += dt;
+  if (frameTimer >= FRAME_RATE) {
+    tick++;
+    frameTimer -= FRAME_RATE;
+    // advance animal frames
+    Object.keys(animalStates).forEach(i => {
+      const st = animalStates[i];
+      st.timer++;
+      if (st.timer % 6 === 0) st.frame++;
+    });
+  }
+
+  ctx.clearRect(0, 0, VW, VH);
+
+  // Sky/bg
+  ctx.fillStyle = '#0a0a14';
+  ctx.fillRect(0, 0, VW, VH);
+
+  const tileStartX = Math.max(0, Math.floor(camX / TSIZE));
+  const tileStartY = Math.max(0, Math.floor(camY / TSIZE));
+  const tileEndX   = Math.min(MAP_W, Math.ceil((camX + VW) / TSIZE));
+  const tileEndY   = Math.min(MAP_H, Math.ceil((camY + VH) / TSIZE));
+
+  // PASS 1: Ground tiles
+  for (let ty = tileStartY; ty < tileEndY; ty++) {
+    for (let tx = tileStartX; tx < tileEndX; tx++) {
+      const px = tx * TSIZE - camX;
+      const py = ty * TSIZE - camY;
+      drawTile(tx, ty, px, py);
+    }
+  }
+
+  // PASS 2: Objects sorted by Y (painter's algorithm for depth)
+  const visObjects = OBJECTS.filter(o =>
+    o.tx >= tileStartX - 2 && o.tx <= tileEndX + 2 &&
+    o.ty >= tileStartY - 2 && o.ty <= tileEndY + 2
+  );
+  // Sort Y so objects lower on screen draw over those higher up
+  visObjects.sort((a, b) => a.ty - b.ty);
+
+  visObjects.forEach(obj => {
+    const px = obj.tx * TSIZE - camX;
+    const py = obj.ty * TSIZE - camY;
+    drawObject(obj, px, py);
+  });
+
+  // PASS 3: Player
+  drawPlayer();
+
+  // PASS 4: Minimap
+  drawMinimap();
 }
 
 // ============================================================
 // MINIMAP
 // ============================================================
 function drawMinimap() {
-  const mw = 80, mh = 80;
+  const mw = 76, mh = 76;
   const tw = mw / MAP_W, th = mh / MAP_H;
   mmCtx.clearRect(0, 0, mw, mh);
 
   for (let ty = 0; ty < MAP_H; ty++) {
     for (let tx = 0; tx < MAP_W; tx++) {
-      const t = tiles[ty][tx];
+      const t = MAP[ty][tx];
       let col = '#3a7020';
-      if (t === T.WATER || t === T.WATER2 || t >= T.WATER_EDGE_N && t <= T.WATER_CORNER_SW) col = '#2060b0';
-      else if (t === T.SAND) col = '#d4b878';
-      else if (t === T.DIRT || t === T.DIRT_PATH) col = '#8b6340';
-      else if (t === T.STONE) col = '#787878';
-      else if (t === T.FARMPLOT || t === T.FARMPLOT_WET) col = '#5a3010';
+      if (t === W) col = '#2060b0';
+      else if (t === D) col = '#a07848';
+      else if (t === F) col = '#5a3010';
+      else if (t === G2) col = '#4a9030';
       mmCtx.fillStyle = col;
-      mmCtx.fillRect(tx*tw, ty*th, tw+0.5, th+0.5);
+      mmCtx.fillRect(tx * tw, ty * th, tw + 0.5, th + 0.5);
     }
   }
 
-  // objects
-  for (let ty = 0; ty < MAP_H; ty++) {
-    for (let tx = 0; tx < MAP_W; tx++) {
-      const o = objects[ty][tx];
-      if (!o) continue;
-      let col = null;
-      if (o === O.TREE_OAK || o === O.TREE_PINE || o === O.BUSH) col = '#1a5010';
-      else if (o === O.HOUSE) col = '#e8d0a0';
-      else if (o === O.MUSHROOM_RED || o === O.MUSHROOM_BROWN) col = '#cc3020';
-      if (col) {
-        mmCtx.fillStyle = col;
-        mmCtx.fillRect(tx*tw, ty*th, tw+0.5, th+0.5);
-      }
+  // Objects on minimap
+  OBJECTS.forEach(o => {
+    let col = null;
+    if (o.type === 'tree')    col = '#1a5010';
+    else if (o.type === 'house') col = '#c0784a';
+    else if (o.type === 'chest') col = '#d4aa40';
+    if (col) {
+      mmCtx.fillStyle = col;
+      mmCtx.fillRect(o.tx * tw, o.ty * th, tw + 1, th + 1);
     }
-  }
+  });
 
-  // viewport rect
-  const vx = (camX / TILE) * tw;
-  const vy = (camY / TILE) * th;
-  const vw = (W_px / TILE) * tw;
-  const vh = (H_px / TILE) * th;
-  mmCtx.strokeStyle = 'rgba(168,255,120,0.7)';
+  // Player dot
+  mmCtx.fillStyle = '#4fa8fd';
+  mmCtx.fillRect(player.tx * tw - 1, player.ty * th - 1, 3, 3);
+
+  // Viewport rect
+  const vx = (camX / TSIZE) * tw;
+  const vy = (camY / TSIZE) * th;
+  const vw = (VW / TSIZE) * tw;
+  const vh = (VH / TSIZE) * th;
+  mmCtx.strokeStyle = 'rgba(168,255,120,0.65)';
   mmCtx.lineWidth = 1;
   mmCtx.strokeRect(vx, vy, Math.min(vw, mw), Math.min(vh, mh));
 }
 
 // ============================================================
-// PAN INPUT
+// INPUT / PAN
 // ============================================================
-let drag = { active: false, startX: 0, startY: 0, camStartX: 0, camStartY: 0 };
+let drag = { active: false, startX: 0, startY: 0, camStartX: 0, camStartY: 0, moved: false };
 let touchStart = null;
 
 canvas.addEventListener('mousedown', e => {
-  drag = { active: true, startX: e.clientX, startY: e.clientY, camStartX: camX, camStartY: camY };
+  drag = { active: true, startX: e.clientX, startY: e.clientY,
+           camStartX: camX, camStartY: camY, moved: false };
 });
 canvas.addEventListener('mousemove', e => {
   if (!drag.active) return;
-  camX = drag.camStartX - (e.clientX - drag.startX);
-  camY = drag.camStartY - (e.clientY - drag.startY);
+  const dx = e.clientX - drag.startX;
+  const dy = e.clientY - drag.startY;
+  if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
+  camX = drag.camStartX - dx;
+  camY = drag.camStartY - dy;
   clampCam();
   updateCoord(e.clientX, e.clientY);
 });
-canvas.addEventListener('mouseup', () => { drag.active = false; });
+canvas.addEventListener('mouseup', e => {
+  if (!drag.moved) handleTap(e.clientX, e.clientY);
+  drag.active = false;
+});
 
 canvas.addEventListener('touchstart', e => {
   e.preventDefault();
   if (e.touches.length === 1) {
     const t = e.touches[0];
-    drag = { active: true, startX: t.clientX, startY: t.clientY, camStartX: camX, camStartY: camY };
-    touchStart = { x: t.clientX, y: t.clientY, time: Date.now() };
+    drag = { active: true, startX: t.clientX, startY: t.clientY,
+             camStartX: camX, camStartY: camY, moved: false };
+    touchStart = { x: t.clientX, y: t.clientY, ts: Date.now() };
   }
 }, { passive: false });
 
@@ -1024,71 +919,117 @@ canvas.addEventListener('touchmove', e => {
   e.preventDefault();
   if (!drag.active || e.touches.length !== 1) return;
   const t = e.touches[0];
-  camX = drag.camStartX - (t.clientX - drag.startX);
-  camY = drag.camStartY - (t.clientY - drag.startY);
+  const dx = t.clientX - drag.startX;
+  const dy = t.clientY - drag.startY;
+  if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
+  camX = drag.camStartX - dx;
+  camY = drag.camStartY - dy;
   clampCam();
   updateCoord(t.clientX, t.clientY);
 }, { passive: false });
 
 canvas.addEventListener('touchend', e => {
   e.preventDefault();
-  if (touchStart && Date.now() - touchStart.time < 200) {
+  if (!drag.moved && touchStart && Date.now() - touchStart.ts < 250) {
     const t = e.changedTouches[0];
     handleTap(t.clientX, t.clientY);
   }
-  drag.active = false;
-  touchStart = null;
+  drag.active = false; touchStart = null;
 }, { passive: false });
 
-canvas.addEventListener('click', e => {
-  if (!drag.active) handleTap(e.clientX, e.clientY);
-});
-
 function updateCoord(cx, cy) {
-  const tx = Math.floor((cx + camX) / TILE);
-  const ty = Math.floor((cy + camY) / TILE);
+  const tx = Math.floor((cx + camX) / TSIZE);
+  const ty = Math.floor((cy + camY) / TSIZE);
   document.getElementById('coord-display').textContent = tx + ', ' + ty;
 }
 
+// ============================================================
+// TAP HANDLER  - move player + tooltip
+// ============================================================
+const tooltip = document.getElementById('tooltip');
+let tipTimer = null;
+
 function handleTap(cx, cy) {
-  const tx = Math.floor((cx + camX) / TILE);
-  const ty = Math.floor((cy + camY) / TILE);
+  const tx = Math.floor((cx + camX) / TSIZE);
+  const ty = Math.floor((cy + camY) / TSIZE);
   if (tx < 0 || tx >= MAP_W || ty < 0 || ty >= MAP_H) return;
-  const obj = objects[ty][tx];
-  const tile = tiles[ty][tx];
-  const label = (obj && OBJ_LABELS[obj]) ? OBJ_LABELS[obj] : (TILE_LABELS[tile] || 'Land');
-  showTooltip(label, cx, cy);
+
+  // Move player toward tapped tile
+  const oldTx = player.tx;
+  player.tx = tx;
+  player.ty = ty;
+
+  // Determine direction faced
+  const dx = tx - oldTx;
+  const dy = ty - oldTy || 0;
+  if (Math.abs(dx) > Math.abs(dy)) {
+    player.dir = 2; // side
+    player.flipX = dx > 0;
+  } else if (dy < 0) {
+    player.dir = 1; // up
+    player.flipX = false;
+  } else {
+    player.dir = 0; // down
+    player.flipX = false;
+  }
+  player.moving = true;
+  player.frame = (player.frame + 1) % 4;
+  setTimeout(() => { player.moving = false; }, 400);
+
+  // Pan camera to follow player
+  camX = tx * TSIZE - VW / 2 + TSIZE / 2;
+  camY = ty * TSIZE - VH / 2 + TSIZE / 2;
+  clampCam();
+
+  // Tooltip for object at tile
+  const obj = OBJECTS.find(o => o.tx === tx && o.ty === ty);
+  if (obj) showTooltip(obj.label, cx, cy);
+  else {
+    const labels = { 0:'Grassland', 1:'Meadow', 2:'Dirt Path', 3:'Farm Plot', 4:'Water' };
+    showTooltip(labels[MAP[ty][tx]] || 'Land', cx, cy);
+  }
 }
 
-// ============================================================
-// TOOLTIP
-// ============================================================
-const tooltip = document.getElementById('tile-tooltip');
-let tooltipTimer = null;
+let oldTy = 0;
+
 function showTooltip(text, x, y) {
   tooltip.textContent = text;
-  const tx = Math.min(x, W_px - 180);
-  const ty = Math.max(y - 40, 60);
-  tooltip.style.left = tx + 'px';
-  tooltip.style.top  = ty + 'px';
-  tooltip.classList.add('visible');
-  clearTimeout(tooltipTimer);
-  tooltipTimer = setTimeout(() => tooltip.classList.remove('visible'), 2000);
+  const tx2 = Math.min(x + 8, VW - 160);
+  const ty2 = Math.max(y - 44, 60);
+  tooltip.style.left = tx2 + 'px';
+  tooltip.style.top  = ty2 + 'px';
+  tooltip.classList.add('show');
+  clearTimeout(tipTimer);
+  tipTimer = setTimeout(() => tooltip.classList.remove('show'), 2000);
 }
+
+// HUD button tabs
+document.querySelectorAll('.hud-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.hud-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
 
 // ============================================================
 // BOOT
 // ============================================================
-window.addEventListener('resize', () => { resize(); });
-resize();
-requestAnimationFrame(ts => {
-  // hide loading
-  setTimeout(() => {
-    document.getElementById('loading').classList.add('hidden');
-    setTimeout(() => { document.getElementById('loading').style.display = 'none'; }, 500);
-  }, 600);
+async function boot() {
+  resize();
+  player.px = player.tx * TSIZE;
+  player.py = player.ty * TSIZE;
+
+  await loadSprites();
+
+  // Hide loading
+  const loading = document.getElementById('loading');
+  loading.classList.add('hidden');
+  setTimeout(() => loading.style.display = 'none', 600);
+
   requestAnimationFrame(draw);
-});
+}
+
+boot();
 </script>
 </body>
 </html>
