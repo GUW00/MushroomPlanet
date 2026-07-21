@@ -1,1035 +1,1595 @@
+
+/
+Claude finished the response
+1000015853.jpg
+Still not letting me place, also add a reset button since it's demo mode. Also when clicking lvl button show our items and what we can build. Only one farm house and farm plot allowed.
+
+
+Diagnosed placement bug, architected reset and inventory features
+Diagnosed placement bug, architected reset and inventory features
+Good catch on the reset button and level info — and let's fix placement more robustly this time by giving it its own dedicated tap tracking instead of sharing state with the pan/zoom code (that's clearly still fragile). Let me check the current file first.
+
+
+Ran a command, viewed a file
+Ran a command, viewed a file
+Now rewriting with placement using its own isolated tap tracking, completely decoupled from the pan/drag flags:
+
+
+Architected reset button and interactive level modal displaying inventory and buildable items
+Architected reset button and interactive level modal displaying inventory and buildable items
+Now let's add the reset button, make the level pill open an unlocks/inventory view, and confirm the single-farmhouse/single-farm rule (that one's already enforced by !state.housePlaced / !state.farmPlaced gating the build buttons — no second one can be placed).
+
+
+Edited 2 files
+Edited 2 files
+Now add the Level & Unlocks modal markup:
+
+
+Add Level & Unlocks modal markup after the info modal
+Add Level & Unlocks modal markup after the info modal
+Now the JS: wire the reset button, level-pill click, and the modal-close binder (which runs once at load, before these were in the DOM at that point — need to check ordering):
+
+
+Verified variable scope and button placement logic
+Verified variable scope and button placement logic
+Good, syntax checks out. Let's present the updated file:
+
+
+Presented file
+Presented file
+What changed:
+
+Placement fixed for real this time — the old code shared a moved flag with the pan/zoom drag logic, and that flag could get "stuck" from an earlier pan and silently block confirmation. Placement now tracks its own touch start/end independently, with no dependency on the panning state at all — it should confirm on tap no matter what you did before entering placement mode.
+Reset button — the ⟳ next to the ? button. Confirms before wiping (clears localStorage and reloads), so demo testing doesn't lose progress by accident.
+Level pill is now tappable — opens a modal showing your current gems/shrooms/spores/streak plus a lock/unlock list of what each level grants (Lvl 2 → Farmhouse, Lvl 3 → Mushroom Farm, with a placeholder row for future tools/cosmetics).
+One farmhouse, one farm — already enforced (!state.housePlaced / !state.farmPlaced hide the build buttons once placed), no change needed there, just confirming it holds.
+Try placing the farm again — if it still doesn't confirm, it'd help to know: does the yellow "Tap the grass..." banner disappear at all when you tap, or does it stay up no matter what?
+
+
+Play
+Code · HTML 
+
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" /> <title>Play | Mushroom Planet</title> <meta name="theme-color" content="#0f0f0f" /> <meta name="mobile
+
+pasted
+
+since im testing on desktop as a dev, lets create a dev only where I can clicka  button and it shows me what the map will look liek on different devices. Im on d
+
+
+Architected dev panel with device preset buttons for responsive testing
+Architected dev panel with device preset buttons for responsive testing
+Good idea — let's add a dev-only device frame simulator, gated behind the same devMode flag as your bypass button.
+
+
+Orchestrating CSS overrides to respect dynamic device dimensions
+Orchestrating CSS overrides to respect dynamic device dimensions
+Added a dev-only device frame simulator:
+
+Only shows up in dev mode (i.e. after you hit "Preview anyway (dev)") — a bar pinned to the top with a device dropdown: iPhone SE, iPhone 14, iPhone 14 Pro Max, Pixel 7, Galaxy S23, a smaller Galaxy S8-size, and iPad Mini, plus "Full window."
+Picking a device shrinks the game into a bordered phone-frame box at that exact CSS pixel size, centered on your desktop screen, and re-runs the zoom-to-fit logic against that simulated viewport — so you'll see exactly how "fully zoomed out" looks on each screen size, obstacle spacing, HUD wrapping, etc.
+Added a "Reset progress" button right in that dev bar too, so you don't have to hunt for the in-game ⟳ while flipping between device sizes.
+One limitation worth knowing: this simulates CSS viewport dimensions, not touch input — since you're on desktop, taps still go through the mouse/click path (which works, just isn't a perfect stand-in for real touch/pinch behavior). For that you'll still want actual phone testing at some point before shipping.
+
+
+Play
+Code · HTML 
+I see the preview on claude but on VS and localhsot its nbot showing those device options
+
+
+Diagnosed dev panel visibility bug and devised mutable variable solution
+Diagnosed dev panel visibility bug and devised mutable variable solution
+Found it — the dev panel visibility check ran once at page load, before your click on "Preview anyway (dev)" had a chance to set the flag. So the very first time you use it in a fresh session (which is what happens on localhost/VS Code, vs. Claude's preview where the flag may have carried over from an earlier click), the game boots but the panel never gets shown — it only would appear after a page reload.
+
+
+Ran 2 commands, edited 2 files, viewed a file
+Ran 2 commands, edited 2 files, viewed a file
+Fixed — the dev panel now shows up immediately the first time you click "Preview anyway (dev)" on localhost, no reload needed. (Claude's preview happened to work because a ?dev=1-style flag or a prior click had already primed sessionStorage before you looked at it — that's why the two environments behaved differently.)
+
+
+Play
+Code · HTML 
+1783978097809_image.png
+Lets copy clash of clans map sizing, horizon side view
+
+
+Architected isometric island aesthetic preserving flat coordinate system
+Architected isometric island aesthetic preserving flat coordinate system
+Full isometric tilt (true 3D camera angle like COC, with parallax buildings) would mean rebuilding all the tap/placement coordinate math we just spent this whole thread stabilizing — too risky to redo right now. What I can do without touching that: turn the map into an actual island floating on water under an open sky, and zoom all the way out to contain mode so you see the whole horizon around it, which is most of what reads as "Clash of Clans" at a glance. Let's do that.
+
+
+Locate world sizing, spawn bounds, fitToScreen, and placement clamp code to rework for island/water/sky styling
+Locate world sizing, spawn bounds, fitToScreen, and placement clamp code to rework for island/water/sky styling
+Let's start with the CSS: add a sky backdrop, turn #world's background into water, and add an inset "island" layer with a cliff-style border.
+
+
+Diagnosing positioning conflicts between nested fixed elements
+Diagnosing positioning conflicts between nested fixed elements
+Now add the sky/cloud markup and the island div inside #world:
+
+
+Edited 2 files, ran a command
+Edited 2 files, ran a command
+Now update the JS: keep obstacles/mushrooms/structures within the island interior, and switch fitToScreen to contain mode so the whole island + surrounding water/horizon is visible when fully zoomed out.
+
+
+Viewed a file, ran a command, edited a file
+Viewed a file, ran a command, edited a file
+Now update obstacle generation, mushroom spawn spot, and placement clamping to use the island bounds:
+
+
+Edited 3 files, ran a command
+Edited 3 files, ran a command
+Now switch fitToScreen from cover to contain, so the whole island and its water/sky horizon is visible at the starting zoom:
+
+
+Reconciled misaligned file state with actual codebase reality
+Reconciled misaligned file state with actual codebase reality
+I need to pause — the actual file on disk has diverged from what I expected (there's a goHome/centerCameraOn/computeZoomBounds camera system I don't recognize writing). Let me re-read the real current state before going further so I don't break something.
+
+
+Reconciled camera system discrepancies and adjusted zoom bounds accordingly
+Reconciled camera system discrepancies and adjusted zoom bounds accordingly
+Important thing to flag: the actual file on disk already has a more advanced "Township-style" camera system (goHome/centerCameraOn/computeZoomBounds, starting zoomed in on your farmhouse rather than fully zoomed out) that I don't have visibility into from this point in our conversation — it must have been added in an earlier exchange that's since scrolled out of my context. I don't want to blindly revert it, so here's what I did:
+
+Kept your existing "go home to farmhouse" starting camera as-is.
+My island/water/sky visuals are layered underneath and are fully compatible with it.
+Adjusted the zoom-out limit so that when you manually pinch/scroll all the way out, the whole island becomes visible floating in water under the sky — that's where the "horizon" view now lives, on-demand rather than as the default.
+
+Let full zoom-out reveal the whole island + water/horizon, instead of capping at 1.4x the container-fit scale
+Let full zoom-out reveal the whole island + water/horizon, instead of capping at 1.4x the container-fit scale
+Let's verify the JS still parses and confirm my island edits landed correctly in this actual file:
+
+
+Verify JS parses and island/sky edits are present in the actual file
+Verify JS parses and island/sky edits are present in the actual file
+Good — everything landed cleanly and the file is syntactically valid. Let's present it:
+
+
+Presented file
+Presented file
+What changed:
+
+Sky backdrop: a fixed gradient (blue at top fading to pale horizon) with a few slow-drifting cloud shapes, sitting behind the whole map.
+Island: grass area is now inset from the world edges with a rounded shape, a dirt/cliff-colored border, and drop shadow — reads like a raised island rather than infinite flat grass.
+Water: the area outside the island (within the world bounds) is now a blue tiled water pattern instead of more grass.
+Everything stays on land: obstacles, wild mushrooms, and farmhouse/farm placement are all now bounded to the island interior, with a buffer so nothing spawns right up against the cliff edge or in the water.
+Horizon on zoom-out: pinching/scrolling all the way out now reveals the entire island floating in the water under the sky, instead of stopping short.
+One more thing I should be upfront about: because part of this conversation's history got trimmed from what I can see, I can't account for anything else that might have changed in that gap beyond the camera system I found. If something looks off that I haven't addressed, it's likely from that blind spot — just point it out and I'll work from what's actually on disk rather than assumptions.
+
+
+Play
+Code · HTML 
+
+Want to be notified when Claude responds?
+
+
+
+
+
+
+
+Claude is AI and can make mistakes. Please double-check responses.
+
+
+Play · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#2d5a1b">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Mushroom Planet">
-  <link rel="apple-touch-icon" href="/images/icon-192.png">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>My Farm | Mushroom Planet</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" />
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      width: 100%; height: 100%;
-      background: #0a0a14;
-      font-family: 'Space Grotesk', sans-serif;
-      overflow: hidden;
-      touch-action: none;
-    }
-
-    /* --- DESKTOP BLOCK --- */
-    #desktop-block {
-      display: none;
-      position: fixed; inset: 0;
-      background: #0e0e1a;
-      z-index: 9999;
-      flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 1rem; color: #fff;
-      text-align: center; padding: 2rem;
-    }
-    #desktop-block .icon { font-size: 4rem; }
-    #desktop-block h2 { font-size: 1.4rem; color: #a8ff78; }
-    #desktop-block p { color: rgba(255,255,255,0.6); font-size: 0.9rem; max-width: 320px; line-height: 1.5; }
-
-    /* --- LOADING --- */
-    #loading {
-      position: fixed; inset: 0;
-      background: #0e0e1a;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 1rem; z-index: 9000;
-      transition: opacity 0.6s;
-    }
-    #loading.hidden { opacity: 0; pointer-events: none; }
-    #loading .shroom { font-size: 3rem; animation: bob 1s ease-in-out infinite alternate; }
-    @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-    #loading p { color: rgba(255,255,255,0.5); font-size: 0.8rem; letter-spacing: 0.1em; }
-    #load-bar-wrap {
-      width: 160px; height: 4px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 2px; overflow: hidden;
-    }
-    #load-bar {
-      height: 100%; width: 0%;
-      background: #a8ff78;
-      border-radius: 2px;
-      transition: width 0.3s;
-    }
-
-    /* --- CANVAS --- */
-    #farm-canvas {
-      position: absolute;
-      top: 0; left: 0;
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
-      cursor: grab;
-    }
-    #farm-canvas:active { cursor: grabbing; }
-
-    /* --- TOP BAR --- */
-    #top-bar {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 50px;
-      background: rgba(8,8,20,0.88);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      display: flex; align-items: center;
-      justify-content: space-between;
-      padding: 0 0.9rem;
-      z-index: 100;
-      border-bottom: 1px solid rgba(168,255,120,0.12);
-    }
-    .top-back {
-      width: 34px; height: 34px;
-      background: rgba(168,255,120,0.08);
-      border: 1px solid rgba(168,255,120,0.25);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      color: #a8ff78; font-size: 1rem;
-      text-decoration: none; cursor: pointer;
-      flex-shrink: 0;
-    }
-    .top-title {
-      font-size: 0.9rem; font-weight: 700;
-      color: #a8ff78; letter-spacing: 0.06em;
-    }
-    .top-coord {
-      font-size: 0.6rem;
-      color: rgba(255,255,255,0.28);
-      font-family: monospace;
-      background: rgba(255,255,255,0.05);
-      padding: 3px 8px; border-radius: 20px;
-    }
-
-    /* --- MINIMAP --- */
-    #minimap {
-      position: absolute;
-      bottom: 78px; right: 10px;
-      width: 76px; height: 76px;
-      border: 1px solid rgba(168,255,120,0.22);
-      border-radius: 6px;
-      overflow: hidden;
-      z-index: 100;
-      opacity: 0.8;
-      background: #0a0a14;
-    }
-    #minimap-canvas {
-      width: 100%; height: 100%;
-      image-rendering: pixelated;
-    }
-
-    /* --- TOOLTIP --- */
-    #tooltip {
-      position: absolute;
-      background: rgba(8,8,20,0.92);
-      border: 1px solid rgba(168,255,120,0.3);
-      border-radius: 8px;
-      padding: 5px 11px;
-      font-size: 0.7rem;
-      color: #fff;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 200;
-      white-space: nowrap;
-    }
-    #tooltip.show { opacity: 1; }
-
-    /* --- BOTTOM HUD --- */
-    #bottom-hud {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 62px;
-      background: rgba(8,8,20,0.88);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-top: 1px solid rgba(168,255,120,0.12);
-      display: flex; align-items: center;
-      justify-content: space-around;
-      padding: 0 0.4rem;
-      z-index: 100;
-    }
-    .hud-btn {
-      display: flex; flex-direction: column;
-      align-items: center; gap: 2px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 9px;
-      padding: 5px 12px;
-      color: rgba(255,255,255,0.4);
-      font-size: 0.58rem; font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      min-width: 52px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .hud-btn .hi { font-size: 1.2rem; line-height: 1; }
-    .hud-btn.active {
-      background: rgba(168,255,120,0.1);
-      border-color: rgba(168,255,120,0.35);
-      color: #a8ff78;
-    }
-
-    /* --- PWA NAV (only in standalone) --- */
-    #pwa-nav {
-      display: none;
-      position: fixed; bottom: 0; left: 0; right: 0;
-      height: 62px;
-      background: #0a0a14;
-      border-top: 1px solid rgba(255,255,225,0.08);
-      align-items: stretch;
-      z-index: 300;
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-    .pwa-tab {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 0.2rem;
-      text-decoration: none;
-      color: rgba(255,255,225,0.32);
-      font-family: 'Space Grotesk', monospace;
-      font-size: 0.52rem; letter-spacing: 0.05em;
-      transition: color 0.2s;
-    }
-    .pwa-tab span:first-child { font-size: 1.25rem; display: flex; align-items: center; justify-content: center; }
-    .pwa-tab.active { color: #a8ff78; }
-
-    /* stage label */
-    #stage-badge {
-      position: absolute;
-      top: 58px; left: 50%;
-      transform: translateX(-50%);
-      background: rgba(8,8,20,0.7);
-      border: 1px solid rgba(168,255,120,0.18);
-      border-radius: 20px;
-      padding: 3px 12px;
-      font-size: 0.58rem;
-      color: rgba(168,255,120,0.45);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      z-index: 50;
-      pointer-events: none;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Play | Mushroom Planet</title>
+<meta name="theme-color" content="#0f0f0f" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="manifest" href="/manifest.json" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne+Mono&display=swap" />
+<style>
+  :root {
+    --cream: #ffffe1;
+    --yellow: #fece00;
+    --red: #fd464f;
+    --blue: #4fa8fd;
+    --green: #7ed957;
+    --purple: #b06ffd;
+    --dark: #0f0f0f;
+    --dark2: #1a1a1a;
+    --dark3: #242424;
+    --grass1: #2f4a2a;
+    --grass2: #35521f;
+    --fence: #8a6a3f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: var(--dark); color: var(--cream);
+    font-family: 'Space Grotesk', sans-serif;
+    overscroll-behavior: none;
+    touch-action: none;
+  }
+ 
+  /* ================= GATE (non-PWA / desktop) ================= */
+  #gate {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--dark);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 2rem; text-align: center;
+  }
+  #gate .icon { font-size: 3rem; margin-bottom: 1rem; }
+  #gate h1 { font-size: 1.4rem; margin-bottom: 0.75rem; }
+  #gate p { color: rgba(255,255,225,0.6); font-size: 0.9rem; max-width: 320px; line-height: 1.6; margin-bottom: 0.5rem; }
+  #gate .steps { text-align: left; max-width: 320px; margin-top: 1.5rem; font-size: 0.85rem; color: rgba(255,255,225,0.75); line-height: 2; }
+  #gate .steps b { color: var(--yellow); }
+  #gate .dev-btn {
+    margin-top: 2rem; font-size: 0.7rem; padding: 0.5rem 1rem;
+    background: transparent; border: 1px solid rgba(255,255,225,0.15);
+    color: rgba(255,255,225,0.3); border-radius: 999px; cursor: pointer;
+  }
+ 
+  /* ================= GAME SHELL ================= */
+  #game { position: fixed; inset: 0; display: none; }
+  #game.active { display: block; }
+ 
+  /* HUD */
+  #hud {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    padding: calc(0.6rem + env(safe-area-inset-top)) 0.75rem 0.6rem;
+    display: flex; gap: 0.5rem; justify-content: space-between; align-items: flex-start;
+    pointer-events: none;
+  }
+  .resource-pill {
+    pointer-events: auto;
+    display: flex; align-items: center; gap: 0.35rem;
+    background: rgba(15,15,15,0.85); backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,225,0.1); border-radius: 999px;
+    padding: 0.4rem 0.7rem; font-family: 'Syne Mono', monospace; font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .resource-pill .ico { font-size: 0.95rem; }
+  #resources { display: flex; gap: 0.4rem; flex-wrap: wrap; max-width: 62vw; }
+  .res-gem { color: var(--blue); }
+  .res-shroom { color: var(--red); }
+  .res-spore { color: var(--yellow); }
+  .res-streak { color: #ff9d42; }
+ 
+  #right-hud { display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; }
+  #level-pill {
+    pointer-events: auto;
+    background: rgba(15,15,15,0.85); backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,225,0.1); border-radius: 999px;
+    padding: 0.4rem 0.7rem; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem;
+    min-width: 84px;
+  }
+  #level-pill .lvl-label { font-family: 'Syne Mono', monospace; font-size: 0.65rem; color: var(--yellow); font-weight: 700; }
+  #level-pill .xp-track { width: 100%; height: 4px; border-radius: 999px; background: rgba(255,255,225,0.12); overflow: hidden; }
+  #level-pill .xp-fill { height: 100%; background: var(--yellow); width: 0%; transition: width 0.4s ease; }
+  #info-btn, #reset-btn {
+    pointer-events: auto; width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(15,15,15,0.85); border: 1px solid rgba(255,255,225,0.15);
+    color: var(--cream); font-size: 0.8rem; font-weight: 700; cursor: pointer;
+  }
+  #reset-btn { color: var(--red); font-size: 1rem; }
+  #level-pill { cursor: pointer; }
+ 
+  /* WORLD */
+  #sky {
+    position: fixed; inset: 0; z-index: 0;
+    background: linear-gradient(180deg, #6fb8dd 0%, #93cde8 30%, #bfe3f2 58%, #e3f4fa 100%);
+    overflow: hidden;
+  }
+  #sky .cloud {
+    position: absolute; background: rgba(255,255,255,0.75);
+    border-radius: 999px; filter: blur(1px);
+    animation: driftCloud linear infinite;
+  }
+  @keyframes driftCloud { from { transform: translateX(0); } to { transform: translateX(120px); } }
+ 
+  #viewport { position: absolute; inset: 0; overflow: hidden; z-index: 1; }
+  #world {
+    position: absolute; top: 0; left: 0;
+    width: 1900px; height: 1900px;
+    background:
+      repeating-linear-gradient(45deg, #2f7fac 0 46px, #35729a 46px 92px);
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+  #world.placing { cursor: crosshair; }
+ 
+  .island {
+    position: absolute;
+    border-radius: 90px;
+    background:
+      radial-gradient(circle at 22% 18%, rgba(255,255,255,0.05), transparent 40%),
+      repeating-linear-gradient(45deg, var(--grass1) 0 40px, var(--grass2) 40px 80px);
+    border: 28px solid #6b4a2a;
+    box-shadow:
+      0 0 0 7px #4d3319,
+      0 50px 90px rgba(0,0,0,0.45),
+      inset 0 0 70px rgba(0,0,0,0.18);
+  }
+ 
+  .sprite {
+    position: absolute; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: transform 0.08s ease, opacity 0.3s ease;
+  }
+  .sprite .emoji { font-size: 2.2rem; filter: drop-shadow(0 4px 3px rgba(0,0,0,0.5)); }
+  .sprite.hit { animation: hitShake 0.15s ease; }
+  @keyframes hitShake {
+    0%,100% { transform: translate(0,0) rotate(0); }
+    30% { transform: translate(-3px,1px) rotate(-4deg); }
+    60% { transform: translate(3px,-1px) rotate(4deg); }
+  }
+ 
+  .mushroom-sprite { position: absolute; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .mushroom-sprite .glow-dot {
+    position: absolute; width: 40px; height: 40px; border-radius: 50%;
+    filter: blur(10px); opacity: 0.55; animation: mushroomPulse 1.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes mushroomPulse { 0%,100% { transform: scale(0.9); opacity: 0.4; } 50% { transform: scale(1.15); opacity: 0.65; } }
+  .mushroom-sprite .emoji { font-size: 1.9rem; position: relative; z-index: 1; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.5)); pointer-events: none; }
+  .mushroom-sprite.pop { animation: popOut 0.28s ease forwards; pointer-events: none; }
+  @keyframes popOut { to { transform: scale(0); opacity: 0; } }
+ 
+  .float-text {
+    position: absolute; font-family: 'Syne Mono', monospace; font-weight: 700; font-size: 0.85rem;
+    pointer-events: none; animation: floatUp 0.9s ease-out forwards; white-space: nowrap;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6); z-index: 10;
+  }
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -46px); }
+  }
+ 
+  #farmhouse {
+    position: absolute; width: 180px; height: 180px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  #farmhouse .house-emoji { font-size: 4.5rem; filter: drop-shadow(0 6px 6px rgba(0,0,0,0.6)); transition: filter 0.6s ease; }
+  #farmhouse .house-decor { position: absolute; top: 18px; right: 24px; font-size: 1.4rem; }
+  #farmhouse .ring {
+    position: absolute; inset: -10px; border-radius: 50%;
+    border: 2px dashed rgba(254,206,0,0.35); animation: spin 12s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .farmhouse.ghost .house-emoji { opacity: 0.6; }
+ 
+  .mushroom-farm { position: absolute; width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: none; }
+  .mushroom-farm .farm-emoji { font-size: 3.4rem; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); opacity: 0.6; }
+ 
+  .fence-boundary {
+    position: absolute; border-radius: 14px;
+    border: 5px dashed var(--fence);
+    background: rgba(90, 60, 30, 0.08);
+    box-shadow: inset 0 0 0 2px rgba(0,0,0,0.15);
+    pointer-events: none;
+  }
+  .farm-hub {
+    position: absolute; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; cursor: pointer; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.5));
+  }
+ 
+  .plot {
+    position: absolute; width: 52px; height: 52px; border-radius: 8px;
+    background: rgba(90,60,30,0.5); border: 2px dashed rgba(255,255,225,0.25);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    font-size: 1.3rem;
+  }
+  .plot.planted { border-style: solid; border-color: var(--red); }
+ 
+  #build-buttons {
+    position: fixed; left: 0.75rem; bottom: calc(1rem + env(safe-area-inset-bottom));
+    z-index: 55; display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .build-btn {
+    display: none;
+    background: var(--yellow); color: var(--dark); border: none;
+    border-radius: 999px; padding: 0.7rem 1.1rem; font-weight: 700; font-size: 0.8rem;
+    font-family: 'Space Grotesk', sans-serif; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(254,206,0,0.35); text-align: left;
+  }
+  .build-btn.show { display: block; }
+ 
+  #placement-banner {
+    position: fixed; top: calc(4.6rem + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+    z-index: 55; display: none;
+    background: rgba(15,15,15,0.9); border: 1px solid var(--yellow); border-radius: 999px;
+    padding: 0.5rem 1rem; font-size: 0.75rem; color: var(--yellow); white-space: nowrap;
+  }
+  #placement-banner.show { display: block; }
+ 
+  /* CONTROLS */
+  #zoom-controls {
+    position: fixed; right: 0.75rem; bottom: calc(1rem + env(safe-area-inset-bottom));
+    z-index: 50; display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  #zoom-controls button {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: rgba(15,15,15,0.85); border: 1px solid rgba(255,255,225,0.15);
+    color: var(--cream); font-size: 1.2rem; font-weight: 700; cursor: pointer;
+  }
+ 
+  /* MODALS */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.75);
+    display: none; align-items: center; justify-content: center; padding: 1.25rem;
+    backdrop-filter: blur(4px);
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    position: relative;
+    background: var(--dark2); border: 1px solid rgba(255,255,225,0.1);
+    border-radius: 1.25rem; padding: 1.75rem; max-width: 340px; width: 100%;
+    max-height: 82vh; display: flex; flex-direction: column;
+  }
+  .modal-x {
+    position: absolute; top: 0.9rem; right: 0.9rem; z-index: 2;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,225,0.06); border: none; color: rgba(255,255,225,0.6);
+    font-size: 1.1rem; line-height: 1; cursor: pointer;
+  }
+  .modal-x:hover { background: rgba(255,255,225,0.15); color: var(--cream); }
+  .modal-scroll { overflow-y: auto; text-align: center; padding-right: 0.25rem; }
+  .modal h2 { font-size: 1.2rem; margin-bottom: 0.5rem; padding-right: 1.5rem; }
+  .modal p { font-size: 0.82rem; color: rgba(255,255,225,0.6); line-height: 1.5; margin-bottom: 1rem; }
+  .repair-track { width: 100%; height: 8px; border-radius: 999px; background: rgba(255,255,225,0.1); overflow: hidden; margin-bottom: 1rem; }
+  .repair-fill { height: 100%; background: var(--green); width: 0%; transition: width 0.5s ease; }
+  .cost-row { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.25rem; font-family: 'Syne Mono', monospace; font-size: 0.85rem; }
+  .modal-btn {
+    width: 100%; padding: 0.75rem; border-radius: 0.75rem; border: none;
+    background: var(--yellow); color: var(--dark); font-weight: 700; font-size: 0.9rem; cursor: pointer;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .modal-btn:disabled { background: rgba(255,255,225,0.12); color: rgba(255,255,225,0.35); }
+ 
+  .legend-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.5rem 0.25rem; border-bottom: 1px solid rgba(255,255,225,0.06);
+    font-size: 0.78rem;
+  }
+  .legend-row:last-child { border-bottom: none; }
+  .legend-left { display: flex; align-items: center; gap: 0.5rem; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .legend-val { font-family: 'Syne Mono', monospace; color: rgba(255,255,225,0.7); }
+ 
+  /* TOAST */
+  #toast {
+    position: fixed; left: 50%; top: calc(4.5rem + env(safe-area-inset-top));
+    transform: translateX(-50%); z-index: 300;
+    background: rgba(15,15,15,0.9); border: 1px solid rgba(254,206,0,0.35);
+    padding: 0.6rem 1.1rem; border-radius: 999px; font-size: 0.8rem;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease;
+    max-width: 85vw; text-align: center;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(4px); }
+  /* ================= DEV DEVICE FRAME (dev-mode only) ================= */
+  #dev-panel {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 5000;
+    display: none; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    background: #000; border-bottom: 1px solid rgba(255,255,225,0.15);
+    padding: 0.5rem 0.75rem; font-family: 'Syne Mono', monospace; font-size: 0.7rem;
+  }
+  #dev-panel.show { display: flex; }
+  #dev-panel label { color: rgba(255,255,225,0.5); }
+  #dev-panel select {
+    background: var(--dark2); color: var(--cream); border: 1px solid rgba(255,255,225,0.2);
+    border-radius: 6px; padding: 0.3rem 0.5rem; font-family: 'Syne Mono', monospace; font-size: 0.7rem;
+  }
+  #dev-panel button {
+    background: rgba(255,255,225,0.1); color: var(--cream); border: 1px solid rgba(255,255,225,0.2);
+    border-radius: 6px; padding: 0.3rem 0.6rem; font-family: 'Syne Mono', monospace; font-size: 0.7rem; cursor: pointer;
+  }
+  #dev-panel .dev-dims { color: var(--yellow); margin-left: auto; }
+ 
+  body.device-frame { background: #050505; }
+  body.device-frame #game {
+    position: fixed; inset: auto; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 44px; border: 10px solid #000;
+    box-shadow: 0 0 0 2px rgba(255,255,225,0.08), 0 30px 70px rgba(0,0,0,0.7);
+    overflow: hidden;
+  }
+</style>
 </head>
 <body>
-
-<div id="desktop-block">
-  <div class="icon">📱</div>
-  <h2>Mobile & PWA Only</h2>
-  <p>Open Mushroom Planet on your phone to explore your farm!</p>
+ 
+<!-- ================= INSTALL GATE ================= -->
+<div id="gate">
+  <div class="icon">🍄</div>
+  <h1>Play is a mobile app</h1>
+  <p>This game only runs as an installed app on your phone home screen &mdash; not in the browser.</p>
+  <div class="steps" id="gate-steps"></div>
+  <button class="dev-btn" id="dev-bypass">Preview anyway (dev)</button>
 </div>
-
-<div id="loading">
-  <div class="shroom">🍄</div>
-  <p>LOADING FARM...</p>
-  <div id="load-bar-wrap"><div id="load-bar"></div></div>
+ 
+<!-- ================= DEV DEVICE FRAME PANEL (dev mode only) ================= -->
+<div id="dev-panel">
+  <label>Device:</label>
+  <select id="device-select">
+    <option value="">Full window</option>
+    <option value="375x667">iPhone SE (375x667)</option>
+    <option value="390x844">iPhone 14 (390x844)</option>
+    <option value="430x932">iPhone 14 Pro Max (430x932)</option>
+    <option value="412x915">Pixel 7 (412x915)</option>
+    <option value="360x780">Galaxy S23 (360x780)</option>
+    <option value="360x740">Galaxy S8 small (360x740)</option>
+    <option value="768x1024">iPad Mini (768x1024)</option>
+  </select>
+  <button id="dev-reset-btn">Reset progress</button>
+  <span class="dev-dims" id="dev-dims"></span>
 </div>
-
-<div id="top-bar">
-  <a class="top-back" href="/profile.html">&#8592;</a>
-  <span class="top-title">🍄 My Farm</span>
-  <span class="top-coord" id="coord-display">0, 0</span>
+ 
+<!-- ================= GAME ================= -->
+<div id="game">
+  <div id="sky">
+    <div class="cloud" style="width:140px; height:44px; top:8%; left:-10%; animation-duration:70s;"></div>
+    <div class="cloud" style="width:100px; height:32px; top:16%; left:40%; animation-duration:95s;"></div>
+    <div class="cloud" style="width:170px; height:50px; top:5%; left:65%; animation-duration:80s;"></div>
+    <div class="cloud" style="width:90px; height:28px; top:22%; left:80%; animation-duration:60s;"></div>
+  </div>
+  <div id="hud">
+    <div id="resources">
+      <div class="resource-pill res-gem"><span class="ico">💎</span><span id="hud-gems">0</span></div>
+      <div class="resource-pill res-shroom"><span class="ico">🍄</span><span id="hud-shrooms">0</span></div>
+      <div class="resource-pill res-spore"><span class="ico">✨</span><span id="hud-spores">0</span></div>
+      <div class="resource-pill res-streak"><span class="ico">🔥</span><span id="hud-streak">0</span></div>
+    </div>
+    <div id="right-hud">
+      <div style="display:flex; gap:0.4rem;">
+        <button id="info-btn">?</button>
+        <button id="reset-btn" title="Reset demo data">⟳</button>
+      </div>
+      <div id="level-pill">
+        <div class="lvl-label" id="hud-level">LVL 1</div>
+        <div class="xp-track"><div class="xp-fill" id="hud-xp"></div></div>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="viewport">
+    <div id="world">
+      <div class="island" style="left:190px; top:190px; width:1520px; height:1520px;"></div>
+    </div>
+  </div>
+ 
+  <div id="build-buttons">
+    <button class="build-btn" id="build-house-btn">🏗️ Place Farmhouse</button>
+    <button class="build-btn" id="build-farm-btn">🍄 Place Mushroom Farm</button>
+  </div>
+  <div id="placement-banner"></div>
+ 
+  <div id="zoom-controls">
+    <button id="zoom-in">+</button>
+    <button id="zoom-out">&minus;</button>
+    <button id="zoom-reset">⤢</button>
+  </div>
 </div>
-
-<div id="stage-badge">Spring Season</div>
-
-<canvas id="farm-canvas"></canvas>
-<div id="minimap"><canvas id="minimap-canvas" width="76" height="76"></canvas></div>
-<div id="tooltip"></div>
-
-<div id="bottom-hud">
-  <div class="hud-btn active" data-tab="farm">
-    <span class="hi">🏡</span><span>Farm</span>
-  </div>
-  <div class="hud-btn" data-tab="animals">
-    <span class="hi">🐄</span><span>Animals</span>
-  </div>
-  <div class="hud-btn" data-tab="crops">
-    <span class="hi">🌱</span><span>Crops</span>
-  </div>
-  <div class="hud-btn" data-tab="map">
-    <span class="hi">🗺️</span><span>Map</span>
+ 
+<!-- ================= FARMHOUSE MODAL ================= -->
+<div class="modal-backdrop" id="house-modal">
+  <div class="modal">
+    <button class="modal-x" data-close>&times;</button>
+    <div class="modal-scroll">
+      <h2 id="house-title">Farmhouse</h2>
+      <p id="house-desc"></p>
+      <div class="repair-track"><div class="repair-fill" id="house-repair-fill"></div></div>
+      <div class="cost-row" id="house-cost-row"></div>
+      <button class="modal-btn" id="house-repair-btn">Upgrade</button>
+    </div>
   </div>
 </div>
-
-<!-- PWA nav injected by JS if standalone -->
-<nav id="pwa-nav">
-  <a href="/profile.html" class="pwa-tab">
-    <span><img src="/images/icon-192.png" style="width:20px;height:20px;object-fit:contain;border-radius:50%;"></span>
-    <span>Profile</span>
-  </a>
-  <a href="/earn.html" class="pwa-tab">
-    <span><img src="/images/earn.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'"></span>
-    <span>Earn</span>
-  </a>
-  <a href="/play.html" class="pwa-tab active">
-    <span><img src="/images/shroomfarm.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'"></span>
-    <span>Farm</span>
-  </a>
-  <a href="/convert.html" class="pwa-tab">
-    <span><img src="/images/swaps.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'"></span>
-    <span>Convert</span>
-  </a>
-  <a href="/vote.html" class="pwa-tab">
-    <span><img src="/images/vote.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'"></span>
-    <span>Vote</span>
-  </a>
-  <a href="/treasury.html" class="pwa-tab">
-    <span><img src="/images/treasury.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'"></span>
-    <span>Treasury</span>
-  </a>
-</nav>
-
+ 
+<!-- ================= FARM MODAL (overview / upgrade) ================= -->
+<div class="modal-backdrop" id="farm-modal">
+  <div class="modal">
+    <button class="modal-x" data-close>&times;</button>
+    <div class="modal-scroll">
+      <h2 id="farm-title">Mushroom Farm</h2>
+      <p id="farm-desc"></p>
+      <div class="repair-track"><div class="repair-fill" id="farm-repair-fill"></div></div>
+      <div class="cost-row" id="farm-cost-row"></div>
+      <button class="modal-btn" id="farm-upgrade-btn">Upgrade</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- ================= PLOT MODAL ================= -->
+<div class="modal-backdrop" id="plot-modal">
+  <div class="modal">
+    <button class="modal-x" data-close>&times;</button>
+    <div class="modal-scroll">
+      <h2 id="plot-title">Farm Plot</h2>
+      <p id="plot-desc">Plant a shroom here to grow spores over time.</p>
+      <div class="cost-row" id="plot-cost-row"></div>
+      <button class="modal-btn" id="plot-action-btn">Plant Shroom</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- ================= LEGEND / INFO MODAL ================= -->
+<div class="modal-backdrop" id="info-modal">
+  <div class="modal">
+    <button class="modal-x" data-close>&times;</button>
+    <div class="modal-scroll">
+      <h2>Wild Mushrooms</h2>
+      <p>Obstacles (rocks, stumps, bushes) only give gemstones. Shrooms come only from mushrooms that spawn on your land.</p>
+      <div id="legend-list"></div>
+      <p style="margin-top:0.75rem;">Clear one Red, Blue, Purple, and Golden mushroom in the same day to grow your streak. A higher streak improves your odds on Brown mushrooms.</p>
+    </div>
+  </div>
+</div>
+ 
+<!-- ================= LEVEL / UNLOCKS MODAL ================= -->
+<div class="modal-backdrop" id="level-modal">
+  <div class="modal">
+    <button class="modal-x" data-close>&times;</button>
+    <div class="modal-scroll">
+      <h2 id="level-modal-title">Level 1</h2>
+      <p>Your inventory and what you can build as you level up.</p>
+      <div id="level-inventory-list"></div>
+      <p style="margin-top:1rem; margin-bottom:0.5rem;">Unlocks</p>
+      <div id="level-unlocks-list"></div>
+    </div>
+  </div>
+</div>
+ 
+<div id="toast"></div>
+ 
 <script>
-// ============================================================
-// DESKTOP GUARD
-// ============================================================
 (function() {
-  const ua = navigator.userAgent;
-  const mob = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-  const pwa = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-  const small = window.innerWidth <= 900;
-  if (!mob && !pwa && !small) {
-    document.getElementById('desktop-block').style.display = 'flex';
-    document.getElementById('loading').style.display = 'none';
+  "use strict";
+ 
+  /* ============== HAPTICS ============== */
+  function vibrate(ms) {
+    try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {}
   }
-})();
-
-// PWA nav: show only in standalone, shift bottom-hud up
-(function() {
-  const pwa = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-  if (pwa) {
-    document.getElementById('pwa-nav').style.display = 'flex';
-    document.getElementById('bottom-hud').style.bottom = '62px';
-    document.getElementById('minimap').style.bottom = '134px';
+ 
+  /* ============== RELIABLE TAP HANDLING ============== */
+  // click alone is flaky inside a custom pan/zoom surface on touch devices,
+  // so we detect real taps via touchend (small movement threshold) and fall
+  // back to click for mouse/desktop, suppressing the ghost click that follows a touch.
+  function bindTap(el, handler) {
+    let sx = 0, sy = 0, lastTapAt = 0;
+    el.addEventListener('touchstart', e => {
+      const t = e.touches[0];
+      sx = t.clientX; sy = t.clientY;
+    }, { passive: true });
+    el.addEventListener('touchend', e => {
+      const t = e.changedTouches[0];
+      const dx = t.clientX - sx, dy = t.clientY - sy;
+      if (Math.sqrt(dx * dx + dy * dy) < 14) {
+        lastTapAt = Date.now();
+        handler(e);
+      }
+    }, { passive: true });
+    el.addEventListener('click', e => {
+      if (Date.now() - lastTapAt < 600) return; // ghost click after touch
+      handler(e);
+    });
   }
-})();
-
-// ============================================================
-// CONSTANTS
-// ============================================================
-const TILE   = 16;   // source tile size in spritesheet
-const ZOOM   = 3;    // render at 48px per tile on screen
-const TSIZE  = TILE * ZOOM; // 48px rendered tile
-
-// Character frame dims (from analysis)
-const CHAR_W  = 16;  // walk frame width in source
-const CHAR_H  = 32;  // character height in source (taller than tile)
-const IDLE_W  = 32;  // idle frame width
-const IDLE_H  = 32;  // idle frame height
-
-// Map dimensions
-const MAP_W = 22;
-const MAP_H = 26;
-
-// ============================================================
-// TILESET TILE COORDS  (col, row in Tileset_Spring.png)
-// Tiles are in the RIGHT half of sheet starting at col 6
-// So actual srcX = (col - 6) * 16,  srcY = row * 16
-// Full sheet is 192px wide, tiles begin at x=96
-// ============================================================
-// From analysis: right 6 cols (96-191px) contain:
-//   rows 0-3:   grass autotile
-//   rows 4-6:   dark ground/cliff
-//   rows 7-10:  dirt/path autotile (orange)
-//   rows 11-12: grass-to-cliff transitions
-//   rows 13-19: grass-cliff-dirt mix
-const TS_OX = 96; // tileset tile region x offset
-
-// Tile type definitions mapped to tileset source coords [sx, sy]
-const TILES = {
-  GRASS:      [TS_OX + 16, 0],    // solid grass tile (col7, row0)
-  GRASS_TL:   [TS_OX + 0,  0],    // grass top-left corner
-  GRASS_TR:   [TS_OX + 32, 0],
-  GRASS_BL:   [TS_OX + 0,  32],
-  GRASS_BR:   [TS_OX + 32, 32],
-  GRASS2:     [TS_OX + 16, 16],   // inner grass
-  DIRT:       [TS_OX + 16, 7*16], // dirt center
-  DIRT_TL:    [TS_OX + 0,  7*16],
-  DIRT_TR:    [TS_OX + 32, 7*16],
-  DIRT_BL:    [TS_OX + 0,  9*16],
-  DIRT_BR:    [TS_OX + 32, 9*16],
-  DIRT_T:     [TS_OX + 16, 7*16],
-  DIRT_B:     [TS_OX + 16, 9*16],
-  DIRT_L:     [TS_OX + 0,  8*16],
-  DIRT_R:     [TS_OX + 32, 8*16],
-  PATH:       [TS_OX + 16, 8*16], // dirt path center
-};
-
-// ============================================================
-// MAP LAYOUT
-// 0 = grass, 1 = grass variant, 2 = dirt/path, 3 = dirt farm plot
-// Using simple integers, then sprite-mapped in drawTile()
-// ============================================================
-const G  = 0; // grass
-const G2 = 1; // grass2
-const D  = 2; // dirt path
-const F  = 3; // farm plot (tilled soil)
-const W  = 4; // water (drawn procedurally)
-
-// prettier-ignore
-const MAP = [
-  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G2,G ,G ,G ,W ,W ,W ,W ,W ,W ,W ,W ,G ,G ,G ,G ,G2,G ,G ,G ,G ],
-  [G ,G ,G ,G ,G ,W ,W ,W ,W ,W ,W ,W ,W ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,G ,W ,W ,W ,W ,W ,W ,W ,W ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G2,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G2,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,D ,D ,D ,D ,D ,D ,D ,D ,D ,D ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,D ,F ,F ,F ,F ,F ,F ,F ,F ,D ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,D ,F ,F ,F ,F ,F ,F ,F ,F ,D ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,D ,F ,F ,F ,F ,F ,F ,F ,F ,D ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,D ,F ,F ,F ,F ,F ,F ,F ,F ,D ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,D ,D ,D ,D ,D ,D ,D ,D ,D ,D ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,D ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,D ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,D ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,D ,D ,D ,D ,D ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G2,G ,G ,G ,G ,G ,G ,G ,G ,G ,D ,G ,G ,G ,G ,G ,G ,G2,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,D ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,D ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G2,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G2,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-  [G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ,G ],
-];
-
-// ============================================================
-// OBJECTS  (placed on top of tiles)
-// Each entry: { type, tx, ty, label }
-// ============================================================
-const OBJECTS = [
-  // Trees around edges
-  { type:'tree', tx:1,  ty:1,  label:'Maple Tree' },
-  { type:'tree', tx:3,  ty:0,  label:'Maple Tree' },
-  { type:'tree', tx:18, ty:1,  label:'Maple Tree' },
-  { type:'tree', tx:20, ty:2,  label:'Maple Tree' },
-  { type:'tree', tx:0,  ty:8,  label:'Maple Tree' },
-  { type:'tree', tx:2,  ty:11, label:'Maple Tree' },
-  { type:'tree', tx:17, ty:7,  label:'Maple Tree' },
-  { type:'tree', tx:19, ty:10, label:'Maple Tree' },
-  { type:'tree', tx:1,  ty:20, label:'Maple Tree' },
-  { type:'tree', tx:20, ty:20, label:'Maple Tree' },
-  { type:'tree', tx:3,  ty:23, label:'Maple Tree' },
-  { type:'tree', tx:18, ty:22, label:'Maple Tree' },
-  // House (4 tiles wide, placed at origin tile, draws full sprite)
-  { type:'house', tx:15, ty:9,  label:'Your Farmhouse' },
-  // Chest
-  { type:'chest', tx:2,  ty:17, label:'Supply Chest' },
-  { type:'chest', tx:19, ty:17, label:'Supply Chest' },
-  // Crops on farm plots
-  { type:'crop', tx:5,  ty:9,  stage:2, label:'Carrot - Growing' },
-  { type:'crop', tx:6,  ty:9,  stage:3, label:'Carrot - Ready!' },
-  { type:'crop', tx:7,  ty:9,  stage:1, label:'Seedling' },
-  { type:'crop', tx:8,  ty:9,  stage:2, label:'Carrot - Growing' },
-  { type:'crop', tx:5,  ty:10, stage:0, label:'Fresh Plot' },
-  { type:'crop', tx:6,  ty:10, stage:1, label:'Seedling' },
-  { type:'crop', tx:7,  ty:10, stage:3, label:'Tomato - Ready!' },
-  { type:'crop', tx:8,  ty:10, stage:2, label:'Tomato - Growing' },
-  { type:'crop', tx:9,  ty:10, stage:1, label:'Seedling' },
-  { type:'crop', tx:10, ty:10, stage:0, label:'Fresh Plot' },
-  { type:'crop', tx:5,  ty:11, stage:3, label:'Mushroom - Ready!' },
-  { type:'crop', tx:6,  ty:11, stage:2, label:'Mushroom - Growing' },
-  { type:'crop', tx:7,  ty:11, stage:1, label:'Seedling' },
-  { type:'crop', tx:9,  ty:11, stage:2, label:'Carrot - Growing' },
-  { type:'crop', tx:10, ty:11, stage:3, label:'Carrot - Ready!' },
-  { type:'crop', tx:11, ty:11, stage:1, label:'Seedling' },
-  // Animals on grass
-  { type:'cow',     tx:16, ty:17, label:'Brown Cow' },
-  { type:'chicken', tx:14, ty:19, label:'Chicken' },
-  { type:'chicken', tx:15, ty:20, label:'Baby Chick' },
-];
-
-// ============================================================
-// SPRITES  -- loaded images
-// ============================================================
-const IMG = {};
-const SPRITE_PATHS = {
-  tileset:  '/assets/Tileset/Tileset Spring.png',
-  idle:     '/assets/Character/Idle.png',
-  walk:     '/assets/Character/Walk.png',
-  house:    '/assets/Objects/House.png',
-  tree:     '/assets/Objects/Maple Tree.png',
-  chest:    '/assets/Objects/chest.png',
-  fence:    '/assets/Objects/Fence\'s copiar.png',
-  road:     '/assets/Objects/Road copiar.png',
-  crops:    '/assets/Objects/Spring Crops.png',
-  cow_f:    '/assets/Farm Animals/Female Cow Brown.png',
-  cow_m:    '/assets/Farm Animals/Male Cow Brown.png',
-  chicken:  '/assets/Farm Animals/Chicken Red.png',
-  chick:    '/assets/Farm Animals/Baby Chicken Yellow.png',
-};
-
-function loadSprites() {
-  return new Promise(resolve => {
-    const keys = Object.keys(SPRITE_PATHS);
-    let loaded = 0;
-    const bar = document.getElementById('load-bar');
-    keys.forEach(k => {
-      const img = new Image();
-      img.onload = img.onerror = () => {
-        IMG[k] = img;
-        loaded++;
-        bar.style.width = (loaded / keys.length * 100) + '%';
-        if (loaded === keys.length) resolve();
+ 
+  /* ============== PWA GATE ============== */
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const isMobileUA = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const params = new URLSearchParams(location.search);
+  let devMode = params.get('dev') === '1' || sessionStorage.getItem('mp_play_dev') === '1';
+ 
+  const gateStepsEl = document.getElementById('gate-steps');
+  gateStepsEl.innerHTML = isIOS
+    ? `<div><b>1.</b> Tap the Share icon in Safari</div><div><b>2.</b> Choose "Add to Home Screen"</div><div><b>3.</b> Open Mushroom Planet from your home screen</div>`
+    : `<div><b>1.</b> Open the browser menu</div><div><b>2.</b> Choose "Add to Home screen" / "Install app"</div><div><b>3.</b> Open Mushroom Planet from your home screen</div>`;
+ 
+  let devPanelInitialized = false;
+  function showDevPanel() {
+    document.getElementById('dev-panel').classList.add('show');
+    if (devPanelInitialized) return; // avoid double-binding listeners
+    devPanelInitialized = true;
+    const select = document.getElementById('device-select');
+    const dims = document.getElementById('dev-dims');
+    select.addEventListener('change', () => {
+      const val = select.value;
+      const gameEl = document.getElementById('game');
+      if (!val) {
+        document.body.classList.remove('device-frame');
+        gameEl.style.width = '';
+        gameEl.style.height = '';
+        dims.textContent = '';
+      } else {
+        const [w, h] = val.split('x').map(Number);
+        document.body.classList.add('device-frame');
+        gameEl.style.width = w + 'px';
+        gameEl.style.height = h + 'px';
+        dims.textContent = `${w} x ${h}`;
+      }
+      // re-run fit-to-screen against the new simulated viewport size
+      requestAnimationFrame(() => { if (typeof goHome === 'function') goHome(); });
+    });
+    document.getElementById('dev-reset-btn').addEventListener('click', () => {
+      if (confirm('Reset all demo progress?')) {
+        try { localStorage.removeItem('mp_play_state_v3'); } catch (e) {}
+        location.reload();
+      }
+    });
+  }
+ 
+  document.getElementById('dev-bypass').addEventListener('click', () => {
+    sessionStorage.setItem('mp_play_dev', '1');
+    devMode = true;
+    showDevPanel();
+    boot();
+  });
+ 
+  if (devMode) showDevPanel();
+ 
+  function boot() {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('game').classList.add('active');
+    initGame();
+  }
+ 
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+ 
+  /* ============== MODAL CLOSE (X + backdrop click) ============== */
+  document.querySelectorAll('.modal-backdrop').forEach(bd => {
+    bd.addEventListener('click', e => { if (e.target === bd) bd.classList.remove('open'); });
+    const xBtn = bd.querySelector('[data-close]');
+    if (xBtn) xBtn.addEventListener('click', () => bd.classList.remove('open'));
+  });
+ 
+  /* ============== GAME STATE ============== */
+  const STORAGE_KEY = 'mp_play_state_v3';
+  const WORLD_SIZE = 1900;
+  const CENTER = WORLD_SIZE / 2;
+  const ISLAND_MARGIN = 190; // matches the .island inset in CSS/HTML
+  const ISLAND_MIN = ISLAND_MARGIN + 40;   // keep a buffer off the cliff edge
+  const ISLAND_MAX = WORLD_SIZE - ISLAND_MARGIN - 40;
+ 
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return {
+      gems: 0, shrooms: 0, spores: 0,
+      xp: 0, level: 1,
+      clearedObstacles: {},
+      mushrooms: {},
+      spawnClocks: {},
+      streak: 0,
+      dailyCollected: { date: null, types: {} },
+      streakCreditedDate: null,
+      lastCheckedDate: null,
+      housePlaced: false, housePosition: null, houseLevel: 0,
+      farmPlaced: false, farmPosition: null, farmLevel: 0,
+      plots: {} // plotId -> { plantedAt }
+    };
+  }
+  let state = loadState();
+  function saveState() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+ 
+  const XP_PER_LEVEL = lvl => 40 + (lvl - 1) * 25;
+ 
+  function grantXP(amount) {
+    state.xp += amount;
+    let needed = XP_PER_LEVEL(state.level);
+    while (state.xp >= needed) {
+      state.xp -= needed;
+      state.level += 1;
+      vibrate([20, 40, 20]);
+      showToast(`Level up! You're now Level ${state.level} 🎉`);
+      needed = XP_PER_LEVEL(state.level);
+      if (state.level === 2) showToast('Farmhouse unlocked! 🏗️');
+      if (state.level === 3) showToast('Mushroom Farm unlocked! 🍄');
+    }
+    updateHUD();
+    updateBuildButtons();
+  }
+ 
+  function updateHUD() {
+    document.getElementById('hud-gems').textContent = state.gems.toLocaleString();
+    document.getElementById('hud-shrooms').textContent = state.shrooms.toLocaleString();
+    document.getElementById('hud-spores').textContent = state.spores.toLocaleString();
+    document.getElementById('hud-streak').textContent = state.streak.toLocaleString();
+    document.getElementById('hud-level').textContent = 'LVL ' + state.level;
+    const needed = XP_PER_LEVEL(state.level);
+    document.getElementById('hud-xp').style.width = Math.min(100, (state.xp / needed) * 100) + '%';
+    saveState();
+  }
+ 
+  let toastTimer = null;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+ 
+  /* ============== SEEDED OBSTACLE LAYOUT (spaced out) ============== */
+  function mulberry32(seed) {
+    return function() {
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const seedRand = mulberry32(20260712);
+  const rand = Math.random; // live randomness for spawns/rewards
+ 
+  // obstacles now ONLY yield gemstones
+  const OBSTACLE_TYPES = [
+    { key: 'rock',  emoji: '🪨', hp: 3, size: 56, gems: [2, 4] },
+    { key: 'rock2', emoji: '🪨', hp: 4, size: 68, gems: [5, 9] },
+    { key: 'stump', emoji: '🪵', hp: 4, size: 60, gems: [4, 7] },
+    { key: 'bush',  emoji: '🌳', hp: 2, size: 58, gems: [1, 3] },
+  ];
+ 
+  const OBSTACLE_COUNT = 46;
+  const MIN_OBSTACLE_SPACING = 130; // center-to-center, prevents crowding
+ 
+  const obstacles = [];
+  {
+    let attempts = 0;
+    while (obstacles.length < OBSTACLE_COUNT && attempts < OBSTACLE_COUNT * 40) {
+      attempts++;
+      const x = ISLAND_MIN + seedRand() * (ISLAND_MAX - ISLAND_MIN);
+      const y = ISLAND_MIN + seedRand() * (ISLAND_MAX - ISLAND_MIN);
+      let tooClose = false;
+      for (let i = 0; i < obstacles.length; i++) {
+        const dx = x - obstacles[i].x, dy = y - obstacles[i].y;
+        if (Math.sqrt(dx * dx + dy * dy) < MIN_OBSTACLE_SPACING) { tooClose = true; break; }
+      }
+      if (tooClose) continue;
+      const type = OBSTACLE_TYPES[Math.floor(seedRand() * OBSTACLE_TYPES.length)];
+      obstacles.push({ id: 'ob_' + obstacles.length, type, x, y, hp: type.hp });
+    }
+  }
+ 
+  /* ============== WILD MUSHROOMS ============== */
+  const HOUR = 60 * 60 * 1000;
+  const DAY = 24 * HOUR;
+  const RARE_TYPES = ['red', 'blue', 'purple', 'golden'];
+ 
+  const MUSHROOM_TYPES = {
+    brown:  { label: 'Brown',  emoji: '🍄', hue: 15,  sat: 0.7,  glow: '#a9702f', intervalMs: HOUR, maxOnMap: 24, value: [1, 50], streak: false },
+    red:    { label: 'Red',    emoji: '🍄', hue: 0,   sat: 1.3,  glow: '#fd464f', intervalMs: DAY,  maxOnMap: 24, value: 50,      streak: true },
+    blue:   { label: 'Blue',   emoji: '🍄', hue: 195, sat: 1.4,  glow: '#4fa8fd', intervalMs: DAY,  maxOnMap: 24, value: 100,     streak: true },
+    purple: { label: 'Purple', emoji: '🍄', hue: 265, sat: 1.4,  glow: '#b06ffd', intervalMs: DAY,  maxOnMap: 24, value: 200,     streak: true },
+    golden: { label: 'Golden', emoji: '🍄', hue: 45,  sat: 1.5,  glow: '#fece00', intervalMs: DAY,  maxOnMap: 24, value: 300,     streak: true },
+  };
+ 
+  function rollBrownValue(streak) {
+    const power = 1 / (1 + Math.min(streak, 12) * 0.12);
+    const r = Math.pow(rand(), power);
+    return Math.max(1, Math.round(1 + r * 49));
+  }
+ 
+  function randomMushroomSpot() {
+    return {
+      x: ISLAND_MIN + rand() * (ISLAND_MAX - ISLAND_MIN),
+      y: ISLAND_MIN + rand() * (ISLAND_MAX - ISLAND_MIN)
+    };
+  }
+ 
+  function countOnMap(typeKey) {
+    let n = 0;
+    for (const id in state.mushrooms) if (state.mushrooms[id].typeKey === typeKey) n++;
+    return n;
+  }
+ 
+  function processSpawns() {
+    const now = Date.now();
+    Object.keys(MUSHROOM_TYPES).forEach(typeKey => {
+      const type = MUSHROOM_TYPES[typeKey];
+      let last = state.spawnClocks[typeKey];
+      if (last == null) last = now - type.intervalMs;
+      let elapsed = now - last;
+      let toSpawn = Math.floor(elapsed / type.intervalMs);
+      toSpawn = Math.min(toSpawn, 5);
+      const room = type.maxOnMap - countOnMap(typeKey);
+      toSpawn = Math.min(toSpawn, Math.max(0, room));
+      for (let i = 0; i < toSpawn; i++) {
+        const spot = randomMushroomSpot();
+        const id = 'm_' + typeKey + '_' + now + '_' + Math.floor(rand() * 100000);
+        state.mushrooms[id] = { typeKey, x: spot.x, y: spot.y };
+        renderMushroom(id, state.mushrooms[id]);
+      }
+      if (toSpawn > 0) state.spawnClocks[typeKey] = last + toSpawn * type.intervalMs;
+      else if (state.spawnClocks[typeKey] == null) state.spawnClocks[typeKey] = last;
+    });
+    saveState();
+  }
+ 
+  function checkDayRollover() {
+    const today = new Date().toDateString();
+    if (state.lastCheckedDate && state.lastCheckedDate !== today) {
+      if (state.streakCreditedDate !== state.lastCheckedDate) {
+        if (state.streak > 0) showToast('Streak reset — missed a full daily set 😔');
+        state.streak = 0;
+      }
+    }
+    if (!state.dailyCollected || state.dailyCollected.date !== today) {
+      state.dailyCollected = { date: today, types: {} };
+    }
+    state.lastCheckedDate = today;
+    saveState();
+  }
+ 
+  function markDailyCollected(typeKey) {
+    const today = new Date().toDateString();
+    if (!state.dailyCollected || state.dailyCollected.date !== today) {
+      state.dailyCollected = { date: today, types: {} };
+    }
+    state.dailyCollected.types[typeKey] = true;
+    const allFour = RARE_TYPES.every(t => state.dailyCollected.types[t]);
+    if (allFour && state.streakCreditedDate !== today) {
+      state.streak = (state.streak || 0) + 1;
+      state.streakCreditedDate = today;
+      vibrate([15, 30, 15, 30, 15]);
+      showToast(`Daily streak! 🔥 ${state.streak} day${state.streak > 1 ? 's' : ''}`);
+    }
+  }
+ 
+  function renderMushroom(id, m) {
+    const type = MUSHROOM_TYPES[m.typeKey];
+    const el = document.createElement('div');
+    el.className = 'mushroom-sprite';
+    el.dataset.id = id;
+    el.style.left = (m.x - 23) + 'px';
+    el.style.top = (m.y - 23) + 'px';
+    el.innerHTML = `<span class="glow-dot" style="background:${type.glow}"></span><span class="emoji" style="filter:hue-rotate(${type.hue}deg) saturate(${type.sat}) drop-shadow(0 3px 3px rgba(0,0,0,0.5))">${type.emoji}</span>`;
+    bindTap(el, () => collectMushroom(id, el));
+    worldEl.appendChild(el);
+  }
+ 
+  function collectMushroom(id, el) {
+    const m = state.mushrooms[id];
+    if (!m || !el || !el.isConnected) return;
+    const type = MUSHROOM_TYPES[m.typeKey];
+    const value = Array.isArray(type.value) ? rollBrownValue(state.streak) : type.value;
+ 
+    delete state.mushrooms[id]; // remove from state immediately so double-taps are no-ops
+ 
+    state.shrooms += value;
+    grantXP(type.streak ? 12 : 3);
+    vibrate(18);
+ 
+    const ft = document.createElement('div');
+    ft.className = 'float-text';
+    ft.textContent = `+${value} 🍄`;
+    ft.style.color = type.glow;
+    ft.style.left = m.x + 'px';
+    ft.style.top = (m.y - 10) + 'px';
+    worldEl.appendChild(ft);
+    setTimeout(() => ft.remove(), 900);
+ 
+    if (type.streak) markDailyCollected(m.typeKey);
+ 
+    el.classList.add('pop');
+    setTimeout(() => el.remove(), 280);
+    updateHUD();
+  }
+ 
+  function renderLegend() {
+    const list = document.getElementById('legend-list');
+    list.innerHTML = Object.keys(MUSHROOM_TYPES).map(key => {
+      const t = MUSHROOM_TYPES[key];
+      const valLabel = Array.isArray(t.value) ? `1-${t.value[1]}` : t.value;
+      const freq = t.intervalMs === HOUR ? 'hourly, 24 max' : 'daily, 24 max';
+      return `<div class="legend-row">
+        <div class="legend-left"><span class="legend-dot" style="background:${t.glow}"></span>${t.label}</div>
+        <span class="legend-val">🍄 ${valLabel} &middot; ${freq}</span>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('info-btn').addEventListener('click', () => {
+    document.getElementById('info-modal').classList.add('open');
+  });
+ 
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    if (confirm('Reset all demo progress? This clears your resources, level, and everything placed on the map.')) {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      location.reload();
+    }
+  });
+ 
+  const LEVEL_UNLOCKS = [
+    { level: 2, label: 'Farmhouse', desc: 'Place and upgrade a farmhouse (5 levels)' },
+    { level: 3, label: 'Mushroom Farm', desc: 'Place a 7-plot farm, upgradeable to 42 plots' },
+  ];
+ 
+  function openLevelModal() {
+    document.getElementById('level-modal-title').textContent = `Level ${state.level}`;
+    const invEl = document.getElementById('level-inventory-list');
+    invEl.innerHTML = [
+      { icon: '💎', label: 'Gemstones', val: state.gems, color: 'var(--blue)' },
+      { icon: '🍄', label: 'Shrooms', val: state.shrooms, color: 'var(--red)' },
+      { icon: '✨', label: 'Spores', val: state.spores, color: 'var(--yellow)' },
+      { icon: '🔥', label: 'Streak', val: state.streak, color: '#ff9d42' },
+    ].map(r => `<div class="legend-row"><div class="legend-left">${r.icon} ${r.label}</div><span class="legend-val" style="color:${r.color}">${r.val.toLocaleString()}</span></div>`).join('');
+ 
+    const unlockEl = document.getElementById('level-unlocks-list');
+    unlockEl.innerHTML = LEVEL_UNLOCKS.map(u => {
+      const unlocked = state.level >= u.level;
+      return `<div class="legend-row">
+        <div class="legend-left">${unlocked ? '✅' : '🔒'} Lvl ${u.level} &mdash; ${u.label}</div>
+        <span class="legend-val" style="max-width:130px; text-align:right; opacity:0.7;">${u.desc}</span>
+      </div>`;
+    }).join('') + `<div class="legend-row"><div class="legend-left">🔒 More levels</div><span class="legend-val" style="opacity:0.5;">Tools &amp; cosmetics coming soon</span></div>`;
+ 
+    document.getElementById('level-modal').classList.add('open');
+  }
+  document.getElementById('level-pill').addEventListener('click', openLevelModal);
+ 
+  /* ============== RENDER WORLD ============== */
+  const worldEl = document.getElementById('world');
+  const viewportEl = document.getElementById('viewport');
+ 
+  function renderObstacles() {
+    obstacles.forEach(ob => {
+      if (state.clearedObstacles[ob.id]) return;
+      const el = document.createElement('div');
+      el.className = 'sprite';
+      el.dataset.id = ob.id;
+      el.style.left = (ob.x - ob.type.size / 2) + 'px';
+      el.style.top = (ob.y - ob.type.size / 2) + 'px';
+      el.style.width = ob.type.size + 'px';
+      el.style.height = ob.type.size + 'px';
+      el.innerHTML = `<span class="emoji">${ob.type.emoji}</span>`;
+      bindTap(el, () => hitObstacle(ob, el));
+      worldEl.appendChild(el);
+    });
+  }
+ 
+  function hitObstacle(ob, el) {
+    if (state.clearedObstacles[ob.id] || !el.isConnected) return;
+    ob.hp -= 1;
+    el.classList.remove('hit');
+    void el.offsetWidth;
+    el.classList.add('hit');
+    vibrate(12);
+ 
+    if (ob.hp <= 0) {
+      state.clearedObstacles[ob.id] = true;
+      const gems = ob.type.gems[0] + Math.floor(rand() * (ob.type.gems[1] - ob.type.gems[0] + 1));
+      state.gems += gems;
+      grantXP(6);
+      vibrate(25);
+ 
+      const ft = document.createElement('div');
+      ft.className = 'float-text';
+      ft.textContent = `+${gems} 💎`;
+      ft.style.color = 'var(--blue)';
+      ft.style.left = (parseFloat(el.style.left) + parseFloat(el.style.width) / 2) + 'px';
+      ft.style.top = (parseFloat(el.style.top) - 6) + 'px';
+      worldEl.appendChild(ft);
+      setTimeout(() => ft.remove(), 900);
+ 
+      el.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+      el.style.transform = 'scale(0)';
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 250);
+      updateHUD();
+    } else {
+      el.style.opacity = String(0.4 + 0.6 * (ob.hp / ob.type.hp));
+    }
+  }
+ 
+  /* ============== GENERIC PLACEMENT (farmhouse + mushroom farm) ============== */
+  let placingKind = null; // 'house' | 'farm' | null
+  let ghostEl = null;
+ 
+  function canPlaceHouse() { return state.level >= 2 && !state.housePlaced; }
+  function canPlaceFarm()  { return state.level >= 3 && !state.farmPlaced; }
+ 
+  function updateBuildButtons() {
+    document.getElementById('build-house-btn').classList.toggle('show', canPlaceHouse());
+    document.getElementById('build-farm-btn').classList.toggle('show', canPlaceFarm());
+  }
+ 
+  function startPlacement(kind) {
+    if (placingKind) return;
+    if (kind === 'house' && !canPlaceHouse()) return;
+    if (kind === 'farm' && !canPlaceFarm()) return;
+    placingKind = kind;
+    dragging = false;
+    moved = false;
+    placeTouchStart = null;
+    worldEl.classList.add('placing');
+    const banner = document.getElementById('placement-banner');
+    banner.textContent = kind === 'house' ? 'Tap the grass to place your farmhouse' : 'Tap the grass to place your mushroom farm';
+    banner.classList.add('show');
+    ghostEl = document.createElement('div');
+    if (kind === 'house') {
+      ghostEl.className = 'farmhouse ghost';
+      ghostEl.innerHTML = `<span class="house-emoji">🏚️</span>`;
+      ghostEl.style.opacity = '0.6';
+    } else {
+      ghostEl.className = 'mushroom-farm';
+      ghostEl.style.pointerEvents = 'none';
+      ghostEl.innerHTML = `<span class="farm-emoji">🍄🏗️</span>`;
+    }
+    ghostEl.style.left = '-999px';
+    worldEl.appendChild(ghostEl);
+  }
+  document.getElementById('build-house-btn').addEventListener('click', () => startPlacement('house'));
+  document.getElementById('build-farm-btn').addEventListener('click', () => startPlacement('farm'));
+ 
+  function moveGhost(screenX, screenY) {
+    if (!placingKind || !ghostEl) return;
+    const rect = viewportEl.getBoundingClientRect();
+    const worldX = (screenX - rect.left - tx) / scale;
+    const worldY = (screenY - rect.top - ty) / scale;
+    const half = placingKind === 'house' ? 90 : 75;
+    ghostEl.style.left = (worldX - half) + 'px';
+    ghostEl.style.top = (worldY - half) + 'px';
+  }
+ 
+  function confirmPlacement(screenX, screenY) {
+    const kind = placingKind;
+    if (!kind) return;
+    const rect = viewportEl.getBoundingClientRect();
+    let x = (screenX - rect.left - tx) / scale;
+    let y = (screenY - rect.top - ty) / scale;
+    x = Math.max(ISLAND_MIN, Math.min(ISLAND_MAX, x));
+    y = Math.max(ISLAND_MIN, Math.min(ISLAND_MAX, y));
+ 
+    placingKind = null;
+    worldEl.classList.remove('placing');
+    document.getElementById('placement-banner').classList.remove('show');
+    if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+ 
+    if (kind === 'house') {
+      state.housePlaced = true;
+      state.housePosition = { x, y };
+      state.houseLevel = 1;
+      vibrate(30);
+      showToast('Farmhouse placed!');
+      renderHouse();
+    } else {
+      state.farmPlaced = true;
+      state.farmPosition = { x, y };
+      state.farmLevel = 1;
+      vibrate(30);
+      showToast('Mushroom Farm placed!');
+      renderFarm();
+    }
+    updateBuildButtons();
+    updateHUD();
+  }
+ 
+  /* ============== FARMHOUSE (5 levels, placed anywhere) ============== */
+  const HOUSE_UPGRADE_COSTS = [
+    { gems: 40, shrooms: 20 },   // 1 -> 2
+    { gems: 70, shrooms: 35 },   // 2 -> 3
+    { gems: 110, shrooms: 55 },  // 3 -> 4
+    { gems: 160, shrooms: 80 },  // 4 -> 5
+  ];
+  const HOUSE_VISUALS = {
+    1: { emoji: '🏚️', filter: 'saturate(0.35) brightness(0.7)',  decor: '',   name: 'Ruins' },
+    2: { emoji: '🏚️', filter: 'saturate(0.6) brightness(0.85)',  decor: '🪵', name: 'Patched' },
+    3: { emoji: '🏡', filter: 'saturate(0.8) brightness(0.95)',  decor: '🌾', name: 'Rebuilt' },
+    4: { emoji: '🏡', filter: 'saturate(1) brightness(1)',       decor: '🌻', name: 'Restored' },
+    5: { emoji: '🏡', filter: 'none',                            decor: '✨', name: 'Homestead' },
+  };
+ 
+  let houseEl = null;
+  function renderHouse() {
+    if (!state.housePlaced) return;
+    if (houseEl) houseEl.remove();
+    const { x, y } = state.housePosition;
+    const visual = HOUSE_VISUALS[state.houseLevel];
+    houseEl = document.createElement('div');
+    houseEl.id = 'farmhouse';
+    houseEl.style.left = (x - 90) + 'px';
+    houseEl.style.top = (y - 90) + 'px';
+    houseEl.innerHTML = `<div class="ring"></div><span class="house-emoji" style="filter:${visual.filter}">${visual.emoji}</span>${visual.decor ? `<span class="house-decor">${visual.decor}</span>` : ''}`;
+    bindTap(houseEl, openHouseModal);
+    worldEl.appendChild(houseEl);
+  }
+ 
+  function openHouseModal() {
+    const backdrop = document.getElementById('house-modal');
+    const level = state.houseLevel;
+    const visual = HOUSE_VISUALS[level];
+    const titleEl = document.getElementById('house-title');
+    const descEl = document.getElementById('house-desc');
+    const fillEl = document.getElementById('house-repair-fill');
+    const costRow = document.getElementById('house-cost-row');
+    const btn = document.getElementById('house-repair-btn');
+ 
+    fillEl.style.width = (level / 5 * 100) + '%';
+    titleEl.textContent = `Farmhouse: Level ${level} - ${visual.name}`;
+ 
+    if (level >= 5) {
+      descEl.textContent = 'Fully restored homestead. This is home base.';
+      costRow.innerHTML = '';
+      btn.style.display = 'none';
+    } else {
+      const cost = HOUSE_UPGRADE_COSTS[level - 1];
+      descEl.textContent = `Upgrade to Level ${level + 1} - ${HOUSE_VISUALS[level + 1].name}.`;
+      costRow.innerHTML = `<span style="color:var(--blue)">💎 ${cost.gems}</span><span style="color:var(--red)">🍄 ${cost.shrooms}</span>`;
+      btn.style.display = 'block';
+      const affordable = state.gems >= cost.gems && state.shrooms >= cost.shrooms;
+      btn.disabled = !affordable;
+      btn.textContent = affordable ? 'Upgrade' : 'Not enough resources';
+      btn.onclick = () => {
+        if (state.gems < cost.gems || state.shrooms < cost.shrooms) return;
+        state.gems -= cost.gems;
+        state.shrooms -= cost.shrooms;
+        state.houseLevel += 1;
+        grantXP(15);
+        vibrate(25);
+        updateHUD();
+        renderHouse();
+        showToast(state.houseLevel >= 5 ? 'Farmhouse fully restored! 🏡' : 'Farmhouse upgraded!');
+        openHouseModal();
       };
-      img.src = SPRITE_PATHS[k];
-    });
-  });
-}
-
-// ============================================================
-// CANVAS + CAMERA
-// ============================================================
-const canvas    = document.getElementById('farm-canvas');
-const ctx       = canvas.getContext('2d');
-ctx.imageSmoothingEnabled = false;
-
-const mmCanvas  = document.getElementById('minimap-canvas');
-const mmCtx     = mmCanvas.getContext('2d');
-mmCtx.imageSmoothingEnabled = false;
-
-let VW, VH;
-let camX = 0, camY = 0;
-let hudH = 62;
-
-function resize() {
-  VW = window.innerWidth;
-  VH = window.innerHeight;
-  canvas.width  = VW;
-  canvas.height = VH;
-  ctx.imageSmoothingEnabled = false;
-  // Center on house initially
-  camX = 15 * TSIZE - VW / 2 + TSIZE;
-  camY = 9  * TSIZE - VH / 2 + TSIZE;
-  clampCam();
-}
-
-function clampCam() {
-  const maxX = MAP_W * TSIZE - VW;
-  const maxY = MAP_H * TSIZE - VH;
-  camX = Math.max(0, Math.min(camX, Math.max(0, maxX)));
-  camY = Math.max(0, Math.min(camY, Math.max(0, maxY)));
-}
-
-window.addEventListener('resize', resize);
-
-// ============================================================
-// ANIMATION STATE
-// ============================================================
-let tick = 0;         // incremented each frame
-let lastTs = 0;
-let frameTimer = 0;
-const FRAME_RATE = 120; // ms per anim frame tick
-
-// Character state
-const player = {
-  tx: 7, ty: 16,       // tile position
-  px: 0, py: 0,        // pixel position (computed)
-  dir: 0,              // 0=down 1=up 2=side
-  moving: false,
-  frame: 0,            // walk frame 0-3
-  animTimer: 0,
-};
-
-// Animal animation states
-const animalStates = {};
-OBJECTS.filter(o => o.type === 'cow' || o.type === 'chicken').forEach((o, i) => {
-  animalStates[i] = { frame: 0, dir: 0, timer: Math.random() * 200, moveTimer: Math.random() * 300 };
-});
-
-// ============================================================
-// DRAW TILE
-// ============================================================
-function drawTile(tx, ty, px, py) {
-  const t = MAP[ty][tx];
-  const ts = IMG.tileset;
-  if (!ts || !ts.complete || ts.naturalWidth === 0) {
-    // fallback solid color
-    const fallback = [['#4a8c2a'],['#52993a'],['#a07848'],['#5a3010'],['#2060b0']];
-    ctx.fillStyle = (fallback[t] || fallback[0])[0];
-    ctx.fillRect(px, py, TSIZE, TSIZE);
-    return;
+    }
+    backdrop.classList.add('open');
   }
-
-  if (t === W) {
-    // Animated water - blue fill
-    ctx.fillStyle = '#2060b0';
-    ctx.fillRect(px, py, TSIZE, TSIZE);
-    // shimmer
-    const o = (tick % 8 < 4) ? 0 : 2;
-    ctx.fillStyle = 'rgba(80,160,220,0.4)';
-    ctx.fillRect(px + 4*ZOOM + o, py + 4*ZOOM, 6*ZOOM, ZOOM);
-    ctx.fillRect(px + 10*ZOOM - o, py + 10*ZOOM, 4*ZOOM, ZOOM);
-    return;
+ 
+  /* ============== MUSHROOM FARM (7 plots, upgrade x5 to 42, fenced) ============== */
+  const FARM_UPGRADE_COSTS = [
+    { gems: 150, spores: 20 },   // 1 -> 2 (7 -> 14)
+    { gems: 300, spores: 50 },   // 2 -> 3 (14 -> 21)
+    { gems: 500, spores: 90 },   // 3 -> 4 (21 -> 28)
+    { gems: 800, spores: 140 },  // 4 -> 5 (28 -> 35)
+    { gems: 1200, spores: 200 }, // 5 -> 6 (35 -> 42)
+  ];
+  const farmPlotsForLevel = lvl => lvl * 7;
+ 
+  const PLANT_COST_SHROOMS = 2;
+  const GROW_TIME_MS = 60 * 1000; // demo pacing
+  const SPORE_YIELD = [4, 8];
+ 
+  let activePlotId = null;
+ 
+  function renderFarm() {
+    if (!state.farmPlaced) return;
+    document.querySelectorAll('.mushroom-farm, .fence-boundary, .farm-hub, .plot').forEach(e => e.remove());
+ 
+    const { x, y } = state.farmPosition;
+    const plotsCount = farmPlotsForLevel(state.farmLevel);
+    const cols = 7;
+    const rows = Math.ceil(plotsCount / cols);
+    const cellSize = 52, gap = 8;
+    const gridW = cols * cellSize + (cols - 1) * gap;
+    const gridH = rows * cellSize + (rows - 1) * gap;
+    const startX = x - gridW / 2;
+    const startY = y - gridH / 2;
+ 
+    const fence = document.createElement('div');
+    fence.className = 'fence-boundary';
+    fence.style.left = (startX - 26) + 'px';
+    fence.style.top = (startY - 26) + 'px';
+    fence.style.width = (gridW + 52) + 'px';
+    fence.style.height = (gridH + 52) + 'px';
+    worldEl.appendChild(fence);
+ 
+    const hub = document.createElement('div');
+    hub.className = 'farm-hub';
+    hub.style.left = (x - 24) + 'px';
+    hub.style.top = (startY - 58) + 'px';
+    hub.textContent = '🪧';
+    bindTap(hub, openFarmModal);
+    worldEl.appendChild(hub);
+ 
+    for (let i = 0; i < plotsCount; i++) {
+      const col = i % cols, row = Math.floor(i / cols);
+      const px = startX + col * (cellSize + gap);
+      const py = startY + row * (cellSize + gap);
+      const plotId = 'plot_' + i;
+      const el = document.createElement('div');
+      el.className = 'plot';
+      el.dataset.id = plotId;
+      el.style.left = px + 'px';
+      el.style.top = py + 'px';
+      bindTap(el, () => openPlotModal(plotId));
+      worldEl.appendChild(el);
+      refreshPlotVisual(plotId, el);
+    }
   }
-
-  // Draw from tileset
-  // Right half of tileset (TS_OX=96) has the tiles
-  // Grass tiles: rows 0-3, cols 6-11 (srcX = 96 + 0..47, srcY = 0..47)
-  // Dirt tiles: rows 7-10
-
-  let sx, sy;
-  if (t === G || t === G2) {
-    // Use center grass tile + variation
-    sx = TS_OX + (t === G2 ? 16 : 16);
-    sy = (t === G2 ? 16 : 0);
-  } else if (t === D) {
-    // Path/dirt - use from dirt region rows 7-9
-    sx = TS_OX + 16;
-    sy = 8 * TILE;
-  } else if (t === F) {
-    // Farm plot tilled soil - use dirt with darker look
-    sx = TS_OX + 0;
-    sy = 8 * TILE;
-  } else {
-    sx = TS_OX + 16; sy = 0;
-  }
-
-  ctx.drawImage(ts, sx, sy, TILE, TILE, px, py, TSIZE, TSIZE);
-}
-
-// ============================================================
-// DRAW OBJECT
-// ============================================================
-function drawObject(obj, px, py) {
-  switch(obj.type) {
-    case 'tree':    drawTree(px, py); break;
-    case 'house':   drawHouse(px, py); break;
-    case 'chest':   drawChest(px, py); break;
-    case 'crop':    drawCrop(px, py, obj.stage); break;
-    case 'cow':     drawCow(px, py, obj); break;
-    case 'chicken': drawChicken(px, py, obj); break;
-  }
-}
-
-function drawTree(px, py) {
-  const img = IMG.tree;
-  if (!img || !img.complete || img.naturalWidth === 0) {
-    // fallback
-    ctx.fillStyle = '#2a6010';
-    ctx.fillRect(px - TSIZE/2, py - TSIZE, TSIZE*2, TSIZE*2);
-    return;
-  }
-  // Tree sprite sheet: 160x48, 10 cols x 3 rows
-  // Full grown tree is at cols 4-5 (2 wide x 2 tall = 32x32 source)
-  // It's a growth animation - stage 3 (biggest) starts at col 6
-  // From image: seedling col0, small col1-2, medium col3-4, big col5-7, full col6-9
-  // Use the full grown tree: source at x=6*16=96, y=0, w=32, h=32
-  const sx = 6 * TILE;
-  const sy = 0;
-  const sw = 32; const sh = 32;
-  // Draw at double size, offset up so roots sit on tile
-  ctx.drawImage(img, sx, sy, sw, sh, px - TSIZE, py - TSIZE, TSIZE*2, TSIZE*2);
-}
-
-function drawHouse(px, py) {
-  const img = IMG.house;
-  if (!img || !img.complete || img.naturalWidth === 0) {
-    ctx.fillStyle = '#c0784a';
-    ctx.fillRect(px, py - TSIZE*2, TSIZE*3, TSIZE*3);
-    return;
-  }
-  // House.png: 224x112 = 14 cols x 7 rows
-  // Left house (complete) occupies roughly cols 0-5, rows 0-6
-  // Right house (complete) occupies cols 8-13, rows 0-6
-  // Use RIGHT house: sx=8*16=128, sy=0, sw=6*16=96, sh=7*16=112
-  // Actually from the grid image the right house starts around col 8
-  const sx = 8 * TILE; const sy = 0;
-  const sw = 6 * TILE; const sh = 7 * TILE;
-  // Draw 3x tall, 3x wide, offset up
-  ctx.drawImage(img, sx, sy, sw, sh, px - TSIZE, py - TSIZE*3, sw * ZOOM, sh * ZOOM);
-}
-
-function drawChest(px, py) {
-  const img = IMG.chest;
-  if (!img || !img.complete || img.naturalWidth === 0) {
-    ctx.fillStyle = '#8b5e20';
-    ctx.fillRect(px + 4, py + 8, TSIZE - 8, TSIZE - 8);
-    return;
-  }
-  // chest.png: 32x32 = 2 cols x 2 rows
-  // Top row = closed, bottom = open. Use closed (row 0)
-  const bob = (tick % 16 < 8) ? 0 : -ZOOM;
-  ctx.drawImage(img, 0, 0, 16, 16, px + 4, py + 4 + bob, TSIZE - 8, TSIZE - 8);
-}
-
-function drawCrop(px, py, stage) {
-  const img = IMG.crops;
-  if (!img || !img.complete || img.naturalWidth === 0) {
-    ctx.fillStyle = stage >= 3 ? '#22c55e' : '#a8ff78';
-    ctx.fillRect(px + 8, py + 8, TSIZE - 16, TSIZE - 16);
-    return;
-  }
-  // Spring_Crops.png: 224x128 = 14 cols x 8 rows
-  // Each crop type is in a row, growth stages in cols
-  // Row 0 = carrot stages, row 2 = tomato, row 4 = mushroom-ish
-  // Stage 0=bare,1=sprout,2=growing,3=ready  -> cols 0,1,2,3
-  const cropRow = 0; // carrot row for now
-  const sx = Math.min(stage, 3) * TILE;
-  const sy = cropRow * TILE;
-  // Small crop drawn centered in tile
-  const bob = (tick % 20 < 10) ? 0 : -1;
-  ctx.drawImage(img, sx, sy, TILE, TILE, px + 4, py + 4 + bob * ZOOM, TSIZE - 8, TSIZE - 8);
-}
-
-function drawCow(px, py, obj) {
-  const img = IMG.cow_f;
-  if (!img || !img.complete || img.naturalWidth === 0) {
-    ctx.fillStyle = '#c8a078';
-    ctx.fillRect(px, py + 8, TSIZE + 8, TSIZE - 8);
-    return;
-  }
-  // Female_Cow_Brown.png: 128x96 = 8 cols x 6 rows
-  // Rows: 0=down, 1=?, 2=side1, 3=side2, 4=up, 5=?
-  // 4 frames per direction (cols 0-3 per anim)
-  const idx = OBJECTS.findIndex(o => o === obj);
-  const st = animalStates[idx] || { frame: 0, dir: 0 };
-  const row = st.dir * 2; // each dir takes 2 rows? let's use row 0 for idle
-  const frame = st.frame % 4;
-  ctx.drawImage(img, frame * TILE, row * TILE, TILE, TILE*2,
-    px - 4, py - TSIZE/2, TSIZE + 8, TSIZE * 2);
-}
-
-function drawChicken(px, py, obj) {
-  const img = IMG.chicken;
-  if (!img || !img.complete || img.naturalWidth === 0) {
-    ctx.fillStyle = '#e84020';
-    ctx.fillRect(px + 8, py + 12, TSIZE - 16, TSIZE - 16);
-    return;
-  }
-  // Chicken_Red.png: 64x32 = 4 cols x 2 rows
-  const idx = OBJECTS.findIndex(o => o === obj);
-  const st = animalStates[idx] || { frame: 0, dir: 0 };
-  const frame = st.frame % 4;
-  const row = st.dir % 2;
-  ctx.drawImage(img, frame * TILE, row * TILE, TILE, TILE,
-    px + 8, py + 12, TSIZE - 16, TSIZE - 16);
-}
-
-// ============================================================
-// DRAW PLAYER
-// ============================================================
-function drawPlayer() {
-  const px = player.tx * TSIZE - camX;
-  const py = player.ty * TSIZE - camY;
-
-  if (player.moving && IMG.walk && IMG.walk.complete && IMG.walk.naturalWidth > 0) {
-    // Walk.png: 192x96, 16w x 32h per frame, 12 cols x 3 rows
-    // Row 0 = down, row 1 = up, row 2 = side
-    const frame = player.frame % 6; // 6 walk frames per dir? use % 4 safely
-    const col   = (player.frame % 4) * 2; // each "frame" is 2 cols of 16px? 
-    // Actually: 12 cols / 3 rows = 4 frames per direction
-    const f = player.frame % 4;
-    const row = player.dir; // 0=down,1=up,2=side
-    // flip if going right (dir=2 side)
-    const flip = player.flipX;
-
-    ctx.save();
-    if (flip) {
-      ctx.translate(px + TSIZE, py);
-      ctx.scale(-1, 1);
-      ctx.drawImage(IMG.walk, f * CHAR_W, row * CHAR_H, CHAR_W, CHAR_H,
-        0, -TSIZE, TSIZE, TSIZE * 2);
+ 
+  function openFarmModal() {
+    const backdrop = document.getElementById('farm-modal');
+    const level = state.farmLevel;
+    const plots = farmPlotsForLevel(level);
+    const titleEl = document.getElementById('farm-title');
+    const descEl = document.getElementById('farm-desc');
+    const fillEl = document.getElementById('farm-repair-fill');
+    const costRow = document.getElementById('farm-cost-row');
+    const btn = document.getElementById('farm-upgrade-btn');
+ 
+    fillEl.style.width = (plots / 42 * 100) + '%';
+    titleEl.textContent = `Mushroom Farm: Level ${level}`;
+ 
+    if (level >= 6) {
+      descEl.textContent = `Fully expanded with all 42 plots. Plant shrooms here to grow spores.`;
+      costRow.innerHTML = '';
+      btn.style.display = 'none';
     } else {
-      ctx.drawImage(IMG.walk, f * CHAR_W, row * CHAR_H, CHAR_W, CHAR_H,
-        px, py - TSIZE, TSIZE, TSIZE * 2);
+      const nextPlots = farmPlotsForLevel(level + 1);
+      const cost = FARM_UPGRADE_COSTS[level - 1];
+      descEl.textContent = `${plots} of 42 plots unlocked. Upgrade to expand to ${nextPlots} plots.`;
+      costRow.innerHTML = `<span style="color:var(--blue)">💎 ${cost.gems}</span><span style="color:var(--yellow)">✨ ${cost.spores}</span>`;
+      btn.style.display = 'block';
+      const affordable = state.gems >= cost.gems && state.spores >= cost.spores;
+      btn.disabled = !affordable;
+      btn.textContent = affordable ? 'Upgrade' : 'Not enough resources';
+      btn.onclick = () => {
+        if (state.gems < cost.gems || state.spores < cost.spores) return;
+        state.gems -= cost.gems;
+        state.spores -= cost.spores;
+        state.farmLevel += 1;
+        grantXP(20);
+        vibrate(25);
+        updateHUD();
+        renderFarm();
+        showToast(state.farmLevel >= 6 ? 'Mushroom Farm fully expanded! 🍄' : 'Mushroom Farm expanded!');
+        openFarmModal();
+      };
     }
-    ctx.restore();
-  } else if (IMG.idle && IMG.idle.complete && IMG.idle.naturalWidth > 0) {
-    // Idle.png: 128x96, 32w x 32h per frame, 4 cols x 3 rows
-    // Row 0=down, row1=up, row2=side
-    const f = Math.floor(tick / 6) % 4;
-    const row = player.dir;
-
-    ctx.save();
-    if (player.flipX) {
-      ctx.translate(px + TSIZE, py);
-      ctx.scale(-1, 1);
-      ctx.drawImage(IMG.idle, f * IDLE_W, row * IDLE_H, IDLE_W, IDLE_H,
-        0, -TSIZE, TSIZE * 2, TSIZE * 2);
+    backdrop.classList.add('open');
+  }
+ 
+  function refreshPlotVisual(plotId, el) {
+    const data = state.plots[plotId];
+    el = el || worldEl.querySelector(`.plot[data-id="${plotId}"]`);
+    if (!el) return;
+    if (!data) { el.classList.remove('planted'); el.innerHTML = '🕳️'; return; }
+    const elapsed = Date.now() - data.plantedAt;
+    el.classList.add('planted');
+    el.innerHTML = elapsed >= GROW_TIME_MS ? '✨' : '🌱';
+  }
+ 
+  function openPlotModal(plotId) {
+    activePlotId = plotId;
+    const backdrop = document.getElementById('plot-modal');
+    const titleEl = document.getElementById('plot-title');
+    const descEl = document.getElementById('plot-desc');
+    const costRow = document.getElementById('plot-cost-row');
+    const btn = document.getElementById('plot-action-btn');
+    const data = state.plots[plotId];
+ 
+    if (!data) {
+      titleEl.textContent = 'Empty Plot';
+      descEl.textContent = `Plant a shroom here. It'll take a little while to grow into spores.`;
+      costRow.innerHTML = `<span style="color:var(--red)">🍄 ${PLANT_COST_SHROOMS}</span>`;
+      btn.textContent = 'Plant Shroom';
+      btn.disabled = state.shrooms < PLANT_COST_SHROOMS;
+      btn.onclick = () => {
+        if (state.shrooms < PLANT_COST_SHROOMS) return;
+        state.shrooms -= PLANT_COST_SHROOMS;
+        state.plots[plotId] = { plantedAt: Date.now() };
+        grantXP(4);
+        vibrate(18);
+        updateHUD();
+        refreshPlotVisual(plotId);
+        showToast('Shroom planted 🌱');
+        backdrop.classList.remove('open');
+      };
     } else {
-      ctx.drawImage(IMG.idle, f * IDLE_W, row * IDLE_H, IDLE_W, IDLE_H,
-        px - TSIZE/2, py - TSIZE, TSIZE * 2, TSIZE * 2);
+      const elapsed = Date.now() - data.plantedAt;
+      if (elapsed >= GROW_TIME_MS) {
+        titleEl.textContent = 'Ready to Harvest';
+        descEl.textContent = 'Your shroom has fully grown. Harvest it for spores.';
+        costRow.innerHTML = '';
+        btn.textContent = 'Harvest';
+        btn.disabled = false;
+        btn.onclick = () => {
+          const yieldAmt = SPORE_YIELD[0] + Math.floor(rand() * (SPORE_YIELD[1] - SPORE_YIELD[0] + 1));
+          state.spores += yieldAmt;
+          delete state.plots[plotId];
+          grantXP(10);
+          vibrate(22);
+          updateHUD();
+          refreshPlotVisual(plotId);
+          showToast(`Harvested +${yieldAmt} ✨ spores`);
+          backdrop.classList.remove('open');
+        };
+      } else {
+        const remainMin = Math.ceil((GROW_TIME_MS - elapsed) / 1000 / 60) || 1;
+        titleEl.textContent = 'Growing...';
+        descEl.textContent = `Still growing. Ready in about ${remainMin} min.`;
+        costRow.innerHTML = '';
+        btn.textContent = 'Still Growing';
+        btn.disabled = true;
+        btn.onclick = null;
+      }
     }
-    ctx.restore();
-  } else {
-    // fallback square
-    ctx.fillStyle = '#4fa8fd';
-    ctx.fillRect(px + 8, py, TSIZE - 16, TSIZE);
+    backdrop.classList.add('open');
   }
-}
-
-// ============================================================
-// MAIN DRAW LOOP
-// ============================================================
-function draw(ts) {
-  requestAnimationFrame(draw);
-
-  const dt = ts - lastTs;
-  lastTs = ts;
-
-  frameTimer += dt;
-  if (frameTimer >= FRAME_RATE) {
-    tick++;
-    frameTimer -= FRAME_RATE;
-    // advance animal frames
-    Object.keys(animalStates).forEach(i => {
-      const st = animalStates[i];
-      st.timer++;
-      if (st.timer % 6 === 0) st.frame++;
-    });
+ 
+  setInterval(() => {
+    if (!document.getElementById('plot-modal').classList.contains('open')) return;
+    if (activePlotId) openPlotModal(activePlotId);
+  }, 5000);
+ 
+  /* ============== PAN & ZOOM ============== */
+  const HOME_SCALE = 1; // 1 world unit = 1 css px at the starting "home" view — medium, near-natural object size
+  let scale = HOME_SCALE, minScale = 0.28, maxScale = 2.5;
+  let tx = 0, ty = 0;
+  let dragging = false, lastX = 0, lastY = 0;
+  let pinchStartDist = 0, pinchStartScale = 1;
+ 
+  function applyTransform() {
+    worldEl.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
   }
-
-  ctx.clearRect(0, 0, VW, VH);
-
-  // Sky/bg
-  ctx.fillStyle = '#0a0a14';
-  ctx.fillRect(0, 0, VW, VH);
-
-  const tileStartX = Math.max(0, Math.floor(camX / TSIZE));
-  const tileStartY = Math.max(0, Math.floor(camY / TSIZE));
-  const tileEndX   = Math.min(MAP_W, Math.ceil((camX + VW) / TSIZE));
-  const tileEndY   = Math.min(MAP_H, Math.ceil((camY + VH) / TSIZE));
-
-  // PASS 1: Ground tiles
-  for (let ty = tileStartY; ty < tileEndY; ty++) {
-    for (let tx = tileStartX; tx < tileEndX; tx++) {
-      const px = tx * TSIZE - camX;
-      const py = ty * TSIZE - camY;
-      drawTile(tx, ty, px, py);
+ 
+  // recompute how far the player is allowed to pinch OUT — now allows the full
+  // island + surrounding water/horizon to come into view at max zoom-out
+  function computeZoomBounds() {
+    const vw = viewportEl.clientWidth;
+    const vh = viewportEl.clientHeight;
+    minScale = Math.max(Math.min(vw / WORLD_SIZE, vh / WORLD_SIZE), 0.18);
+  }
+ 
+  function centerCameraOn(worldX, worldY, targetScale) {
+    const vw = viewportEl.clientWidth;
+    const vh = viewportEl.clientHeight;
+    scale = Math.max(minScale, Math.min(maxScale, targetScale));
+    tx = vw / 2 - worldX * scale;
+    ty = vh / 2 - worldY * scale;
+    clampPan();
+    applyTransform();
+  }
+ 
+  // Township-style "go home": medium zoom centered on the farmhouse (once placed), not the whole map
+  function goHome() {
+    computeZoomBounds();
+    const target = (state.housePlaced && state.housePosition) ? state.housePosition : { x: CENTER, y: CENTER };
+    centerCameraOn(target.x, target.y, HOME_SCALE);
+  }
+ 
+  function clampPan() {
+    const vw = viewportEl.clientWidth;
+    const vh = viewportEl.clientHeight;
+    const worldW = WORLD_SIZE * scale;
+    const worldH = WORLD_SIZE * scale;
+    const minTx = Math.min(0, vw - worldW);
+    const minTy = Math.min(0, vh - worldH);
+    tx = Math.max(minTx, Math.min(0, tx));
+    ty = Math.max(minTy, Math.min(0, ty));
+    if (worldW <= vw) tx = (vw - worldW) / 2;
+    if (worldH <= vh) ty = (vh - worldH) / 2;
+  }
+ 
+  function dist(t1, t2) {
+    const dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+ 
+  let moved = false;
+  let placeTouchStart = null;
+ 
+  viewportEl.addEventListener('touchstart', e => {
+    if (placingKind) {
+      const t = e.touches[0];
+      placeTouchStart = { x: t.clientX, y: t.clientY };
+      return;
     }
-  }
-
-  // PASS 2: Objects sorted by Y (painter's algorithm for depth)
-  const visObjects = OBJECTS.filter(o =>
-    o.tx >= tileStartX - 2 && o.tx <= tileEndX + 2 &&
-    o.ty >= tileStartY - 2 && o.ty <= tileEndY + 2
-  );
-  // Sort Y so objects lower on screen draw over those higher up
-  visObjects.sort((a, b) => a.ty - b.ty);
-
-  visObjects.forEach(obj => {
-    const px = obj.tx * TSIZE - camX;
-    const py = obj.ty * TSIZE - camY;
-    drawObject(obj, px, py);
+    moved = false;
+    if (e.touches.length === 1) {
+      dragging = true;
+      lastX = e.touches[0].clientX;
+      lastY = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+      dragging = false;
+      pinchStartDist = dist(e.touches[0], e.touches[1]);
+      pinchStartScale = scale;
+    }
+  }, { passive: true });
+ 
+  viewportEl.addEventListener('touchmove', e => {
+    if (placingKind) { moveGhost(e.touches[0].clientX, e.touches[0].clientY); return; }
+    if (e.touches.length === 1 && dragging) {
+      const dx = e.touches[0].clientX - lastX;
+      const dy = e.touches[0].clientY - lastY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+      tx += dx; ty += dy;
+      lastX = e.touches[0].clientX;
+      lastY = e.touches[0].clientY;
+      clampPan();
+      applyTransform();
+    } else if (e.touches.length === 2) {
+      const d = dist(e.touches[0], e.touches[1]);
+      scale = Math.max(minScale, Math.min(maxScale, pinchStartScale * (d / pinchStartDist)));
+      clampPan();
+      applyTransform();
+    }
+  }, { passive: true });
+ 
+  viewportEl.addEventListener('touchend', e => {
+    if (placingKind) {
+      const t = e.changedTouches[0];
+      let ok = true;
+      if (placeTouchStart) {
+        const dx = t.clientX - placeTouchStart.x, dy = t.clientY - placeTouchStart.y;
+        ok = Math.sqrt(dx * dx + dy * dy) < 20;
+      }
+      placeTouchStart = null;
+      if (ok) confirmPlacement(t.clientX, t.clientY);
+      return;
+    }
+    dragging = false;
+  }, { passive: true });
+ 
+  // desktop dev-mode mouse support
+  viewportEl.addEventListener('mousedown', e => {
+    if (placingKind) return;
+    dragging = true; lastX = e.clientX; lastY = e.clientY; moved = false;
   });
-
-  // PASS 3: Player
-  drawPlayer();
-
-  // PASS 4: Minimap
-  drawMinimap();
-}
-
-// ============================================================
-// MINIMAP
-// ============================================================
-function drawMinimap() {
-  const mw = 76, mh = 76;
-  const tw = mw / MAP_W, th = mh / MAP_H;
-  mmCtx.clearRect(0, 0, mw, mh);
-
-  for (let ty = 0; ty < MAP_H; ty++) {
-    for (let tx = 0; tx < MAP_W; tx++) {
-      const t = MAP[ty][tx];
-      let col = '#3a7020';
-      if (t === W) col = '#2060b0';
-      else if (t === D) col = '#a07848';
-      else if (t === F) col = '#5a3010';
-      else if (t === G2) col = '#4a9030';
-      mmCtx.fillStyle = col;
-      mmCtx.fillRect(tx * tw, ty * th, tw + 0.5, th + 0.5);
-    }
-  }
-
-  // Objects on minimap
-  OBJECTS.forEach(o => {
-    let col = null;
-    if (o.type === 'tree')    col = '#1a5010';
-    else if (o.type === 'house') col = '#c0784a';
-    else if (o.type === 'chest') col = '#d4aa40';
-    if (col) {
-      mmCtx.fillStyle = col;
-      mmCtx.fillRect(o.tx * tw, o.ty * th, tw + 1, th + 1);
-    }
+  window.addEventListener('mousemove', e => {
+    if (placingKind) { moveGhost(e.clientX, e.clientY); return; }
+    if (!dragging) return;
+    if (Math.abs(e.clientX - lastX) > 3 || Math.abs(e.clientY - lastY) > 3) moved = true;
+    tx += e.clientX - lastX; ty += e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    clampPan(); applyTransform();
   });
-
-  // Player dot
-  mmCtx.fillStyle = '#4fa8fd';
-  mmCtx.fillRect(player.tx * tw - 1, player.ty * th - 1, 3, 3);
-
-  // Viewport rect
-  const vx = (camX / TSIZE) * tw;
-  const vy = (camY / TSIZE) * th;
-  const vw = (VW / TSIZE) * tw;
-  const vh = (VH / TSIZE) * th;
-  mmCtx.strokeStyle = 'rgba(168,255,120,0.65)';
-  mmCtx.lineWidth = 1;
-  mmCtx.strokeRect(vx, vy, Math.min(vw, mw), Math.min(vh, mh));
-}
-
-// ============================================================
-// INPUT / PAN
-// ============================================================
-let drag = { active: false, startX: 0, startY: 0, camStartX: 0, camStartY: 0, moved: false };
-let touchStart = null;
-
-canvas.addEventListener('mousedown', e => {
-  drag = { active: true, startX: e.clientX, startY: e.clientY,
-           camStartX: camX, camStartY: camY, moved: false };
-});
-canvas.addEventListener('mousemove', e => {
-  if (!drag.active) return;
-  const dx = e.clientX - drag.startX;
-  const dy = e.clientY - drag.startY;
-  if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
-  camX = drag.camStartX - dx;
-  camY = drag.camStartY - dy;
-  clampCam();
-  updateCoord(e.clientX, e.clientY);
-});
-canvas.addEventListener('mouseup', e => {
-  if (!drag.moved) handleTap(e.clientX, e.clientY);
-  drag.active = false;
-});
-
-canvas.addEventListener('touchstart', e => {
-  e.preventDefault();
-  if (e.touches.length === 1) {
-    const t = e.touches[0];
-    drag = { active: true, startX: t.clientX, startY: t.clientY,
-             camStartX: camX, camStartY: camY, moved: false };
-    touchStart = { x: t.clientX, y: t.clientY, ts: Date.now() };
-  }
-}, { passive: false });
-
-canvas.addEventListener('touchmove', e => {
-  e.preventDefault();
-  if (!drag.active || e.touches.length !== 1) return;
-  const t = e.touches[0];
-  const dx = t.clientX - drag.startX;
-  const dy = t.clientY - drag.startY;
-  if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
-  camX = drag.camStartX - dx;
-  camY = drag.camStartY - dy;
-  clampCam();
-  updateCoord(t.clientX, t.clientY);
-}, { passive: false });
-
-canvas.addEventListener('touchend', e => {
-  e.preventDefault();
-  if (!drag.moved && touchStart && Date.now() - touchStart.ts < 250) {
-    const t = e.changedTouches[0];
-    handleTap(t.clientX, t.clientY);
-  }
-  drag.active = false; touchStart = null;
-}, { passive: false });
-
-function updateCoord(cx, cy) {
-  const tx = Math.floor((cx + camX) / TSIZE);
-  const ty = Math.floor((cy + camY) / TSIZE);
-  document.getElementById('coord-display').textContent = tx + ', ' + ty;
-}
-
-// ============================================================
-// TAP HANDLER  - move player + tooltip
-// ============================================================
-const tooltip = document.getElementById('tooltip');
-let tipTimer = null;
-
-function handleTap(cx, cy) {
-  const tx = Math.floor((cx + camX) / TSIZE);
-  const ty = Math.floor((cy + camY) / TSIZE);
-  if (tx < 0 || tx >= MAP_W || ty < 0 || ty >= MAP_H) return;
-
-  // Move player toward tapped tile
-  const oldTx = player.tx;
-  player.tx = tx;
-  player.ty = ty;
-
-  // Determine direction faced
-  const dx = tx - oldTx;
-  const dy = ty - oldTy || 0;
-  if (Math.abs(dx) > Math.abs(dy)) {
-    player.dir = 2; // side
-    player.flipX = dx > 0;
-  } else if (dy < 0) {
-    player.dir = 1; // up
-    player.flipX = false;
-  } else {
-    player.dir = 0; // down
-    player.flipX = false;
-  }
-  player.moving = true;
-  player.frame = (player.frame + 1) % 4;
-  setTimeout(() => { player.moving = false; }, 400);
-
-  // Pan camera to follow player
-  camX = tx * TSIZE - VW / 2 + TSIZE / 2;
-  camY = ty * TSIZE - VH / 2 + TSIZE / 2;
-  clampCam();
-
-  // Tooltip for object at tile
-  const obj = OBJECTS.find(o => o.tx === tx && o.ty === ty);
-  if (obj) showTooltip(obj.label, cx, cy);
-  else {
-    const labels = { 0:'Grassland', 1:'Meadow', 2:'Dirt Path', 3:'Farm Plot', 4:'Water' };
-    showTooltip(labels[MAP[ty][tx]] || 'Land', cx, cy);
-  }
-}
-
-let oldTy = 0;
-
-function showTooltip(text, x, y) {
-  tooltip.textContent = text;
-  const tx2 = Math.min(x + 8, VW - 160);
-  const ty2 = Math.max(y - 44, 60);
-  tooltip.style.left = tx2 + 'px';
-  tooltip.style.top  = ty2 + 'px';
-  tooltip.classList.add('show');
-  clearTimeout(tipTimer);
-  tipTimer = setTimeout(() => tooltip.classList.remove('show'), 2000);
-}
-
-// HUD button tabs
-document.querySelectorAll('.hud-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.hud-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  window.addEventListener('mouseup', () => { dragging = false; });
+  viewportEl.addEventListener('click', e => {
+    if (placingKind) { confirmPlacement(e.clientX, e.clientY); return; }
   });
-});
-
-// ============================================================
-// BOOT
-// ============================================================
-async function boot() {
-  resize();
-  player.px = player.tx * TSIZE;
-  player.py = player.ty * TSIZE;
-
-  await loadSprites();
-
-  // Hide loading
-  const loading = document.getElementById('loading');
-  loading.classList.add('hidden');
-  setTimeout(() => loading.style.display = 'none', 600);
-
-  requestAnimationFrame(draw);
-}
-
-boot();
+  viewportEl.addEventListener('wheel', e => {
+    if (placingKind) return;
+    e.preventDefault();
+    scale = Math.max(minScale, Math.min(maxScale, scale - e.deltaY * 0.001));
+    clampPan(); applyTransform();
+  }, { passive: false });
+ 
+  document.getElementById('zoom-in').addEventListener('click', () => {
+    scale = Math.min(maxScale, scale + 0.25); clampPan(); applyTransform();
+  });
+  document.getElementById('zoom-out').addEventListener('click', () => {
+    scale = Math.max(minScale, scale - 0.25); clampPan(); applyTransform();
+  });
+  document.getElementById('zoom-reset').addEventListener('click', goHome);
+ 
+  window.addEventListener('resize', goHome);
+ 
+  /* ============== INIT ============== */
+  function initGame() {
+    checkDayRollover();
+    renderObstacles();
+    Object.keys(state.mushrooms).forEach(id => renderMushroom(id, state.mushrooms[id]));
+    processSpawns();
+    if (state.housePlaced) renderHouse();
+    if (state.farmPlaced) renderFarm();
+    renderLegend();
+    updateBuildButtons();
+    updateHUD();
+    goHome();
+ 
+    setInterval(() => {
+      checkDayRollover();
+      processSpawns();
+    }, 30 * 1000);
+ 
+    setInterval(() => {
+      document.querySelectorAll('.plot').forEach(el => refreshPlotVisual(el.dataset.id, el));
+    }, 10 * 1000);
+  }
+ 
+  if ((isStandalone && isMobileUA) || devMode) boot();
+})();
 </script>
 </body>
 </html>
+ 
+
+
+
+
+
+
+
+
