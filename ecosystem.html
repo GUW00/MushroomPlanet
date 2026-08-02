@@ -728,7 +728,7 @@
     <div class="stats-panel" id="sporebot-remaining-panel" style="margin-bottom:1.5rem;">
       <h2 style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">Sporebot Wallet Remaining
         <span style="display:flex;align-items:center;gap:0.5rem;">
-          <button type="button" id="remaining-flip" class="demo-btn" style="font-size:0.6rem;">In-bot breakdown</button>
+          <button type="button" id="remaining-flip" style="font-family:'Space Grotesk',monospace;font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,225,0.6);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,225,0.15);border-radius:999px;padding:0.3em 0.8em;cursor:pointer;">In-bot breakdown</button>
           <span style="font-family:'Space Grotesk',monospace;font-size:0.6rem;padding:0.2em 0.6em;background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3);border-radius:999px;">LIVE</span>
         </span>
       </h2>
@@ -1152,6 +1152,7 @@
 
   // Remaining = wallet2 + sporebot wallet + total donations - in-bot grand total
   let _remData = null;
+  let _remFlipped = false;
   function renderRemaining(showBreakdown) {
     const el = document.getElementById('sporebot-remaining-body');
     if (!_remData) { el.textContent = 'Live balance unavailable right now.'; return; }
@@ -1163,6 +1164,7 @@
       + '<span style="color:' + color + ';font-weight:' + (bold ? 700 : 600) + ';">' + val + '</span></div>';
     const n = v => Math.round(v).toLocaleString();
     if (!showBreakdown) {
+      if (!d.hasOnchain) { el.textContent = 'Onchain balance unavailable - breakdown still available via the button above.'; return; }
       el.innerHTML =
         line('SHROOM remaining', n(d.remShroom), d.remShroom < 0 ? 'var(--red)' : '#8fd15a')
         + line('SPORE remaining', n(d.remSpore), d.remSpore < 0 ? 'var(--red)' : 'var(--blue)')
@@ -1180,32 +1182,33 @@
         + (t.timestamp ? ' &middot; Last updated: ' + new Date(t.timestamp).toLocaleString() : '') + '</div>';
     }
   }
+  async function fetchJsonSafe(url, tag) {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) { console.error('[SPOREBOT-REMAINING] ' + tag + ' HTTP ' + r.status); return null; }
+      const j = await r.json();
+      if (!j.ok) { console.error('[SPOREBOT-REMAINING] ' + tag + ' returned ok:false'); return null; }
+      return j;
+    } catch (e) { console.error('[SPOREBOT-REMAINING] ' + tag + ' failed:', e); return null; }
+  }
   async function loadSporebotRemaining() {
     const el = document.getElementById('sporebot-remaining-body');
-    try {
-      const [hRes, tRes, dRes] = await Promise.all([
-        fetch(API_BASE + '/api/treasury-holdings'),
-        fetch(API_BASE + '/api/sporebot-totals'),
-        fetch(API_BASE + '/api/ecosystem/donors'),
-      ]);
-      const h = await hRes.json();
-      const t = await tRes.json();
-      const dn = await dRes.json();
-      if (!h.ok || !t.ok) { el.textContent = 'Live balance unavailable right now.'; return; }
-      const donShroom = (dn.ok && dn.totals) ? dn.totals.shroom : 0;
-      const donSpore  = (dn.ok && dn.totals) ? dn.totals.spore  : 0;
-      _remData = {
-        remShroom: (h.wallet2_shroom || 0) + (h.sporebot_shroom || 0) + donShroom - (t.totals.grand_total_shrooms || 0),
-        remSpore:  (h.wallet2_spore  || 0) + (h.sporebot_spore  || 0) + donSpore  - (t.totals.grand_total_spores  || 0),
-        totals: t.totals,
-      };
-      renderRemaining(false);
-    } catch (e) {
-      console.error('[SPOREBOT-REMAINING]', e);
-      el.textContent = 'Live balance unavailable right now.';
-    }
-  }
-  let _remFlipped = false;
+    const [h, t, dn] = await Promise.all([
+      fetchJsonSafe(API_BASE + '/api/treasury-holdings', 'holdings'),
+      fetchJsonSafe(API_BASE + '/api/sporebot-totals', 'totals'),
+      fetchJsonSafe(API_BASE + '/api/ecosystem/donors', 'donors'),
+    ]);
+    if (!t) { el.textContent = 'Live balance unavailable right now.'; return; }
+    const donShroom = (dn && dn.totals) ? dn.totals.shroom : 0;
+    const donSpore  = (dn && dn.totals) ? dn.totals.spore  : 0;
+    _remData = {
+      hasOnchain: !!h,
+      remShroom: h ? (h.wallet2_shroom || 0) + (h.sporebot_shroom || 0) + donShroom - (t.totals.grand_total_shrooms || 0) : 0,
+      remSpore:  h ? (h.wallet2_spore  || 0) + (h.sporebot_spore  || 0) + donSpore  - (t.totals.grand_total_spores  || 0) : 0,
+      totals: t.totals,
+    };
+    renderRemaining(_remFlipped);
+  };
   document.getElementById('remaining-flip').addEventListener('click', function() {
     _remFlipped = !_remFlipped;
     this.textContent = _remFlipped ? 'Show remaining' : 'In-bot breakdown';
@@ -1213,14 +1216,12 @@
   });
   loadSporebotRemaining();
 
-  // Live Sporebot wallet remaining = onchain wallet2 balance - in-bot grand totals
-  async function loadSporebotRemaining() {
-    const el = document.getElementById('sporebot-remaining-body');
-    try {
-      const [hRes, tRes] = await Promise.all([
-        fetch(API_BASE + '/api/treasury-holdings'),
-        fetch(API_BASE + '/api/sporebot-totals'),
-      ]);
+  } catch (e) {
+      console.error('[SPOREBOT-REMAINING]', e);
+      el.textContent = 'Live balance unavailable right now.';
+    }
+  }
+  loadSporebotRemaining();
       const h = await hRes.json();
       const t = await tRes.json();
       if (!h.ok || !t.ok) { el.textContent = 'Live balance unavailable right now.'; return; }
