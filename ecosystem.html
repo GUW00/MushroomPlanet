@@ -544,6 +544,9 @@
     }
     .unit-btn.active[data-unit="spore"] { color: var(--blue); border-color: var(--blue); background: rgba(79,168,253,0.08); }
     .unit-btn.active[data-unit="shroom"] { color: var(--red); border-color: var(--red); background: rgba(253,70,79,0.08); }
+    .unit-btn.active[data-wallet="discord"] { color: #9b8cff; border-color: #9b8cff; background: rgba(155,140,255,0.08); }
+    .unit-btn.active[data-wallet="reddit"] { color: #ff6a3d; border-color: #ff6a3d; background: rgba(255,106,61,0.08); }
+    .bal-icon { width: 13px; height: 13px; object-fit: contain; vertical-align: -2px; margin-right: 3px; }
     .amount-presets { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
     .preset-btn {
       font-family: 'Space Grotesk', monospace; font-size: 0.68rem;
@@ -1260,7 +1263,10 @@
     if (!walletBalances) { el.textContent = 'Loading balances...'; return; }
     const b = selectedWallet === 'reddit' ? walletBalances.reddit : walletBalances.discord;
     if (!b) { el.textContent = 'No linked Reddit account.'; return; }
-    el.textContent = fmt(b.shroom) + ' SHROOM  /  ' + fmt(b.spore) + ' SPORE available';
+    el.innerHTML =
+      '<img class="bal-icon" src="/images/shroom.png" onerror="this.style.display=\'none\'">' + fmt(b.shroom) + ' SHROOM'
+      + '<span style="opacity:0.4;margin:0 0.5rem;">/</span>'
+      + '<img class="bal-icon" src="/images/spore.png" onerror="this.style.display=\'none\'">' + fmt(b.spore) + ' SPORE available';
   }
   async function loadBalances() {
     if (!currentUser || !currentUser.discord_id) { renderBalances(); return; }
