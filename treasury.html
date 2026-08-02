@@ -1859,6 +1859,7 @@ function openSporebotModal() {
     { label: 'Discord Wallets',   shroom: t.discord_shroom_wallet,  spore: t.discord_spore_wallet },
     { label: 'Reddit Balances',   shroom: t.reddit_shrooms,         spore: t.reddit_spores },
     { label: 'Staked Spores',     shroom: null,                     spore: t.staked_spores },
+    { label: 'Total Withdrawn',   shroom: t.withdrawn_shrooms || 0, spore: t.withdrawn_spores || 0 },
     { label: 'Grand Total',       shroom: t.grand_total_shrooms,    spore: t.grand_total_spores, bold: true },
   ];
   body.innerHTML = rows.map(r => `

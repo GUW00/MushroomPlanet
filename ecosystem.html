@@ -1150,6 +1150,7 @@
         + line('Discord Wallets', duo(t.discord_shroom_wallet || 0, t.discord_spore_wallet || 0), 'inherit')
         + line('Reddit Balances', duo(t.reddit_shrooms || 0, t.reddit_spores || 0), 'inherit')
         + line('Staked Spores', n(t.staked_spores || 0), 'var(--blue)')
+        + line('Total Withdrawn', duo(t.withdrawn_shrooms || 0, t.withdrawn_spores || 0), 'inherit')
         + line('Grand Total in Shrooms', n(grandEq), 'var(--yellow)', true)
         + '<div style="font-size:0.6rem;color:rgba(255,255,225,0.3);text-align:right;padding-top:0.3rem;">'
         + '<span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; 100 SPORE = 1 SHROOM'
@@ -1175,10 +1176,15 @@
     if (!t) { el.textContent = 'Live balance unavailable right now.'; return; }
     const donShroom = (dn && dn.totals) ? dn.totals.shroom : 0;
     const donSpore  = (dn && dn.totals) ? dn.totals.spore  : 0;
+    // Obligations = in-bot only. Withdrawn tokens already left the wallet onchain,
+    // so they're excluded here to avoid double-counting against the wallet balance.
+    const oweShroom = (t.totals.grand_total_shrooms || 0) - (t.totals.withdrawn_shrooms || 0);
+    const oweSpore  = (t.totals.grand_total_spores  || 0) - (t.totals.withdrawn_spores  || 0);
     _remData = {
       hasOnchain: !!h,
-      remShroom: h ? (h.wallet2_shroom || 0) + (h.sporebot_shroom || 0) + donShroom - (t.totals.grand_total_shrooms || 0) : 0,
-      remSpore:  h ? (h.wallet2_spore  || 0) + (h.sporebot_spore  || 0) + donSpore  - (t.totals.grand_total_spores  || 0) : 0,
+      oweShroom, oweSpore,
+      remShroom: h ? (h.wallet2_shroom || 0) + (h.sporebot_shroom || 0) + donShroom - oweShroom : 0,
+      remSpore:  h ? (h.wallet2_spore  || 0) + (h.sporebot_spore  || 0) + donSpore  - oweSpore  : 0,
       totals: t.totals,
     };
     renderRemaining(_remFlipped);
@@ -1189,8 +1195,8 @@
     if (h && ((t.totals.grand_total_shrooms || 0) > 0 || (t.totals.grand_total_spores || 0) > 0)) {
       let livePct = 0;
       if (_remData.remShroom >= 0 && _remData.remSpore >= 0) {
-        const surS = (t.totals.grand_total_shrooms || 0) > 0 ? _remData.remShroom / t.totals.grand_total_shrooms : 0;
-        const surP = (t.totals.grand_total_spores  || 0) > 0 ? _remData.remSpore  / t.totals.grand_total_spores  : 0;
+        const surS = _remData.oweShroom > 0 ? _remData.remShroom / _remData.oweShroom : 0;
+        const surP = _remData.oweSpore  > 0 ? _remData.remSpore  / _remData.oweSpore  : 0;
         livePct = Math.max(0, Math.min(150, Math.round(((surS + surP) / 2) * 100)));
       }
       render(livePct);
