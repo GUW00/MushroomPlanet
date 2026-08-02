@@ -430,6 +430,7 @@
       color: inherit;
       -moz-appearance: textfield;
     }
+    .sgr-tile .sgr-tile-input[readonly] { pointer-events: none; user-select: none; }
     .sgr-tile .sgr-tile-input::-webkit-outer-spin-button,
     .sgr-tile .sgr-tile-input::-webkit-inner-spin-button {
       -webkit-appearance: none; margin: 0;
@@ -794,7 +795,7 @@
           <div class="sgr-tile-label">In-Game Sporebot</div>
         </div>
       </div>
-      <div class="sgr-source-hint">Enter your actual numbers from Profile &rarr; Spore Generation Breakdown for the most accurate result.</div>
+      <div class="sgr-source-hint">Log in on the Profile page to load your real numbers automatically.</div>
 
       <div class="sgr-total-row">
         <span>Your total earned SGR</span>
@@ -1099,12 +1100,10 @@
     render(healthPct);
   });
 
+  // SGR tiles are read-only - values come straight from the user's profile
   SGR_SOURCE_IDS.forEach(id => {
-    document.getElementById(id).addEventListener('input', () => {
-      profileTotalSgr = null; // manual edit switches back to simulator mode
-      profileOnchainSgr = 0;
-      updateSgrCalc(currentPct);
-    });
+    document.getElementById(id).setAttribute('readonly', 'readonly');
+    document.getElementById(id).setAttribute('tabindex', '-1');
   });
 
   // Auto-fill SGR tiles from the logged-in user's real APY breakdown
@@ -1129,7 +1128,7 @@
       const hint = document.querySelector('.sgr-source-hint');
       if (hint) hint.textContent = 'Loaded from your profile: '
         + (profileTotalSgr - profileOnchainSgr).toFixed(1) + '% in-game (affected by health) + '
-        + profileOnchainSgr.toFixed(1) + '% on-chain (always full rate). Edit any tile to simulate instead.';
+        + profileOnchainSgr.toFixed(1) + '% on-chain (always full rate).';
       updateSgrCalc(currentPct);
     } catch (e) { console.error('[SGR profile]', e); }
   }
@@ -1264,9 +1263,9 @@
     const b = selectedWallet === 'reddit' ? walletBalances.reddit : walletBalances.discord;
     if (!b) { el.textContent = 'No linked Reddit account.'; return; }
     el.innerHTML =
-      '<img class="bal-icon" src="/images/shroom.png" onerror="this.style.display=\'none\'">' + fmt(b.shroom) + ' SHROOM'
+      '<img class="bal-icon" src="/images/shroom.png" onerror="this.style.display=\'none\'">' + b.shroom.toLocaleString() + ' SHROOM'
       + '<span style="opacity:0.4;margin:0 0.5rem;">/</span>'
-      + '<img class="bal-icon" src="/images/spore.png" onerror="this.style.display=\'none\'">' + fmt(b.spore) + ' SPORE available';
+      + '<img class="bal-icon" src="/images/spore.png" onerror="this.style.display=\'none\'">' + b.spore.toLocaleString() + ' SPORE available';
   }
   async function loadBalances() {
     if (!currentUser || !currentUser.discord_id) { renderBalances(); return; }
