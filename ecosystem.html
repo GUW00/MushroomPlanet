@@ -826,8 +826,15 @@
         <div class="modal-label">Your name</div>
         <input type="text" class="modal-input" id="donate-name" maxlength="24" placeholder="Anonymous" />
 
+        <div class="modal-label">From wallet</div>
+        <div class="unit-toggle" id="wallet-toggle">
+          <button type="button" class="unit-btn active" data-wallet="discord">DISCORD</button>
+          <button type="button" class="unit-btn" data-wallet="reddit">REDDIT</button>
+        </div>
+        <div class="modal-convert" id="wallet-balances">Log in on the Profile page to see balances.</div>
+
         <div class="modal-label">Give</div>
-        <div class="unit-toggle">
+        <div class="unit-toggle" id="unit-toggle">
           <button type="button" class="unit-btn active" data-unit="spore">SPORE</button>
           <button type="button" class="unit-btn" data-unit="shroom">SHROOM</button>
         </div>
@@ -1202,6 +1209,7 @@
       nameEl.disabled = true;
     }
     donateModal.classList.add('active');
+    loadBalances();
   }
   function closeDonateModal() {
     donateModal.classList.remove('active');
@@ -1218,9 +1226,9 @@
   });
 
   let selectedUnit = 'spore';
-  document.querySelectorAll('.unit-btn').forEach(btn => {
+  document.querySelectorAll('#unit-toggle .unit-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#unit-toggle .unit-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       selectedUnit = btn.dataset.unit;
       const amountInput = document.getElementById('donate-amount');
@@ -1232,6 +1240,37 @@
         : amt.toFixed(2) + ' SHROOM = ' + (amt * SPORE_PER_SHROOM).toFixed(0) + ' SPORE';
     });
   });
+
+  let selectedWallet = 'discord';
+  let walletBalances = null;
+  document.querySelectorAll('#wallet-toggle .unit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.wallet === 'reddit' && walletBalances && !walletBalances.reddit) {
+        showToast('No linked Reddit account.'); return;
+      }
+      document.querySelectorAll('#wallet-toggle .unit-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedWallet = btn.dataset.wallet;
+      renderBalances();
+    });
+  });
+  function renderBalances() {
+    const el = document.getElementById('wallet-balances');
+    if (!currentUser || !currentUser.discord_id) { el.textContent = 'Log in on the Profile page to see balances.'; return; }
+    if (!walletBalances) { el.textContent = 'Loading balances...'; return; }
+    const b = selectedWallet === 'reddit' ? walletBalances.reddit : walletBalances.discord;
+    if (!b) { el.textContent = 'No linked Reddit account.'; return; }
+    el.textContent = fmt(b.shroom) + ' SHROOM  /  ' + fmt(b.spore) + ' SPORE available';
+  }
+  async function loadBalances() {
+    if (!currentUser || !currentUser.discord_id) { renderBalances(); return; }
+    try {
+      const r = await fetch(API_BASE + '/api/ecosystem/balances/' + currentUser.discord_id);
+      const d = await r.json();
+      if (d.ok) walletBalances = { discord: d.discord, reddit: d.reddit };
+    } catch (e) { console.error('[balances]', e); }
+    renderBalances();
+  }
 
   document.querySelectorAll('.preset-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1258,6 +1297,11 @@
     }
     const amount = parseInt(document.getElementById('donate-amount').value, 10);
     if (isNaN(amount) || amount <= 0) { showToast('Enter a whole number amount.'); return; }
+    const wb = walletBalances && (selectedWallet === 'reddit' ? walletBalances.reddit : walletBalances.discord);
+    if (wb && amount > wb[selectedUnit]) {
+      showToast('Not enough ' + selectedUnit.toUpperCase() + ' in your ' + selectedWallet + ' wallet.');
+      return;
+    }
 
     donating = true;
     const btn = document.querySelector('.donate-submit');
@@ -1267,10 +1311,11 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-discord-id': currentUser.discord_id },
         credentials: 'include',
-        body: JSON.stringify({ amount: amount, unit: selectedUnit }),
+        body: JSON.stringify({ amount: amount, unit: selectedUnit, source: selectedWallet }),
       });
       const d = await r.json();
       if (!d.ok) { showToast(d.message || 'Donation failed.'); return; }
+      if (wb && typeof d.new_balance === 'number') { wb[selectedUnit] = d.new_balance; renderBalances(); }
       renderLeaderboard();
       closeDonateModal();
       pulseMushroom();

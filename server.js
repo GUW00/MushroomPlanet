@@ -1840,27 +1840,34 @@ app.post('/api/ecosystem/donate', async (req, res) => {
   const amt = parseInt(amount, 10);
   if (isNaN(amt) || amt <= 0) return res.status(400).json({ ok: false, message: 'Invalid amount' });
   if (unit !== 'spore' && unit !== 'shroom') return res.status(400).json({ ok: false, message: 'Invalid unit' });
+  const source = req.body.source === 'reddit' ? 'reddit' : 'discord'; // farm wallet intentionally NOT allowed
 
   const uid = sessionUser.discord_id;
   try {
-    const [walletSnap, donorSnap, miscSnap] = await Promise.all([
-      db.ref(`Pixie/Users/${uid}/Wallet`).get(),
+    const [donorSnap, miscSnap, secSnap] = await Promise.all([
       db.ref(`Website/Ecosystem/Donors/${uid}`).get(),
       db.ref(`Pixie/Users/${uid}/Misc/username`).get(),
+      db.ref(`Pixie/Users/${uid}/Security`).get(),
     ]);
-    const wallet = walletSnap.val() || {};
-    const donor  = donorSnap.val() || {};
+    const donor = donorSnap.val() || {};
     const username = sessionUser.username || miscSnap.val() || 'Unknown';
 
-    const field = unit === 'spore' ? 'spore_wallet' : 'shroom_wallet';
-    const bal = parseInt(wallet[field] || 0, 10);
-    if (amt > bal) return res.status(400).json({ ok: false, message: `Not enough ${unit.toUpperCase()}. You have ${bal.toLocaleString()}.` });
+    let balPath;
+    if (source === 'reddit') {
+      const sec = secSnap.val() || {};
+      if (!sec.RedditName || !sec.RedditLink) return res.status(400).json({ ok: false, message: 'No linked Reddit account.' });
+      balPath = `Reddit/Users/${sec.RedditName}/Balance/${unit === 'spore' ? 'reddit_spores' : 'reddit_shrooms'}`;
+    } else {
+      balPath = `Pixie/Users/${uid}/Wallet/${unit === 'spore' ? 'spore_wallet' : 'shroom_wallet'}`;
+    }
+    const bal = parseInt((await db.ref(balPath).get()).val() || 0, 10);
+    if (amt > bal) return res.status(400).json({ ok: false, message: `Not enough ${unit.toUpperCase()} in your ${source} wallet. You have ${bal.toLocaleString()}.` });
 
     const eq = unit === 'spore' ? amt / 100 : amt;
 
     // Atomic multi-path update: wallet deduction + donor ledger in ONE write
     const updates = {};
-    updates[`Pixie/Users/${uid}/Wallet/${field}`] = bal - amt;
+    updates[balPath] = bal - amt;
     updates[`Website/Ecosystem/Donors/${uid}`] = {
       name: username,
       spore:  parseInt(donor.spore  || 0, 10) + (unit === 'spore'  ? amt : 0),
@@ -1870,7 +1877,7 @@ app.post('/api/ecosystem/donate', async (req, res) => {
     };
     await db.ref().update(updates);
 
-    console.log(`[ECO-DONATE] ${uid} (${username}) donated ${amt.toLocaleString()} ${unit.toUpperCase()}`);
+    console.log(`[ECO-DONATE] ${uid} (${username}) donated ${amt.toLocaleString()} ${unit.toUpperCase()} from ${source} wallet`);
     res.json({ ok: true, message: `Donated ${amt.toLocaleString()} ${unit.toUpperCase()}!`, new_balance: bal - amt, unit });
   } catch (err) {
     console.error('[ECO-DONATE] Error:', err);
@@ -1887,6 +1894,31 @@ app.get('/api/ecosystem/donors', async (req, res) => {
   } catch (err) {
     console.error('[ECO-DONORS] Error:', err);
     res.status(500).json({ ok: false, donors: [] });
+  }
+});
+
+app.get('/api/ecosystem/balances/:id', async (req, res) => {
+  try {
+    const uid = req.params.id;
+    const [walletSnap, secSnap] = await Promise.all([
+      db.ref(`Pixie/Users/${uid}/Wallet`).get(),
+      db.ref(`Pixie/Users/${uid}/Security`).get(),
+    ]);
+    const w = walletSnap.val() || {};
+    const sec = secSnap.val() || {};
+    let reddit = null;
+    if (sec.RedditName && sec.RedditLink) {
+      const rb = (await db.ref(`Reddit/Users/${sec.RedditName}/Balance`).get()).val() || {};
+      reddit = { shroom: parseInt(rb.reddit_shrooms || 0, 10), spore: parseInt(rb.reddit_spores || 0, 10) };
+    }
+    res.json({
+      ok: true,
+      discord: { shroom: parseInt(w.shroom_wallet || 0, 10), spore: parseInt(w.spore_wallet || 0, 10) },
+      reddit,
+    });
+  } catch (err) {
+    console.error('[ECO-BAL] Error:', err);
+    res.status(500).json({ ok: false });
   }
 });
 
