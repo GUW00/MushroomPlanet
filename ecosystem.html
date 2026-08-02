@@ -733,7 +733,7 @@
         </span>
       </h2>
       <div id="sporebot-remaining-body" style="font-family:'Space Grotesk',monospace;font-size:0.8rem;color:rgba(255,255,225,0.6);padding:0.5rem 0;">Loading live balance...</div>
-      <div class="snapshot-note"><strong>Remaining</strong> = onchain reserve wallets + total donations - tokens already distributed in-bot (Discord + Reddit + farms + staking).</div>
+      <div class="snapshot-note" id="remaining-note"><strong>Remaining</strong> = onchain reserve wallets + total donations - tokens already distributed in-bot (Discord + Reddit + farms + staking).</div>
     </div>
 
     <div class="demo-panel">
@@ -1172,13 +1172,19 @@
           ? '<div style="font-size:0.65rem;color:var(--red);padding-top:0.3rem;">Wallets hold less than in-bot obligations - top up needed.</div>' : '');
     } else {
       const t = d.totals;
+      const duo = (sh, sp) =>
+        '<span style="color:var(--red);">' + n(sh) + '</span>'
+        + '<span style="opacity:0.35;margin:0 0.35rem;">/</span>'
+        + '<span style="color:var(--blue);">' + n(sp) + '</span>';
+      const grandEq = (t.grand_total_shrooms || 0) + (t.grand_total_spores || 0) / 100;
       el.innerHTML =
-        line('Farm Balances', n(t.farm_shrooms || 0) + ' / ' + n(t.farm_spores || 0), 'rgba(255,255,225,0.8)')
-        + line('Discord Wallets', n(t.discord_shroom_wallet || 0) + ' / ' + n(t.discord_spore_wallet || 0), 'rgba(255,255,225,0.8)')
-        + line('Reddit Balances', n(t.reddit_shrooms || 0) + ' / ' + n(t.reddit_spores || 0), 'rgba(255,255,225,0.8)')
+        line('Farm Balances', duo(t.farm_shrooms || 0, t.farm_spores || 0), 'inherit')
+        + line('Discord Wallets', duo(t.discord_shroom_wallet || 0, t.discord_spore_wallet || 0), 'inherit')
+        + line('Reddit Balances', duo(t.reddit_shrooms || 0, t.reddit_spores || 0), 'inherit')
         + line('Staked Spores', n(t.staked_spores || 0), 'var(--blue)')
-        + line('Grand Total', n(t.grand_total_shrooms || 0) + ' / ' + n(t.grand_total_spores || 0), 'var(--yellow)', true)
-        + '<div style="font-size:0.6rem;color:rgba(255,255,225,0.3);text-align:right;padding-top:0.3rem;">SHROOM / SPORE'
+        + line('Grand Total in Shrooms', n(grandEq), 'var(--yellow)', true)
+        + '<div style="font-size:0.6rem;color:rgba(255,255,225,0.3);text-align:right;padding-top:0.3rem;">'
+        + '<span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; 100 SPORE = 1 SHROOM'
         + (t.timestamp ? ' &middot; Last updated: ' + new Date(t.timestamp).toLocaleString() : '') + '</div>';
     }
   }
@@ -1212,6 +1218,7 @@
   document.getElementById('remaining-flip').addEventListener('click', function() {
     _remFlipped = !_remFlipped;
     this.textContent = _remFlipped ? 'Show remaining' : 'In-bot breakdown';
+    document.getElementById('remaining-note').style.display = _remFlipped ? 'none' : '';
     renderRemaining(_remFlipped);
   });
   loadSporebotRemaining();
