@@ -8009,20 +8009,23 @@ function renderStats(s, p) {
         { label: 'Sporebot NFT',      key: 'sporebot_bonus',        color: 'var(--blue)',   imgSrc: 'nft.png' },
         { label: 'LP Provider',       key: 'lp_bonus',              color: '#9b8cff',       imgSrc: 'lp.png' },
         { label: 'Guwoo NFT',         key: 'guwoo_bonus',          color: 'var(--yellow)', imgSrc: 'guwoo.png' },
+        { label: 'Onchain SPORE Holdings', key: 'onchain_spore_bonus', color: 'var(--blue)', imgSrc: 'spore.png' },
       ];
       const nftW3 = (profileData.pixie?.Wallet?.NFT) || {};
-      let poolCnt3 = 0, portraitCnt3 = 0;
+      let poolCnt3 = 0, portraitCnt3 = 0, lakeCnt3 = 0;
       Object.entries(nftW3).forEach(([k, v]) => {
         if (!v || typeof v !== 'object') return;
         const c = parseInt(v.count || 1);
         if (k.includes('King Mooshie Pool')) poolCnt3 += c;
         else if (k.includes('Mooshie Family Portrait') || v.token_id == 2) portraitCnt3 += c;
+        else if (k.includes('King Mooshie Lake') || v.token_id == 5) lakeCnt3 += c;
       });
       const mooshieSub3 = [];
       if (poolCnt3 > 0) mooshieSub3.push({ label: 'King Mooshie Pool x' + poolCnt3 + ' (2% each)', val: poolCnt3 * 2, imgSrc: 'pool_nft.png', color: 'var(--yellow)' });
       if (portraitCnt3 > 0) mooshieSub3.push({ label: 'Mooshie Family Portrait x' + portraitCnt3 + ' (3% each)', val: portraitCnt3 * 3, imgSrc: 'portrait_nft.png', color: 'var(--yellow)' });
+      if (lakeCnt3 > 0 && apy.lake_bonus > 0) mooshieSub3.push({ label: 'King Mooshie Lake x' + lakeCnt3 + ' (5%/10% max)', val: apy.lake_bonus, imgSrc: 'lake_nft.png', color: 'var(--yellow)' });
       const ingameKeys3 = ['stage_bonus','rank_bonus','ingame_sporebot_bonus','potion_bonus','collector_bonus','rootsong_bonus','sunspore_bonus','brewing_bonus'];
-      const onchainKeys3 = ['sporebot_bonus','lp_bonus','guwoo_bonus'];
+      const onchainKeys3 = ['sporebot_bonus','lp_bonus','guwoo_bonus','onchain_spore_bonus'];
       const activeRows3 = sgrRows3.filter(r => apy[r.key] > 0);
       const ingameRows3 = activeRows3.filter(r => ingameKeys3.includes(r.key));
       const onchainRows3 = activeRows3.filter(r => onchainKeys3.includes(r.key));
