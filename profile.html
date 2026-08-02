@@ -4644,24 +4644,27 @@ function renderFarm(s, p) {
       { label: 'Sporebot NFT',      key: 'sporebot_bonus',        suffix: '%', color: 'var(--purple)',  emoji: sgrI('nft.png') },
       { label: 'LP Provider',       key: 'lp_bonus',              suffix: '%', color: '#9b8cff',        emoji: sgrI('lp.png') },
       { label: 'Guwoo NFT',         key: 'guwoo_bonus',           suffix: '%', color: 'var(--yellow)',  emoji: sgrI('guwoo.png') },
+      { label: 'Onchain SPORE Holdings', key: 'onchain_spore_bonus', suffix: '%', color: 'var(--blue)', emoji: sgrI('spore.png') },
     ];
     // Build mooshie sub-rows from NFT wallet
     const nftW = (profileData.pixie?.Wallet?.NFT) || {};
-    let poolCount = 0, portraitCount = 0;
+    let poolCount = 0, portraitCount = 0, lakeCount = 0;
     Object.entries(nftW).forEach(([k, v]) => {
       if (!v || typeof v !== 'object') return;
       const cnt = parseInt(v.count || 1);
       if (k.includes('King Mooshie Pool')) poolCount += cnt;
       else if (k.includes('Mooshie Family Portrait')) portraitCount += cnt;
+      else if (k.includes('King Mooshie Lake')) lakeCount += cnt;
     });
     const mooshieSubRows = [];
+    if (lakeCount > 0 && apy.lake_bonus > 0) mooshieSubRows.push({ label: 'King Mooshie Lake x' + lakeCount + ' (5%/10% max)', key: '_lake', val: apy.lake_bonus, emoji: sgrI('lake_nft.png'), color: 'var(--yellow)' });
     if (poolCount > 0) mooshieSubRows.push({ label: 'King Mooshie Pool x' + poolCount + ' (2% each)', key: '_pool', val: poolCount * 2, emoji: sgrI('pool_nft.png'), color: 'var(--yellow)' });
     if (portraitCount > 0) mooshieSubRows.push({ label: 'Mooshie Family Portrait x' + portraitCount + ' (3% each)', key: '_portrait', val: portraitCount * 3, emoji: sgrI('portrait_nft.png'), color: 'var(--yellow)' });
 
     const activeRows = sgrRows.filter(r => apy[r.key] > 0);
     const totalApy = Math.round((farm.APY || 0) * 100);
     const ingameKeys = ['stage_bonus','rank_bonus','ingame_sporebot_bonus','potion_bonus','collector_bonus','rootsong_bonus','sunspore_bonus','brewing_bonus'];
-    const onchainKeys = ['sporebot_bonus','lp_bonus','guwoo_bonus'];
+    const onchainKeys = ['sporebot_bonus','lp_bonus','guwoo_bonus','onchain_spore_bonus'];
     const ingameRows = activeRows.filter(r => ingameKeys.includes(r.key));
     const onchainRows = activeRows.filter(r => onchainKeys.includes(r.key));
     const sectionHdr = (img, label, first) =>

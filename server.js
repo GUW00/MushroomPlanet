@@ -1828,6 +1828,69 @@ app.post('/api/wallet/convert', async (req, res) => {
 });
 
 // ----------------------------------------------------------------
+// ECOSYSTEM DONATIONS ("Feed the Mushroom")
+// Deducts from Discord wallet, records to Website/Ecosystem/Donors.
+// Donated tokens are burned (removed from circulation).
+// ----------------------------------------------------------------
+app.post('/api/ecosystem/donate', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+
+  const { amount, unit } = req.body;
+  const amt = parseInt(amount, 10);
+  if (isNaN(amt) || amt <= 0) return res.status(400).json({ ok: false, message: 'Invalid amount' });
+  if (unit !== 'spore' && unit !== 'shroom') return res.status(400).json({ ok: false, message: 'Invalid unit' });
+
+  const uid = sessionUser.discord_id;
+  try {
+    const [walletSnap, donorSnap, miscSnap] = await Promise.all([
+      db.ref(`Pixie/Users/${uid}/Wallet`).get(),
+      db.ref(`Website/Ecosystem/Donors/${uid}`).get(),
+      db.ref(`Pixie/Users/${uid}/Misc/username`).get(),
+    ]);
+    const wallet = walletSnap.val() || {};
+    const donor  = donorSnap.val() || {};
+    const username = sessionUser.username || miscSnap.val() || 'Unknown';
+
+    const field = unit === 'spore' ? 'spore_wallet' : 'shroom_wallet';
+    const bal = parseInt(wallet[field] || 0, 10);
+    if (amt > bal) return res.status(400).json({ ok: false, message: `Not enough ${unit.toUpperCase()}. You have ${bal.toLocaleString()}.` });
+
+    const eq = unit === 'spore' ? amt / 100 : amt;
+
+    // Atomic multi-path update: wallet deduction + donor ledger in ONE write
+    const updates = {};
+    updates[`Pixie/Users/${uid}/Wallet/${field}`] = bal - amt;
+    updates[`Website/Ecosystem/Donors/${uid}`] = {
+      name: username,
+      spore:  parseInt(donor.spore  || 0, 10) + (unit === 'spore'  ? amt : 0),
+      shroom: parseInt(donor.shroom || 0, 10) + (unit === 'shroom' ? amt : 0),
+      shroom_eq: parseFloat(donor.shroom_eq || 0) + eq,
+      last_donated: new Date().toISOString(),
+    };
+    await db.ref().update(updates);
+
+    console.log(`[ECO-DONATE] ${uid} (${username}) donated ${amt.toLocaleString()} ${unit.toUpperCase()}`);
+    res.json({ ok: true, message: `Donated ${amt.toLocaleString()} ${unit.toUpperCase()}!`, new_balance: bal - amt, unit });
+  } catch (err) {
+    console.error('[ECO-DONATE] Error:', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
+app.get('/api/ecosystem/donors', async (req, res) => {
+  try {
+    const snap = await db.ref('Website/Ecosystem/Donors').get();
+    const list = Object.values(snap.val() || {})
+      .sort((a, b) => (b.shroom_eq || 0) - (a.shroom_eq || 0)).slice(0, 10);
+    res.json({ ok: true, donors: list });
+  } catch (err) {
+    console.error('[ECO-DONORS] Error:', err);
+    res.status(500).json({ ok: false, donors: [] });
+  }
+});
+
+// ----------------------------------------------------------------
 // POST /api/proposals/create
 // Auth required. Burns SPORE from Discord wallet, creates proposal.
 // ----------------------------------------------------------------
