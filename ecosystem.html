@@ -1150,7 +1150,7 @@
   }
   loadProfileSgr();
 
-  // Remaining = wallet2 + sporebot wallet + total donations - in-bot grand total
+// Remaining = wallet2 + sporebot wallet + total donations - in-bot grand total
   let _remData = null;
   let _remFlipped = false;
   function renderRemaining(showBreakdown) {
@@ -1208,42 +1208,13 @@
       totals: t.totals,
     };
     renderRemaining(_remFlipped);
-  };
+  }
   document.getElementById('remaining-flip').addEventListener('click', function() {
     _remFlipped = !_remFlipped;
     this.textContent = _remFlipped ? 'Show remaining' : 'In-bot breakdown';
     renderRemaining(_remFlipped);
   });
   loadSporebotRemaining();
-
-  } catch (e) {
-      console.error('[SPOREBOT-REMAINING]', e);
-      el.textContent = 'Live balance unavailable right now.';
-    }
-  }
-  loadSporebotRemaining();
-      const h = await hRes.json();
-      const t = await tRes.json();
-      if (!h.ok || !t.ok) { el.textContent = 'Live balance unavailable right now.'; return; }
-      const remShroom = (h.wallet2_shroom || 0) - (t.totals.grand_total_shrooms || 0);
-      const remSpore  = (h.wallet2_spore  || 0) - (t.totals.grand_total_spores  || 0);
-      const line = (val, label, color) =>
-        '<div style="display:flex;justify-content:space-between;padding:0.25rem 0;">'
-        + '<span>' + label + '</span>'
-        + '<span style="color:' + (val < 0 ? 'var(--red)' : color) + ';font-weight:700;">'
-        + Math.round(val).toLocaleString() + '</span></div>';
-      el.innerHTML = line(remShroom, 'SHROOM remaining', 'var(--green, #8fd15a)')
-        + line(remSpore, 'SPORE remaining', 'var(--blue)');
-      if (remShroom < 0 || remSpore < 0) {
-        el.innerHTML += '<div style="font-size:0.65rem;color:var(--red);padding-top:0.3rem;">Wallet holds less than in-bot obligations - top up needed.</div>';
-      }
-    } catch (e) {
-      console.error('[SPOREBOT-REMAINING]', e);
-      el.textContent = 'Live balance unavailable right now.';
-    }
-  }
-  loadSporebotRemaining();
-
   // ─────────────────────────────────────────────────────────────────
   // FEED THE MUSHROOM - demo donations + leaderboard
   // Stored in this browser's localStorage only. No real transactions,
