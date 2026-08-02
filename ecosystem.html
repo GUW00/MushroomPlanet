@@ -753,29 +753,6 @@
       <div class="demo-note">Dragging the slider previews the mushroom only. Past 100% is <strong style="color:var(--gold);">Golden Sporulation</strong> - a treasury surplus. It does not change the supply figures below.</div>
     </div>
 
-    <div class="stats-panel">
-      <h2>Remaining Supply</h2>
-      <div class="bar-item">
-        <div class="bar-meta">
-          <span class="bm-label">SHROOM</span>
-          <span class="bm-pct" id="shroom-pct">--%</span>
-        </div>
-        <div class="bar-track"><div class="bar-fill shroom" id="shroom-bar" style="width:0%;"></div></div>
-        <div class="bar-sub" id="shroom-sub">-- / -- SHROOM</div>
-      </div>
-      <div class="bar-item">
-        <div class="bar-meta">
-          <span class="bm-label">SPORE</span>
-          <span class="bm-pct" id="spore-pct">--%</span>
-        </div>
-        <div class="bar-track"><div class="bar-fill spore" id="spore-bar" style="width:0%;"></div></div>
-        <div class="bar-sub" id="spore-sub">-- / -- SPORE</div>
-      </div>
-      <div class="snapshot-note">
-        <strong>Manual snapshot.</strong> These figures are set by hand and not yet pulled from live treasury data. See <a href="/treasury.html" style="color:rgba(255,255,225,0.45);">Treasury</a> for the current on-chain breakdown.
-      </div>
-    </div>
-
     <div class="sgr-panel">
       <h2>How This Affects Your SGR</h2>
       <p class="sgr-intro">
@@ -1214,6 +1191,21 @@
       totals: t.totals,
     };
     renderRemaining(_remFlipped);
+
+    // Drive live mushroom health from real solvency: reserves / in-bot obligations
+    // Live mushroom health = SURPLUS above in-bot obligations.
+    // 0% at breakeven or any shortfall; 100% when surplus equals obligations; 150 = max golden.
+    if (h && ((t.totals.grand_total_shrooms || 0) > 0 || (t.totals.grand_total_spores || 0) > 0)) {
+      let livePct = 0;
+      if (_remData.remShroom >= 0 && _remData.remSpore >= 0) {
+        const surS = (t.totals.grand_total_shrooms || 0) > 0 ? _remData.remShroom / t.totals.grand_total_shrooms : 0;
+        const surP = (t.totals.grand_total_spores  || 0) > 0 ? _remData.remSpore  / t.totals.grand_total_spores  : 0;
+        livePct = Math.max(0, Math.min(150, Math.round(((surS + surP) / 2) * 100)));
+      }
+      render(livePct);
+      slider.value = livePct;
+      demoVal.textContent = livePct + '%';
+    }
   }
   document.getElementById('remaining-flip').addEventListener('click', function() {
     _remFlipped = !_remFlipped;
