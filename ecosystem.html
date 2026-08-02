@@ -753,6 +753,8 @@
       <div class="demo-note">Dragging the slider previews the mushroom only. Past 100% is <strong style="color:var(--gold);">Golden Sporulation</strong> - a treasury surplus. It does not change the supply figures below.</div>
     </div>
 
+    
+
     <div class="sgr-panel">
       <h2>How This Affects Your SGR</h2>
       <p class="sgr-intro">
@@ -1003,16 +1005,6 @@
     });
   }
 
-  function renderSupplyBars() {
-    document.getElementById('shroom-pct').textContent = Math.round(shroomPct * 100) + '%';
-    setBarWidth(document.getElementById('shroom-bar'), shroomPct * 100);
-    document.getElementById('shroom-sub').textContent = fmt(REMAINING_SHROOM) + ' / ' + fmt(TOTAL_SHROOM_SUPPLY) + ' SHROOM';
-
-    document.getElementById('spore-pct').textContent = Math.round(sporePct * 100) + '%';
-    setBarWidth(document.getElementById('spore-bar'), sporePct * 100);
-    document.getElementById('spore-sub').textContent = fmt(REMAINING_SPORE) + ' / ' + fmt(TOTAL_SPORE_SUPPLY) + ' SPORE';
-  }
-
   const SGR_SOURCE_IDS = ['sgr-stage', 'sgr-rank', 'sgr-gem', 'sgr-sporebot'];
 
   function getEarnedSgr() {
@@ -1067,7 +1059,6 @@
 
   // Live snapshot render (the SHROOM/SPORE bars always reflect this, never the demo slider)
   render(healthPct);
-  renderSupplyBars();
 
   // ─────────────────────────────────────────────────────────────────
   // DEMO CONTROLS (preview only - does not touch REMAINING_* values)
