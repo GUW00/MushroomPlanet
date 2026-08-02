@@ -725,6 +725,14 @@
       </div>
     </div>
 
+    <div class="stats-panel" id="sporebot-remaining-panel" style="margin-bottom:1.5rem;">
+      <h2 style="display:flex;align-items:center;justify-content:space-between;">Sporebot Wallet Remaining
+        <span style="font-family:'Space Grotesk',monospace;font-size:0.6rem;padding:0.2em 0.6em;background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3);border-radius:999px;">LIVE</span>
+      </h2>
+      <div id="sporebot-remaining-body" style="font-family:'Space Grotesk',monospace;font-size:0.8rem;color:rgba(255,255,225,0.6);padding:0.5rem 0;">Loading live balance...</div>
+      <div class="snapshot-note"><strong>Remaining</strong> = onchain Sporebot wallet balance minus tokens already distributed in-bot (Discord + Reddit + farms + staking).</div>
+    </div>
+
     <div class="demo-panel">
       <div class="demo-head">
         <span>Demo: preview any stage</span>
@@ -738,7 +746,6 @@
         <button type="button" class="demo-btn" data-pct="70">Healthy</button>
         <button type="button" class="demo-btn" data-pct="95">Thriving</button>
         <button type="button" class="demo-btn demo-btn-gold" data-pct="130">Golden Sporulation</button>
-        <button type="button" class="demo-btn demo-btn-reset" id="demo-reset">Live snapshot</button>
       </div>
       <div class="demo-note">Dragging the slider previews the mushroom only. Past 100% is <strong style="color:var(--gold);">Golden Sporulation</strong> - a treasury surplus. It does not change the supply figures below.</div>
     </div>
@@ -1106,12 +1113,6 @@
     });
   });
 
-  document.getElementById('demo-reset').addEventListener('click', () => {
-    slider.value = healthPct;
-    demoVal.textContent = healthPct + '%';
-    render(healthPct);
-  });
-
   // SGR tiles are read-only - values come straight from the user's profile
   SGR_SOURCE_IDS.forEach(id => {
     document.getElementById(id).setAttribute('readonly', 'readonly');
@@ -1145,6 +1146,36 @@
     } catch (e) { console.error('[SGR profile]', e); }
   }
   loadProfileSgr();
+
+  // Live Sporebot wallet remaining = onchain wallet2 balance - in-bot grand totals
+  async function loadSporebotRemaining() {
+    const el = document.getElementById('sporebot-remaining-body');
+    try {
+      const [hRes, tRes] = await Promise.all([
+        fetch(API_BASE + '/api/treasury-holdings'),
+        fetch(API_BASE + '/api/sporebot-totals'),
+      ]);
+      const h = await hRes.json();
+      const t = await tRes.json();
+      if (!h.ok || !t.ok) { el.textContent = 'Live balance unavailable right now.'; return; }
+      const remShroom = (h.wallet2_shroom || 0) - (t.totals.grand_total_shrooms || 0);
+      const remSpore  = (h.wallet2_spore  || 0) - (t.totals.grand_total_spores  || 0);
+      const line = (val, label, color) =>
+        '<div style="display:flex;justify-content:space-between;padding:0.25rem 0;">'
+        + '<span>' + label + '</span>'
+        + '<span style="color:' + (val < 0 ? 'var(--red)' : color) + ';font-weight:700;">'
+        + Math.round(val).toLocaleString() + '</span></div>';
+      el.innerHTML = line(remShroom, 'SHROOM remaining', 'var(--green, #8fd15a)')
+        + line(remSpore, 'SPORE remaining', 'var(--blue)');
+      if (remShroom < 0 || remSpore < 0) {
+        el.innerHTML += '<div style="font-size:0.65rem;color:var(--red);padding-top:0.3rem;">Wallet holds less than in-bot obligations - top up needed.</div>';
+      }
+    } catch (e) {
+      console.error('[SPOREBOT-REMAINING]', e);
+      el.textContent = 'Live balance unavailable right now.';
+    }
+  }
+  loadSporebotRemaining();
 
   // ─────────────────────────────────────────────────────────────────
   // FEED THE MUSHROOM - demo donations + leaderboard
