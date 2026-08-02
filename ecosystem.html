@@ -798,7 +798,7 @@
         <span id="sgr-total-val">0.0%</span>
       </div>
 
-      <div class="sgr-formula">Effective SGR = Your Earned SGR &times; (Treasury Health &divide; 100)</div>
+      <div class="sgr-formula">Effective SGR = (In-Game SGR &times; Treasury Health &divide; 100) + On-Chain Bonuses</div>
 
       <div class="sgr-result">
         <div class="sgr-result-label">At <span id="sgr-health-echo">50%</span> treasury health, you actually receive</div>
@@ -1018,11 +1018,14 @@
     return Math.min(100, total);
   }
   let profileTotalSgr = null;
+  let profileOnchainSgr = 0; // portion NOT affected by treasury health
 
   function updateSgrCalc(pct) {
     const earned = getEarnedSgr();
     const multiplier = pct / 100;
-    const effective = earned * multiplier;
+    const onchain = profileTotalSgr !== null ? profileOnchainSgr : 0;
+    const ingame = Math.max(0, earned - onchain);
+    const effective = (ingame * multiplier) + onchain; // health only affects in-game
     const delta = effective - earned;
 
     document.getElementById('sgr-total-val').textContent = earned.toFixed(1) + '%';
@@ -1089,6 +1092,7 @@
   SGR_SOURCE_IDS.forEach(id => {
     document.getElementById(id).addEventListener('input', () => {
       profileTotalSgr = null; // manual edit switches back to simulator mode
+      profileOnchainSgr = 0;
       updateSgrCalc(currentPct);
     });
   });
@@ -1108,8 +1112,14 @@
       document.getElementById('sgr-gem').value      = gems.toFixed(1);
       document.getElementById('sgr-sporebot').value = (b.ingame_sporebot_bonus||0).toFixed(1);
       profileTotalSgr = Math.round((farm.APY || 0) * 100);
+      // On-chain bonuses are immune to treasury health. lake_bonus is already
+      // inside mooshie_bonus, so it is NOT added here (would double-count).
+      profileOnchainSgr = (b.sporebot_bonus||0) + (b.lp_bonus||0) + (b.guwoo_bonus||0)
+        + (b.mooshie_bonus||0) + (b.onchain_spore_bonus||0);
       const hint = document.querySelector('.sgr-source-hint');
-      if (hint) hint.textContent = 'Loaded from your profile - total includes ALL bonuses (LP, NFTs, on-chain). Edit any tile to simulate instead.';
+      if (hint) hint.textContent = 'Loaded from your profile: '
+        + (profileTotalSgr - profileOnchainSgr).toFixed(1) + '% in-game (affected by health) + '
+        + profileOnchainSgr.toFixed(1) + '% on-chain (always full rate). Edit any tile to simulate instead.';
       updateSgrCalc(currentPct);
     } catch (e) { console.error('[SGR profile]', e); }
   }
