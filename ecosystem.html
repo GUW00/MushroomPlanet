@@ -814,6 +814,7 @@
     <div class="lb-panel">
       <div class="lb-panel-head">
         <h2>Top Donators</h2>
+        <div style="font-family:'Space Grotesk',monospace;font-size:0.65rem;color:rgba(255,255,225,0.4);margin-top:0.25rem;">*100 SPORE = 1 SHROOM fed</div>
       </div>
       <div id="leaderboard-list"><div class="lb-empty">No donations yet. Be the first to feed the mushroom.</div></div>
     </div>
@@ -1166,7 +1167,7 @@
           + '<span>' + fmt(d.spore) + ' SPORE</span>'
           + '<span>' + fmt(d.shroom) + ' SHROOM</span>'
         + '</div>'
-        + '<div class="lb-eq">' + fmt(d.shroom_eq || 0) + ' eq</div>'
+        + '<div class="lb-eq">Total Fed: ' + fmt(d.shroom_eq || 0) + ' SHROOM</div>'
       + '</div>';
     }).join('');
   }

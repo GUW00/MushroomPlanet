@@ -1477,8 +1477,9 @@ app.post('/api/auth/discord/callback', async (req, res) => {
 
     // Store username + avatar in Misc so fallback auth can retrieve them
     await db.ref(`Pixie/Users/${discord_id}/Misc`).update({
-      username:    discordUser.username,
-      avatar_hash: discordUser.avatar || null,
+      username:     discordUser.username,
+      avatar_hash:  discordUser.avatar || null,
+      display_name: discordUser.global_name || discordUser.username,
     });
 
     const [levelSnap, flairSnap] = await Promise.all([

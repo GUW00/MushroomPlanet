@@ -8638,6 +8638,13 @@ async function _revalidateLbSnapshot() {
     var data = await res.json();
     if (data.ok) {
       _lbSnapshot = data.data;
+      // Prefer Discord display names everywhere in the leaderboard
+      (function useDisplayNames(obj) {
+        for (var k in obj) {
+          if (Array.isArray(obj[k])) obj[k].forEach(function(u) { if (u && u.display_name) u.name = u.display_name; });
+          else if (obj[k] && typeof obj[k] === 'object') useDisplayNames(obj[k]);
+        }
+      })(_lbSnapshot);
       _lbSnapshotTs = Date.now();
       try {
         sessionStorage.setItem('lb_snapshot', JSON.stringify({ data: _lbSnapshot, ts: _lbSnapshotTs }));
@@ -8653,6 +8660,12 @@ async function _revalidateLbSnapshot() {
     var cached = JSON.parse(sessionStorage.getItem('lb_snapshot') || 'null');
     if (cached && cached.data && (Date.now() - cached.ts) < LB_TTL) {
       _lbSnapshot = cached.data;
+      (function useDisplayNames(obj) {
+        for (var k in obj) {
+          if (Array.isArray(obj[k])) obj[k].forEach(function(u) { if (u && u.display_name) u.name = u.display_name; });
+          else if (obj[k] && typeof obj[k] === 'object') useDisplayNames(obj[k]);
+        }
+      })(_lbSnapshot);
       _lbSnapshotTs = cached.ts;
     }
   } catch(e) {}
