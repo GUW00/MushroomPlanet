@@ -726,11 +726,14 @@
     </div>
 
     <div class="stats-panel" id="sporebot-remaining-panel" style="margin-bottom:1.5rem;">
-      <h2 style="display:flex;align-items:center;justify-content:space-between;">Sporebot Wallet Remaining
-        <span style="font-family:'Space Grotesk',monospace;font-size:0.6rem;padding:0.2em 0.6em;background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3);border-radius:999px;">LIVE</span>
+      <h2 style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">Sporebot Wallet Remaining
+        <span style="display:flex;align-items:center;gap:0.5rem;">
+          <button type="button" id="remaining-flip" class="demo-btn" style="font-size:0.6rem;">In-bot breakdown</button>
+          <span style="font-family:'Space Grotesk',monospace;font-size:0.6rem;padding:0.2em 0.6em;background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3);border-radius:999px;">LIVE</span>
+        </span>
       </h2>
       <div id="sporebot-remaining-body" style="font-family:'Space Grotesk',monospace;font-size:0.8rem;color:rgba(255,255,225,0.6);padding:0.5rem 0;">Loading live balance...</div>
-      <div class="snapshot-note"><strong>Remaining</strong> = onchain Sporebot wallet balance minus tokens already distributed in-bot (Discord + Reddit + farms + staking).</div>
+      <div class="snapshot-note"><strong>Remaining</strong> = onchain reserve wallets + total donations - tokens already distributed in-bot (Discord + Reddit + farms + staking).</div>
     </div>
 
     <div class="demo-panel">
@@ -1146,6 +1149,69 @@
     } catch (e) { console.error('[SGR profile]', e); }
   }
   loadProfileSgr();
+
+  // Remaining = wallet2 + sporebot wallet + total donations - in-bot grand total
+  let _remData = null;
+  function renderRemaining(showBreakdown) {
+    const el = document.getElementById('sporebot-remaining-body');
+    if (!_remData) { el.textContent = 'Live balance unavailable right now.'; return; }
+    const d = _remData;
+    const line = (label, val, color, bold) =>
+      '<div style="display:flex;justify-content:space-between;padding:0.3rem 0;'
+      + (bold ? 'border-top:1px solid rgba(255,255,225,0.1);margin-top:0.25rem;padding-top:0.5rem;' : '')
+      + '"><span style="' + (bold ? 'font-weight:700;' : 'color:rgba(255,255,225,0.5);') + '">' + label + '</span>'
+      + '<span style="color:' + color + ';font-weight:' + (bold ? 700 : 600) + ';">' + val + '</span></div>';
+    const n = v => Math.round(v).toLocaleString();
+    if (!showBreakdown) {
+      el.innerHTML =
+        line('SHROOM remaining', n(d.remShroom), d.remShroom < 0 ? 'var(--red)' : '#8fd15a')
+        + line('SPORE remaining', n(d.remSpore), d.remSpore < 0 ? 'var(--red)' : 'var(--blue)')
+        + (d.remShroom < 0 || d.remSpore < 0
+          ? '<div style="font-size:0.65rem;color:var(--red);padding-top:0.3rem;">Wallets hold less than in-bot obligations - top up needed.</div>' : '');
+    } else {
+      const t = d.totals;
+      el.innerHTML =
+        line('Farm Balances', n(t.farm_shrooms || 0) + ' / ' + n(t.farm_spores || 0), 'rgba(255,255,225,0.8)')
+        + line('Discord Wallets', n(t.discord_shroom_wallet || 0) + ' / ' + n(t.discord_spore_wallet || 0), 'rgba(255,255,225,0.8)')
+        + line('Reddit Balances', n(t.reddit_shrooms || 0) + ' / ' + n(t.reddit_spores || 0), 'rgba(255,255,225,0.8)')
+        + line('Staked Spores', n(t.staked_spores || 0), 'var(--blue)')
+        + line('Grand Total', n(t.grand_total_shrooms || 0) + ' / ' + n(t.grand_total_spores || 0), 'var(--yellow)', true)
+        + '<div style="font-size:0.6rem;color:rgba(255,255,225,0.3);text-align:right;padding-top:0.3rem;">SHROOM / SPORE'
+        + (t.timestamp ? ' &middot; Last updated: ' + new Date(t.timestamp).toLocaleString() : '') + '</div>';
+    }
+  }
+  async function loadSporebotRemaining() {
+    const el = document.getElementById('sporebot-remaining-body');
+    try {
+      const [hRes, tRes, dRes] = await Promise.all([
+        fetch(API_BASE + '/api/treasury-holdings'),
+        fetch(API_BASE + '/api/sporebot-totals'),
+        fetch(API_BASE + '/api/ecosystem/donors'),
+      ]);
+      const h = await hRes.json();
+      const t = await tRes.json();
+      const dn = await dRes.json();
+      if (!h.ok || !t.ok) { el.textContent = 'Live balance unavailable right now.'; return; }
+      const donShroom = (dn.ok && dn.totals) ? dn.totals.shroom : 0;
+      const donSpore  = (dn.ok && dn.totals) ? dn.totals.spore  : 0;
+      _remData = {
+        remShroom: (h.wallet2_shroom || 0) + (h.sporebot_shroom || 0) + donShroom - (t.totals.grand_total_shrooms || 0),
+        remSpore:  (h.wallet2_spore  || 0) + (h.sporebot_spore  || 0) + donSpore  - (t.totals.grand_total_spores  || 0),
+        totals: t.totals,
+      };
+      renderRemaining(false);
+    } catch (e) {
+      console.error('[SPOREBOT-REMAINING]', e);
+      el.textContent = 'Live balance unavailable right now.';
+    }
+  }
+  let _remFlipped = false;
+  document.getElementById('remaining-flip').addEventListener('click', function() {
+    _remFlipped = !_remFlipped;
+    this.textContent = _remFlipped ? 'Show remaining' : 'In-bot breakdown';
+    renderRemaining(_remFlipped);
+  });
+  loadSporebotRemaining();
 
   // Live Sporebot wallet remaining = onchain wallet2 balance - in-bot grand totals
   async function loadSporebotRemaining() {

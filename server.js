@@ -928,13 +928,33 @@ app.get('/api/treasury-holdings', async (req, res) => {
       })
     );
 
+    // Sporebot distribution wallet (SHROOM + SPORE) - reported separately, NOT merged into treasury totals
+    const sporebotWalletResults = await Promise.all(
+      HOLDINGS_TOKENS_LIST.filter(t => t.symbol === '$HROOM' || t.symbol === 'SPORE').map(async t => {
+        const data3 = '0x70a08231' + SPOREBOT_WALLET_ADDR.slice(2).padStart(64, '0');
+        const body3 = JSON.stringify({
+          jsonrpc: '2.0', method: 'eth_call',
+          params: [{ to: t.contract, data: data3 }, 'latest'], id: 1,
+        });
+        const r3 = await fetch(rpcUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body3 });
+        const j3 = await r3.json();
+        return { symbol: t.symbol, balance: parseInt(j3.result, 16) / Math.pow(10, t.decimals) };
+      })
+    );
+
     // Merge wallet2 into main balances (same symbols, just add the amounts)
     const mergedBalances = [...tokenResults, { symbol: 'POL', balance: polBal }].map(b => {
       const w2 = wallet2Results.find(w => w.symbol === b.symbol);
       return w2 ? { ...b, balance: b.balance + w2.balance, wallet2: w2.balance } : b;
     });
 
-    res.json({ ok: true, balances: mergedBalances, wallet2_shroom: wallet2Results.find(w => w.symbol === '$HROOM')?.balance || 0, wallet2_spore: wallet2Results.find(w => w.symbol === 'SPORE')?.balance || 0 });
+    res.json({
+      ok: true, balances: mergedBalances,
+      wallet2_shroom: wallet2Results.find(w => w.symbol === '$HROOM')?.balance || 0,
+      wallet2_spore:  wallet2Results.find(w => w.symbol === 'SPORE')?.balance || 0,
+      sporebot_shroom: sporebotWalletResults.find(w => w.symbol === '$HROOM')?.balance || 0,
+      sporebot_spore:  sporebotWalletResults.find(w => w.symbol === 'SPORE')?.balance || 0,
+    });
   } catch (err) {
     console.error('[TREASURY-HOLDINGS] Error:', err);
     res.status(500).json({ ok: false, error: 'Failed to fetch holdings' });
@@ -1889,9 +1909,14 @@ app.post('/api/ecosystem/donate', async (req, res) => {
 app.get('/api/ecosystem/donors', async (req, res) => {
   try {
     const snap = await db.ref('Website/Ecosystem/Donors').get();
-    const list = Object.values(snap.val() || {})
-      .sort((a, b) => (b.shroom_eq || 0) - (a.shroom_eq || 0)).slice(0, 10);
-    res.json({ ok: true, donors: list });
+    const all = Object.values(snap.val() || {});
+    const list = all.sort((a, b) => (b.shroom_eq || 0) - (a.shroom_eq || 0)).slice(0, 10);
+    const totals = all.reduce((acc, d) => {
+      acc.shroom += parseInt(d.shroom || 0, 10);
+      acc.spore  += parseInt(d.spore  || 0, 10);
+      return acc;
+    }, { shroom: 0, spore: 0 });
+    res.json({ ok: true, donors: list, totals });
   } catch (err) {
     console.error('[ECO-DONORS] Error:', err);
     res.status(500).json({ ok: false, donors: [] });
@@ -2450,12 +2475,14 @@ app.get('/api/leaderboard/snapshot', async (req, res) => {
 
     // Build name->avatar lookup from Pixie/Users Misc
     const avatarMap = {};
+    const displayMap = {};
     if (pixieSnap.exists()) {
       pixieSnap.forEach(child => {
         const misc = (child.val() || {}).Misc || {};
         if (misc.username && misc.avatar_hash) {
           avatarMap[misc.username] = { discord_id: child.key, avatar: misc.avatar_hash };
         }
+        if (misc.username && misc.display_name) displayMap[misc.username] = misc.display_name;
       });
     }
 
@@ -2473,7 +2500,7 @@ app.get('/api/leaderboard/snapshot', async (req, res) => {
     const snapData = snap.val();
     function collectNames(arr) {
       if (!Array.isArray(arr)) return;
-      arr.forEach(u => { if (u.name && !avatarMap[u.name]) namesToFetch.add(u.name); });
+      arr.forEach(u => { if (u.name && (!avatarMap[u.name] || !displayMap[u.name])) namesToFetch.add(u.name); });
     }
     for (const section of Object.keys(snapData)) {
       for (const key of Object.keys(snapData[section] || {})) {
@@ -2499,6 +2526,10 @@ app.get('/api/leaderboard/snapshot', async (req, res) => {
           headers: { Authorization: 'Bot ' + process.env.DISCORD_BOT_TOKEN }
         });
         const u = await r.json();
+        if (u.id && u.global_name) {
+          displayMap[name] = u.global_name;
+          db.ref(`Pixie/Users/${discordId}/Misc`).update({ display_name: u.global_name }).catch(() => {});
+        }
         if (u.avatar) {
           avatarMap[name] = { discord_id: discordId, avatar: u.avatar };
           db.ref(`Pixie/Users/${discordId}/Misc`).update({ avatar_hash: u.avatar }).catch(() => {});
@@ -2514,10 +2545,11 @@ app.get('/api/leaderboard/snapshot', async (req, res) => {
     function enrichList(arr) {
       if (!Array.isArray(arr)) return arr;
       return arr.map(u => {
-        if (u.discord_id && u.avatar) return u;
+        const dn = u.name && displayMap[u.name];
+        if (u.discord_id && u.avatar) return dn ? { ...u, display_name: dn } : u;
         const match = u.name && avatarMap[u.name];
-        if (match) return { ...u, discord_id: match.discord_id, avatar: match.avatar };
-        return u;
+        if (match) return { ...u, discord_id: match.discord_id, avatar: match.avatar, display_name: dn || undefined };
+        return dn ? { ...u, display_name: dn } : u;
       });
     }
     for (const section of Object.keys(data)) {
