@@ -270,8 +270,8 @@
       height: 10px;
       border-radius: 999px;
       background: linear-gradient(90deg,
-        #7a3b3b 0%, #c9743f 13.3%, #fece00 26.7%, #fece00 40%,
-        #8fd15a 53.3%, #4fa8fd 66.6%, #ffe066 66.7%, var(--gold) 100%);
+        var(--red) 0%, #ff9a3d 16.7%, var(--blue) 33.3%,
+        #9b8cff 50%, #8fd15a 66.6%, #ffe066 66.7%, var(--gold) 100%);
       opacity: 0.9;
       transition: box-shadow 0.6s ease;
     }
@@ -802,7 +802,13 @@
         <span id="sgr-total-val">0.0%</span>
       </div>
 
-      <div class="sgr-formula">Effective SGR = (In-Game SGR &times; Treasury Health &divide; 100) + On-Chain Bonuses</div>
+      <div class="sgr-formula">
+        <span style="color:var(--blue);font-weight:600;">Effective SGR</span> =
+        (<span style="color:#8fd15a;font-weight:600;">In-Game SGR</span> &times;
+        <span style="color:var(--yellow);font-weight:600;">Treasury Health</span>
+        &divide; 100) +
+        <span style="color:#9b8cff;font-weight:600;">On-Chain Bonuses</span>
+      </div>
 
       <div class="sgr-result">
         <div class="sgr-result-label">At <span id="sgr-health-echo">50%</span> treasury health, you actually receive</div>
@@ -894,23 +900,23 @@
   const GAUGE_MAX = 150; // domain of the rolling gauge; 100-150 is the Golden Sporulation bonus zone
 
   const STAGES = [
-    { key: 'dying',       min: 1,  max: 20,  label: 'Dying',       color: '#7a3b3b',
+    { key: 'dying',       min: 1,  max: 20,  label: 'Dying',       color: '#fd464f',
       particles: 2,  glowOp: 0.10, glowBlur: 4,  glowSpread: 0, sporeOp: 0.35, drift: 14,
       capSat: 0.35, capBright: 0.55, droop: -6, sway: 9,
       desc: 'Reserves are critically low. Immediate treasury action is needed.' },
-    { key: 'struggling',  min: 21, max: 40,  label: 'Struggling',  color: '#c9743f',
+    { key: 'struggling',  min: 21, max: 40,  label: 'Struggling',  color: '#ff9a3d',
       particles: 6,  glowOp: 0.22, glowBlur: 7,  glowSpread: 1, sporeOp: 0.5,  drift: 20,
       capSat: 0.6,  capBright: 0.75, droop: -3, sway: 7.5,
       desc: 'Reserves are running low across multiple pools. Refill or slow distribution soon.' },
-    { key: 'okay',        min: 41, max: 60,  label: 'Okay',        color: '#fece00',
+    { key: 'okay',        min: 41, max: 60,  label: 'Okay',        color: '#4fa8fd',
       particles: 11, glowOp: 0.35, glowBlur: 10, glowSpread: 2, sporeOp: 0.65, drift: 26,
       capSat: 0.85, capBright: 0.9,  droop: -1, sway: 6.5,
       desc: 'Reserves are past the midpoint. Keep an eye on distribution pace.' },
-    { key: 'healthy',     min: 61, max: 80,  label: 'Healthy',     color: '#8fd15a',
+    { key: 'healthy',     min: 61, max: 80,  label: 'Healthy',     color: '#9b8cff',
       particles: 17, glowOp: 0.5,  glowBlur: 14, glowSpread: 3, sporeOp: 0.8,  drift: 32,
       capSat: 1,    capBright: 1,    droop: 0,  sway: 6,
       desc: 'Reserves are solid. Most allocations remain comfortably funded.' },
-    { key: 'thriving',    min: 81, max: 100, label: 'Thriving',    color: '#4fa8fd',
+    { key: 'thriving',    min: 81, max: 100, label: 'Thriving',    color: '#8fd15a',
       particles: 26, glowOp: 0.7,  glowBlur: 20, glowSpread: 5, sporeOp: 0.9,  drift: 40,
       capSat: 1.1,  capBright: 1.08, droop: 0,  sway: 5,
       desc: 'The treasury is well-stocked. Sporulation is strong across every reward pool.' },
