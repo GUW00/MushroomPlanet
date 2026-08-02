@@ -816,6 +816,11 @@
         <h2>Top Donators</h2>
         <div style="font-family:'Space Grotesk',monospace;font-size:0.65rem;color:rgba(255,255,225,0.4);margin-top:0.25rem;">*100 SPORE = 1 SHROOM fed</div>
       </div>
+      <div class="lb-row" style="border-bottom:1px solid rgba(255,255,225,0.12);padding:0.35rem 0.25rem;">
+        <div class="lb-rank"></div>
+        <div class="lb-name" style="font-family:'Space Grotesk',monospace;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,225,0.45);">Shroomie</div>
+        <div style="font-family:'Space Grotesk',monospace;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,225,0.45);">Total Fed</div>
+      </div>
       <div id="leaderboard-list"><div class="lb-empty">No donations yet. Be the first to feed the mushroom.</div></div>
     </div>
 
@@ -1167,7 +1172,7 @@
           + '<span>' + fmt(d.spore) + ' SPORE</span>'
           + '<span>' + fmt(d.shroom) + ' SHROOM</span>'
         + '</div>'
-        + '<div class="lb-eq">Total Fed: ' + fmt(d.shroom_eq || 0) + ' SHROOM</div>'
+        + '<div class="lb-eq">' + fmt(d.shroom_eq || 0) + ' SHROOM</div>'
       + '</div>';
     }).join('');
   }
