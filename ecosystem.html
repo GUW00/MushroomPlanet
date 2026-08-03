@@ -548,6 +548,20 @@
     .unit-btn.active[data-wallet="discord"] { color: #9b8cff; border-color: #9b8cff; background: rgba(155,140,255,0.08); }
     .unit-btn.active[data-wallet="reddit"] { color: #ff6a3d; border-color: #ff6a3d; background: rgba(255,106,61,0.08); }
     .bal-icon { width: 13px; height: 13px; object-fit: contain; vertical-align: -2px; margin-right: 3px; }
+    .bd-nav {
+      font-family: 'Space Grotesk', monospace; font-size: 0.75rem;
+      color: rgba(255,255,225,0.6); background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,225,0.15); border-radius: 999px;
+      padding: 0.1em 0.7em; cursor: pointer;
+    }
+    .bd-nav:disabled { opacity: 0.3; cursor: default; }
+    .unit-btn.active[data-bd="discord"] { color: #9b8cff; border-color: #9b8cff; background: rgba(155,140,255,0.08); }
+    .unit-btn.active[data-bd="reddit"] { color: #ff6a3d; border-color: #ff6a3d; background: rgba(255,106,61,0.08); }
+    .bd-sec { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,225,0.4); margin: 0.6rem 0 0.2rem; }
+    .bd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); column-gap: 1.5rem; }
+    .bd-row { display: flex; justify-content: space-between; padding: 0.12rem 0; border-bottom: 1px solid rgba(255,255,225,0.04); }
+    .bd-row span:first-child { color: rgba(255,255,225,0.65); }
+    .bd-tot { display: flex; justify-content: space-between; padding: 0.4rem 0 0.1rem; border-top: 1px solid rgba(255,255,225,0.1); margin-top: 0.3rem; font-weight: 700; }
     .amount-presets { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
     .preset-btn {
       font-family: 'Space Grotesk', monospace; font-size: 0.68rem;
@@ -728,12 +742,27 @@
     <div class="stats-panel" id="sporebot-remaining-panel" style="margin-bottom:1.5rem;">
       <h2 style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">Sporebot Wallet Remaining
         <span style="display:flex;align-items:center;gap:0.5rem;">
-          <button type="button" id="remaining-flip" style="font-family:'Space Grotesk',monospace;font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,225,0.6);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,225,0.15);border-radius:999px;padding:0.3em 0.8em;cursor:pointer;">In-bot breakdown</button>
+          <button type="button" id="remaining-flip" style="font-family:'Space Grotesk',monospace;font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,225,0.6);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,225,0.15);border-radius:999px;padding:0.3em 0.8em;cursor:pointer;">Breakdown</button>
           <span style="font-family:'Space Grotesk',monospace;font-size:0.6rem;padding:0.2em 0.6em;background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3);border-radius:999px;">LIVE</span>
         </span>
       </h2>
       <div id="sporebot-remaining-body" style="font-family:'Space Grotesk',monospace;font-size:0.8rem;color:rgba(255,255,225,0.6);padding:0.5rem 0;">Loading live balance...</div>
       <div class="snapshot-note" id="remaining-note"><strong>Remaining</strong> = onchain reserve wallets + total donations - tokens already distributed in-bot (Discord + Reddit + farms + staking).</div>
+    </div>
+
+    <div class="stats-panel" id="breakdown-panel" style="margin-bottom:1.5rem;">
+      <h2 style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">Daily Reward Breakdown
+        <span style="display:flex;align-items:center;gap:0.4rem;">
+          <button type="button" id="bd-prev" class="bd-nav">&larr;</button>
+          <span id="bd-date" style="font-family:'Space Grotesk',monospace;font-size:0.7rem;color:rgba(255,255,225,0.7);min-width:8.5em;text-align:center;"></span>
+          <button type="button" id="bd-next" class="bd-nav">&rarr;</button>
+        </span>
+      </h2>
+      <div class="unit-toggle" id="bd-toggle" style="margin-bottom:0.75rem;">
+        <button type="button" class="unit-btn active" data-bd="discord">DISCORD</button>
+        <button type="button" class="unit-btn" data-bd="reddit">REDDIT</button>
+      </div>
+      <div id="bd-body" style="font-family:'Space Grotesk',monospace;font-size:0.75rem;">Loading...</div>
     </div>
 
     <div class="demo-panel">
@@ -1206,11 +1235,62 @@
   }
   document.getElementById('remaining-flip').addEventListener('click', function() {
     _remFlipped = !_remFlipped;
-    this.textContent = _remFlipped ? 'Show remaining' : 'In-bot breakdown';
+    this.textContent = _remFlipped ? 'Show remaining' : 'Breakdown';
     document.getElementById('remaining-note').style.display = _remFlipped ? 'none' : '';
     renderRemaining(_remFlipped);
   });
   loadSporebotRemaining();
+
+  // Daily reward breakdown (public view of !admindb)
+  let bdDate = new Date();
+  let bdCategory = 'discord';
+  const bdFmt = d => String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + '-' + d.getFullYear();
+  const bdLabel = d => d.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+  function bdRows(items, color) {
+    return '<div class="bd-grid">' + items.map(i => '<div class="bd-row"><span>' + i.label.replace(/</g,'&lt;') + '</span>'
+      + '<span style="color:' + color + ';font-weight:600;">' + i.val.toLocaleString() + '</span></div>').join('') + '</div>';
+  }
+  async function loadBreakdown() {
+    const el = document.getElementById('bd-body');
+    document.getElementById('bd-date').textContent = bdLabel(bdDate);
+    el.textContent = 'Loading...';
+    const d = await fetchJsonSafe(API_BASE + '/api/ecosystem/breakdown?date=' + bdFmt(bdDate) + '&category=' + bdCategory, 'breakdown');
+    if (!d) { el.textContent = 'Breakdown unavailable right now.'; return; }
+    if (d.empty) { el.innerHTML = '<div style="color:rgba(255,255,225,0.4);padding:0.5rem 0;">No breakdown data for this day.</div>'; return; }
+    let html = '';
+    if (d.costs.length) {
+      html += '<div class="bd-sec">Shrooms Received</div>' + bdRows(d.costs, 'var(--red)')
+        + '<div class="bd-tot"><span>Fed to the Mushroom</span><span style="color:var(--red);">-' + d.total_costs.toLocaleString() + ' SHROOM</span></div>';
+    }
+    if (d.shrooms.length) {
+      html += '<div class="bd-sec">Shrooms Rewarded</div>' + bdRows(d.shrooms, 'var(--red)')
+        + '<div class="bd-tot"><span>Net</span><span style="color:var(--red);">' + d.net_shrooms.toLocaleString() + ' SHROOM</span></div>';
+    }
+    if (d.spores.length) {
+      html += '<div class="bd-sec">Spores Rewarded</div>' + bdRows(d.spores, 'var(--blue)')
+        + '<div class="bd-tot"><span>Total</span><span style="color:var(--blue);">' + d.total_spores.toLocaleString() + ' SPORE</span></div>';
+    }
+    if (d.totems.length) html += '<div class="bd-sec">Totem Triggers</div>' + bdRows(d.totems, 'var(--yellow)');
+    el.innerHTML = html;
+  }
+  function bdShift(days) {
+    const nd = new Date(bdDate); nd.setDate(nd.getDate() + days);
+    if (nd > new Date()) return;
+    bdDate = nd; loadBreakdown();
+    document.getElementById('bd-next').disabled = bdFmt(bdDate) === bdFmt(new Date());
+  }
+  document.getElementById('bd-prev').addEventListener('click', () => bdShift(-1));
+  document.getElementById('bd-next').addEventListener('click', () => bdShift(1));
+  document.querySelectorAll('#bd-toggle .unit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bd-toggle .unit-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      bdCategory = btn.dataset.bd;
+      loadBreakdown();
+    });
+  });
+  document.getElementById('bd-next').disabled = true;
+  loadBreakdown();
   // ─────────────────────────────────────────────────────────────────
   // FEED THE MUSHROOM - demo donations + leaderboard
   // Stored in this browser's localStorage only. No real transactions,

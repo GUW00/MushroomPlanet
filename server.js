@@ -1949,6 +1949,91 @@ app.get('/api/ecosystem/balances/:id', async (req, res) => {
 });
 
 // ----------------------------------------------------------------
+// PUBLIC DAILY REWARD BREAKDOWN (mirrors the !admindb Discord command)
+// ----------------------------------------------------------------
+const BD_SPORE_SOURCES = ['sporulation','spores generated','cave','spore','spores','reddit_spores',
+  'totem rewards','link spores','papa_visit','papa visit','goodshroom','staking claim'];
+const BD_COST_SOURCES = ['animal feed'];
+
+// Display names for breakdown keys. Anything not listed falls back to Title Case.
+const BD_LABELS = {
+  'forage': 'Forage', 'forage_shrooms': 'Forage', 'fan': 'Fan', 'mist': 'Mist',
+  'dig': 'Dig', 'toss': 'Toss', 'wagon': 'Wagon', 'cave': 'Cave',
+  'bronze': 'Bronze Rank', 'silver': 'Silver Rank', 'gold': 'Gold Rank',
+  'spore_bag': 'Spore Bag', 'spore_bag_spores': 'Spore Bag',
+  'papa_visit': 'Papa Visit', 'goodshroom': 'Goodshroom', 'goodshroom_spores': 'Goodshroom',
+  'sporulation': 'Sporulation', 'spores generated': 'Spores Generated',
+  'staking claim': 'Staking Claim', 'totem rewards': 'Totem Rewards',
+  'potion sale': 'Potion Sale', 'potion sale spores': 'Potion Sale (Spores)',
+  'social butterfly': 'Social Butterfly', 'animal_feed': 'Animal Feed',
+  'monthly_upvotes_shrooms': 'Monthly Upvotes', 'monthly_upvotes_spores': 'Monthly Upvotes',
+  'post_reward_shrooms': 'Post Rewards', 'post_reward_spores': 'Post Rewards',
+  'reddit_spores': 'Reddit Spores', 'link spores': 'Link Spores',
+  'queen totem': 'Queen Totem', 'king totem': 'King Totem',
+  'kid totem': 'Kid Totem', 'gold totem': 'Gold Totem',
+};
+function bdLabel(key) {
+  const kl = key.toLowerCase().trim().replace(/_/g, ' ');
+  if (BD_LABELS[key.toLowerCase().trim()]) return BD_LABELS[key.toLowerCase().trim()];
+  if (BD_LABELS[kl]) return BD_LABELS[kl];
+  return kl.replace(/\b\w/g, c => c.toUpperCase());
+}
+
+app.get('/api/ecosystem/breakdown', async (req, res) => {
+  try {
+    const date = String(req.query.date || '').trim();            // MM-DD-YYYY
+    const category = req.query.category === 'reddit' ? 'reddit' : 'discord';
+    if (!/^\d{2}-\d{2}-\d{4}$/.test(date)) return res.status(400).json({ ok: false, message: 'Invalid date' });
+
+    let breakdown = {};
+    if (category === 'reddit') {
+      const [mainSnap, extraSnap] = await Promise.all([
+        db.ref(`Reddit/Logs/Daily/${date}/Breakdown`).get(),
+        db.ref(`Sporebot/Logs/Daily/${date}/Breakdown`).get(),
+      ]);
+      breakdown = mainSnap.val() || {};
+      const extra = extraSnap.val() || {};
+      for (const k in extra) if (k.toLowerCase().includes('link')) breakdown[k] = extra[k];
+    } else {
+      breakdown = (await db.ref(`Sporebot/Logs/Daily/${date}/Breakdown`).get()).val() || {};
+    }
+
+    const shrooms = [], spores = [], totems = [], costs = [];
+    let totalShrooms = 0, totalSpores = 0, totalCosts = 0;
+    const seen = new Set();
+
+    Object.entries(breakdown)
+      .sort((a, b) => (parseInt(b[1]) || 0) - (parseInt(a[1]) || 0))
+      .forEach(([k, v]) => {
+        const kl = k.toLowerCase().trim().replace(/_/g, ' ');
+        if (seen.has(kl)) return;
+        seen.add(kl);
+        const val = parseInt(v, 10);
+        if (isNaN(val)) return;
+        if (category === 'discord' && (kl === 'nft reward' || kl.includes('link'))) return;
+
+        const lbl = bdLabel(k);
+        if (kl.includes('totem') && !kl.includes('rewards')) { totems.push({ label: lbl, val }); return; }
+        if (BD_COST_SOURCES.some(s => kl.includes(s))) { costs.push({ label: lbl, val }); totalCosts += val; }
+        else if (BD_SPORE_SOURCES.some(s => kl.includes(s))) { spores.push({ label: lbl, val }); totalSpores += val; }
+        else { shrooms.push({ label: lbl, val }); totalShrooms += val; }
+      });
+
+    res.json({
+      ok: true, date, category,
+      costs, shrooms, spores, totems,
+      total_costs: totalCosts,
+      net_shrooms: totalShrooms - totalCosts,
+      total_spores: totalSpores,
+      empty: !Object.keys(breakdown).length,
+    });
+  } catch (err) {
+    console.error('[ECO-BREAKDOWN] Error:', err);
+    res.status(500).json({ ok: false });
+  }
+});
+
+// ----------------------------------------------------------------
 // POST /api/proposals/create
 // Auth required. Burns SPORE from Discord wallet, creates proposal.
 // ----------------------------------------------------------------
