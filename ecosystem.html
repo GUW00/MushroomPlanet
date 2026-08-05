@@ -85,12 +85,12 @@
 
     .eco-section {
       position: relative; z-index: 1; max-width: 720px;
-      margin: 0 auto; padding: 1rem 1.5rem 3rem;
+      margin: 0 auto; padding: 0 1.5rem 3rem;
     }
 
     /* ---- STAGE BADGE ---- */
     .stage-badge {
-      display: flex; justify-content: center; margin-bottom: 0.5rem;
+      display: flex; justify-content: center; margin-top: 1.25rem;
     }
     .stage-pill {
       font-family: 'Space Grotesk', monospace; font-size: 0.7rem;
@@ -106,11 +106,11 @@
     .mushroom-stage {
       position: relative;
       width: 100%;
-      height: 340px;
+      height: 290px;
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      margin: 1.5rem 0 1rem;
+      margin: 0 0 1rem;
     }
     .ground {
       position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
@@ -423,6 +423,7 @@
       display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem;
       margin-bottom: 1.5rem;
     }
+    #forage-tiles { grid-template-columns: repeat(5, 1fr); }
     .sgr-tile {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,225,0.08);
@@ -500,7 +501,7 @@
     }
 
     @media (max-width: 480px) {
-      .sgr-sources { grid-template-columns: repeat(2, 1fr); }
+      .sgr-sources, #forage-tiles { grid-template-columns: repeat(2, 1fr); }
     }
 
     /* ---- DONATE MODAL ---- */
@@ -700,13 +701,11 @@
 
   <div class="eco-hero">
     <div class="eyebrow">Treasury Ecosystem</div>
-    <h1>One Mushroom.<br /><span>To Rule them All</span></h1>
+    <h1>One Mushroom<br /><span>To Rule them All</span></h1>
     <p>View the Ecosystem of Sporebot.</p>
   </div>
 
   <div class="eco-section">
-
-    <div class="stage-badge"><div class="stage-pill" id="stage-pill">Loading...</div></div>
 
     <div class="mushroom-stage">
       <div class="ground"></div>
@@ -749,6 +748,8 @@
         <span>0</span><span>25</span><span>50</span><span>75</span><span class="lbl-100">100</span><span>150</span><span>200</span>
       </div>
     </div>
+
+    <div class="stage-badge"><div class="stage-pill" id="stage-pill">Loading...</div></div>
 
     <div class="stats-panel" id="sporebot-remaining-panel" style="margin-bottom:1.5rem;">
       <h2 style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">Sporebot Wallet Remaining
@@ -855,7 +856,8 @@
       <div id="forage-view" style="display:none;">
         <p class="sgr-intro">
           Your <strong>Forage Bonus</strong> is a percentage added on top of your base daily
-          forage reward on Reddit. It is <strong>not</strong> affected by mushroom health.
+          forage reward on Reddit. Mushroom health is applied as a multiplier on the in-game
+          portion. Your <strong>NFT bonus</strong> is on-chain and always pays full rate.
         </p>
         <div class="sgr-sources" id="forage-tiles"></div>
         <div class="sgr-source-hint" id="forage-hint">Log in on the Profile page to load your real numbers.</div>
@@ -863,10 +865,25 @@
           <span>Your total forage bonus</span>
           <span id="forage-total-val">0.0%</span>
         </div>
-        <div class="sgr-formula">
-          <span style="color:var(--red);font-weight:600;">Forage Reward</span> =
-          <span style="color:#8fd15a;font-weight:600;">Base (from streak)</span> &times;
-          (1 + <span style="color:var(--yellow);font-weight:600;">Forage Bonus</span> &divide; 100)
+        <div class="sgr-formula" style="text-align:left;line-height:2;">
+          <div><span style="opacity:0.4;">1.</span>
+            <span style="color:var(--blue);font-weight:600;">Effective Bonus</span> =
+            (<span style="color:#8fd15a;font-weight:600;">In-Game Bonus</span> &times;
+            <span style="color:var(--yellow);font-weight:600;">Treasury Health</span> &divide; 100)
+            + <span style="color:#a78bfa;font-weight:600;">NFT Bonus</span></div>
+          <div><span style="opacity:0.4;">2.</span>
+            <span style="color:var(--red);font-weight:600;">Forage Reward</span> =
+            <span style="color:#8fd15a;font-weight:600;">Base</span> &times;
+            (1 + <span style="color:var(--blue);font-weight:600;">Effective Bonus</span> &divide; 100)</div>
+          <div style="font-size:0.62rem;opacity:0.45;line-height:1.6;padding-top:0.4rem;">
+            Base grows with your streak. The bonus multiplies that base - it is not added on as a flat amount.
+          </div>
+        </div>
+        <div id="forage-example" style="font-family:'Space Grotesk',monospace;font-size:0.7rem;color:rgba(255,255,225,0.5);text-align:center;padding-top:0.6rem;"></div>
+        <div class="sgr-result">
+          <div class="sgr-result-label">At <span id="forage-health-echo">50%</span> treasury health, you actually receive</div>
+          <div class="sgr-effective" id="forage-effective">0.0%</div>
+          <div class="sgr-delta" id="forage-delta">-0.0%</div>
         </div>
       </div>
     </div>
@@ -882,6 +899,15 @@
         <div style="font-family:'Space Grotesk',monospace;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,225,0.45);">Total Fed</div>
       </div>
       <div id="leaderboard-list"><div class="lb-empty">No donations yet. Be the first to feed the mushroom.</div></div>
+
+      <div class="snapshot-note" style="margin-top:1rem;padding-top:0.9rem;">
+        <strong style="color:var(--gold);">Donator NFT</strong> - Feed a minimum of
+        <strong>100,000 SHROOM</strong> or <strong>10,000,000 SPORE</strong> (or any combination
+        totalling 100,000 in SHROOM terms) to qualify for a special commemorative NFT.
+        Your <strong>mint number is set by your position on this leaderboard</strong>, so the
+        more you feed, the lower your number. Open now through
+        <strong>January 1, 2027</strong>.
+      </div>
     </div>
 
   </div>
@@ -1121,6 +1147,7 @@
     updateSgrCalc(pct);
     const pctEl = document.getElementById('remaining-pct');
     if (pctEl) pctEl.textContent = ' ' + (pct / 2).toFixed(1) + '% of the launch supply is still unspent.';
+    if (forageReady) renderForage();
     return stage;
   }
 
@@ -1187,12 +1214,13 @@
 
   const FORAGE_SOURCES = [
     { key: 'feed_bonus',    label: 'Feed Boost',      cap: 25,  color: 'var(--red)' },
-    { key: 'flair_bonus',   label: 'Flair Bonus',     cap: 25,  color: 'var(--yellow)' },
-    { key: 'nft_bonus',     label: 'NFT Bonus',       cap: 25,  color: '#a78bfa' },
+    { key: 'flair_bonus',   label: 'Flair Bonus',     cap: 50,  color: 'var(--yellow)' },
+    { key: 'nft_bonus',     label: 'NFT Bonus',       cap: 50,  color: '#a78bfa' },
     { key: 'post_bonus',    label: 'Post Upvotes',    cap: 50,  color: 'var(--blue)' },
     { key: 'comment_bonus', label: 'Comment Upvotes', cap: 50,  color: '#8fd15a' },
   ];
   let forageData = null;
+  var forageReady = false; // var, not let - must hoist for the guard in render()
   function renderForage() {
     const wrap = document.getElementById('forage-tiles');
     if (!wrap) return;
@@ -1206,8 +1234,69 @@
         + '<div class="sgr-tile-label">' + s.label + '</div></div>';
     }).join('');
     document.getElementById('forage-total-val').textContent = total.toFixed(1) + '%';
+    // Mirrors SGR: health scales the in-game portion only. NFT bonus is on-chain.
+    const onchain = forageData ? (forageData.nft_bonus || 0) : 0;
+    const ingame = Math.max(0, total - onchain);
+    const eff = (ingame * (currentPct / 100)) + onchain;
+    const delta = eff - total;
+    document.getElementById('forage-health-echo').textContent = currentPct + '%';
+    document.getElementById('forage-effective').textContent = eff.toFixed(1) + '%';
+    const fd = document.getElementById('forage-delta');
+    if (currentPct > 100) {
+      fd.textContent = '+' + delta.toFixed(1) + '% bonus from Golden Sporulation';
+      fd.style.color = 'var(--gold)';
+    } else if (currentPct === 100) {
+      fd.textContent = 'No deduction - full base rate';
+      fd.style.color = 'rgba(255,255,225,0.5)';
+    } else {
+      fd.textContent = delta.toFixed(1) + '% (a ' + (100 - currentPct) + '% deduction from treasury health)';
+      fd.style.color = 'rgba(255,255,225,0.5)';
+    }
+    // Worked example using the streak your NEXT forage will land on.
+    const ex = document.getElementById('forage-example');
+    if (ex) {
+      if (!forageData) { ex.textContent = ''; return; }
+      const s = (forageData.streak || 0) + 1;
+      let base;
+      if (s <= 100) base = 1000 + (s - 1) * 15;
+      else if (s <= 400) base = 2500 + (s - 101) * 10;
+      else if (s <= 419) base = 5490 + (s - 401) * 69;
+      else base = 6874;
+      const reward = Math.floor(base * (1 + eff / 100));
+      ex.innerHTML = 'Your next forage (streak ' + s + '): '
+        + '<span style="color:#8fd15a;">' + base.toLocaleString() + '</span> base &times; '
+        + '<span style="color:var(--blue);">' + (1 + eff / 100).toFixed(2) + '</span> = '
+        + '<span style="color:var(--red);font-weight:600;">' + reward.toLocaleString() + ' SHROOM</span>';
+    }
   }
+  forageReady = true;
   renderForage();
+  async function loadForageBonus() {
+    if (!currentUser || !currentUser.discord_id) return;
+    try {
+      const r = await fetch(API_BASE + '/api/reddit-user/' + currentUser.discord_id);
+      const d = await r.json();
+      const u = d && d.reddit;
+      const hint = document.getElementById('forage-hint');
+      if (!u) {
+        if (hint) hint.textContent = 'No linked Reddit account found. Link one to see your forage bonus.';
+        return;
+      }
+      const fg = u.Forage || {}, fl = u.Flair || {}, fd = u.Feed || {}, wl = u.Wallet || {};
+      forageData = {
+        feed_bonus:    Number(fd.feed_boost) || 0,
+        flair_bonus:   Number(fl.Flair_Boost) || 0,
+        nft_bonus:     Number(wl.NFT_Forage_Bonus) || 0,
+        post_bonus:    Number(fg.Post_Bonus) || 0,
+        comment_bonus: Number(fg.Comment_Bonus) || 0,
+        streak: Number(fg.streak) || 0,
+      };
+      if (hint) hint.textContent = 'Loaded from u/' + (d.redditName || '?')
+        + ' - streak ' + (Number(fg.streak) || 0) + ' days.';
+      renderForage();
+    } catch (e) { console.error('[forage bonus]', e); }
+  }
+  loadForageBonus();
   document.getElementById('sgr-flip').addEventListener('click', function() {
     const onForage = document.getElementById('forage-view').style.display === 'none';
     document.getElementById('sgr-view').style.display = onForage ? 'none' : '';
