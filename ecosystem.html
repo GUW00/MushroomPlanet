@@ -117,6 +117,8 @@
       width: 240px; height: 14px; border-radius: 50%;
       background: radial-gradient(ellipse at center, rgba(0,0,0,0.4), transparent 70%);
       filter: blur(3px);
+      box-shadow: 0 0 34px 12px rgba(var(--glow-rgb), calc(var(--glow-op, 0.4) * 0.35));
+      transition: box-shadow 1.4s ease;
     }
 
     .spore-field {
@@ -172,6 +174,14 @@
       animation: sway var(--sway-dur, 6s) ease-in-out infinite;
     }
     .mushroom:hover .cap { filter: brightness(1.08); }
+    @keyframes spotGlow {
+      0%, 100% { box-shadow: 0 0 0 rgba(255,255,240,0); }
+      50%      { box-shadow: 0 0 9px 2px rgba(255,255,240,0.45); }
+    }
+    .spot { animation: spotGlow 4.5s ease-in-out infinite; }
+    .spot:nth-child(4n)   { animation-delay: 1.1s; }
+    .spot:nth-child(4n+1) { animation-delay: 2.3s; }
+    .spot:nth-child(4n+2) { animation-delay: 3.4s; }
     .mushroom.tap-pulse { animation: sway var(--sway-dur, 6s) ease-in-out infinite, tapPulse 0.5s ease; }
     @keyframes tapPulse {
       0%   { transform: rotate(var(--droop, 0deg)) scale(1); }
@@ -263,15 +273,15 @@
       font-size: 0.9rem; color: rgba(255,255,225,0.6); line-height: 1.5;
     }
 
-    /* ---- ROLLING GAUGE (0-150%, 100-150 is the Golden Sporulation bonus zone) ---- */
+    /* ---- ROLLING GAUGE (0-200%, 100-200 is the Golden Sporulation bonus zone) ---- */
     .gauge-wrap { margin: 1.75rem 0 0.5rem; }
     .gauge-track {
       position: relative;
       height: 10px;
       border-radius: 999px;
       background: linear-gradient(90deg,
-        var(--red) 0%, #ff9a3d 16.7%, var(--blue) 33.3%,
-        #9b8cff 50%, #8fd15a 66.6%, #ffe066 66.7%, var(--gold) 100%);
+        var(--red) 0%, #ff9a3d 12.5%, var(--blue) 25%,
+        #9b8cff 37.5%, #8fd15a 49.9%, #ffe066 50%, var(--gold) 100%);
       opacity: 0.9;
       transition: box-shadow 0.6s ease;
     }
@@ -284,7 +294,7 @@
       50%      { box-shadow: 0 0 18px 3px rgba(255,215,0,0.7); }
     }
     .gauge-track .gauge-100-tick {
-      position: absolute; top: -3px; bottom: -3px; left: 66.6%;
+      position: absolute; top: -3px; bottom: -3px; left: 50%;
       width: 2px; background: rgba(15,15,15,0.6);
     }
     .gauge-marker {
@@ -390,6 +400,7 @@
       padding-top: 0.9rem;
     }
     .snapshot-note strong { color: rgba(255,255,225,0.45); }
+    #remaining-note { margin-top: 0.1rem; padding-top: 0.90rem; }
 
     /* ---- SGR EXPLAINER ---- */
     .sgr-panel {
@@ -689,8 +700,8 @@
 
   <div class="eco-hero">
     <div class="eyebrow">Treasury Ecosystem</div>
-    <h1>One Mushroom.<br /><span>The Whole Treasury.</span></h1>
-    <p>Every SHROOM and SPORE still in the ground keeps it growing. This is what's left.</p>
+    <h1>One Mushroom.<br /><span>To Rule them All</span></h1>
+    <p>View the Ecosystem of Sporebot.</p>
   </div>
 
   <div class="eco-section">
@@ -735,7 +746,7 @@
         <div class="gauge-marker" id="gauge-marker"></div>
       </div>
       <div class="gauge-labels">
-        <span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span class="lbl-100">100</span><span>150</span>
+        <span>0</span><span>25</span><span>50</span><span>75</span><span class="lbl-100">100</span><span>150</span><span>200</span>
       </div>
     </div>
 
@@ -747,7 +758,9 @@
         </span>
       </h2>
       <div id="sporebot-remaining-body" style="font-family:'Space Grotesk',monospace;font-size:0.8rem;color:rgba(255,255,225,0.6);padding:0.5rem 0;">Loading live balance...</div>
-      <div class="snapshot-note" id="remaining-note"><strong>Remaining</strong> = onchain reserve wallets + total donations - tokens already distributed in-bot (Discord + Reddit + farms + staking).</div>
+      <div class="snapshot-note" id="remaining-note"><strong>Remaining</strong> = initial Sporebot fund - tokens withdrawn onchain - tokens still held in-bot (Discord + Reddit + farms + staking) + Donations (feeding the mushroom).<span id="remaining-pct"></span>
+        <div id="remaining-legend" style="font-size:0.6rem;color:rgba(255,255,225,0.3);padding-top:0.4rem;"></div>
+      </div>
     </div>
 
     <div class="stats-panel" id="breakdown-panel" style="margin-bottom:1.5rem;">
@@ -770,7 +783,7 @@
         <span>Demo: preview any stage</span>
         <span id="demo-val">50%</span>
       </div>
-      <input type="range" min="0" max="150" value="50" step="1" id="demo-slider" class="demo-slider" />
+      <input type="range" min="0" max="200" value="50" step="1" id="demo-slider" class="demo-slider" />
       <div class="demo-presets">
         <button type="button" class="demo-btn" data-pct="10">Dying</button>
         <button type="button" class="demo-btn" data-pct="30">Struggling</button>
@@ -785,7 +798,11 @@
     
 
     <div class="sgr-panel">
-      <h2>How This Affects Your SGR</h2>
+      <h2 style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
+        <span id="sgr-panel-title">How This Affects Your SGR</span>
+        <button type="button" class="unit-btn" id="sgr-flip" style="font-size:0.6rem;">Reddit Forage</button>
+      </h2>
+      <div id="sgr-view">
       <p class="sgr-intro">
         Your <strong>Spore Generation Rate (SGR)</strong> is built from four in-game sources, each worth up to
         <strong>25%</strong>, for a base rate of up to <strong>100%</strong>. The mushroom's health above is applied
@@ -832,6 +849,25 @@
         <div class="sgr-result-label">At <span id="sgr-health-echo">50%</span> treasury health, you actually receive</div>
         <div class="sgr-effective" id="sgr-effective">0.0%</div>
         <div class="sgr-delta" id="sgr-delta">-0.0% (a 50% deduction from treasury health)</div>
+      </div>
+      </div>
+
+      <div id="forage-view" style="display:none;">
+        <p class="sgr-intro">
+          Your <strong>Forage Bonus</strong> is a percentage added on top of your base daily
+          forage reward on Reddit. It is <strong>not</strong> affected by mushroom health.
+        </p>
+        <div class="sgr-sources" id="forage-tiles"></div>
+        <div class="sgr-source-hint" id="forage-hint">Log in on the Profile page to load your real numbers.</div>
+        <div class="sgr-total-row">
+          <span>Your total forage bonus</span>
+          <span id="forage-total-val">0.0%</span>
+        </div>
+        <div class="sgr-formula">
+          <span style="color:var(--red);font-weight:600;">Forage Reward</span> =
+          <span style="color:#8fd15a;font-weight:600;">Base (from streak)</span> &times;
+          (1 + <span style="color:var(--yellow);font-weight:600;">Forage Bonus</span> &divide; 100)
+        </div>
       </div>
     </div>
 
@@ -915,7 +951,7 @@
   let currentUser = null;
   try { currentUser = JSON.parse(localStorage.getItem('mp_profile_user') || 'null'); } catch (e) {}
 
-  const GAUGE_MAX = 150; // domain of the rolling gauge; 100-150 is the Golden Sporulation bonus zone
+  const GAUGE_MAX = 200; // domain of the rolling gauge; 100-200 is the Golden Sporulation bonus zone
 
   const STAGES = [
     { key: 'dying',       min: 1,  max: 20,  label: 'Dying',       color: '#fd464f',
@@ -941,7 +977,7 @@
     { key: 'golden',      min: 101, max: 999, label: 'Golden Sporulation', color: '#ffd700', golden: true,
       particles: 34, glowOp: 0.85, glowBlur: 28, glowSpread: 8, sporeOp: 1,   drift: 46,
       capSat: 1.15, capBright: 1.15, droop: 0,  sway: 4.5,
-      desc: 'The treasury holds more than its full launch supply. Every reward pool is running a surplus, so sporulation exceeds baseline and players earn a bonus on top of their normal SGR.' },
+      desc: 'More than half the launch supply is still unspent. Every reward pool is comfortably funded, so sporulation exceeds baseline and players earn a bonus on top of their normal SGR.' },
   ];
 
   function stageFor(pct) {
@@ -1083,6 +1119,8 @@
     const stage = stageFor(pct);
     applyStage(stage, pct);
     updateSgrCalc(pct);
+    const pctEl = document.getElementById('remaining-pct');
+    if (pctEl) pctEl.textContent = ' ' + (pct / 2).toFixed(1) + '% of the launch supply is still unspent.';
     return stage;
   }
 
@@ -1147,6 +1185,38 @@
   }
   loadProfileSgr();
 
+  const FORAGE_SOURCES = [
+    { key: 'feed_bonus',    label: 'Feed Boost',      cap: 25,  color: 'var(--red)' },
+    { key: 'flair_bonus',   label: 'Flair Bonus',     cap: 25,  color: 'var(--yellow)' },
+    { key: 'nft_bonus',     label: 'NFT Bonus',       cap: 25,  color: '#a78bfa' },
+    { key: 'post_bonus',    label: 'Post Upvotes',    cap: 50,  color: 'var(--blue)' },
+    { key: 'comment_bonus', label: 'Comment Upvotes', cap: 50,  color: '#8fd15a' },
+  ];
+  let forageData = null;
+  function renderForage() {
+    const wrap = document.getElementById('forage-tiles');
+    if (!wrap) return;
+    let total = 0;
+    wrap.innerHTML = FORAGE_SOURCES.map(s => {
+      const v = forageData ? (forageData[s.key] || 0) : 0;
+      total += v;
+      return '<div class="sgr-tile">'
+        + '<div class="sgr-tile-input" style="color:' + s.color + ';">' + v.toFixed(1) + '</div>'
+        + '<div class="sgr-tile-cap">/ ' + s.cap + '%</div>'
+        + '<div class="sgr-tile-label">' + s.label + '</div></div>';
+    }).join('');
+    document.getElementById('forage-total-val').textContent = total.toFixed(1) + '%';
+  }
+  renderForage();
+  document.getElementById('sgr-flip').addEventListener('click', function() {
+    const onForage = document.getElementById('forage-view').style.display === 'none';
+    document.getElementById('sgr-view').style.display = onForage ? 'none' : '';
+    document.getElementById('forage-view').style.display = onForage ? '' : 'none';
+    document.getElementById('sgr-panel-title').textContent = onForage
+      ? 'Your Reddit Forage Bonus' : 'How This Affects Your SGR';
+    this.textContent = onForage ? 'Sporebot SGR' : 'Reddit Forage';
+  });
+
 // Remaining = wallet2 + sporebot wallet + total donations - in-bot grand total
   let _remData = null;
   let _remFlipped = false;
@@ -1160,30 +1230,47 @@
       + '"><span style="' + (bold ? 'font-weight:700;' : 'color:rgba(255,255,225,0.5);') + '">' + label + '</span>'
       + '<span style="color:' + color + ';font-weight:' + (bold ? 700 : 600) + ';">' + val + '</span></div>';
     const n = v => Math.round(v).toLocaleString();
+    const duo = (sh, sp) =>
+      '<span style="color:var(--red);">' + n(sh) + '</span>'
+      + '<span style="opacity:0.35;margin:0 0.35rem;">/</span>'
+      + '<span style="color:var(--blue);">' + n(sp) + '</span>';
+    const eqv = (sh, sp, eq) => duo(sh, sp)
+      + '<span style="opacity:0.3;margin:0 0.4rem;">=</span>'
+      + '<span style="color:var(--yellow);">' + n(eq) + '</span>';
     if (!showBreakdown) {
       if (!d.hasOnchain) { el.textContent = 'Onchain balance unavailable - breakdown still available via the button above.'; return; }
+      const tw = d.totals;
+      const wdSh = tw.withdrawn_shrooms || 0, wdSp = tw.withdrawn_spores || 0;
+      const dSh = d.donShroom || 0, dSp = d.donSpore || 0;
+      
       el.innerHTML =
-        line('SHROOM remaining', n(d.remShroom), d.remShroom < 0 ? 'var(--red)' : '#8fd15a')
-        + line('SPORE remaining', n(d.remSpore), d.remSpore < 0 ? 'var(--red)' : 'var(--blue)')
+        line('Initial Sporebot Fund', eqv(INITIAL_FUND_SHROOM, INITIAL_FUND_SPORE, INITIAL_FUND_EQ), 'inherit')
+        + line('Less: Withdrawn Onchain', eqv(wdSh, wdSp, wdSh + wdSp / 100), 'inherit')
+        + line('Less: Still in Sporebot', eqv(d.oweShroom, d.oweSpore, d.oweShroom + d.oweSpore / 100), 'inherit')
+        + line('Plus: Donations Received', eqv(dSh, dSp, dSh + dSp / 100), 'inherit')
+        + line('Remaining', eqv(d.remShroom, d.remSpore, d.remShroom + d.remSpore / 100), 'inherit', true)
+        
         + (d.remShroom < 0 || d.remSpore < 0
           ? '<div style="font-size:0.65rem;color:var(--red);padding-top:0.3rem;">Wallets hold less than in-bot obligations - top up needed.</div>' : '');
     } else {
       const t = d.totals;
-      const duo = (sh, sp) =>
-        '<span style="color:var(--red);">' + n(sh) + '</span>'
-        + '<span style="opacity:0.35;margin:0 0.35rem;">/</span>'
-        + '<span style="color:var(--blue);">' + n(sp) + '</span>';
       const grandEq = (t.grand_total_shrooms || 0) + (t.grand_total_spores || 0) / 100;
+      const inBotShroom = (t.grand_total_shrooms || 0) - (t.withdrawn_shrooms || 0);
+      const inBotSpore  = (t.grand_total_spores  || 0) - (t.withdrawn_spores  || 0);
+      const inBotEq = inBotShroom + inBotSpore / 100;
+      const wdEq    = (t.withdrawn_shrooms || 0) + (t.withdrawn_spores || 0) / 100;
+      
       el.innerHTML =
         line('Farm Balances', duo(t.farm_shrooms || 0, t.farm_spores || 0), 'inherit')
         + line('Discord Wallets', duo(t.discord_shroom_wallet || 0, t.discord_spore_wallet || 0), 'inherit')
         + line('Reddit Balances', duo(t.reddit_shrooms || 0, t.reddit_spores || 0), 'inherit')
         + line('Staked Spores', n(t.staked_spores || 0), 'var(--blue)')
-        + line('Total Withdrawn', duo(t.withdrawn_shrooms || 0, t.withdrawn_spores || 0), 'inherit')
-        + line('Grand Total in Shrooms', n(grandEq), 'var(--yellow)', true)
-        + '<div style="font-size:0.6rem;color:rgba(255,255,225,0.3);text-align:right;padding-top:0.3rem;">'
-        + '<span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; 100 SPORE = 1 SHROOM'
-        + (t.timestamp ? ' &middot; Last updated: ' + new Date(t.timestamp).toLocaleString() : '') + '</div>';
+        + line('Still in Sporebot', eqv(inBotShroom, inBotSpore, inBotEq), 'inherit', true)
+        + line('Withdrawn Onchain', eqv(t.withdrawn_shrooms || 0, t.withdrawn_spores || 0, wdEq), 'inherit')
+        + line('Grand Total (all-time)', n(grandEq), 'var(--yellow)', true)
+        + '<div style="font-size:0.6rem;color:rgba(255,255,225,0.3);padding-top:0.3rem;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;">'
+        + '<span><span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; <span style="color:var(--gold);">100 SPORE = 1 SHROOM</span></span>'
+        + '<span>' + (t.timestamp ? 'Last updated: ' + new Date(t.timestamp).toLocaleString() : '') + '</span></div>';
     }
   }
   async function fetchJsonSafe(url, tag) {
@@ -1195,6 +1282,18 @@
       return j;
     } catch (e) { console.error('[SPOREBOT-REMAINING] ' + tag + ' failed:', e); return null; }
   }
+  // TEMP: simulates the pending Treasury -> Sporebot Funding Wallet transfer.
+  // These tokens have NOT moved yet. Set both to 0 once the real transfer lands
+  // and the onchain wallet balance picks them up naturally.
+  const TEMP_BONUS_SHROOM = 1200970065;
+  const TEMP_BONUS_SPORE  = 137346117560;
+  // Original Sporebot allocation. Health = unspent share of this.
+  // 100% = full launch supply still unspent; >100% = topped up beyond launch.
+  const INITIAL_FUND_SHROOM = 1500000000;
+  const INITIAL_FUND_SPORE  = 150000000000;
+  const INITIAL_FUND_EQ = INITIAL_FUND_SHROOM + (INITIAL_FUND_SPORE / 100); // 3,000,000,000
+  // Gauge is scaled so 200% = the full launch supply, 100% = half of it remaining.
+  const HEALTH_FULL_EQ = INITIAL_FUND_EQ / 2; // 1,500,000,000
   async function loadSporebotRemaining() {
     const el = document.getElementById('sporebot-remaining-body');
     const [h, t, dn] = await Promise.all([
@@ -1212,21 +1311,28 @@
     _remData = {
       hasOnchain: !!h,
       oweShroom, oweSpore,
-      remShroom: h ? (h.wallet2_shroom || 0) + (h.sporebot_shroom || 0) + donShroom - oweShroom : 0,
-      remSpore:  h ? (h.wallet2_spore  || 0) + (h.sporebot_spore  || 0) + donSpore  - oweSpore  : 0,
+      donShroom, donSpore,
+      remShroom: h ? TEMP_BONUS_SHROOM + (h.wallet2_shroom || 0) + (h.sporebot_shroom || 0) + donShroom - oweShroom : 0,
+      remSpore:  h ? TEMP_BONUS_SPORE  + (h.wallet2_spore  || 0) + (h.sporebot_spore  || 0) + donSpore  - oweSpore  : 0,
       totals: t.totals,
     };
     renderRemaining(_remFlipped);
+    const lg = document.getElementById('remaining-legend');
+    if (lg) {
+      lg.style.cssText = 'font-size:0.6rem;color:rgba(255,255,225,0.3);padding-top:0.4rem;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;';
+      lg.innerHTML = '<span><span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; <span style="color:var(--gold);">100 SPORE = 1 SHROOM</span></span>'
+        + '<span>' + (t.totals.timestamp ? 'Last updated: ' + new Date(t.totals.timestamp).toLocaleString() : '') + '</span>';
+    }
 
-    // Drive live mushroom health from real solvency: reserves / in-bot obligations
-    // Live mushroom health = SURPLUS above in-bot obligations.
-    // 0% at breakeven or any shortfall; 100% when surplus equals obligations; 150 = max golden.
+    // Live mushroom health = unspent share of the original Sporebot allocation.
+    // 100% = the full 3B launch supply is still unspent; 150 = max golden.
     if (h && ((t.totals.grand_total_shrooms || 0) > 0 || (t.totals.grand_total_spores || 0) > 0)) {
       let livePct = 0;
       if (_remData.remShroom >= 0 && _remData.remSpore >= 0) {
-        const surS = _remData.oweShroom > 0 ? _remData.remShroom / _remData.oweShroom : 0;
-        const surP = _remData.oweSpore  > 0 ? _remData.remSpore  / _remData.oweSpore  : 0;
-        livePct = Math.max(0, Math.min(150, Math.round(((surS + surP) / 2) * 100)));
+        // Weight by SHROOM-equivalent value, not a flat average of two ratios.
+        // A flat average lets an over-covered SPORE side mask a SHROOM shortfall.
+        const remEq = _remData.remShroom + _remData.remSpore / 100;
+        livePct = Math.max(0, Math.min(GAUGE_MAX, Math.round((remEq / HEALTH_FULL_EQ) * 100)));
       }
       render(livePct);
       slider.value = livePct;
@@ -1238,6 +1344,12 @@
     this.textContent = _remFlipped ? 'Show remaining' : 'Breakdown';
     document.getElementById('remaining-note').style.display = _remFlipped ? 'none' : '';
     renderRemaining(_remFlipped);
+    const lg = document.getElementById('remaining-legend');
+    if (lg) {
+      lg.style.cssText = 'font-size:0.6rem;color:rgba(255,255,225,0.3);padding-top:0.4rem;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;';
+      lg.innerHTML = '<span><span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; <span style="color:var(--gold);">100 SPORE = 1 SHROOM</span></span>'
+        + '<span>' + (t.totals.timestamp ? 'Last updated: ' + new Date(t.totals.timestamp).toLocaleString() : '') + '</span>';
+    }
   });
   loadSporebotRemaining();
 
@@ -1249,6 +1361,10 @@
   function bdRows(items, color) {
     return '<div class="bd-grid">' + items.map(i => '<div class="bd-row"><span>' + i.label.replace(/</g,'&lt;') + '</span>'
       + '<span style="color:' + color + ';font-weight:600;">' + i.val.toLocaleString() + '</span></div>').join('') + '</div>';
+  }
+  const BD_LABEL_FIX = { 'Bronze Rank': 'Bronze Chest', 'Silver Rank': 'Silver Chest', 'Gold Rank': 'Gold Chest' };
+  function bdLabelFix(s) { return BD_LABEL_FIX[s] || s; }
+  function _bdUnused() {
   }
   async function loadBreakdown() {
     const el = document.getElementById('bd-body');
