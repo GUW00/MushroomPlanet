@@ -12,6 +12,10 @@ config.js
 .env
 firebase.json
 firebase-adminsdk.json
+bruhbot-firebase.json
+# catch any other service-account / firebase key files
+*firebase*.json
+*-adminsdk*.json
 
 # Build artifacts
 dist/
@@ -25,6 +29,3 @@ build/
 
 # Sensitive guides
 sporebot_guide.txt
-
-node_modules/
-package-lock.json
