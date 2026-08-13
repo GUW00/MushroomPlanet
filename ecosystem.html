@@ -1314,17 +1314,17 @@
     if (!_remData) { el.textContent = 'Live balance unavailable right now.'; return; }
     const d = _remData;
     const line = (label, val, color, bold) =>
-      '<div style="display:flex;justify-content:space-between;padding:0.3rem 0;'
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.5rem;flex-wrap:wrap;padding:0.3rem 0;'
       + (bold ? 'border-top:1px solid rgba(255,255,225,0.1);margin-top:0.25rem;padding-top:0.5rem;' : '')
-      + '"><span style="' + (bold ? 'font-weight:700;' : 'color:rgba(255,255,225,0.5);') + '">' + label + '</span>'
-      + '<span style="color:' + color + ';font-weight:' + (bold ? 700 : 600) + ';">' + val + '</span></div>';
+      + '"><span style="flex:1 1 auto;min-width:0;' + (bold ? 'font-weight:700;' : 'color:rgba(255,255,225,0.5);') + '">' + label + '</span>'
+      + '<span style="flex:0 1 auto;min-width:0;text-align:right;color:' + color + ';font-weight:' + (bold ? 700 : 600) + ';">' + val + '</span></div>';
     const n = v => Math.round(v).toLocaleString();
     const duo = (sh, sp) =>
       '<span style="color:var(--red);">' + n(sh) + '</span>'
-      + '<span style="opacity:0.35;margin:0 0.35rem;">/</span>'
+      + '<span style="opacity:0.35;margin:0 0.35rem;">/</span><wbr>'
       + '<span style="color:var(--blue);">' + n(sp) + '</span>';
-    const eqv = (sh, sp, eq) => duo(sh, sp)
-      + '<span style="opacity:0.3;margin:0 0.4rem;">=</span>'
+    const eqv = (sh, sp, eq) => duo(sh, sp) + '<wbr>'
+      + '<span style="opacity:0.3;margin:0 0.4rem;">=</span><wbr>'
       + '<span style="color:var(--yellow);">' + n(eq) + '</span>';
     if (!showBreakdown) {
       if (!d.hasOnchain) { el.textContent = 'Onchain balance unavailable - breakdown still available via the button above.'; return; }

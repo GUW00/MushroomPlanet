@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Partners | Mushroom Planet</title>
+  <meta name="description" content="The projects and bots the Mushroom Planet ecosystem grows alongside." />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne+Mono&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="config.js"></script>
+  <style>
+    :root {
+      --cream: #ffffe1; --yellow: #fece00; --red: #fd464f; --blue: #4fa8fd;
+      --dark: #0f0f0f; --dark2: #1a1a1a; --dark3: #242424;
+      --green: #22c55e; --purple: #c084fc; --gold: #ffd700;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { overflow-x: hidden; max-width: 100%; }
+    body {
+      background: var(--dark); color: var(--cream);
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden; max-width: 100%;
+      padding-top: 100px !important;
+    }
+
+    /* ---- STARFIELD (shared shell) ---- */
+    #starfield { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+    .star { position: absolute; border-radius: 50%; background: var(--cream); opacity: 0; animation: twinkle var(--dur) var(--delay) infinite; }
+    @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: var(--op); transform: scale(1); } }
+
+    /* ---- HERO ---- */
+    .guide-hero { position: relative; z-index: 1; text-align: center; padding: 5rem 1rem 2.5rem; }
+    .guide-hero .eyebrow { font-family: 'Space Grotesk', monospace; font-size: 0.75rem; letter-spacing: 0.3em; color: var(--red); text-transform: uppercase; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.2s forwards; }
+    .guide-hero h1 { font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 700; line-height: 1.1; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.4s forwards; }
+    .guide-hero h1 span { color: var(--blue); }
+    .guide-hero p { font-size: 1.05rem; max-width: 640px; margin: 0 auto; color: rgba(255,255,225,0.65); opacity: 0; animation: fadeUp 0.6s 0.6s forwards; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+    .partners-section { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+    .section-label { font-family: 'Space Grotesk', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red); margin-bottom: 1.25rem; text-align: center; }
+
+    /* ---- PARTNER CARDS ---- */
+    .partner-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    .partner-card {
+      display: flex; align-items: center; gap: 1.1rem;
+      background: var(--dark2);
+      border: 1px solid rgba(255,255,225,0.08);
+      border-radius: 1.25rem;
+      padding: 1.4rem 1.5rem;
+      text-decoration: none; color: inherit;
+      transition: border-color 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+      opacity: 0; transform: translateY(20px);
+      animation: fadeUp 0.6s forwards;
+    }
+    .partner-card:nth-child(1) { animation-delay: 0.15s; }
+    .partner-card:nth-child(2) { animation-delay: 0.25s; }
+    .partner-card:nth-child(3) { animation-delay: 0.35s; }
+    .partner-card:hover { transform: translateY(-2px); border-color: var(--accent, var(--blue)); box-shadow: 0 8px 26px rgba(0,0,0,0.35); }
+    .partner-card.locked { cursor: default; }
+    .partner-card.locked:hover { transform: none; border-color: rgba(255,255,225,0.08); box-shadow: none; }
+
+    .partner-logo {
+      width: 58px; height: 58px; flex-shrink: 0; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.9rem;
+      background: var(--logo-bg, rgba(79,168,253,0.1));
+      border: 1px solid var(--logo-br, rgba(79,168,253,0.25));
+    }
+    .partner-logo img { width: 40px; height: 40px; object-fit: contain; }
+    .partner-body { flex: 1; min-width: 0; }
+    .partner-name { font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .partner-tag {
+      font-family: 'Space Grotesk', monospace; font-size: 0.55rem; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.2em 0.6em; border-radius: 999px;
+      background: var(--tag-bg, rgba(34,197,94,0.1)); color: var(--tag-c, var(--green));
+      border: 1px solid var(--tag-br, rgba(34,197,94,0.3));
+    }
+    .partner-desc { font-size: 0.85rem; color: rgba(255,255,225,0.6); line-height: 1.55; margin-top: 0.3rem; }
+    .partner-arrow { flex-shrink: 0; font-size: 1.3rem; color: rgba(255,255,225,0.35); transition: color 0.2s, transform 0.2s; }
+    .partner-card:hover .partner-arrow { color: var(--accent, var(--blue)); transform: translateX(3px); }
+
+    .partners-footnote {
+      text-align: center; margin-top: 2rem;
+      font-family: 'Space Grotesk', monospace; font-size: 0.68rem;
+      color: rgba(255,255,225,0.3); line-height: 1.6;
+    }
+
+    /* ---- header icons (shared shell) ---- */
+    .header-icons { display: none; }
+    .header-icons img { width: 22px !important; height: 22px !important; object-fit: contain !important; border-radius: 0 !important; border: none !important; margin: 0 !important; opacity: 0.85; }
+    .header-icons #header-profile-icon { border-radius: 50% !important; object-fit: cover !important; }
+    @media (max-width: 768px) { .header-icons { display: flex; gap: 0.75rem; align-items: center; } }
+    @media (display-mode: standalone) { .header-icons { display: none !important; } }
+
+    /* ---- PWA bottom nav (shared shell) ---- */
+    .pwa-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #111; border-top: 1px solid rgba(255,255,225,0.08); display: none; align-items: stretch; z-index: 999; padding-bottom: env(safe-area-inset-bottom); }
+    @media (display-mode: standalone) { .pwa-nav { display: flex; } body { padding-bottom: 65px !important; } }
+    .pwa-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; text-decoration: none; color: rgba(255,255,225,0.35); font-family: 'Space Grotesk', monospace; font-size: 0.55rem; letter-spacing: 0.05em; transition: color 0.2s; }
+    .pwa-tab span:first-child { font-size: 1.3rem; display: flex; align-items: center; justify-content: center; }
+    .pwa-tab.active { color: #c084fc; }
+    @media (display-mode: standalone) {
+      header { display: none !important; } #global-menu { display: none !important; }
+      html body { padding-top: 0 !important; }
+      .guide-hero { padding: 1.25rem 1rem 0.75rem !important; }
+      .guide-hero h1 { font-size: 1.75rem !important; margin-bottom: 0.35rem !important; }
+      .guide-hero p { font-size: 0.8rem !important; margin-bottom: 0.75rem !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="starfield"></div>
+
+  <header>
+    <nav class="container">
+      <a href="earn.html" class="logo">Mushroom Planet</a>
+      <ul class="nav-links">
+        <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
+        <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
+        <li><a href="/profile.html">PROFILE</a></li>
+      </ul>
+      <div class="header-icons">
+        <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank"><img src="/images/reddit.png" alt="Reddit"></a>
+        <a href="https://discord.com/invite/ECauU2KSSt" target="_blank"><img src="/images/discord.png" alt="Discord"></a>
+        <a href="/profile.html"><img id="header-profile-icon" src="/images/profile1.png" alt="Profile" style="border-radius:50%;"></a>
+      </div>
+    </nav>
+  </header>
+
+  <div id="global-menu"></div>
+
+  <div class="guide-hero">
+    <div class="eyebrow">The Ecosystem &amp; Friends</div>
+    <h1>Our <span>Partners</span></h1>
+    <p>The projects, bots, and communities Mushroom Planet grows alongside. Tap one to explore its world.</p>
+  </div>
+
+  <div class="partners-section">
+    <div class="section-label">Featured Partners</div>
+
+    <div class="partner-grid">
+
+      <!-- THE NEWS BRUH → opens the BruhBot dashboard -->
+      <a href="/newsbruh.html" class="partner-card"
+         style="--accent: #fece00; --logo-bg: rgba(254,206,0,0.1); --logo-br: rgba(254,206,0,0.3); --tag-bg: rgba(34,197,94,0.1); --tag-c: var(--green); --tag-br: rgba(34,197,94,0.3);">
+        <div class="partner-logo">📰</div>
+        <div class="partner-body">
+          <div class="partner-name">The News Bruh <span class="partner-tag">Live</span></div>
+          <div class="partner-desc">The r/NewsBruh reward economy, powered by BruhBot. See the standings, daily &amp; total rewards, staking vault, and every Bruh on the leaderboard — priced in NEW.</div>
+        </div>
+        <div class="partner-arrow">→</div>
+      </a>
+
+      <!-- Placeholder slots for future partners -->
+      <div class="partner-card locked"
+           style="--logo-bg: rgba(255,255,225,0.04); --logo-br: rgba(255,255,225,0.1);">
+        <div class="partner-logo" style="opacity:0.5;">🤝</div>
+        <div class="partner-body">
+          <div class="partner-name" style="color:rgba(255,255,225,0.55);">Your project here <span class="partner-tag" style="--tag-bg:rgba(255,255,225,0.05); --tag-c:rgba(255,255,225,0.45); --tag-br:rgba(255,255,225,0.15);">Soon</span></div>
+          <div class="partner-desc">Building something in the mycelium? Partnerships open new reward loops between communities.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="partners-footnote">
+      Want to partner with Mushroom Planet? Reach out in the
+      <a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer" style="color:var(--blue);text-decoration:none;">Discord</a>.
+    </p>
+  </div>
+
+  <!-- PWA bottom nav (shared shell) -->
+  <nav class="pwa-nav">
+    <a href="/profile.html" class="pwa-tab" data-page="profile">
+      <span><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;border:1px solid rgba(255,255,225,0.2);" onerror="this.style.display='none'"></span>
+      <span>Profile</span>
+    </a>
+    <a href="/earn.html" class="pwa-tab" data-page="guide">
+      <span><img src="/images/earn.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+      <span>Earn</span>
+    </a>
+    <a href="/convert.html" class="pwa-tab" data-page="convert">
+      <span><img src="/images/swaps.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+      <span>Convert</span>
+    </a>
+    <a href="/vote.html" class="pwa-tab" data-page="vote">
+      <span><img src="/images/vote.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+      <span>Vote</span>
+    </a>
+    <a href="/treasury.html" class="pwa-tab" data-page="treasury">
+      <span><img src="/images/treasury.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+      <span>Treasury</span>
+    </a>
+  </nav>
+
+  <script type="module">
+    // Global menu (shared site shell)
+    import('./config.js').then(m => {
+      const t = document.getElementById('global-menu');
+      if (t && m.default && m.default.menu) t.innerHTML = m.default.menu.html;
+    }).catch(() => {});
+
+    // Starfield
+    (function () {
+      const sf = document.getElementById('starfield');
+      for (let i = 0; i < 80; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        const sz = Math.random() * 2.5 + 0.5;
+        s.style.cssText = [
+          'width:' + sz + 'px', 'height:' + sz + 'px',
+          'top:' + (Math.random() * 100) + '%',
+          'left:' + (Math.random() * 100) + '%',
+          '--dur:' + (3 + Math.random() * 5) + 's',
+          '--delay:' + (Math.random() * 6) + 's',
+          '--op:' + (0.2 + Math.random() * 0.5),
+        ].join(';');
+        sf.appendChild(s);
+      }
+    })();
+  </script>
+
+</body>
+</html>

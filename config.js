@@ -64,6 +64,7 @@ const config = {
         <a href="/convert">Convert</a>
         <a href="/vote">Governance</a>
         <a href="/treasury">Treasury</a>
+        <a href="/partners">Partners</a>
         <a href="/guides">Guides</a>
       </div>
 
@@ -73,6 +74,7 @@ const config = {
         <a href="/convert">Convert</a>
         <a href="/vote">Vote</a>
         <a href="/treasury">Treasury</a>
+        <a href="/partners">Partners</a>
         <a href="/guides">Guides</a>
       </div>
     `

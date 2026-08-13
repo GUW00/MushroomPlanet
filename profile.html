@@ -4632,14 +4632,20 @@ function renderFarm(s, p) {
   const sgrEl = document.getElementById('sgr-breakdown-content');
   if (Object.keys(apy).length) {
     const sgrI = (f) => '<img src="/images/' + f + '" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">';
+    const sgrItems = ((profileData.sporebot || {}).Inventory || {}).Items || {};
     const sgrRows = [
       { label: 'Stage Bonus',       key: 'stage_bonus',           suffix: '%', color: 'var(--green)',   emoji: sgrI((farm.current_stage||'spore').toLowerCase().replace('_','')+'.png') },
       { label: 'Rank Bonus',        key: 'rank_bonus',            suffix: '%', color: 'var(--yellow)',  emoji: sgrI(RANK_IMGS[rankName]||'bronze.png') },
       { label: 'In-Game Sporebot',  key: 'ingame_sporebot_bonus', suffix: '%', color: 'var(--blue)',    emoji: sgrI('sporebot.png') },
       { label: 'Potion Bonus',      key: 'potion_bonus',          suffix: '%', color: 'var(--purple)',  emoji: sgrI('potionrecipe.png') },
-      { label: 'Item Collector',   key: 'collector_bonus',       suffix: '%', color: 'var(--green)',   emoji: sgrI('wildtongue_gemstone.png') },
+      { label: 'Wildtongue Gemstone', key: '_wildtongue_bonus', suffix: '%', color: 'var(--green)',  emoji: sgrI('wildtongue_gemstone.png'),
+        val: (sgrItems.Wildtongue_Gemstone ? 5 : 0) },
+      { label: 'Mooshie Gemstone',    key: '_mooshie_bonus',    suffix: '%', color: 'var(--purple)', emoji: sgrI('mystical_gemstone.png'),
+        val: (sgrItems.Mooshie_Gemstone ? 5 : 0) },
+      { label: 'Bondsmith Gemstone',  key: '_animalgem_bonus',  suffix: '%', color: 'var(--purple)', emoji: sgrI('bondsmith_gemstone.png'),
+        val: (sgrItems.bondsmith_gemstone ? 10 : 0) },
       { label: 'Rootsong Gemstone', key: 'rootsong_bonus',        suffix: '%', color: 'var(--green)',   emoji: sgrI('rootsong_gemstone.png') },
-      { label: 'Sunspore Gemstone', key: 'sunspore_bonus',        suffix: '%', color: 'var(--yellow)',  emoji: sgrI('sunspore_gemstone.png') },
+      { label: 'Sunspore Gemstone', key: 'sunspore_bonus',        suffix: '%', color: 'var(--yellow)',  emoji: sgrI('sunspore_gemstone1.png') },
       { label: 'Spirit Gemstone',   key: 'brewing_bonus',         suffix: '%', color: 'var(--purple)',  emoji: sgrI('spirit_gemstone.png') },
       { label: 'Sporebot NFT',      key: 'sporebot_bonus',        suffix: '%', color: 'var(--purple)',  emoji: sgrI('nft.png') },
       { label: 'LP Provider',       key: 'lp_bonus',              suffix: '%', color: '#9b8cff',        emoji: sgrI('lp.png') },
@@ -4661,9 +4667,10 @@ function renderFarm(s, p) {
     if (poolCount > 0) mooshieSubRows.push({ label: 'King Mooshie Pool x' + poolCount + ' (2% each)', key: '_pool', val: poolCount * 2, emoji: sgrI('pool_nft.png'), color: 'var(--yellow)' });
     if (portraitCount > 0) mooshieSubRows.push({ label: 'Mooshie Family Portrait x' + portraitCount + ' (3% each)', key: '_portrait', val: portraitCount * 3, emoji: sgrI('portrait_nft.png'), color: 'var(--yellow)' });
 
-    const activeRows = sgrRows.filter(r => apy[r.key] > 0);
+    const sgrVal = r => (r.val != null ? r.val : apy[r.key]);
+    const activeRows = sgrRows.filter(r => sgrVal(r) > 0);
     const totalApy = Math.round((farm.APY || 0) * 100);
-    const ingameKeys = ['stage_bonus','rank_bonus','ingame_sporebot_bonus','potion_bonus','collector_bonus','rootsong_bonus','sunspore_bonus','brewing_bonus'];
+    const ingameKeys = ['stage_bonus','rank_bonus','ingame_sporebot_bonus','potion_bonus','_wildtongue_bonus','_mooshie_bonus','_animalgem_bonus','rootsong_bonus','sunspore_bonus','brewing_bonus'];
     const onchainKeys = ['sporebot_bonus','lp_bonus','guwoo_bonus','onchain_spore_bonus'];
     const ingameRows = activeRows.filter(r => ingameKeys.includes(r.key));
     const onchainRows = activeRows.filter(r => onchainKeys.includes(r.key));
@@ -4679,7 +4686,7 @@ function renderFarm(s, p) {
         ? r.emoji + r.label + ' <span style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(79,168,253,0.6);margin-left:0.25rem;">tap</span>'
         : r.emoji + r.label;
       return '<div class="data-row"' + clickAttr + '><span style="color:rgba(255,255,225,0.8);font-size:0.82rem;display:flex;align-items:center;">' + labelHtml + '</span>'
-        + '<span style="font-family:Space Grotesk,monospace;font-size:0.82rem;font-weight:600;color:' + r.color + ';">+' + Number(apy[r.key]).toFixed(1) + r.suffix + '</span></div>';
+        + '<span style="font-family:Space Grotesk,monospace;font-size:0.82rem;font-weight:600;color:' + r.color + ';">+' + Number(sgrVal(r)).toFixed(1) + r.suffix + '</span></div>';
     };
     const mooshieRowsHtml = mooshieSubRows.length && apy.mooshie_bonus > 0
       ? mooshieSubRows.map(r => '<div class="data-row"><span style="color:rgba(255,255,225,0.8);font-size:0.82rem;display:flex;align-items:center;">' + r.emoji + r.label + '</span><span style="font-family:Space Grotesk,monospace;font-size:0.82rem;font-weight:600;color:' + r.color + ';">+' + r.val + '%</span></div>').join('')
@@ -6879,9 +6886,9 @@ function renderInventory(s) {
 
   // Items
   const ITEM_MAP = {
-    Golden_Shovel:'Golden Shovel', Elder_Pipe:'Elder Pipe', Feather:'Feather',
+    Golden_Shovel:'Golden Shovel', Elder_Pipe:'Elder Pipe',
     Wildtongue_Gemstone:'Wildtongue Gemstone', Mooshie_Gemstone:'Mooshie Gemstone',
-    animal_gemstone:'Mystical Gemstone',
+    animal_gemstone:'Bondsmith Gemstone',
     King_Totem:'King Totem', Queen_Totem:'Queen Totem', Kid_Totem:'Kid Totem',
     Gold_Totem:'Gold Totem', Miner_Helmet:'Miner Helmet', Well_Access:'Well Access',
   };
@@ -6890,7 +6897,7 @@ function renderInventory(s) {
   if (ownedItems.length) {
     const ITEM_IMGS = {
       Golden_Shovel:'/images/shovel.png', Elder_Pipe:'/images/pipe.png',
-      Feather:'/images/feather.png', Wildtongue_Gemstone:'/images/wildtongue_gemstone.png',
+      Wildtongue_Gemstone:'/images/wildtongue_gemstone.png',
       Mooshie_Gemstone:'/images/mystical_gemstone.png', King_Totem:'/images/king.png',
       Queen_Totem:'/images/queen.png', Kid_Totem:'/images/kidshroom.png',
       Gold_Totem:'/images/goldmooshie.png', Miner_Helmet:'/images/miner_helmet.png',
@@ -7004,16 +7011,17 @@ function renderItemsOrganized(s) {
 
   const GEM_DEFS = [
     { key:'Wildtongue_Gemstone',  img:'wildtongue_gemstone.png',  label:'Wildtongue Gemstone', color:'var(--green)',
-      earn:'Collect all 10 Artifacts via !explore to unlock. Gives +5% SGR & lets you !feed animals.' },
-    
-    { key:'animal_gemstone',      img:'mystical_gemstone.png',    label:'Mystical Gemstone',   color:'var(--purple)',
-      earn:'Earned at 50,000 total SHROOMS fed. Gives +5% SGR & unlocks !companion system.' },
+      earn:'<b style="color:rgba(255,255,225,0.75);">Goal:</b> Collect all Artifacts in !explore.<br><b style="color:rgba(255,255,225,0.75);">Reward:</b> Lets you talk to animals, unlocks !pets and grants +5% SGR.' },
+    { key:'Mooshie_Gemstone',     img:'mooshie_gemstone.png',    label:'Mooshie Gemstone',    color:'var(--purple)',
+      earn:'<b style="color:rgba(255,255,225,0.75);">Goal:</b> Collect all Scrolls in !explore.<br><b style="color:rgba(255,255,225,0.75);">Reward:</b> Lets you read the Ancient Mooshie Language, unlocks !treasure and grants +5% SGR.' },
+    { key:'bondsmith_gemstone',   img:'bondsmith_gemstone.png',   label:'Bondsmith Gemstone',  color:'var(--purple)',
+      earn:'<b style="color:rgba(255,255,225,0.75);">Goal:</b> Max Bond all 12 pets.<br><b style="color:rgba(255,255,225,0.75);">Reward:</b> Grants +10% SGR and unlocks !campfire.' },
     { key:'rootsong_gemstone',    img:'rootsong_gemstone.png',    label:'Rootsong Gemstone',   color:'var(--green)',
-      earn:'Sell 4,200,000 SPORE worth of gems to Rhizo. Gives +5% SGR.' },
-    { key:'sunspore_gemstone',    img:'sunspore_gemstone.png',    label:'Sunspore Gemstone',   color:'var(--yellow)',
-      earn:'Reach Herbology Level 100 via !gather. Gives +5% SGR.' },
+      earn:'<b style="color:rgba(255,255,225,0.75);">Goal:</b> Sell Gems to Rhizo.<br><b style="color:rgba(255,255,225,0.75);">Reward:</b> Grants a special book allowing you to !craft and grants +5% SGR.' },
+    { key:'sunspore_gemstone',    img:'sunspore_gemstone1.png',    label:'Sunspore Gemstone',   color:'var(--yellow)',
+      earn:'<b style="color:rgba(255,255,225,0.75);">Goal:</b> Reach Herbology Level 100 via !gather.<br><b style="color:rgba(255,255,225,0.75);">Reward:</b> Grants +5% SGR.' },
     { key:'spirit_gemstone',      img:'spirit_gemstone.png',      label:'Spirit Gemstone',     color:'var(--purple)',
-      earn:'Brew a perfect 10/10 potion and trade it to Mycelia. Gives +5% SGR.' },
+      earn:'<b style="color:rgba(255,255,225,0.75);">Goal:</b> Brew a 10/10 potion and trade it to Mycelia.<br><b style="color:rgba(255,255,225,0.75);">Reward:</b> Grants +5% SGR.' },
   ];
 
   GEM_DEFS.forEach(function(g) {
@@ -7056,7 +7064,6 @@ function renderItemsOrganized(s) {
     
     { key:'Miner_Helmet',  img:'miner_helmet.png', label:'Miner Helmet', color:'rgba(255,255,225,0.6)',
       earn:'Found in !explore and !toss - Allows you to continue your !cave run on any round' },
-    
   ];
   MISC_DEFS.forEach(function(m) {
     var owned = !!(items[m.key]);
@@ -7685,7 +7692,7 @@ function renderShopQuests(s, p) {
     + questBlock(img('rootsong_gemstone.png'), "Rootsong Gemstone",
         hasRootSong ? 'Gemstone owned - Rhizo now pays SPORES for gems!' : rhizoSold.toLocaleString() + ' / ' + RHIZO_GOAL.toLocaleString() + ' SPORES worth of gems sold',
         rhizoPct, 'var(--green)', hasRootSong)
-    + questBlock(img('sunspore_gemstone.png'), 'Sunspore Gemstone',
+    + questBlock(img('sunspore_gemstone1.png'), 'Sunspore Gemstone',
         hasSunspore ? 'Gemstone owned (+5% SGR)' : 'Herbology Level ' + herbLvl + ' / 100 - reach Lv.100 to unlock',
         herbPct, 'var(--yellow)', hasSunspore)
     + questBlock(img('spirit_gemstone.png'), 'Spirit Gemstone',
@@ -7697,7 +7704,6 @@ function renderDig(s) {
   const el = document.getElementById('dig-odds-content');
   if (!el) return;
   const items = (s.Inventory || {}).Items || {};
-  const hasFeather = items.Feather || false;
   const hasShovel = items.Golden_Shovel || false;
   const img = (src) => '<img src="/images/' + src + '" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:6px;" onerror="this.style.display=\'none\'">';
 
@@ -7705,7 +7711,7 @@ function renderDig(s) {
   var baseWeights = { shroom:978, coin:5, nft:1, bronzetreasure:10, silvertreasure:5, goldentreasure:1 };
   var weights = {};
   Object.keys(baseWeights).forEach(function(k) {
-    weights[k] = hasFeather ? baseWeights[k] * 2 : baseWeights[k];
+    weights[k] = baseWeights[k];
   });
   var total = Object.values(weights).reduce(function(a,b){return a+b;},0);
   function pct(k) { return ((weights[k]/total)*100); }
@@ -7727,11 +7733,7 @@ function renderDig(s) {
       + '</div>';
   }
 
-  if (hasFeather) {
-    html += '<div style="background:rgba(254,206,0,0.07);border:1px solid rgba(254,206,0,0.25);border-radius:0.75rem;padding:0.6rem 1rem;margin-bottom:1rem;font-family:Space Grotesk,monospace;font-size:0.65rem;color:var(--yellow);display:flex;align-items:center;gap:0.5rem;">'
-      + img('feather.png') + '<b>Mystical Feather Active</b> - All chest odds are DOUBLED!'
-      + '</div>';
-  }
+  
 
   html += '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.75rem;">REWARD ODDS PER DIG</div>';
 
@@ -8004,7 +8006,7 @@ function renderStats(s, p) {
         { label: 'Potion Bonus',      key: 'potion_bonus',          color: 'var(--purple)', imgSrc: 'potionrecipe.png' },
         { label: 'Collector Items',   key: 'collector_bonus',       color: 'var(--green)',  imgSrc: 'backpack1.png' },
         { label: 'Rootsong Gemstone', key: 'rootsong_bonus',        color: 'var(--green)',  imgSrc: 'rootsong_gemstone.png' },
-        { label: 'Sunspore Gemstone', key: 'sunspore_bonus',        color: 'var(--yellow)', imgSrc: 'sunspore_gemstone.png' },
+        { label: 'Sunspore Gemstone', key: 'sunspore_bonus',        color: 'var(--yellow)', imgSrc: 'sunspore_gemstone1.png' },
         { label: 'Spirit Gemstone',   key: 'brewing_bonus',         color: 'var(--purple)', imgSrc: 'spirit_gemstone.png' },
         { label: 'Sporebot NFT',      key: 'sporebot_bonus',        color: 'var(--blue)',   imgSrc: 'nft.png' },
         { label: 'LP Provider',       key: 'lp_bonus',              color: '#9b8cff',       imgSrc: 'lp.png' },
@@ -8080,10 +8082,8 @@ function renderStats(s, p) {
       }
     } else if (statKey === 'Dig_Odds') {
       const items2 = (s.Inventory || {}).Items || {};
-      const hasFeather2 = !!(items2.Feather);
       const hasShovel2  = !!(items2.Golden_Shovel);
-      const hasAnimalGem2 = !!(items2.animal_gemstone);
-      const mul = (hasFeather2 || hasAnimalGem2) ? 2 : 1;
+      const mul = 1;
       const bW = 10*mul, sW = 5*mul, gW = 1*mul, tot = 978 + 5 + 1 + bW + sW + gW;
       const pct2 = (w) => ((w/tot)*100);
       const fmtPct = (w) => pct2(w) < 0.5 ? pct2(w).toFixed(2)+'%' : Math.round(pct2(w))+'%';
@@ -8099,13 +8099,7 @@ function renderStats(s, p) {
           + img2('shovel.png') + 'Requires a <b>Golden Shovel</b> - earned at 7-day !forage streak'
           + '</div>';
       }
-      if (hasFeather2 || hasAnimalGem2) {
-        const doubleSource = hasFeather2 ? 'Mystical Feather' : 'Mystical Gemstone';
-        const doubleImg = hasFeather2 ? 'feather.png' : 'mystical_gemstone.png';
-        html += '<div style="background:rgba(254,206,0,0.07);border:1px solid rgba(254,206,0,0.25);border-radius:0.625rem;padding:0.6rem 0.875rem;margin-bottom:0.75rem;font-family:Space Grotesk,monospace;font-size:0.65rem;color:var(--yellow);display:flex;align-items:center;gap:0.5rem;">'
-          + img2(doubleImg) + '<b>' + doubleSource + ' Active</b> - Chest odds doubled!'
-          + '</div>';
-      }
+      
       chests.forEach(function(c) {
         html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid rgba(255,255,225,0.05);">'
           + '<span style="display:flex;align-items:center;font-size:0.82rem;color:rgba(255,255,225,0.8);">' + img2(c.img) + c.label + '</span>'
@@ -8205,8 +8199,7 @@ function renderStats(s, p) {
         const digItems = (s.Inventory || {}).Items || {};
         let displayVal;
         if (isDig) {
-          const hasDigDouble = digItems.Feather || digItems.animal_gemstone;
-          displayVal = digItems.Golden_Shovel ? (hasDigDouble ? '2x odds' : 'Unlocked') : 'Locked';
+          displayVal = digItems.Golden_Shovel ? 'Unlocked' : 'Locked';
         } else if (isLimit) {
           const onchainBal2 = parseInt((p.Wallet?.Onchain?.shroom_balance) || 0);
           const onchainB2 = Math.floor(onchainBal2 / 100000) * 100000;

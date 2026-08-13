@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The News Bruh | Mushroom Planet</title>
+  <meta name="description" content="BruhBot ledger — standings, circulation and reward stats for the r/NewsBruh economy." />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne+Mono&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="config.js"></script>
+  <style>
+    :root {
+      --cream: #ffffe1; --yellow: #fece00; --red: #fd464f; --blue: #4fa8fd;
+      --dark: #0f0f0f; --dark2: #1a1a1a; --dark3: #242424;
+      --green: #22c55e; --purple: #c084fc; --gold: #ffd700;
+      --new: #ff7a3c;        /* BruhBot's NEW token accent */
+      --new-soft: rgba(255,122,60,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { overflow-x: hidden; max-width: 100%; }
+    body {
+      background: var(--dark); color: var(--cream);
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden; max-width: 100%;
+      padding-top: 100px !important;
+    }
+
+    #starfield { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+    .star { position: absolute; border-radius: 50%; background: var(--cream); opacity: 0; animation: twinkle var(--dur) var(--delay) infinite; }
+    @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: var(--op); transform: scale(1); } }
+
+    .header-icons { display: none; }
+    .header-icons img { width: 22px !important; height: 22px !important; object-fit: contain !important; border-radius: 0 !important; border: none !important; margin: 0 !important; opacity: 0.85; }
+    .header-icons #header-profile-icon { border-radius: 50% !important; object-fit: cover !important; }
+    @media (max-width: 768px) { .header-icons { display: flex; gap: 0.75rem; align-items: center; } }
+    @media (display-mode: standalone) { .header-icons { display: none !important; } }
+
+    /* ---- HERO ---- */
+    .guide-hero { position: relative; z-index: 1; text-align: center; padding: 4rem 1rem 1.5rem; }
+    .guide-hero .eyebrow { font-family: 'Space Grotesk', monospace; font-size: 0.75rem; letter-spacing: 0.3em; color: var(--new); text-transform: uppercase; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.2s forwards; }
+    .guide-hero h1 { font-size: clamp(2rem, 6vw, 3.6rem); font-weight: 700; line-height: 1.1; margin-bottom: 0.75rem; opacity: 0; animation: fadeUp 0.6s 0.4s forwards; }
+    .guide-hero h1 span { color: var(--new); }
+    .guide-hero p { font-size: 1rem; max-width: 600px; margin: 0 auto; color: rgba(255,255,225,0.65); opacity: 0; animation: fadeUp 0.6s 0.6s forwards; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+
+    .back-link { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 0 1.5rem; }
+    .back-link a { font-family: 'Space Grotesk', monospace; font-size: 0.7rem; letter-spacing: 0.05em; color: rgba(255,255,225,0.5); text-decoration: none; transition: color 0.2s; }
+    .back-link a:hover { color: var(--new); }
+
+    /* ---- STATUS PILL ---- */
+    .status-row { display: flex; justify-content: center; margin: 1rem 0 0; position: relative; z-index: 1; }
+    .status-pill { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Space Grotesk', monospace; font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.4rem 0.9rem; border-radius: 999px; border: 1px solid rgba(255,255,225,0.12); color: rgba(255,255,225,0.55); }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--yellow); }
+    .status-dot.live { background: var(--green); }
+
+    .eco-section { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 0 1.5rem 2rem; }
+    .section-divider { font-family: 'Space Grotesk', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--new); margin: 2.25rem 0 1rem; display: flex; align-items: center; gap: 0.75rem; }
+    .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,122,60,0.35), transparent); }
+    .section-divider .muted { color: rgba(255,255,225,0.35); text-transform: none; letter-spacing: 0.04em; }
+
+    /* ---- STAT GRID ---- */
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.9rem; }
+    @media (max-width: 820px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 420px) { .stat-grid { grid-template-columns: 1fr; } }
+    .stat-card { position: relative; background: var(--dark2); border: 1px solid rgba(255,255,225,0.07); border-radius: 1.25rem; padding: 1.4rem 1.3rem; overflow: hidden; transition: border-color 0.3s; }
+    .stat-card:hover { border-color: rgba(255,255,225,0.16); }
+    .stat-card .tag { position: absolute; top: 1rem; right: 1.1rem; font-family: 'Space Grotesk', monospace; font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,225,0.3); }
+    .stat-card .label { font-family: 'Space Grotesk', monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,225,0.45); }
+    .stat-card .num { font-size: clamp(1.7rem, 4.5vw, 2.4rem); font-weight: 700; line-height: 1.05; margin-top: 0.6rem; font-variant-numeric: tabular-nums; }
+    .stat-card .sub { font-size: 0.72rem; color: rgba(255,255,225,0.45); margin-top: 0.4rem; line-height: 1.5; }
+    .stat-card.hot .num { color: var(--new); }
+    .stat-card.coin .num { color: var(--gold); }
+    .stat-card.stk .num { color: var(--green); }
+
+    /* ---- REWARD PANELS ---- */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 780px) { .cols { grid-template-columns: 1fr; } }
+    .panel { background: var(--dark2); border: 1px solid rgba(255,255,225,0.07); border-radius: 1.25rem; overflow: hidden; }
+    .panel h3 { font-family: 'Space Grotesk', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,225,0.6); padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,225,0.06); }
+    .rows { padding: 0.4rem 0; }
+    .row { display: flex; justify-content: space-between; align-items: baseline; padding: 0.6rem 1.25rem; }
+    .row + .row { border-top: 1px solid rgba(255,255,225,0.04); }
+    .row .k { font-size: 0.82rem; color: rgba(255,255,225,0.6); }
+    .row .v { font-family: 'Space Grotesk', monospace; font-size: 0.9rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .row .v.new { color: var(--new); }
+    .row .v.stk { color: var(--green); }
+
+    /* ---- LEADERBOARD ---- */
+    .lb-controls { display: flex; gap: 0.5rem; margin: 0 0 1rem; flex-wrap: wrap; }
+    .lb-btn { font-family: 'Space Grotesk', monospace; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; padding: 0.45rem 1rem; border-radius: 999px; border: 1.5px solid rgba(255,255,225,0.12); background: transparent; color: rgba(255,255,225,0.45); cursor: pointer; transition: all 0.2s; }
+    .lb-btn.on { border-color: var(--new); color: var(--new); background: var(--new-soft); }
+    .lb-btn:hover:not(.on) { border-color: rgba(255,255,225,0.3); color: rgba(255,255,225,0.75); }
+    .lb-btn:focus-visible { outline: 2px solid var(--new); outline-offset: 2px; }
+
+    .board-wrap { background: var(--dark2); border: 1px solid rgba(255,255,225,0.07); border-radius: 1.25rem; overflow: hidden; }
+    table.board { width: 100%; border-collapse: collapse; }
+    .board thead th { text-align: left; font-family: 'Space Grotesk', monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,225,0.35); padding: 0.85rem 0.9rem; border-bottom: 1px solid rgba(255,255,225,0.08); }
+    .board thead th.r { text-align: right; }
+    .board tbody td { padding: 0.8rem 0.9rem; border-top: 1px solid rgba(255,255,225,0.04); font-size: 0.85rem; }
+    .board tbody td.r { text-align: right; font-family: 'Space Grotesk', monospace; font-variant-numeric: tabular-nums; font-weight: 600; }
+    .board tbody tr:hover { background: rgba(255,255,255,0.02); }
+    .rank { font-family: 'Space Grotesk', monospace; font-weight: 700; color: rgba(255,255,225,0.4); width: 38px; }
+    .rank.top1 { color: var(--new); }
+    .rank.top2, .rank.top3 { color: var(--cream); }
+    .bar { position: relative; }
+    .bar .fillbar { position: absolute; left: 0; top: 0; bottom: 0; background: var(--new-soft); z-index: 0; }
+    .bar .cell { position: relative; z-index: 1; }
+    .uname { font-weight: 600; color: var(--cream); }
+    .uname .u { color: rgba(255,255,225,0.4); font-weight: 400; }
+    .flair { display: block; font-family: 'Space Grotesk', monospace; font-size: 0.6rem; color: rgba(255,255,225,0.4); margin-top: 0.2rem; }
+    .coinpill { color: var(--gold); }
+    .lb-note { font-family: 'Space Grotesk', monospace; font-size: 0.62rem; color: rgba(255,255,225,0.35); margin-top: 0.75rem; line-height: 1.6; }
+
+    @media (max-width: 560px) { .hide-sm { display: none; } }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+    .pwa-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #111; border-top: 1px solid rgba(255,255,225,0.08); display: none; align-items: stretch; z-index: 999; padding-bottom: env(safe-area-inset-bottom); }
+    @media (display-mode: standalone) { .pwa-nav { display: flex; } body { padding-bottom: 65px !important; } header { display: none !important; } #global-menu { display: none !important; } html body { padding-top: 0 !important; } .guide-hero { padding: 1.25rem 1rem 0.75rem !important; } }
+    .pwa-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; text-decoration: none; color: rgba(255,255,225,0.35); font-family: 'Space Grotesk', monospace; font-size: 0.55rem; letter-spacing: 0.05em; }
+    .pwa-tab span:first-child { font-size: 1.3rem; }
+    .pwa-tab.active { color: #c084fc; }
+  </style>
+</head>
+<body>
+  <div id="starfield"></div>
+  <header>
+    <nav class="container">
+      <a href="ecosystem.html" class="logo">Mushroom Planet</a>
+      <ul class="nav-links">
+        <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
+        <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
+        <li><a href="/profile.html">PROFILE</a></li>
+      </ul>
+      <div class="header-icons">
+        <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank"><img src="/images/reddit.png" alt="Reddit"></a>
+        <a href="https://discord.com/invite/ECauU2KSSt" target="_blank"><img src="/images/discord.png" alt="Discord"></a>
+        <a href="/profile.html"><img id="header-profile-icon" src="/images/profile1.png" alt="Profile" style="border-radius:50%;"></a>
+      </div>
+    </nav>
+  </header>
+  <div id="global-menu"></div>
+
+  <div class="back-link"><a href="/partners.html">&larr; Back to Partners</a></div>
+
+  <div class="guide-hero">
+    <div class="eyebrow">Partner · BruhBot</div>
+    <h1>The News <span>Bruh</span></h1>
+    <p>Standings, circulation &amp; reward stats for the r/NewsBruh economy — priced in the NEW token.</p>
+  </div>
+
+  <div class="status-row">
+    <span class="status-pill"><span id="statusDot" class="status-dot"></span><span id="statusText">Demo data</span></span>
+  </div>
+
+  <div class="eco-section">
+
+    <!-- ===================== CIRCULATION & MEMBERS ===================== -->
+    <div class="section-divider reveal">Circulation &amp; Members <span class="muted" style="margin-left:auto;">totals since launch</span></div>
+    <div class="stat-grid reveal" id="totalsGrid"></div>
+
+    <!-- ===================== REWARDS ===================== -->
+    <div class="section-divider reveal">The Rewards Desk <span class="muted" style="margin-left:auto;">NEW paid out</span></div>
+    <div class="cols reveal">
+      <div class="panel">
+        <h3>Today &amp; This Month</h3>
+        <div class="rows" id="periodRows"></div>
+      </div>
+      <div class="panel">
+        <h3>Pools &amp; All-Time</h3>
+        <div class="rows" id="poolRows"></div>
+      </div>
+    </div>
+
+    <!-- ===================== STAKING ===================== -->
+    <div class="section-divider reveal">The Staking Vault <span class="muted" style="margin-left:auto;">weekly pool, split by stake</span></div>
+    <div class="stat-grid reveal" id="stakeGrid"></div>
+
+    <!-- ===================== LEADERBOARD ===================== -->
+    <div class="section-divider reveal">Standings <span class="muted" id="lbCount" style="margin-left:auto;"></span></div>
+    <div class="lb-controls reveal" id="lbControls">
+      <button class="lb-btn on" data-sort="balance">Balance</button>
+      <button class="lb-btn" data-sort="xp">XP</button>
+      <button class="lb-btn" data-sort="goodbruh">GoodBruh 🪙</button>
+      <button class="lb-btn" data-sort="stake">Staked</button>
+      <button class="lb-btn" data-sort="quests">Quests</button>
+    </div>
+    <div class="board-wrap reveal">
+      <table class="board">
+        <thead>
+          <tr>
+            <th class="r">#</th>
+            <th>Bruh</th>
+            <th class="r">NEW</th>
+            <th class="r hide-sm">XP</th>
+            <th class="r">🪙</th>
+            <th class="r hide-sm">Staked</th>
+            <th class="r hide-sm">Quests</th>
+          </tr>
+        </thead>
+        <tbody id="boardBody"></tbody>
+      </table>
+    </div>
+    <p class="lb-note" id="lbNote"></p>
+
+  </div>
+
+  <!-- ===== PWA BOTTOM NAV ===== -->
+  <nav class="pwa-nav">
+    <a href="/profile.html" class="pwa-tab" data-page="profile"><span id="pwa-avatar-wrap"><img src="/images/profile1.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;" onerror="this.style.display='none'"></span><span>Profile</span></a>
+    <a href="/vote.html" class="pwa-tab" data-page="vote"><span><img src="/images/vote.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span><span>Vote</span></a>
+    <a href="/treasury.html" class="pwa-tab" data-page="treasury"><span><img src="/images/treasury.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span><span>Treasury</span></a>
+    <a href="/guides.html" class="pwa-tab" data-page="guide"><span><img src="/images/guide.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span><span>Guide</span></a>
+  </nav>
+
+  <script type="module">
+    import config from './config.js';
+    window.addEventListener('DOMContentLoaded', () => {
+      const t = document.getElementById('global-menu');
+      if (t) t.innerHTML = config.menu.html;
+    });
+  </script>
+
+  <script>
+  /* ============================================================
+     LIVE DATA
+     Reads from the site backend at /api/newsbruh-stats, which pulls
+     from BruhBot's (separate) Firebase project server-side. See the
+     newsbruh-endpoint.js snippet for the route to paste into server.js.
+     If the API is unreachable, the demo dataset below is shown instead.
+     ============================================================ */
+  const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:3001' : 'https://api.mushroomplanet.earth';
+  const STAKE_REWARD_POOL = 5000000;  // match STAKE_REWARD_POOL in BruhBot reddit_config.py
+  const DAILY_QUEST_REWARD_NEW = 1000;// match DAILY_QUEST_REWARD["new"]
+
+  function formatM(n){ n=Number(n)||0; if(n<1e6) return n.toLocaleString("en-US"); if(n<1e9) return (n/1e6).toFixed(1)+"M"; return (n/1e9).toFixed(2)+"B"; }
+  const comma = n => (Number(n)||0).toLocaleString("en-US");
+
+  const DEMO = {
+    totals: { NEW_Earned: 184320000, NEW_Withdrawn: 41200500, TotalUsers: 1287 },
+    daily:  { NEW_Earned: 642000, NEW_Withdrawn: 118000, New_Users: 9, Active_Users: 214 },
+    monthly:{ NEW_Earned: 14880000, NEW_Withdrawn: 3120000, New_Users: 143, Active_Users: 612 },
+    stake:  { GlobalTotal: 58200000, stakerCount: 47, lastPayout: { pool: 5000000, week: "2026-32", total_staked: 57950000 } },
+    users: [
+      { name:"Individual_Wallaby1", balance: 12480000, stake: 8200000, goodbruh: 341, xp: 98220, quests: 214, flair:"📰 Press Baron" },
+      { name:"crypto_gary_",        balance: 9110000,  stake: 5400000, goodbruh: 288, xp: 71040, quests: 190, flair:"📰 Editor" },
+      { name:"NewsHoundDaily",      balance: 7620500,  stake: 6100000, goodbruh: 255, xp: 66300, quests: 176, flair:"📰 Editor" },
+      { name:"stackin_sats_88",     balance: 6890000,  stake: 3000000, goodbruh: 198, xp: 54110, quests: 168, flair:"📰 Reporter" },
+      { name:"paperboy_pete",       balance: 5340000,  stake: 4200000, goodbruh: 233, xp: 51900, quests: 155, flair:"📰 Reporter" },
+      { name:"mod_of_the_void",     balance: 4720000,  stake: 1200000, goodbruh: 170, xp: 40220, quests: 149, flair:"📰 Reporter" },
+      { name:"bruh_enjoyer",        balance: 3980000,  stake: 900000,  goodbruh: 142, xp: 33800, quests: 133, flair:"📰 Stringer" },
+      { name:"quiet_lurker_x",      balance: 3110000,  stake: 2500000, goodbruh: 121, xp: 29940, quests: 121, flair:"📰 Stringer" },
+      { name:"tipjar_tina",         balance: 2760000,  stake: 0,       goodbruh: 305, xp: 27110, quests: 118, flair:"📰 Stringer" },
+      { name:"latenight_reader",    balance: 2200000,  stake: 1500000, goodbruh: 96,  xp: 21050, quests: 104, flair:"📰 Newcomer" },
+      { name:"airdrop_andy",        balance: 1890000,  stake: 300000,  goodbruh: 88,  xp: 18770, quests: 97,  flair:"📰 Newcomer" },
+      { name:"stake_or_die",        balance: 1450000,  stake: 5200000, goodbruh: 61,  xp: 15600, quests: 82,  flair:"📰 Newcomer" },
+    ]
+  };
+
+  async function loadLive(){
+    const res = await fetch(API_BASE + '/api/newsbruh-stats');
+    if(!res.ok) throw new Error('API '+res.status);
+    const d = await res.json();
+    if(!d || !d.ok) throw new Error('API not ok');
+    return {
+      totals:  d.totals  || {},
+      daily:   d.daily   || {},
+      monthly: d.monthly || {},
+      stake:   d.stake   || { GlobalTotal:0, stakerCount:0, lastPayout:{} },
+      users:   Array.isArray(d.users) ? d.users : [],
+    };
+  }
+
+  function statCard(label, value, sub, cls, tag){
+    return `<div class="stat-card ${cls||""}">
+      ${tag?`<span class="tag">${tag}</span>`:""}
+      <div class="label">${label}</div>
+      <div class="num">${value}</div>
+      ${sub?`<div class="sub">${sub}</div>`:""}
+    </div>`;
+  }
+  function rowLine(k,v,cls){ return `<div class="row"><span class="k">${k}</span><span class="v ${cls||""}">${v}</span></div>`; }
+
+  let STATE=null, SORT="balance";
+
+  function renderTotals(d){
+    const net=(Number(d.totals.NEW_Earned)||0)-(Number(d.totals.NEW_Withdrawn)||0);
+    document.getElementById("totalsGrid").innerHTML =
+      statCard("Total Bruhs", comma(d.totals.TotalUsers), "registered all-time", "", "users") +
+      statCard("Daily Active", comma(d.daily.Active_Users), comma(d.daily.New_Users)+" new today", "") +
+      statCard("Monthly Active", comma(d.monthly.Active_Users), comma(d.monthly.New_Users)+" new this month", "") +
+      statCard("NEW in Circulation", formatM(net), comma(net)+" net", "hot", "NEW");
+  }
+  function renderRewards(d){
+    document.getElementById("periodRows").innerHTML =
+      rowLine("Rewards paid today", formatM(d.daily.NEW_Earned)+" NEW","new") +
+      rowLine("Withdrawn today", formatM(d.daily.NEW_Withdrawn)+" NEW") +
+      rowLine("Active earners today", comma(d.daily.Active_Users)) +
+      rowLine("Rewards this month", formatM(d.monthly.NEW_Earned)+" NEW","new") +
+      rowLine("Withdrawn this month", formatM(d.monthly.NEW_Withdrawn)+" NEW");
+    document.getElementById("poolRows").innerHTML =
+      rowLine("All-time earned", formatM(d.totals.NEW_Earned)+" NEW","new") +
+      rowLine("All-time withdrawn", formatM(d.totals.NEW_Withdrawn)+" NEW") +
+      rowLine("Weekly staking pool", formatM(STAKE_REWARD_POOL)+" NEW","stk") +
+      rowLine("Daily quest reward", comma(DAILY_QUEST_REWARD_NEW)+" NEW") +
+      rowLine("Last payout week", d.stake.lastPayout&&d.stake.lastPayout.week?d.stake.lastPayout.week:"—");
+  }
+  function renderStake(d){
+    const lp=d.stake.lastPayout||{};
+    document.getElementById("stakeGrid").innerHTML =
+      statCard("Total Staked", formatM(d.stake.GlobalTotal), "locked in vault", "stk", "NEW") +
+      statCard("Active Stakers", comma(d.stake.stakerCount), "users with a stake", "") +
+      statCard("Weekly Pool", formatM(lp.pool||STAKE_REWARD_POOL), "split pro-rata", "hot", "NEW") +
+      statCard("Last Payout", lp.week||"—", lp.total_staked?formatM(lp.total_staked)+" NEW staked":"awaiting payout", "");
+  }
+  function renderBoard(d){
+    const key=SORT;
+    const rows=[...d.users].sort((a,b)=>(b[key]||0)-(a[key]||0)).slice(0,25);
+    const max=Math.max(1,...rows.map(r=>r[key]||0));
+    document.getElementById("boardBody").innerHTML = rows.map((r,i)=>{
+      const rank=i+1, rc=rank===1?"top1":rank===2?"top2":rank===3?"top3":"";
+      const pct=((r[key]||0)/max*100).toFixed(1);
+      return `<tr>
+        <td class="r rank ${rc}">${rank}</td>
+        <td class="bar"><div class="fillbar" style="width:${pct}%"></div>
+          <div class="cell"><span class="uname"><span class="u">u/</span>${r.name}</span>${r.flair?`<span class="flair">${r.flair}</span>`:""}</div>
+        </td>
+        <td class="r">${formatM(r.balance)}</td>
+        <td class="r hide-sm">${comma(r.xp)}</td>
+        <td class="r coinpill">${comma(r.goodbruh)}</td>
+        <td class="r hide-sm">${r.stake?formatM(r.stake):"—"}</td>
+        <td class="r hide-sm">${comma(r.quests)}</td>
+      </tr>`;
+    }).join("");
+    document.getElementById("lbCount").textContent = d.users.length+" bruhs · top 25";
+    const names={balance:"NEW balance",xp:"XP",goodbruh:"GoodBruh received",stake:"amount staked",quests:"quests completed"};
+    document.getElementById("lbNote").textContent = "Ranked by "+names[key]+". Bar shows share of the leader.";
+  }
+  function renderAll(d){ STATE=d; renderTotals(d); renderRewards(d); renderStake(d); renderBoard(d); }
+
+  document.getElementById("lbControls").addEventListener("click", e=>{
+    const b=e.target.closest("button"); if(!b) return;
+    document.querySelectorAll("#lbControls .lb-btn").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on"); SORT=b.dataset.sort; if(STATE) renderBoard(STATE);
+  });
+
+  (async function(){
+    const dot=document.getElementById("statusDot"), txt=document.getElementById("statusText");
+    try {
+      const live=await loadLive();
+      dot.classList.add("live"); txt.textContent="Live";
+      renderAll(live);
+    } catch(err){
+      console.error('[newsbruh]', err);
+      txt.textContent="Live data unavailable — demo data";
+      renderAll(DEMO);
+    }
+  })();
+
+  // starfield
+  (function(){ const sf=document.getElementById('starfield'); for(let i=0;i<80;i++){ const s=document.createElement('div'); s.className='star'; const sz=Math.random()*2.5+0.5; s.style.cssText=['width:'+sz+'px','height:'+sz+'px','top:'+(Math.random()*100)+'%','left:'+(Math.random()*100)+'%','--dur:'+(3+Math.random()*5)+'s','--delay:'+(Math.random()*6)+'s','--op:'+(0.2+Math.random()*0.5)].join(';'); sf.appendChild(s); } })();
+  // reveal
+  const observer=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target);} }); },{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(r=>observer.observe(r));
+  // pwa
+  (function(){ const page=window.location.pathname.split('/').pop().replace('.html','')||'partners'; document.querySelectorAll('.pwa-tab').forEach(t=>{ if(t.dataset.page===page) t.classList.add('active'); }); if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js'); })();
+  </script>
+</body>
+</html>

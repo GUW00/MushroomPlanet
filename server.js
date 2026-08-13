@@ -27,6 +27,32 @@ admin.initializeApp({
 const TESTING = process.env.TESTING === 'true';
 const db = admin.database();
 
+// ================================================================
+// NEWS BRUH / BRUHBOT — second Firebase app (separate project)
+// BruhBot writes to its own Firebase project, so we init a named
+// admin app pointed at its database and read from that.
+// SETUP:
+//   1. Put BruhBot's service-account JSON next to server.js as ./bruhbot-firebase.json
+//   2. Add to .env: BRUH_FIREBASE_DATABASE_URL=https://<your-bruhbot-db>.firebaseio.com
+// Fail-soft: if the credentials file or env var is missing, the rest of
+// the server still starts — only /api/newsbruh-stats returns unavailable.
+// ================================================================
+let bruhDb = null;
+try {
+  if (!process.env.BRUH_FIREBASE_DATABASE_URL) {
+    throw new Error('BRUH_FIREBASE_DATABASE_URL not set in .env');
+  }
+  const bruhServiceAccount = JSON.parse(fs.readFileSync('./bruhbot-firebase.json', 'utf8'));
+  const bruhApp = admin.initializeApp({
+    credential: admin.credential.cert(bruhServiceAccount),
+    databaseURL: process.env.BRUH_FIREBASE_DATABASE_URL,
+  }, 'bruhbot');                 // named app, kept separate from the default db
+  bruhDb = bruhApp.database();
+  console.log('[NEWSBRUH] BruhBot Firebase app initialized.');
+} catch (e) {
+  console.warn('[NEWSBRUH] BruhBot Firebase not configured — /api/newsbruh-stats disabled:', e.message);
+}
+
 const LOG_CHANNEL_ID = '1369734531606646864';
 
 async function discordLog(discord_id, message) {
@@ -1407,6 +1433,92 @@ app.get('/api/sporebot-totals', async (req, res) => {
 
 app.get('/api/config/public', (req, res) => {
   res.json({ discord_client_id: process.env.DISCORD_CLIENT_ID });
+});
+
+// ----------------------------------------------------------------
+// GET /api/newsbruh-stats
+// Live stats for the News Bruh partner page (reads BruhBot's project).
+// ----------------------------------------------------------------
+app.get('/api/newsbruh-stats', async (req, res) => {
+  if (!bruhDb) {
+    return res.status(503).json({ ok: false, error: 'BruhBot Firebase not configured' });
+  }
+  try {
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    // BruhBot daily key format: MM-DD-YYYY (UTC)
+    const dayKey = `${pad(now.getUTCMonth() + 1)}-${pad(now.getUTCDate())}-${now.getUTCFullYear()}`;
+    // BruhBot monthly key format: Month_YYYY (e.g. "August_2026")
+    const monthName = now.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' });
+    const monthKey = `${monthName}_${now.getUTCFullYear()}`;
+
+    const [totalsSnap, dailySnap, monthlySnap, usersSnap, stakeSnap] = await Promise.all([
+      bruhDb.ref('NewsBruh/Logs/Totals').get(),
+      bruhDb.ref(`NewsBruh/Logs/Daily/${dayKey}`).get(),
+      bruhDb.ref(`NewsBruh/Logs/Monthly/${monthKey}`).get(),
+      bruhDb.ref('NewsBruh/Users').get(),
+      bruhDb.ref('NewsBruh/Stake').get(),
+    ]);
+
+    const totals  = totalsSnap.val()  || {};
+    const daily   = dailySnap.val()   || {};
+    const monthly = monthlySnap.val() || {};
+    const stake   = stakeSnap.val()   || {};
+
+    // Build leaderboard rows from the real BruhBot user schema.
+    const users = [];
+    if (usersSnap.exists()) {
+      usersSnap.forEach(child => {
+        const u = child.val() || {};
+        const bal   = u.Balance || {};
+        const flair = u.Flair   || {};
+        users.push({
+          name:     child.key,
+          balance:  Number(bal.NEW)   || 0,
+          stake:    Number(bal.Stake) || 0,
+          goodbruh: Number((u.GoodBruh || {}).Tokens_Received) || 0,
+          xp:       Number(flair.Total_XP) || 0,
+          quests:   Number((u.Quests || {}).Total_Quest) || 0,
+          flair:    typeof flair.Flair === 'string' ? flair.Flair : '',
+        });
+      });
+    }
+    // Sort by balance server-side; client can re-sort by other keys.
+    users.sort((a, b) => b.balance - a.balance);
+
+    const current = stake.Current || {};
+
+    res.json({
+      ok: true,
+      totals: {
+        NEW_Earned:    Number(totals.NEW_Earned)    || 0,
+        NEW_Withdrawn: Number(totals.NEW_Withdrawn) || 0,
+        TotalUsers:    Number(totals.TotalUsers)    || 0,
+      },
+      daily: {
+        NEW_Earned:    Number(daily.NEW_Earned)    || 0,
+        NEW_Withdrawn: Number(daily.NEW_Withdrawn) || 0,
+        New_Users:     Number(daily.New_Users)     || 0,
+        Active_Users:  Number(daily.Active_Users)  || 0,
+      },
+      monthly: {
+        NEW_Earned:    Number(monthly.NEW_Earned)    || 0,
+        NEW_Withdrawn: Number(monthly.NEW_Withdrawn) || 0,
+        New_Users:     Number(monthly.New_Users)     || 0,
+        Active_Users:  Number(monthly.Active_Users)  || 0,
+      },
+      stake: {
+        GlobalTotal: Number(stake.GlobalTotal) || 0,
+        stakerCount: Object.keys(current).length,
+        lastPayout:  stake.LastPayout || {},
+      },
+      // Trim to top 50 to keep the payload small; the page shows top 25.
+      users: users.slice(0, 50),
+    });
+  } catch (err) {
+    console.error('[NEWSBRUH-STATS]', err);
+    res.status(500).json({ ok: false });
+  }
 });
 
 // ================================================================

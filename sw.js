@@ -1,9 +1,10 @@
 if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
   self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));
 } else {
-const CACHE = 'mp-v45';
+const CACHE = 'mp-v46';
 const SHELL = [
   '/profile.html', '/treasury.html', '/vote.html', '/convert.html',
+  '/partners.html', '/newsbruh.html',
   '/styles.css', '/config.js',
   '/images/discord.png', '/images/reddit.png',
   '/images/icon-192.png', '/images/icon-512.png'
