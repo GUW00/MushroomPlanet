@@ -779,7 +779,7 @@
       <div id="bd-body" style="font-family:'Space Grotesk',monospace;font-size:0.75rem;">Loading...</div>
     </div>
 
-    <div class="demo-panel">
+    <div class="demo-panel" style="display:none;">
       <div class="demo-head">
         <span>Demo: preview any stage</span>
         <span id="demo-val">50%</span>
@@ -888,7 +888,7 @@
       </div>
     </div>
 
-    <div class="lb-panel">
+    <div class="lb-panel" style="display:none;">
       <div class="lb-panel-head">
         <h2>Top Donators</h2>
         <div style="font-family:'Space Grotesk',monospace;font-size:0.65rem;color:rgba(255,255,225,0.4);margin-top:0.25rem;">*100 SPORE = 1 SHROOM fed</div>
@@ -1696,7 +1696,7 @@
     }
   });
 
-  renderLeaderboard();
+  // renderLeaderboard(); // panel hidden - skip donor fetch
 
   // ─────────────────────────────────────────────────────────────────
   // GLOBAL MENU + STARFIELD (shared site shell)

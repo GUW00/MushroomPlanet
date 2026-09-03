@@ -374,6 +374,186 @@ app.post('/api/actions/equip-potion',  (req, res) => proxyToFastAPI('equip-potio
 app.post('/api/actions/discard-potion',(req, res) => proxyToFastAPI('discard-potion',req, res, 'DISCARD-POTION'));
 app.post('/api/actions/craft-herbs', (req, res) => proxyToFastAPI('craft-herbs', req, res, 'CRAFT-HERBS'));
 app.post('/api/actions/buy-herb', (req, res) => proxyToFastAPI('buy-herb', req, res, 'BUY-HERB'));
+app.post('/api/actions/dig', (req, res) => proxyToFastAPI('dig', req, res, 'DIG'));
+
+// ================================================================
+// POTION MARKETPLACE (player-to-player, seller-set prices)
+// New node: Sporebot/Marketplace/Listings/{id} — does NOT touch
+// any existing user data structures. Potions are escrowed here
+// while listed (removed from seller inventory) so they can't be
+// double-sold or activated. All balance moves are atomic.
+// ================================================================
+
+// GET /api/marketplace/listings — all active listings (public)
+app.get('/api/marketplace/listings', async (req, res) => {
+  try {
+    const snap = await db.ref('Sporebot/Marketplace/Listings').get();
+    const raw = snap.val() || {};
+    const listings = Object.entries(raw).map(([id, l]) => ({ id, ...l }));
+    res.json({ ok: true, listings });
+  } catch (err) {
+    console.error('[MKT-LIST]', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
+// POST /api/marketplace/list — escrow a potion into a listing
+app.post('/api/marketplace/list', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+  const discord_id = sessionUser.discord_id;
+  const { slot_key } = req.body;
+  const price = parseInt(req.body.price, 10);
+  if (!slot_key || !String(slot_key).startsWith('Potion_'))
+    return res.status(400).json({ ok: false, message: 'Invalid potion slot' });
+  if (!price || price < 1)
+    return res.status(400).json({ ok: false, message: 'Invalid price' });
+
+  try {
+    const potionsRef = db.ref(`Sporebot/Users/${discord_id}/Inventory/Potions`);
+    const potionsSnap = await potionsRef.get();
+    const potions = potionsSnap.val() || {};
+    const potion = potions[slot_key];
+    if (!potion || typeof potion !== 'object')
+      return res.status(404).json({ ok: false, message: 'Potion not found in that slot' });
+
+    // Resolve a display name for the seller
+    let seller_name = sessionUser.username;
+    if (!seller_name) {
+      const nSnap = await db.ref(`Sporebot/Users/${discord_id}/Misc/username`).get();
+      seller_name = nSnap.val() || 'Shroomie';
+    }
+
+    // Rebuild the seller's potion slots WITHOUT the listed one, reindexed 1..N
+    const remaining = Object.entries(potions)
+      .filter(([k, v]) => k.startsWith('Potion_') && k !== slot_key && v && typeof v === 'object')
+      .map(([, v]) => v);
+    const nonPotionKeys = Object.entries(potions)
+      .filter(([k]) => !k.startsWith('Potion_'));
+
+    const newPotions = {};
+    for (const [k, v] of nonPotionKeys) newPotions[k] = v; // preserve Active_Potion, Extra_Slots, etc.
+    remaining.forEach((v, i) => { newPotions[`Potion_${i + 1}`] = v; });
+
+    const listingId = db.ref('Sporebot/Marketplace/Listings').push().key;
+    const listing = {
+      seller_id: discord_id,
+      seller_name,
+      potion,
+      price,
+      created: new Date().toISOString(),
+    };
+
+    // Atomic: write the reindexed potions block + create the listing together.
+    // (Potions is fully recomputed above from live data, so this set is safe.)
+    const updates = {};
+    updates[`Sporebot/Users/${discord_id}/Inventory/Potions`] = newPotions;
+    updates[`Sporebot/Marketplace/Listings/${listingId}`] = listing;
+    await db.ref().update(updates);
+
+    console.log(`[MKT-LIST] ${discord_id} listed ${slot_key} for ${price} SPORE`);
+    discordLog(discord_id, `Listed potion **${potion.name || 'Unnamed'}** for ${price.toLocaleString()} SPORE`).catch(() => {});
+    res.json({ ok: true, listing_id: listingId });
+  } catch (err) {
+    console.error('[MKT-LIST-CREATE]', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
+// POST /api/marketplace/delist — return an escrowed potion to the seller
+app.post('/api/marketplace/delist', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+  const discord_id = sessionUser.discord_id;
+  const { listing_id } = req.body;
+  if (!listing_id) return res.status(400).json({ ok: false, message: 'Missing listing' });
+
+  try {
+    const listingRef = db.ref(`Sporebot/Marketplace/Listings/${listing_id}`);
+
+    // Transaction: only the owner can claim it, and only once.
+    let claimed = null;
+    await listingRef.transaction(cur => {
+      if (!cur) return cur;                       // already gone
+      if (String(cur.seller_id) !== String(discord_id)) return;  // not yours -> abort
+      claimed = cur;
+      return null;                                // delete listing
+    });
+    if (!claimed) return res.status(409).json({ ok: false, message: 'Listing no longer available' });
+
+    // Return potion to next free slot (recompute from live inventory)
+    const potionsRef = db.ref(`Sporebot/Users/${discord_id}/Inventory/Potions`);
+    const potions = (await potionsRef.get()).val() || {};
+    let i = 1; while (potions[`Potion_${i}`]) i++;
+    await potionsRef.child(`Potion_${i}`).set(claimed.potion);
+
+    console.log(`[MKT-DELIST] ${discord_id} delisted ${listing_id}`);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[MKT-DELIST]', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
+// POST /api/marketplace/buy — atomic purchase
+app.post('/api/marketplace/buy', async (req, res) => {
+  const sessionUser = getSessionUser(req);
+  if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
+  const buyer_id = sessionUser.discord_id;
+  const { listing_id } = req.body;
+  if (!listing_id) return res.status(400).json({ ok: false, message: 'Missing listing' });
+
+  try {
+    const listingRef = db.ref(`Sporebot/Marketplace/Listings/${listing_id}`);
+
+    // Claim the listing via transaction so two buyers can't both win it.
+    let claimed = null;
+    await listingRef.transaction(cur => {
+      if (!cur) return cur;                              // already sold/gone
+      if (String(cur.seller_id) === String(buyer_id)) return; // can't buy own -> abort
+      claimed = cur;
+      return null;                                       // remove listing (reserved for this buyer)
+    });
+    if (!claimed) return res.status(409).json({ ok: false, message: 'Listing no longer available' });
+
+    const price = parseInt(claimed.price, 10) || 0;
+    const seller_id = claimed.seller_id;
+
+    // Read balances + buyer inventory
+    const [buyerWalletSnap, sellerWalletSnap, buyerPotionsSnap] = await Promise.all([
+      db.ref(`Pixie/Users/${buyer_id}/Wallet`).get(),
+      db.ref(`Pixie/Users/${seller_id}/Wallet`).get(),
+      db.ref(`Sporebot/Users/${buyer_id}/Inventory/Potions`).get(),
+    ]);
+    const buyerSpore  = parseInt(buyerWalletSnap.val()?.spore_wallet || 0, 10);
+    const sellerSpore = parseInt(sellerWalletSnap.val()?.spore_wallet || 0, 10);
+
+    if (buyerSpore < price) {
+      // refund the listing back to the market since buyer can't pay
+      await listingRef.set(claimed);
+      return res.status(400).json({ ok: false, message: `Not enough SPORE. You have ${buyerSpore.toLocaleString()}.` });
+    }
+
+    // Next free potion slot for buyer
+    const buyerPotions = buyerPotionsSnap.val() || {};
+    let i = 1; while (buyerPotions[`Potion_${i}`]) i++;
+
+    // Atomic settlement: pay seller, charge buyer, deliver potion. Listing already removed.
+    const updates = {};
+    updates[`Pixie/Users/${buyer_id}/Wallet/spore_wallet`]  = buyerSpore - price;
+    updates[`Pixie/Users/${seller_id}/Wallet/spore_wallet`] = sellerSpore + price;
+    updates[`Sporebot/Users/${buyer_id}/Inventory/Potions/Potion_${i}`] = claimed.potion;
+    await db.ref().update(updates);
+
+    console.log(`[MKT-BUY] ${buyer_id} bought ${listing_id} from ${seller_id} for ${price} SPORE`);
+    discordLog(buyer_id,  `Bought potion **${claimed.potion?.name || 'Unnamed'}** for ${price.toLocaleString()} SPORE`).catch(() => {});
+    discordLog(seller_id, `Sold potion **${claimed.potion?.name || 'Unnamed'}** for ${price.toLocaleString()} SPORE`).catch(() => {});
+    res.json({ ok: true, spore_wallet: buyerSpore - price });
+  } catch (err) {
+    console.error('[MKT-BUY]', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
 
 // GET /api/user/recipes/:discord_id
 app.get('/api/user/:id/recipes', async (req, res) => {

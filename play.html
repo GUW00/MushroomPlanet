@@ -7,647 +7,304 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne+Mono&display=swap" />
   <link rel="stylesheet" href="styles.css" />
   <style>
-    
-    .ground-tile {
-      position: absolute;
-      image-rendering: pixelated;
-      background-repeat: no-repeat;
+    .contract-row { display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;background:var(--dark3);border-radius:0.875rem;margin-bottom:0.5rem;font-size:0.8rem;flex-wrap:wrap; }
+    @media(max-width:480px) {
+      .contract-row { flex-direction:column;align-items:flex-start; }
+      .copy-btn { margin-left:0;width:100%;text-align:center; }
     }
-    /* shovel edit mode: subtle grid so cells are visible while painting */
-    #tile-host.editing .ground-tile { box-shadow: 0 0 0 1px rgba(0,0,0,0.15) inset; cursor: pointer; }
-    #tile-host.editing .ground-tile:hover { box-shadow: 0 0 0 2px rgba(255,214,0,0.7) inset; }
-    /* Shovel button + tile palette bar */
-    #shovel-btn {
-      position: absolute; left: 0.6rem; bottom: 3.4rem; z-index: 55;
-      background: var(--gold); color: var(--dark); border: none; border-radius: 999px;
-      padding: 0.55rem 0.9rem; font-weight: 700; font-size: 0.75rem;
-      font-family: 'Space Grotesk', sans-serif; cursor: pointer;
-      box-shadow: 0 4px 16px rgba(254,206,0,0.35);
-    }
-    #tile-palette {
-      position: absolute; left: 50%; bottom: 0.6rem; transform: translateX(-50%);
-      z-index: 60; display: none; gap: 0.35rem; padding: 0.4rem 0.5rem;
-      background: rgba(15,15,15,0.92); border: 1px solid rgba(255,255,225,0.15);
-      border-radius: 12px; max-width: 94%; overflow-x: auto;
-    }
-    #tile-palette.show { display: flex; }
-    .palette-tile {
-      width: 40px; height: 40px; flex: 0 0 auto; border-radius: 6px; cursor: pointer;
-      image-rendering: pixelated; background-repeat: no-repeat;
-      border: 2px solid transparent;
-    }
-    
-    .palette-tile.selected { border-color: var(--gold); }
-    #tile-done-btn {
-      flex: 0 0 auto; align-self: center; background: var(--gold); color: var(--dark);
-      border: none; border-radius: 8px; padding: 0.4rem 0.7rem; font-weight: 700;
-      font-size: 0.7rem; cursor: pointer; font-family: 'Space Grotesk', sans-serif;
-    }
-    /* Living grass: each tuft bends around its base. A shared keyframe with
-       per-tuft animation-delay makes the field ripple out of phase, and a
-       slower "gust" keyframe layered on adds rolling wind waves. */
-    .grass-tuft {
-      transform-box: fill-box;
-      transform-origin: 50% 100%;
-      animation: tuftSway 3.2s ease-in-out infinite;
-      will-change: transform;
-    }
-    @keyframes tuftSway {
-      0%   { transform: rotate(-4deg); }
-      50%  { transform: rotate(5deg); }
-      100% { transform: rotate(-4deg); }
-    }
-
-    
-    /* Gust group: a second, slower rock applied to the whole tuft layer,
-       so a wind wave passes over everything on top of the individual sway. */
-    #grass-layer {
-      transform-box: fill-box;
-      transform-origin: 50% 100%;
-      animation: windGust 7s ease-in-out infinite;
-    }
-    @keyframes windGust {
-      0%, 100% { transform: skewX(0deg); }
-      45%      { transform: skewX(-3deg); }
-      70%      { transform: skewX(1.5deg); }
-    }
+    .contract-row img { width:22px;height:22px;object-fit:contain; }
+    .contract-name { color:var(--cream);text-decoration:none;font-weight:600;transition:color 0.2s; }
+    .contract-name:hover { color:var(--gold); }
+    .copy-btn { margin-left:auto;font-family:'Space Grotesk',monospace;font-size:0.62rem;padding:0.3em 0.85em;border-radius:999px;border:1px solid rgba(79,168,253,0.3);background:rgba(79,168,253,0.08);color:var(--blue);cursor:pointer;transition:all 0.2s;white-space:nowrap;letter-spacing:0.04em; }
+    .copy-btn:hover { background:rgba(79,168,253,0.18);border-color:rgba(79,168,253,0.6); }
+    .copy-btn.copied { color:var(--green);border-color:rgba(34,197,94,0.4);background:rgba(34,197,94,0.08); }
+    body { padding-top: 100px !important; }
     :root {
-      --cream: #ffffe1; --yellow: #fece00; --red: #fd464f; --blue: #4fa8fd;
+      --cream: #ffffe1; --yellow: #fd464f; --red: #fd464f; --blue: #4fa8fd;
       --dark: #0f0f0f; --dark2: #1a1a1a; --dark3: #242424;
       --green: #22c55e; --purple: #c084fc; --gold: #fece00;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { padding-top: 100px !important; }
     body { background: var(--dark); color: var(--cream); font-family: 'Space Grotesk', sans-serif; overflow-x: hidden; }
     #starfield { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
     .star { position: absolute; border-radius: 50%; background: var(--cream); opacity: 0; animation: twinkle var(--dur) var(--delay) infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: var(--op); transform: scale(1); } }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.65s ease, transform 0.65s ease; }
-    .reveal.visible { opacity: 1; transform: none; }
-
-    .guide-hero { position: relative; z-index: 1; text-align: center; padding: 5rem 1rem 2rem;}
-    .guide-hero .eyebrow { font-family: 'Space Grotesk', monospace; font-size: 0.75rem; letter-spacing: 0.3em; color: var(--green); text-transform: uppercase; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.2s forwards; }
+    .guide-hero { position: relative; z-index: 1; text-align: center; padding: 5rem 1rem 2.5rem;}
+    .guide-hero .eyebrow { font-family: 'Space Grotesk', monospace; font-size: 0.75rem; letter-spacing: 0.3em; color: var(--red); text-transform: uppercase; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.2s forwards; }
     .guide-hero h1 { font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 700; line-height: 1.1; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.4s forwards; }
     .guide-hero h1 span { color: var(--blue); }
-    .guide-hero p { font-size: 1.05rem; max-width: 640px; margin: 0 auto; color: rgba(255,255,225,0.65); opacity: 0; animation: fadeUp 0.6s 0.6s forwards; }
-
-    .page-section { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 2rem; }
-
-    .field-frame.map-fullscreen {
-      position: fixed !important; inset: 0 !important; z-index: 1500;
-      width: auto !important; height: auto !important; aspect-ratio: auto !important;
-      border-radius: 0 !important; border: none !important;
+    .guide-hero p { font-size: 1.05rem; max-width: 640px; margin: 0 auto 2.5rem; color: rgba(255,255,225,0.65); opacity: 0; animation: fadeUp 0.6s 0.6s forwards; }
+    .guide-tabs { position: relative; z-index: 1; display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; padding: 0 1rem 2.5rem; opacity: 0; animation: fadeUp 0.6s 0.8s forwards; }
+    @media (max-width: 600px), (display-mode: standalone) {
+      .guide-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 0 1rem 1.5rem; }
+      .guide-tab { justify-content: center; padding: 0.55rem 0.5rem; font-size: 0.65rem; }
+      .guide-section { padding-bottom: 2rem !important; }
     }
-    body.map-locked { overflow: hidden !important; }
-    body.map-locked header,
-    body.map-locked #global-menu,
-    body.map-locked .guide-hero,
-    body.map-locked footer,
-    body.map-locked #starfield { display: none !important; }
-    .field-frame {
-      position: relative; width: 100%; aspect-ratio: 1 / 1;
-      border-radius: 1.5rem; overflow: hidden;
-      border: 1px solid rgba(255,255,225,0.07);
-      background: #24512a;
-      touch-action: none;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
+    .guide-tab { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.4rem; border-radius: 999px; border: 1.5px solid rgba(255,255,225,0.12); background: transparent; color: rgba(255,255,225,0.5); font-family: 'Space Grotesk', monospace; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.22s; letter-spacing: 0.05em; }
+    .guide-tab img { width: 18px; height: 18px; object-fit: contain; opacity: 0.6; transition: opacity 0.2s; }
+    .guide-tab:hover { border-color: rgba(255,255,225,0.3); color: var(--cream); }
+    .guide-tab:hover img { opacity: 1; }
+    .guide-tab.active { border-color: var(--blue); color: var(--blue); background: rgba(79,168,253,0.08); }
+    .guide-tab.active img { opacity: 1; }
+    .guide-section { position: relative; z-index: 1; display: none; max-width: 1000px; margin: 0 auto; padding: 0 1.5rem 2rem; }
+    .guide-section.active { display: block; }
+    .section-label { font-family: 'Space Grotesk', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red); margin-bottom: 0.4rem; }
+    .section-title { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; margin-bottom: 2rem; }
+    .guide-card { background: var(--dark2); border: 1px solid rgba(255,255,225,0.07); border-radius: 1.5rem; padding: 2rem; margin-bottom: 1rem; transition: border-color 0.3s; }
+    .guide-card:hover { border-color: rgba(255,255,225,0.13); }
+    .guide-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .guide-card h4 { font-size: 0.88rem; font-weight: 700; color: rgba(255,255,225,0.8); margin: 1.25rem 0 0.5rem; font-family: 'Space Grotesk', monospace; letter-spacing: 0.05em; }
+    .guide-card p { font-size: 0.85rem; color: rgba(255,255,225,0.65); line-height: 1.75; margin-bottom: 0.75rem; }
+    .guide-card p:last-child { margin-bottom: 0; }
+    .guide-card ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 0.45rem; }
+    .guide-card li { font-size: 0.82rem; color: rgba(255,255,225,0.65); line-height: 1.65; padding-left: 1.1rem; position: relative; }
+    .guide-card li::before { content: '-'; position: absolute; left: 0; color: var(--blue); font-family: 'Space Grotesk', monospace; }
+    .guide-card code { font-family: 'Space Grotesk', monospace; font-size: 0.78rem; background: rgba(79,168,253,0.08); padding: 0.15em 0.45em; border-radius: 0.35rem; color: var(--blue); }
+    .guide-card li strong { color: var(--cream); }
+    .guide-card a { color: var(--blue); text-decoration: none; }
+    .guide-card a:hover { text-decoration: underline; }
+    .dual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    @media (max-width: 768px) { .dual-grid { grid-template-columns: 1fr; } }
+    .highlight-row { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 1rem; border-radius: 0.75rem; margin-bottom: 0.4rem; font-family: 'Space Grotesk', monospace; font-size: 0.72rem; border: 1px solid; transition: all 0.2s; }
+    .section-divider { font-family: 'Space Grotesk', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin: 1.75rem 0 0.75rem; display: flex; align-items: center; gap: 0.75rem; }
+    .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(79,168,253,0.35), transparent); }
+    .btn { display: inline-flex; align-items: center; gap: 0.45rem; font-family: 'Space Grotesk', monospace; font-size: 0.72rem; font-weight: 600; padding: 0.6em 1.4em; border-radius: 999px; border: 1px solid; cursor: pointer; transition: all 0.2s; text-decoration: none; letter-spacing: 0.05em; }
+    .btn-yellow { color: var(--red); background: rgba(253,70,79,0.08); border-color: rgba(253,70,79,0.3); }
+    .btn-yellow:hover { background: rgba(253,70,79,0.16); border-color: rgba(253,70,79,0.6); }
+    .btn-blue { color: var(--blue); background: rgba(79,168,253,0.08); border-color: rgba(79,168,253,0.3); }
+    .btn-blue:hover { background: rgba(79,168,253,0.16); border-color: rgba(79,168,253,0.6); }
+    .btn-green { color: var(--green); background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.3); }
+    .btn-green:hover { background: rgba(34,197,94,0.16); border-color: rgba(34,197,94,0.6); }
+    .cta-row { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2.5rem; }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+
+    .team-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin-top: 0.75rem; }
+    .team-card { background: var(--dark3); border: 1px solid rgba(255,255,225,0.06); border-radius: 1rem; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.875rem; transition: border-color 0.3s; }
+    @media (max-width: 480px) { .team-card { flex-direction: column; align-items: flex-start; gap: 0.5rem; } .team-card img { width: 36px; height: 36px; } }
+    .team-card:hover { border-color: rgba(255,255,225,0.15); }
+    .team-card img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(79,168,253,0.3); flex-shrink: 0; }
+    .team-card .t-name { font-size: 0.82rem; font-weight: 700; color: var(--cream); margin-bottom: 0.15rem; }
+    .team-card .t-role { font-size: 0.68rem; font-family: 'Space Grotesk', monospace; color: rgba(255,255,225,0.4); line-height: 1.4; }
+
+    .lore-list { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem; }
+    .lore-item { display: flex; gap: 1rem; align-items: flex-start; }
+    .lore-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--blue); flex-shrink: 0; margin-top: 0.35rem; }
+    .lore-text { font-size: 0.82rem; color: rgba(255,255,225,0.65); line-height: 1.65; }
+    .lore-text strong { color: var(--cream); }
 
     .header-icons { display: none; }
     .header-icons img { width: 22px !important; height: 22px !important; object-fit: contain !important; border-radius: 0 !important; border: none !important; margin: 0 !important; opacity: 0.85; }
     .header-icons #header-profile-icon { border-radius: 50% !important; object-fit: cover !important; }
     @media (max-width: 768px) { .header-icons { display: flex; gap: 0.75rem; align-items: center; } }
     @media (display-mode: standalone) { .header-icons { display: none !important; } }
-
     .pwa-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #111; border-top: 1px solid rgba(255,255,225,0.08); display: none; align-items: stretch; z-index: 999; padding-bottom: env(safe-area-inset-bottom); }
     @media (display-mode: standalone) { .pwa-nav { display: flex; } body { padding-bottom: 65px !important; } }
+    @media (display-mode: standalone) { .guide-section { padding-bottom: 2rem !important; } }
     .pwa-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; text-decoration: none; color: rgba(255,255,225,0.35); font-family: 'Space Grotesk', monospace; font-size: 0.55rem; letter-spacing: 0.05em; transition: color 0.2s; }
     .pwa-tab span:first-child { font-size: 1.3rem; display: flex; align-items: center; justify-content: center; }
-    .pwa-tab.active { color: var(--green); }
-
+    .pwa-tab.active { color: #c084fc; }
     @media (display-mode: standalone) {
       header { display: none !important; } #global-menu { display: none !important; }
       html body { padding-top: 0 !important; }
       .guide-hero { padding: 1.25rem 1rem 0.75rem !important; }
       .guide-hero h1 { font-size: 1.75rem !important; margin-bottom: 0.35rem !important; }
-      .guide-hero p { font-size: 0.8rem !important; }
+      .guide-hero p { font-size: 0.8rem !important; margin-bottom: 0.75rem !important; }
     }
-
-    /* ================= GAME (inside .field-frame only) ================= */
-    #viewport {
-      position: absolute; inset: 0; overflow: hidden;
-      background: #24512a;
+    @media (max-width: 600px) { .guide-tab { padding: 0.5rem 1rem; font-size: 0.65rem; } .guide-card { padding: 1.4rem; } }
+    .reward-table { font-family: 'Space Grotesk', monospace; font-size: 0.68rem; border: 1px solid rgba(255,255,225,0.06); border-radius: 0.75rem; overflow: hidden; margin-top: 0.5rem; }
+    .rt-head { display: grid; padding: 0.4rem 0.75rem; background: rgba(255,255,255,0.05); color: rgba(255,255,225,0.35); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .rt-row { display: grid; padding: 0.35rem 0.75rem; border-top: 1px solid rgba(255,255,225,0.04); }
+    .rt-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+    .btn-link { display: block; text-align: center; padding: 0.45rem 0.6rem; border-radius: 0.5rem; font-family: 'Space Grotesk', monospace; font-size: 0.65rem; font-weight: 600; text-decoration: none; transition: all 0.2s; letter-spacing: 0.04em; }
+    .btn-red { color: var(--red); background: rgba(253,70,79,0.08); border: 1px solid rgba(253,70,79,0.25); }
+    .btn-red:hover { background: rgba(253,70,79,0.16); }
+    .btn-link.btn-blue { color: var(--blue); background: rgba(79,168,253,0.08); border: 1px solid rgba(79,168,253,0.25); }
+    .btn-link.btn-blue:hover { background: rgba(79,168,253,0.16); }
+    .btn-ghost { color: rgba(255,255,225,0.5); background: rgba(255,255,225,0.04); border: 1px solid rgba(255,255,225,0.12); }
+    .btn-ghost:hover { background: rgba(255,255,225,0.08); color: var(--cream); }
+    .gi { width: 16px; height: 16px; object-fit: contain; vertical-align: middle; margin-right: 5px; display: inline-block; }
+    .gi-sm { width: 13px; height: 13px; object-fit: contain; vertical-align: middle; margin-right: 4px; display: inline-block; }
+    .support-meta { font-size: 0.78rem; color: rgba(255,255,225,0.6); line-height: 1.7; margin-bottom: 0.75rem; }
+    .support-meta span { font-weight: 600; }
+    .nft-divider { font-family: 'Space Grotesk', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,225,0.35); display: flex; align-items: center; gap: 0.5rem; margin: 0.75rem 0 0.5rem; }
+    .nft-divider::before, .nft-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,225,0.08); }
+    #tab-earn .section-divider { color: var(--red); }
+    #tab-earn .section-divider::before, #tab-earn .section-divider::after { background: linear-gradient(90deg, transparent, rgba(253,70,79,0.35), transparent); }
+    .nft-shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 1rem; }
+    .nft-shop-card { background: var(--dark2); border: 1px solid rgba(255,255,225,0.07); border-radius: 1.5rem; overflow: hidden; display: flex; flex-direction: column; transition: border-color 0.3s, transform 0.25s; }
+    .nft-shop-card:hover { border-color: rgba(255,255,225,0.18); transform: translateY(-3px); }
+    .nft-shop-img { width: 100%; overflow: hidden; background: var(--dark3); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+    .nft-shop-img img { width: 100%; height: auto; object-fit: contain; display: block; }
+    .nft-shop-info { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+    .nft-shop-name { font-size: 0.95rem; font-weight: 700; color: var(--cream); }
+    .nft-shop-name span { font-size: 0.72rem !important; font-weight: 600 !important; color: rgba(255,255,225,0.55) !important; }
+    .nft-shop-reward { font-family: 'Space Grotesk', monospace; font-size: 0.68rem; color: var(--blue); font-weight: 600; }
+    .nft-shop-desc { font-size: 0.78rem; color: rgba(255,255,225,0.55); line-height: 1.65; flex: 1; }
+    @media (max-width: 600px) { .nft-shop-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 400px) { .nft-shop-grid { grid-template-columns: 1fr; } }
+    .shop-intro-card { background: var(--dark2); border: 1px solid rgba(255,255,225,0.07); border-radius: 1.25rem; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+    .shop-intro-card p { font-size: 0.82rem; color: rgba(255,255,225,0.6); line-height: 1.75; margin: 0; }
+    .shop-intro-card p + p { margin-top: 0.5rem; }
+    .shop-filter-row { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .shop-filter-btn { font-family: 'Space Grotesk', monospace; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; padding: 0.4rem 1rem; border-radius: 999px; border: 1.5px solid rgba(255,255,225,0.12); background: transparent; color: rgba(255,255,225,0.45); cursor: pointer; transition: all 0.2s; }
+    .shop-filter-btn.active { border-color: var(--blue); color: var(--blue); background: rgba(79,168,253,0.08); }
+    .shop-filter-btn:hover:not(.active) { border-color: rgba(255,255,225,0.28); color: rgba(255,255,225,0.75); }
+    .nft-shop-meta { font-family: 'Space Grotesk', monospace; font-size: 0.62rem; color: rgba(255,255,225,0.3); line-height: 1.5; margin-bottom: 0.35rem; }
+    .nft-shop-launch { font-size: 0.7rem; color: rgba(255,255,225,0.4); line-height: 1.55; margin-bottom: 0.4rem; }
+    .nft-shop-card[data-avail="secondary"] .nft-shop-name::after { content: ''; }
+    .nft-shop-card[data-avail="available"] { border-color: rgba(79,168,253,0.18); }
+    .shop-avail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 1rem; }
+    @media (max-width: 600px) { .shop-avail-grid { grid-template-columns: 1fr; } }
+    .os-price-badge { display: flex; flex-direction: column; gap: 0.2rem; font-family: 'Space Grotesk', monospace; font-size: 0.68rem; padding: 0.4rem 0.65rem; border-radius: 0.5rem; background: rgba(79,168,253,0.07); border: 1px solid rgba(79,168,253,0.18); margin-top: 0.5rem; }
+    .os-price-row { display: flex; align-items: center; gap: 0.35rem; white-space: nowrap; }
+    .os-price-badge .os-weth { color: var(--blue); font-weight: 600; }
+    .os-price-badge .os-usd { color: rgba(255,255,225,0.4); font-size: 0.62rem; }
+    .os-price-badge .os-label { color: rgba(255,255,225,0.3); font-size: 0.6rem; margin-right: 0.25rem; }
+  </style>
+  <style>
+    /* ===== Play box + dig (page-specific, layered on top of shared foundation) ===== */
+    .field-frame {
+      position: relative; width: 100%; max-width: 560px; margin: 0 auto 2.5rem;
+      aspect-ratio: 1 / 1; background: radial-gradient(circle at 50% 30%, #241a12 0%, #14100c 70%, #0c0908 100%);
+      border: 1px solid rgba(255,255,225,0.10); border-radius: 1.5rem; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 0 60px rgba(0,0,0,0.4);
     }
-    #world {
-      position: absolute; top: 0; left: 0;
-      transform-origin: 0 0;
-      will-change: transform;
-    }
-    #world.placing { cursor: crosshair; }
-    #iso-ground {
-      position: absolute; top: 0; left: 0;
-      background: #3f7d3a;
-      box-shadow:
-        0 0 0 6px #1e331b inset,
-        0 0 60px rgba(0,0,0,0.35) inset,
-        0 0 140px rgba(0,0,0,0.25) inset;
-    }
-    #iso-grid-svg { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
-    #iso-fence-svg { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
-    /* Sun-driven shadow vars (updated on #world each tick):
-       --sun-rot   : direction the shadow points (deg)
-       --sun-len   : length multiplier (short at noon, long at dawn/dusk)
-       --sun-op    : shadow opacity multiplier (0 at night) */
-    /* Sun-driven shadow vars on #world:
-       --sun-rot : direction shadow is cast (deg)
-       --sun-len : length along the cast direction (short noon, long dawn/dusk)
-       --sun-op  : opacity (faint at night)
-       A cast shadow is a BLADE: it grows along its length only and stays
-       thin across. The element's own width/height is the object's ground
-       footprint; --sun-len stretches just the length axis. The gradient
-       runs along that axis and fades at the far tip. transform-origin is
-       the near edge (base of the object) so it pivots at the feet. */
-    #world { --sun-rot: 0deg; --sun-len: 1; --sun-op: 1; }
-    .iso-shadow {
-      position: absolute; border-radius: 50%;
-      background: linear-gradient(90deg,
-        rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.4) 25%, rgba(0,0,0,0.18) 60%, transparent 100%);
-      transform-origin: 0% 50%;
-      transform:
-        translate(-50%, -50%)
-        rotate(var(--sun-rot))
-        scaleX(var(--sun-len));
-      opacity: var(--sun-op);
-      filter: blur(1.5px);
-      pointer-events: none;
-      transition: opacity 0.8s ease;
-    }
-    .iso-shadow.shadow-mushroom {
-      background: linear-gradient(90deg,
-        rgba(5,15,3,0.5) 0%, rgba(5,15,3,0.32) 35%, transparent 100%);
-      filter: blur(2px);
-    }
-    .iso-shadow.shadow-rock {
-      background: linear-gradient(90deg,
-        rgba(0,0,0,0.52) 0%, rgba(0,0,0,0.36) 32%, rgba(0,0,0,0.12) 68%, transparent 100%);
-      transform-origin: 0% 50%;
-      transform: translate(-50%, -72%) rotate(var(--sun-rot)) scaleX(var(--sun-len));
-      filter: blur(1.5px);
-    }
-    .iso-shadow.shadow-log {
-      background: linear-gradient(90deg,
-        rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 35%, transparent 100%);
-      filter: blur(1.5px);
-    }
-    .iso-shadow.shadow-soft {
-      background: radial-gradient(ellipse at 15% 50%,
-        rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 45%, transparent 80%);
-      filter: blur(3px);
-    }
-    /* Ambient day/night tint over the whole map */
-    #daynight-overlay {
-      position: absolute; inset: 0; pointer-events: none; z-index: 400;
-      mix-blend-mode: multiply;
-      background: #ffffff;
-      transition: background 2s linear;
-    }
-    #sun-clock {
-      position: absolute; top: 0.6rem; left: 50%; transform: translateX(-50%);
-      z-index: 60; pointer-events: none;
-      background: rgba(15,15,15,0.8); border: 1px solid rgba(255,255,225,0.12);
-      border-radius: 999px; padding: 0.25rem 0.6rem;
-      font-family: 'Syne Mono', monospace; font-size: 0.65rem; font-weight: 700;
-      color: rgba(255,255,225,0.85); display: flex; align-items: center; gap: 0.3rem;
-    }
-    .iso-lift {
-      position: absolute; transform: translate(-50%, -100%);
-      display: flex; align-items: center; justify-content: center;
-      transition: transform 0.08s ease, opacity 0.3s ease;
-    }
-    .sprite .emoji { font-size: 2.1rem; filter: drop-shadow(0 4px 3px rgba(0,0,0,0.5)); cursor: pointer; }
-    .sprite.hit .emoji { animation: hitShake 0.15s ease; }
-    @keyframes hitShake {
-      0%,100% { transform: translate(0,0) rotate(0); }
-      30% { transform: translate(-3px,1px) rotate(-4deg); }
-      60% { transform: translate(3px,-1px) rotate(4deg); }
-    }
-    .mushroom-sprite .glow-dot {
-      position: absolute; width: 38px; height: 38px; border-radius: 50%;
-      filter: blur(10px); opacity: 0.55; animation: mushroomPulse 1.8s ease-in-out infinite;
-      pointer-events: none; left: 50%; top: 50%; transform: translate(-50%,-50%);
-    }
-    @keyframes mushroomPulse { 0%,100% { transform: translate(-50%,-50%) scale(0.9); opacity: 0.4; } 50% { transform: translate(-50%,-50%) scale(1.15); opacity: 0.65; } }
-    .mushroom-sprite .emoji { position: relative; z-index: 1; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.5)); pointer-events: none; cursor: pointer; }
-    .mushroom-sprite.pop .iso-lift { animation: popOut 0.28s ease forwards; pointer-events: none; }
-    @keyframes popOut { to { transform: translate(-50%,-100%) scale(0); opacity: 0; } }
-    .float-text {
-      position: absolute; font-family: 'Syne Mono', monospace; font-weight: 700; font-size: 0.85rem;
-      pointer-events: none; animation: floatUp 0.9s ease-out forwards; white-space: nowrap;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.6); z-index: 9999;
-      transform: translate(-50%, -100%);
-    }
-    @keyframes floatUp {
-      0% { opacity: 1; transform: translate(-50%, -100%); }
-      100% { opacity: 0; transform: translate(-50%, -146px); }
-    }
-    #farmhouse .house-emoji { font-size: 4.2rem; filter: drop-shadow(0 8px 6px rgba(0,0,0,0.6)); transition: filter 0.6s ease; cursor: pointer; }
-    #farmhouse .house-decor { position: absolute; top: 6px; right: -6px; font-size: 1.3rem; }
-    #farmhouse .ring {
-      position: absolute; left: 50%; bottom: -8px; width: 90px; height: 34px; transform: translate(-50%,50%);
-      border-radius: 50%; border: 2px dashed rgba(254,206,0,0.3); animation: hbspin 12s linear infinite;
-      pointer-events: none;
-    }
-    @keyframes hbspin { to { transform: translate(-50%,50%) rotate(360deg); } }
-    .farm-hub { font-size: 1.7rem; cursor: pointer; filter: drop-shadow(0 4px 3px rgba(0,0,0,0.5)); }
-    .plot {
-      position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px;
-      background: rgba(90,60,30,0.55); border: 2px dashed rgba(255,255,225,0.25);
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
-      font-size: 1.05rem;
-    }
-    .plot.planted { border-style: solid; border-color: var(--red); }
-
-    #game-hud {
-      position: absolute; top: 0; left: 0; right: 0; z-index: 50;
-      padding: 0.6rem 0.6rem;
-      display: flex; gap: 0.4rem; justify-content: space-between; align-items: flex-start;
-      pointer-events: none;
-    }
-    .resource-pill {
-      pointer-events: auto;
-      display: flex; align-items: center; gap: 0.3rem;
-      background: rgba(15,15,15,0.85); backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,225,0.1); border-radius: 999px;
-      padding: 0.3rem 0.55rem; font-family: 'Syne Mono', monospace; font-size: 0.7rem;
-      font-weight: 700;
-    }
-    .resource-pill .ico { font-size: 0.9rem; }
-    #resources { display: flex; gap: 0.35rem; flex-wrap: wrap; max-width: 60%; }
-    .res-gem { color: var(--blue); }
-    .res-shroom { color: var(--red); }
-    .res-spore { color: var(--gold); }
-    .res-streak { color: #ff9d42; }
-    #right-hud { display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem; }
-    #level-pill {
-      pointer-events: auto; cursor: pointer;
-      background: rgba(15,15,15,0.85); backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,225,0.1); border-radius: 999px;
-      padding: 0.35rem 0.6rem; display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;
-      min-width: 78px;
-    }
-    #level-pill .lvl-label { font-family: 'Syne Mono', monospace; font-size: 0.62rem; color: var(--gold); font-weight: 700; }
-    #level-pill .xp-track { width: 100%; height: 4px; border-radius: 999px; background: rgba(255,255,225,0.12); overflow: hidden; }
-    #level-pill .xp-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.4s ease; }
-    #info-btn {
-      pointer-events: auto; width: 28px; height: 28px; border-radius: 50%;
-      background: rgba(15,15,15,0.85); border: 1px solid rgba(255,255,225,0.15);
-      color: var(--cream); font-size: 0.75rem; font-weight: 700; cursor: pointer;
-    }
-
-    #build-buttons {
-      position: absolute; left: 0.6rem; bottom: 0.6rem;
-      z-index: 55; display: flex; flex-direction: column; gap: 0.45rem;
-    }
-    .build-btn {
-      display: none;
-      background: var(--gold); color: var(--dark); border: none;
-      border-radius: 999px; padding: 0.55rem 0.9rem; font-weight: 700; font-size: 0.75rem;
-      font-family: 'Space Grotesk', sans-serif; cursor: pointer;
-      box-shadow: 0 4px 16px rgba(254,206,0,0.35); text-align: left;
-    }
-    .build-btn.show { display: block; }
-    #placement-banner {
-      position: absolute; top: 3.4rem; left: 50%; transform: translateX(-50%);
-      z-index: 55; display: none; align-items: center; gap: 0.6rem;
-      background: rgba(15,15,15,0.9); border: 1px solid var(--gold); border-radius: 999px;
-      padding: 0.45rem 0.9rem; font-size: 0.7rem; color: var(--gold); white-space: nowrap;
-      max-width: 94%;
-    }
-    #placement-banner.show { display: flex; }
-    #decor-done-btn {
-      background: var(--gold); color: var(--dark); border: none; border-radius: 999px;
-      padding: 0.3rem 0.7rem; font-size: 0.68rem; font-weight: 700; cursor: pointer;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-    #zoom-controls {
-      position: absolute; right: 0.6rem; bottom: 0.6rem;
-      z-index: 50; display: flex; flex-direction: column; gap: 0.45rem;
-    }
-    #zoom-controls button {
-      width: 38px; height: 38px; border-radius: 50%;
-      background: rgba(15,15,15,0.85); border: 1px solid rgba(255,255,225,0.15);
-      color: var(--cream); font-size: 1.1rem; font-weight: 700; cursor: pointer;
-    }
-    #game-toast {
-      position: absolute; left: 50%; top: 3.4rem;
-      transform: translateX(-50%); z-index: 300;
-      background: rgba(15,15,15,0.9); border: 1px solid rgba(254,206,0,0.35);
-      padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.72rem;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease;
-      max-width: 92%; text-align: center;
-    }
-    #game-toast.show { opacity: 1; transform: translateX(-50%) translateY(4px); }
-
-    .modal-backdrop {
-      position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.75);
-      display: none; align-items: center; justify-content: center; padding: 1.25rem;
-      backdrop-filter: blur(4px);
-    }
-    .modal-backdrop.open { display: flex; }
-    .modal {
-      position: relative;
-      background: var(--dark2); border: 1px solid rgba(255,255,225,0.1);
-      border-radius: 1.25rem; padding: 1.75rem; max-width: 340px; width: 100%;
-      max-height: 82vh; display: flex; flex-direction: column;
-    }
-    .modal-x {
-      position: absolute; top: 0.9rem; right: 0.9rem; z-index: 2;
-      width: 28px; height: 28px; border-radius: 50%;
-      background: rgba(255,255,225,0.06); border: none; color: rgba(255,255,225,0.6);
-      font-size: 1.1rem; line-height: 1; cursor: pointer;
-    }
-    .modal-x:hover { background: rgba(255,255,225,0.15); color: var(--cream); }
-    .modal-scroll { overflow-y: auto; text-align: center; padding-right: 0.25rem; }
-    .modal h2 { font-size: 1.2rem; margin-bottom: 0.5rem; padding-right: 1.5rem; }
-    .modal p { font-size: 0.82rem; color: rgba(255,255,225,0.6); line-height: 1.5; margin-bottom: 1rem; }
-    .repair-track { width: 100%; height: 8px; border-radius: 999px; background: rgba(255,255,225,0.1); overflow: hidden; margin-bottom: 1rem; }
-    .repair-fill { height: 100%; background: var(--green); width: 0%; transition: width 0.5s ease; }
-    .cost-row { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.25rem; font-family: 'Syne Mono', monospace; font-size: 0.85rem; }
-    .modal-btn {
-      width: 100%; padding: 0.75rem; border-radius: 0.75rem; border: none;
-      background: var(--gold); color: var(--dark); font-weight: 700; font-size: 0.9rem; cursor: pointer;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-    .modal-btn:disabled { background: rgba(255,255,225,0.12); color: rgba(255,255,225,0.35); }
-    .legend-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.5rem 0.25rem; border-bottom: 1px solid rgba(255,255,225,0.06);
-      font-size: 0.78rem;
-    }
-    .legend-row:last-child { border-bottom: none; }
-    .legend-left { display: flex; align-items: center; gap: 0.5rem; }
-    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .legend-val { font-family: 'Syne Mono', monospace; color: rgba(255,255,225,0.7); }
-    .decor-palette-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.5rem; }
-    .decor-palette-item {
-      background: rgba(255,255,225,0.06); border: 1px solid rgba(255,255,225,0.12);
-      border-radius: 0.75rem; padding: 0.6rem 0.3rem; cursor: pointer; text-align: center;
-      color: var(--cream); font-family: 'Space Grotesk', sans-serif;
-    }
-    .decor-palette-item .dp-icon { font-size: 1.4rem; display: block; margin-bottom: 0.2rem; }
-    .decor-palette-item .dp-label { font-size: 0.62rem; display: block; }
-    .decor-palette-item .dp-cost { font-size: 0.6rem; color: var(--blue); display: block; margin-top: 0.15rem; font-family: 'Syne Mono', monospace; }
-    .decor-tile { position: absolute; }
-  
-    /* Animated torch decoration */
-    .campfire-sprite { position: relative; pointer-events: none; }
-    .campfire-sprite .stick {
-      position: absolute; left: 50%; bottom: -2px; transform: translateX(-50%);
-      width: 5px; height: 26px; z-index: 1; border-radius: 2px;
-      background: linear-gradient(90deg, #6b4a2b 0%, #8a5f38 45%, #a3714a 55%, #5c3f24 100%);
-      box-shadow: 0 2px 2px rgba(0,0,0,0.4);
-    }
-    .campfire-sprite .wrap {
-      position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%);
-      width: 10px; height: 8px; z-index: 2; border-radius: 2px;
-      background: linear-gradient(90deg, #3f2a17 0%, #5c3f24 50%, #2f1f11 100%);
-      box-shadow: 0 1px 1px rgba(0,0,0,0.4);
-    }
-    .campfire-sprite .flame {
-      position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%);
-      width: 15px; height: 24px; z-index: 3;
-      background: radial-gradient(ellipse at 50% 90%,
-        #fff6c8 0%, #ffd93b 22%, #ff8c1a 48%, #ff3d24 74%, rgba(255,61,36,0) 100%);
-      border-radius: 50% 50% 48% 48% / 62% 62% 40% 40%;
-      transform-origin: 50% 100%;
-      animation: flameFlicker 0.42s ease-in-out infinite alternate;
-      mix-blend-mode: screen;
-      filter: blur(0.5px);
-    }
-    .campfire-sprite .flame.inner {
-      width: 8px; height: 15px; bottom: 26px; z-index: 4;
-      background: radial-gradient(ellipse at 50% 90%,
-        #ffffff 0%, #fff2a0 35%, #ffcf3a 70%, rgba(255,207,58,0) 100%);
-      animation-duration: 0.31s;
-    }
-    @keyframes flameFlicker {
-      0%   { transform: translateX(-50%) scaleY(1)    scaleX(1)    skewX(-3deg); opacity: 0.92; }
-      25%  { transform: translateX(-52%) scaleY(1.12) scaleX(0.94) skewX(4deg);  opacity: 1;    }
-      50%  { transform: translateX(-48%) scaleY(0.96) scaleX(1.06) skewX(-2deg); opacity: 0.88; }
-      100% { transform: translateX(-50%) scaleY(1.08) scaleX(0.97) skewX(3deg);  opacity: 1;    }
-    }
-    /* Torch light lives in #light-layer (ABOVE the darkness overlay) so it
-       actually brightens. --fire-light (0 day -> ~1 night) sets how strong. */
-    #world { --fire-light: 0; }
-    #light-layer {
-      position: absolute; top: 0; left: 0;
-      width: 100%; height: 100%;
-      transform-origin: 0 0;
-      pointer-events: none; z-index: 450;
-      mix-blend-mode: screen;
-      overflow: visible;
-    }
-    .torch-light {
-      position: absolute; width: 200px; height: 200px; border-radius: 50%;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle,
-        rgba(255,206,130,0.34) 0%, rgba(255,175,80,0.24) 28%,
-        rgba(255,150,50,0.12) 52%, rgba(255,130,40,0) 74%);
-      opacity: var(--fire-light);
-      animation: lightBreathe 2.4s ease-in-out infinite;
-    }
-    @keyframes lightBreathe { 0%,100% { transform: translate(-50%,-50%) scale(1); } 50% { transform: translate(-50%,-50%) scale(1.06); } }
+    .play-screen { position: absolute; inset: 0; display: none; flex-direction: column; padding: 1.25rem; box-sizing: border-box; }
+    .play-screen.active { display: flex; }
+    #screen-menu { align-items: center; justify-content: center; gap: 1.25rem; }
+    .menu-title { font-size: clamp(1.6rem, 6vw, 2.4rem); font-weight: 700; color: var(--gold); text-align: center; margin: 0; letter-spacing: 0.02em; }
+    .menu-title span { color: var(--green); }
+    .menu-sub { font-family: 'Space Grotesk', monospace; font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,225,0.4); margin: -0.5rem 0 0.4rem; }
+    .menu-btns { display: flex; flex-direction: column; gap: 0.7rem; width: min(80%, 300px); }
+    .menu-btn { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--dark); background: var(--gold); border: none; border-radius: 999px; padding: 0.75rem 1rem; cursor: pointer; transition: transform 0.08s ease, box-shadow 0.2s ease; box-shadow: 0 6px 20px rgba(254,206,0,0.28); }
+    .menu-btn:active { transform: translateY(2px); }
+    .menu-btn.secondary { background: rgba(255,255,225,0.06); color: rgba(255,255,225,0.5); box-shadow: none; border: 1px solid rgba(255,255,225,0.12); cursor: not-allowed; }
+    .screen-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.9rem; }
+    .back-btn { font-family: 'Space Grotesk', monospace; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.05em; color: rgba(255,255,225,0.7); background: rgba(255,255,225,0.06); border: 1px solid rgba(255,255,225,0.12); border-radius: 999px; padding: 0.4rem 0.9rem; cursor: pointer; transition: all 0.2s; }
+    .back-btn:hover { color: var(--cream); border-color: rgba(255,255,225,0.3); }
+    .screen-head h2 { font-size: 1rem; color: var(--gold); margin: 0; letter-spacing: 0.02em; }
+    .cmd-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .cmd-card { display: flex; align-items: center; gap: 0.8rem; background: var(--dark2); border: 1px solid rgba(255,255,225,0.07); border-radius: 1rem; padding: 0.85rem 0.9rem; cursor: pointer; transition: border-color 0.2s; }
+    .cmd-card:hover { border-color: rgba(255,255,225,0.18); }
+    .cmd-card .cmd-emoji { font-size: 1.5rem; }
+    .cmd-card .cmd-text b { color: var(--gold); font-size: 0.92rem; }
+    .cmd-card .cmd-text p { margin: 0.15rem 0 0; font-size: 0.72rem; color: rgba(255,255,225,0.5); font-family: 'Space Grotesk', monospace; }
+    #screen-dig { justify-content: flex-start; }
+    .dig-status { font-family: 'Space Grotesk', monospace; font-size: 0.72rem; color: rgba(255,255,225,0.6); text-align: center; margin: 0 0 0.7rem; min-height: 1em; }
+    .dig-status .warn { color: var(--red); } .dig-status .ok { color: var(--green); }
+    .dig-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; width: min(92%, 360px); margin: 0 auto; aspect-ratio: 1/1; padding: 10px; border-radius: 14px; background: radial-gradient(120% 90% at 50% 15%, #e8c079 0%, #d9a94f 40%, #b9822f 100%); box-shadow: inset 0 6px 18px rgba(90,50,10,0.45), inset 0 -4px 12px rgba(255,240,200,0.25), 0 10px 30px rgba(0,0,0,0.5); }
+    .dig-tile { position: relative; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; overflow: hidden; user-select: none; background-color: #d7a655; background-image: radial-gradient(28% 22% at 22% 30%, rgba(255,244,214,0.55) 0%, transparent 60%), radial-gradient(24% 20% at 72% 40%, rgba(255,244,214,0.4) 0%, transparent 60%), radial-gradient(30% 26% at 55% 78%, rgba(150,95,35,0.35) 0%, transparent 65%), radial-gradient(26% 22% at 30% 82%, rgba(150,95,35,0.28) 0%, transparent 65%), radial-gradient(120% 120% at 40% 20%, #e6bf7c 0%, #cf9f52 55%, #bb883b 100%); box-shadow: inset 0 1px 2px rgba(255,248,220,0.45), inset 0 -2px 4px rgba(120,70,20,0.35); transition: transform 0.08s ease, filter 0.12s ease; }
+    .dig-tile:not(.dug):not(.legendary-win):hover { filter: brightness(1.06); }
+    .dig-tile:not(.dug):active { transform: scale(0.93); }
+    .dig-tile .decor { position: absolute; font-size: 0.95rem; opacity: 0.9; pointer-events: none; filter: drop-shadow(1px 2px 1px rgba(80,45,10,0.5)); }
+    .dig-tile.dug { background: radial-gradient(70% 70% at 50% 45%, #3a2a17 0%, #4d3720 60%, #6f4f28 100%); box-shadow: inset 0 4px 10px rgba(0,0,0,0.7), inset 0 -2px 3px rgba(255,220,160,0.25), 0 0 0 2px rgba(160,110,55,0.5); }
+    .dig-tile.dug .decor { display: none; }
+    .dig-tile.revealing { animation: tilePop 0.35s ease; }
+    @keyframes tilePop { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+    .dig-tile.legendary-win { background: radial-gradient(70% 70% at 50% 40%, #fff2b0 0%, #fece00 45%, #d99b00 100%); box-shadow: 0 0 20px rgba(254,206,0,0.85), inset 0 2px 4px rgba(255,255,255,0.6); animation: legPulse 1s ease-in-out infinite; }
+    @keyframes legPulse { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
+    .dig-grid.locked .dig-tile:not(.dug):not(.legendary-win) { cursor: not-allowed; filter: brightness(0.82) saturate(0.85); }
+    .dig-result { margin-top: 0.9rem; text-align: center; min-height: 2.2rem; }
+    .dig-result .r-label { font-size: 1.05rem; font-weight: 700; color: var(--gold); }
+    .dig-result .r-amount { font-size: 0.85rem; color: rgba(255,255,225,0.8); font-family: 'Space Grotesk', monospace; }
+    .dig-result .r-legendary { font-size: 1.2rem; font-weight: 700; color: var(--cream); text-shadow: 0 0 12px rgba(254,206,0,0.9); }
   </style>
 </head>
 <body>
   <div id="starfield"></div>
-  <header>
-    <nav class="container">
-      <a href="earn.html" class="logo">Mushroom Planet</a>
-      <ul class="nav-links">
-        <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
-        <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
-        <li><a href="/profile.html">PROFILE</a></li>
-      </ul>
-      <div class="header-icons">
-        <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank"><img src="/images/reddit.png" alt="Reddit"></a>
-        <a href="https://discord.com/invite/ECauU2KSSt" target="_blank"><img src="/images/discord.png" alt="Discord"></a>
-        <a href="/profile.html"><img id="header-profile-icon" src="/images/profile1.png" alt="Profile" style="border-radius:50%;"></a>
-      </div>
-    </nav>
-  </header>
+    <header>
+  <nav class="container">
+    <a href="earn.html" class="logo">Mushroom Planet</a>
+    <ul class="nav-links">
+      <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
+      <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
+      <li><a href="/profile.html">PROFILE</a></li>
+    </ul>
+    <div class="header-icons">
+      <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank"><img src="/images/reddit.png" alt="Reddit"></a>
+      <a href="https://discord.com/invite/ECauU2KSSt" target="_blank"><img src="/images/discord.png" alt="Discord"></a>
+      <a href="/profile.html"><img id="header-profile-icon" src="/images/profile1.png" alt="Profile" style="border-radius:50%;"></a>
+    </div>
+  </nav>
+</header>
   <div id="global-menu"></div>
 
   <div class="guide-hero">
     <div class="eyebrow">Play</div>
-    <h1><span style="color:var(--green);">Your</span> Farm</h1>
-    <p>A living view of your mushroom farm and farmhouse. More to grow here soon.</p>
+    <h1><span style="color:var(--red);">Mushroom</span> <span>Planet</span></h1>
+    <p>Pick a game from the menu. More commands are moving here soon.</p>
   </div>
 
-  <div class="page-section">
+  <div class="guide-section active" style="max-width:640px;">
+
     <div class="field-frame reveal">
-      <div id="viewport">
-        <div id="world">
-          <div id="iso-ground"></div>
-          <svg id="iso-grid-svg"></svg>
-          <svg id="iso-fence-svg"></svg>
+
+      <div class="play-screen active" id="screen-menu">
+        <h1 class="menu-title"><span>Mushroom</span> Planet</h1>
+        <p class="menu-sub">Choose your game</p>
+        <div class="menu-btns">
+          <button class="menu-btn" data-goto="screen-play">&#x1F3AE; Play</button>
+          <button class="menu-btn secondary" disabled>&#x1F512; More Soon</button>
         </div>
       </div>
-      <div id="game-hud">
-        <div id="resources">
-          <div class="resource-pill res-gem"><span class="ico">&#x1F48E;</span><span id="hud-gems">0</span></div>
-          <div class="resource-pill res-shroom"><span class="ico">&#x1F344;</span><span id="hud-shrooms">0</span></div>
-          <div class="resource-pill res-spore"><span class="ico">&#x2728;</span><span id="hud-spores">0</span></div>
-          <div class="resource-pill res-streak"><span class="ico">&#x1F525;</span><span id="hud-streak">0</span></div>
+
+      <div class="play-screen" id="screen-play">
+        <div class="screen-head">
+          <button class="back-btn" data-goto="screen-menu">&#x2039; Back</button>
+          <h2>Commands</h2>
         </div>
-        <div id="right-hud">
-          <button id="info-btn">?</button>
-          <div id="level-pill">
-            <div class="lvl-label" id="hud-level">LVL 1</div>
-            <div class="xp-track"><div class="xp-fill" id="hud-xp"></div></div>
+        <div class="cmd-list">
+          <div class="cmd-card" data-goto="screen-dig">
+            <span class="cmd-emoji">&#x1FA93;</span>
+            <span class="cmd-text"><b>Dig</b><p>Dig the desert for buried treasure. Once per day.</p></span>
           </div>
         </div>
       </div>
-      <div id="build-buttons">
-        <button class="build-btn" id="build-house-btn">&#x1F3D7;&#xFE0F; Place Farmhouse</button>
-        <button class="build-btn" id="build-farm-btn">&#x1F344; Place Mushroom Farm</button>
-        <button class="build-btn show" id="build-decor-btn">&#x1F337; Decorate</button>
+
+      <div class="play-screen" id="screen-dig">
+        <div class="screen-head">
+          <button class="back-btn" data-goto="screen-play">&#x2039; Back</button>
+          <h2>&#x1FA93; Dig</h2>
+        </div>
+        <p class="dig-status" id="dig-status">Tap a tile to dig...</p>
+        <div class="dig-grid" id="dig-grid"></div>
+        <div class="dig-result" id="dig-result"></div>
       </div>
-      <button id="shovel-btn">&#x1FA93; Shovel</button>
-      <div id="tile-palette"></div>
-      <div id="placement-banner">
-        <span id="placement-banner-text"></span>
-        <button id="decor-done-btn" style="display:none;">Done</button>
-      </div>
-      <div id="zoom-controls">
-        <button id="zoom-in">+</button>
-        <button id="zoom-out">&minus;</button>
-        <button id="zoom-reset">&#x2922;</button>
-      </div>
-      <div id="game-toast"></div>
-      <div id="daynight-overlay"></div>
-      <div id="light-layer"></div>
-      <div id="sun-clock"><span id="sun-icon">&#x2600;&#xFE0F;</span><span id="sun-time">12:00</span></div>
-      <div id="demo-panel" style="position:absolute; top:0.6rem; right:2.6rem; z-index:60; display:flex; gap:0.3rem;">
-        <button id="demo-day" title="Force day" style="background:rgba(15,15,15,0.85); border:1px solid rgba(255,255,225,0.15); color:#fece00; border-radius:6px; padding:0.25rem 0.45rem; font-size:0.62rem; font-weight:700; cursor:pointer;">&#x2600;</button>
-        <button id="demo-night" title="Force night" style="background:rgba(15,15,15,0.85); border:1px solid rgba(255,255,225,0.15); color:#4fa8fd; border-radius:6px; padding:0.25rem 0.45rem; font-size:0.62rem; font-weight:700; cursor:pointer;">&#x1F319;</button>
-        <button id="demo-clock" title="Resume clock" style="background:rgba(15,15,15,0.85); border:1px solid rgba(255,255,225,0.15); color:#7ed957; border-radius:6px; padding:0.25rem 0.45rem; font-size:0.62rem; font-weight:700; cursor:pointer;">&#x25B6;</button>
-        <button id="demo-reset" title="Reset game" style="background:rgba(15,15,15,0.85); border:1px solid rgba(253,70,79,0.5); color:#fd464f; border-radius:6px; padding:0.25rem 0.45rem; font-size:0.62rem; font-weight:700; cursor:pointer;">&#x21BB;</button>
-      </div>
+
     </div>
   </div>
-
   <footer style="position:relative;z-index:1;background:var(--dark2);border-top:1px solid rgba(255,255,225,0.06);color:rgba(255,255,225,0.3);padding:0.75rem 0;text-align:center;font-family:'Space Grotesk',monospace;font-size:0.7rem;letter-spacing:0.05em;">
     &copy; 2025 Mushroom Planet. All rights reserved.
   </footer>
 
   <nav class="pwa-nav" style="position:fixed;bottom:0;left:0;right:0;height:65px;background:#111;border-top:1px solid rgba(255,255,225,0.08);align-items:stretch;z-index:999;padding-bottom:env(safe-area-inset-bottom);">
-    <a href="/profile.html" class="pwa-tab" data-page="profile" id="pwa-profile-tab">
-      <span id="pwa-avatar-wrap"><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;border:1px solid rgba(255,255,225,0.2);" onerror="this.style.display='none'"></span>
-      <span>Profile</span>
-    </a>
+      <a href="/profile.html" class="pwa-tab" data-page="profile" id="pwa-profile-tab">
+    <span id="pwa-avatar-wrap"><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;border:1px solid rgba(255,255,225,0.2);" onerror="this.style.display='none'"></span>
+    <span>Profile</span>
+  </a>
     <a href="/earn.html" class="pwa-tab" data-page="guide">
-      <span><img src="/images/earn.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-      <span>Earn</span>
-    </a>
+    <span><img src="/images/earn.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Earn</span>
+  </a>
     <a href="/convert.html" class="pwa-tab" data-page="convert">
-      <span><img src="/images/swaps.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-      <span>Convert</span>
-    </a>
-    <a href="/play.html" class="pwa-tab" data-page="play">
-      <span><img src="/images/play.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-      <span>Play</span>
-    </a>
-    <a href="/vote.html" class="pwa-tab" data-page="vote">
-      <span><img src="/images/vote.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-      <span>Vote</span>
-    </a>
-    <a href="/treasury.html" class="pwa-tab" data-page="treasury">
-      <span><img src="/images/treasury.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-      <span>Treasury</span>
-    </a>
-    <a href="/guides.html" class="pwa-tab" data-page="guide">
-      <span><img src="/images/guide.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
-      <span>Guide</span>
-    </a>
+    <span><img src="/images/swaps.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Convert</span>
+  </a>
+  <a href="/vote.html" class="pwa-tab" data-page="vote">
+    <span><img src="/images/vote.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Vote</span>
+  </a>
+  <a href="/treasury.html" class="pwa-tab" data-page="treasury">
+    <span><img src="/images/treasury.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Treasury</span>
+  </a>
+  <a href="/guides.html" class="pwa-tab" data-page="guide">
+    <span><img src="/images/guide.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span>
+    <span>Guide</span>
+  </a>
   </nav>
-
-  <div class="modal-backdrop" id="house-modal">
-    <div class="modal">
-      <button class="modal-x" data-close>&times;</button>
-      <div class="modal-scroll">
-        <h2 id="house-title">Farmhouse</h2>
-        <p id="house-desc"></p>
-        <div class="repair-track"><div class="repair-fill" id="house-repair-fill"></div></div>
-        <div class="cost-row" id="house-cost-row"></div>
-        <button class="modal-btn" id="house-repair-btn">Upgrade</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-backdrop" id="farm-modal">
-    <div class="modal">
-      <button class="modal-x" data-close>&times;</button>
-      <div class="modal-scroll">
-        <h2 id="farm-title">Mushroom Farm</h2>
-        <p id="farm-desc"></p>
-        <div class="repair-track"><div class="repair-fill" id="farm-repair-fill"></div></div>
-        <div class="cost-row" id="farm-cost-row"></div>
-        <button class="modal-btn" id="farm-upgrade-btn">Upgrade</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-backdrop" id="plot-modal">
-    <div class="modal">
-      <button class="modal-x" data-close>&times;</button>
-      <div class="modal-scroll">
-        <h2 id="plot-title">Farm Plot</h2>
-        <p id="plot-desc">Plant a shroom here to grow spores over time.</p>
-        <div class="cost-row" id="plot-cost-row"></div>
-        <button class="modal-btn" id="plot-action-btn">Plant Shroom</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-backdrop" id="decor-modal">
-    <div class="modal">
-      <button class="modal-x" data-close>&times;</button>
-      <div class="modal-scroll">
-        <h2>Decorate</h2>
-        <p>Pick something to place around your land. Tap a placed item to remove it.</p>
-        <div class="decor-palette-grid" id="decor-palette-grid"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-backdrop" id="info-modal">
-    <div class="modal">
-      <button class="modal-x" data-close>&times;</button>
-      <div class="modal-scroll">
-        <h2>Wild Mushrooms</h2>
-        <p>Obstacles (rocks, stumps, bushes) only give gemstones. Shrooms come only from mushrooms that spawn on your land.</p>
-        <div id="legend-list"></div>
-        <p style="margin-top:0.75rem;">Clear one Red, Blue, Purple, and Golden mushroom in the same day to grow your streak. A higher streak improves your odds on Brown mushrooms.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-backdrop" id="level-modal">
-    <div class="modal">
-      <button class="modal-x" data-close>&times;</button>
-      <div class="modal-scroll">
-        <h2 id="level-modal-title">Level 1</h2>
-        <p>Your inventory and what you can build as you level up.</p>
-        <div id="level-inventory-list"></div>
-        <p style="margin-top:1rem; margin-bottom:0.5rem;">Unlocks</p>
-        <div id="level-unlocks-list"></div>
-      </div>
-    </div>
-  </div>
 
   <script type="module">
     import config from './config.js';
@@ -671,10 +328,7 @@
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
     }, { threshold: 0.1 });
     document.querySelectorAll('.reveal').forEach(r => observer.observe(r));
-
     (function() {
-      const page = window.location.pathname.split('/').pop().replace('.html', '') || 'play';
-      document.querySelectorAll('.pwa-tab').forEach(t => { if (t.dataset.page === page) t.classList.add('active'); });
       try {
         const user = JSON.parse(localStorage.getItem('mp_profile_user') || '{}');
         if (user.discord_id && user.avatar) {
@@ -687,1629 +341,101 @@
   </script>
 
   <script>
-  /* ================= GAME LOGIC (map only) ================= */
+  /* ================= MENU + DIG LOGIC ================= */
   (function() {
     "use strict";
-
-    function vibrate(ms) {
-      try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {}
-    }
-
-    function bindTap(el, handler) {
-      let sx = 0, sy = 0, lastTapAt = 0;
-      el.addEventListener('touchstart', e => {
-        const t = e.touches[0];
-        sx = t.clientX; sy = t.clientY;
-      }, { passive: true });
-      el.addEventListener('touchend', e => {
-        const t = e.changedTouches[0];
-        const dx = t.clientX - sx, dy = t.clientY - sy;
-        if (Math.sqrt(dx * dx + dy * dy) < 14) {
-          lastTapAt = Date.now();
-          handler(e);
-        }
-      }, { passive: true });
-      el.addEventListener('click', e => {
-        if (Date.now() - lastTapAt < 600) return;
-        handler(e);
-      });
-    }
-
-    function mulberry32(seed) {
-      return function() {
-        seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
-        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-      };
-    }
-    const seedRand = mulberry32(20260712);
-    const rand = Math.random;
-
-    const GRID_TILES = 16;                    // squares per side
-    const TILE = 118.75;                      // world-px per square
-    const WORLD_SIZE = TILE * GRID_TILES;     // 1900
-    const ISO_W = WORLD_SIZE;
-    const ISO_H = WORLD_SIZE;
-    const ISO_MARGIN = 0;
-
-    // Object footprints expressed as a fraction of one tile.
-    // Change these to resize everything consistently; change GRID_TILES/TILE
-    // to rescale the whole world. This is the single source of truth for sizes.
-    const SIZE = {
-      mushroom: 0.36,   // ~43px, slightly smaller
-      rock:     0.42,   // ~50px
-      rock2:    0.50,   // ~60px
-      stump:    0.45,   // ~54px
-      bush:     0.44,   // ~52px
-      house:    1.5,    // spans ~1.5 tiles
-      plot:     0.34,   // ~40px
+    var API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:3001' : 'https://api.mushroomplanet.earth';
+    var TILE_COUNT = 36;
+    var TIER_EMOJI = {
+      nothing: '\uD83D\uDCA8', common: '\uD83D\uDCE6', bronze: '\uD83D\uDFEB',
+      silver: '\u26AA', golden: '\uD83D\uDFE1', legendary: '\uD83D\uDC51'
     };
-    function ts(frac) { return TILE * frac; }  // tile-size -> world px
+    function $(id){ return document.getElementById(id); }
+    function vibrate(ms){ try { if (navigator.vibrate) navigator.vibrate(ms); } catch(e){} }
 
-    const CUSTOM_ART = { rock: 'rock.png', rock2: 'rock.png' };
-    const ART_BASE = '/assets/emojis/';
-    function spriteHTML(artKey, emoji, sizePx, extraStyle) {
-      extraStyle = extraStyle || '';
-      if (CUSTOM_ART[artKey]) {
-        return `<img src="${ART_BASE}${CUSTOM_ART[artKey]}" alt=""
-          style="width:${sizePx}px; height:${sizePx}px; object-fit:contain;
-          filter:drop-shadow(0 2px 2px rgba(0,0,0,0.35)) ${extraStyle}; pointer-events:none;"
-          onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'emoji',textContent:'${emoji}',style:'font-size:${sizePx * 0.72}px'}))">`;
-      }
-      return `<span class="emoji" style="font-size:${sizePx * 0.72}px">${emoji}</span>`;
+    function showScreen(id){
+      var screens = document.querySelectorAll('.play-screen');
+      for (var i=0;i<screens.length;i++) screens[i].classList.remove('active');
+      var t = $(id); if (t) t.classList.add('active');
+      if (id === 'screen-dig') buildDigGrid();
     }
-
-    const TILESET_URL = '/Sprites/tileset-grass-spring.png';
-    const TILESET_COLS = 24, TILESET_ROWS = 40, TILE_PX = 16;
-
-    // Paintable MATERIALS (what the player chooses). Autotiler picks the
-    // actual sheet tile per corner-combo. 0 must be the base/background.
-    const MATERIALS = [
-      { key: 'grass', label: 'Grass', fill: [9, 2]  },
-      { key: 'dirt',  label: 'Dirt',  fill: [9, 14] },
-      { key: 'water', label: 'Water', fill: [14, 1], sheet: 'water' },
-    ];
-    const WATER_TILESET_URL = '/Sprites/water-ground-animation.png';
-    const DEFAULT_MATERIAL = 0; // grass
-
-    // Corner-based (dual-grid) autotile map for DIRT-over-grass.
-    // combo bits: TL=1, TR=2, BL=4, BR=8  (1 = that corner is DIRT)
-    // value = [col,row] in the 16px sheet. THESE ARE FIRST-PASS GUESSES from
-    // the rows 8-15 transition block; the debug strip lets us correct them.
-    // Edge-based (blob) autotile. Mask bits: N=1, E=2, S=4, W=8 (set if that
-    // orthogonal NEIGHBOR is also dirt). Coordinates extracted directly from
-    // the tileset's rows 8-11, cols 0-3. A dirt cell picks its tile by which
-    // sides continue into more dirt, giving smooth grass borders.
-    const AUTOTILE_DIRT = {
-      0:  [0, 11],  // isolated dirt (grass all sides)
-      1:  [0, 10],  // N
-      2:  [1, 11],  // E
-      3:  [1, 10],  // NE
-      4:  [0, 8],   // S
-      5:  [0, 9],   // NS
-      6:  [1, 8],   // ES
-      7:  [1, 9],   // NES
-      8:  [3, 11],  // W
-      9:  [3, 10],  // NW
-      10: [2, 11],  // EW
-      11: [2, 10],  // NEW
-      12: [3, 8],   // SW
-      13: [3, 9],   // NSW
-      14: [2, 8],   // ESW
-      15: [2, 9],   // NESW (center, dirt all around)
-    };
-    const GRASS_FILL = [9, 2]; // pure grass tile for non-dirt cells
-
-    // Water shoreline autotile (deep water), extracted from water sheet
-    // rows 0-7, cols 12-15. Mask bits N=1,E=2,S=4,W=8 (neighbor is water).
-    const AUTOTILE_WATER = {
-      0:[14,9], 1:[12,2], 2:[13,3], 3:[13,2],
-      4:[12,0], 5:[12,1], 6:[13,0], 7:[13,1],
-      8:[15,3], 9:[15,2], 10:[14,3], 11:[14,2],
-      12:[15,0], 13:[15,1], 14:[14,0], 15:[14,9],
-    };
-
-    function sheetBg(col, row, cellPx, totalRows) {
-      const rows = totalRows || TILESET_ROWS;
-      return {
-        size: `${TILESET_COLS * cellPx}px ${rows * cellPx}px`,
-        pos: `-${col * cellPx}px -${row * cellPx}px`,
-      };
-    }
-    const WATER_ROWS = 16;
-    const TILE_PALETTE = [
-      { key: 'grassA',  label: 'Grass',      col: 5,  row: 17 },
-      { key: 'grassA2', label: 'Grass +',    col: 5,  row: 18 },
-      { key: 'grassB',  label: 'Grass dk',   col: 17, row: 17 },
-      { key: 'grassB2', label: 'Grass dk +', col: 17, row: 18 },
-      { key: 'dirtA',   label: 'Dirt',       col: 5,  row: 9  },
-      { key: 'dirtA2',  label: 'Dirt +',     col: 5,  row: 10 },
-      { key: 'path',    label: 'Soil',       col: 9,  row: 9  },
-      { key: 'path2',   label: 'Soil +',     col: 9,  row: 13 },
-      { key: 'pathEdge',label: 'Path',       col: 17, row: 9  },
-    ];
-    const DEFAULT_TILE = 0;
-    function tileBgPos(idx, cellPx) {
-      const t = TILE_PALETTE[idx] || TILE_PALETTE[0];
-      return {
-        size: `${TILESET_COLS * cellPx}px ${TILESET_ROWS * cellPx}px`,
-        pos: `-${t.col * cellPx}px -${t.row * cellPx}px`,
-      };
-    }
-
-    const STORAGE_KEY = 'mp_play_state_v3';
-    const XP_PER_LEVEL = lvl => 40 + (lvl - 1) * 25;
-
-    function toIso(x, y) { return { ix: x, iy: y }; }
-    function fromIso(ix, iy) { return { x: ix, y: iy }; }
-    function depthIndex(x, y) { return Math.round(y); }
-
-    function placeIso(el, x, y, height) {
-      const { ix, iy } = toIso(x, y);
-      el.style.left = ix + 'px';
-      el.style.top = (iy - (height || 0)) + 'px';
-      el.style.zIndex = String(1000 + depthIndex(x, y));
-    }
-    function placeShadow(el, x, y, w, h) {
-      const { ix, iy } = toIso(x, y);
-      el.style.left = ix + 'px';
-      el.style.top = iy + 'px';
-      el.style.width = w + 'px';
-      el.style.height = h + 'px';
-      el.style.zIndex = String(999 + depthIndex(x, y));
-    }
-
-    function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
-      } catch (e) {}
-      return {
-        gems: 0, shrooms: 0, spores: 0,
-        xp: 0, level: 1,
-        clearedObstacles: {},
-        mushrooms: {},
-        spawnClocks: {},
-        streak: 0,
-        dailyCollected: { date: null, types: {} },
-        streakCreditedDate: null,
-        lastCheckedDate: null,
-        housePlaced: false, housePosition: null, houseLevel: 0,
-        farmPlaced: false, farmPosition: null, farmLevel: 0,
-        plots: {},
-        decorations: {}
-      };
-    }
-    let state = loadState();
-    if (!state.decorations) state.decorations = {};
-    if (state.lastMushroomCropDay == null) state.lastMushroomCropDay = -1;
-    if (state.lastObstacleScatter == null) state.lastObstacleScatter = null;
-    if (state.tiles == null) state.tiles = {}; // { "col_row": paletteIndex } - only non-default cells stored
-    function saveState() {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
-    }
-
-    function grantXP(amount) {
-      state.xp += amount;
-      let needed = XP_PER_LEVEL(state.level);
-      while (state.xp >= needed) {
-        state.xp -= needed;
-        state.level += 1;
-        vibrate([20, 40, 20]);
-        showToast(`Level up! You're now Level ${state.level} \u{1F389}`);
-        needed = XP_PER_LEVEL(state.level);
-        if (state.level === 2) showToast('Farmhouse unlocked! \u{1F3D7}\uFE0F');
-        if (state.level === 3) showToast('Mushroom Farm unlocked! \u{1F344}');
-      }
-      updateHUD();
-      updateBuildButtons();
-    }
-
-    function updateHUD() {
-      document.getElementById('hud-gems').textContent = state.gems.toLocaleString();
-      document.getElementById('hud-shrooms').textContent = state.shrooms.toLocaleString();
-      document.getElementById('hud-spores').textContent = state.spores.toLocaleString();
-      document.getElementById('hud-streak').textContent = state.streak.toLocaleString();
-      document.getElementById('hud-level').textContent = 'LVL ' + state.level;
-      const needed = XP_PER_LEVEL(state.level);
-      document.getElementById('hud-xp').style.width = Math.min(100, (state.xp / needed) * 100) + '%';
-      saveState();
-    }
-
-    let toastTimer = null;
-    function showToast(msg) {
-      const t = document.getElementById('game-toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
-    }
-
-    document.getElementById('info-btn').addEventListener('click', () => {
-      document.getElementById('info-modal').classList.add('open');
+    document.addEventListener('click', function(e){
+      var el = e.target.closest('[data-goto]'); if (!el) return;
+      if (el.disabled) return;
+      showScreen(el.getAttribute('data-goto'));
     });
 
-    const LEVEL_UNLOCKS = [
-      { level: 2, label: 'Farmhouse', desc: 'Place and upgrade a farmhouse (5 levels)' },
-      { level: 3, label: 'Mushroom Farm', desc: 'Place a 7-plot farm, upgradeable to 42 plots' },
-    ];
-
-    function openLevelModal() {
-      document.getElementById('level-modal-title').textContent = `Level ${state.level}`;
-      const invEl = document.getElementById('level-inventory-list');
-      invEl.innerHTML = [
-        { icon: '\u{1F48E}', label: 'Gemstones', val: state.gems, color: 'var(--blue)' },
-        { icon: '\u{1F344}', label: 'Shrooms', val: state.shrooms, color: 'var(--red)' },
-        { icon: '\u2728', label: 'Spores', val: state.spores, color: 'var(--gold)' },
-        { icon: '\u{1F525}', label: 'Streak', val: state.streak, color: '#ff9d42' },
-      ].map(r => `<div class="legend-row"><div class="legend-left">${r.icon} ${r.label}</div><span class="legend-val" style="color:${r.color}">${r.val.toLocaleString()}</span></div>`).join('');
-
-      const unlockEl = document.getElementById('level-unlocks-list');
-      unlockEl.innerHTML = LEVEL_UNLOCKS.map(u => {
-        const unlocked = state.level >= u.level;
-        return `<div class="legend-row">
-          <div class="legend-left">${unlocked ? '\u2705' : '\u{1F512}'} Lvl ${u.level} &mdash; ${u.label}</div>
-          <span class="legend-val" style="max-width:130px; text-align:right; opacity:0.7;">${u.desc}</span>
-        </div>`;
-      }).join('') + `<div class="legend-row"><div class="legend-left">\u{1F512} More levels</div><span class="legend-val" style="opacity:0.5;">Tools &amp; cosmetics coming soon</span></div>`;
-
-      document.getElementById('level-modal').classList.add('open');
+    var digInFlight = false, digDoneToday = false;
+    function buildDigGrid(){
+      var grid = $('dig-grid'), status = $('dig-status'), result = $('dig-result');
+      if (!grid) return;
+      grid.innerHTML = ''; grid.classList.remove('locked'); result.innerHTML = ''; digInFlight = false;
+      var DECOR = ['\uD83C\uDF35','\uD83E\uDEA8','\uD83C\uDF3E','\uD83E\uDD8E'];
+      var decorSlots = {}, placed = 0;
+      while (placed < 7){ var r = Math.floor(Math.random()*TILE_COUNT); if (!decorSlots[r]){ decorSlots[r] = DECOR[Math.floor(Math.random()*DECOR.length)]; placed++; } }
+      for (var i=0;i<TILE_COUNT;i++){
+        var tile = document.createElement('div');
+        tile.className = 'dig-tile'; tile.setAttribute('data-tile', i);
+        if (decorSlots[i]){ var d = document.createElement('span'); d.className = 'decor'; d.textContent = decorSlots[i]; tile.appendChild(d); }
+        grid.appendChild(tile);
+      }
+      if (digDoneToday){ grid.classList.add('locked'); status.innerHTML = '<span class="warn">You already dug today. Resets at daily reset.</span>'; }
+      else { status.textContent = 'Tap a tile to dig...'; }
     }
-    document.getElementById('level-pill').addEventListener('click', openLevelModal);
-
-    document.querySelectorAll('.modal-backdrop').forEach(bd => {
-      bd.addEventListener('click', e => { if (e.target === bd) bd.classList.remove('open'); });
-      const xBtn = bd.querySelector('[data-close]');
-      if (xBtn) xBtn.addEventListener('click', () => bd.classList.remove('open'));
+    document.addEventListener('click', function(e){
+      var tile = e.target.closest('.dig-tile'); if (!tile) return;
+      if (digInFlight || digDoneToday) return;
+      if (tile.classList.contains('dug')) return;
+      doDig(parseInt(tile.getAttribute('data-tile'),10), tile);
     });
-
-    const worldEl = document.getElementById('world');
-    const viewportEl = document.getElementById('viewport');
-    const lightLayerEl = document.getElementById('light-layer');
-    const groundEl = document.getElementById('iso-ground');
-    const fenceSvg = document.getElementById('iso-fence-svg');
-    const gridSvg = document.getElementById('iso-grid-svg');
-
-    worldEl.style.width = ISO_W + 'px';
-    worldEl.style.height = ISO_H + 'px';
-    groundEl.style.width = ISO_W + 'px';
-    groundEl.style.height = ISO_H + 'px';
-    fenceSvg.setAttribute('width', ISO_W);
-    fenceSvg.setAttribute('height', ISO_H);
-    fenceSvg.setAttribute('viewBox', `0 0 ${ISO_W} ${ISO_H}`);
-    gridSvg.setAttribute('width', ISO_W);
-    gridSvg.setAttribute('height', ISO_H);
-    gridSvg.setAttribute('viewBox', `0 0 ${ISO_W} ${ISO_H}`);
-
-    // True if the grid cell at world position (x,y) is water (material 2).
-    function isWaterAt(x, y) {
-      const c = Math.floor(x / TILE), r = Math.floor(y / TILE);
-      return matAt(c, r) === 2;
-    }
-
-    // Material at a grid cell (out of bounds = grass base).
-    function matAt(c, r) {
-      if (c < 0 || r < 0 || c >= GRID_TILES || r >= GRID_TILES) return 0;
-      const v = state.tiles[c + '_' + r];
-      return v != null ? v : DEFAULT_MATERIAL;
-    }
-
-    // Direct per-cell blob autotiler. One rendered tile per grid cell (no
-    // offset). A dirt cell picks its piece from AUTOTILE_DIRT by which
-    // orthogonal neighbors are also dirt; grass cells show the plain fill.
-    let tileEls = {}; // "c_r" -> DOM node
-    function renderIsoGrid() {
-      gridSvg.innerHTML = '';
-      const oldGrass = document.getElementById('grass-layer');
-      if (oldGrass) oldGrass.remove();
-
-      let host = document.getElementById('tile-host');
-      if (!host) {
-        host = document.createElement('div');
-        host.id = 'tile-host';
-        host.style.position = 'absolute';
-        host.style.top = '0'; host.style.left = '0';
-        host.style.width = ISO_W + 'px'; host.style.height = ISO_H + 'px';
-        host.style.zIndex = '1';
-        groundEl.parentNode.insertBefore(host, groundEl.nextSibling);
-      }
-      host.innerHTML = '';
-      tileEls = {};
-
-      for (let r = 0; r < GRID_TILES; r++) {
-        for (let c = 0; c < GRID_TILES; c++) {
-          const cell = document.createElement('div');
-          cell.className = 'ground-tile';
-          cell.dataset.rk = c + '_' + r;
-          cell.style.left = (c * TILE) + 'px';
-          cell.style.top = (r * TILE) + 'px';
-          cell.style.width = TILE + 'px';
-          cell.style.height = TILE + 'px';
-          cell.style.backgroundImage = `url('${TILESET_URL}')`;
-          host.appendChild(cell);
-          tileEls[c + '_' + r] = cell;
-          paintCell(c, r);
+    function getUser(){ try { return JSON.parse(localStorage.getItem('mp_profile_user') || '{}'); } catch(e){ return {}; } }
+    function doDig(tileIndex, tileEl){
+      var status = $('dig-status'), grid = $('dig-grid');
+      var user = getUser();
+      if (!user.discord_id){ status.innerHTML = '<span class="warn">Sign in on your Profile first.</span>'; return; }
+      digInFlight = true; grid.classList.add('locked'); status.textContent = 'Digging...'; vibrate(20);
+      fetch(API_BASE + '/api/actions/dig', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'x-discord-id': user.discord_id },
+        body: JSON.stringify({ tile: tileIndex })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        digInFlight = false;
+        if (!data || !data.ok){
+          grid.classList.remove('locked');
+          var msg = (data && data.message) ? data.message : 'Something went wrong. Try again.';
+          status.innerHTML = '<span class="warn">' + msg + '</span>';
+          if (data && data.code === 'cooldown'){ digDoneToday = true; grid.classList.add('locked'); }
+          return;
         }
-      }
+        digDoneToday = true; grid.classList.add('locked');
+        revealTile(tileEl, data); showResult(data);
+      })
+      .catch(function(){ digInFlight = false; grid.classList.remove('locked'); status.innerHTML = '<span class="warn">Network error. Try again.</span>'; });
     }
-
-    // Pick + apply the tile for cell (c,r).
-    function paintCell(c, r) {
-      const cell = tileEls[c + '_' + r];
-      if (!cell) return;
-      const mat = matAt(c, r);
-      let col, row, url = TILESET_URL;
-      if (mat === 1) {
-        const mask =
-          (matAt(c,   r-1) === 1 ? 1 : 0) |
-          (matAt(c+1, r  ) === 1 ? 2 : 0) |
-          (matAt(c,   r+1) === 1 ? 4 : 0) |
-          (matAt(c-1, r  ) === 1 ? 8 : 0);
-        [col, row] = AUTOTILE_DIRT[mask] || AUTOTILE_DIRT[0];
-      } else if (mat === 2) {
-        const mask =
-          (matAt(c,   r-1) === 2 ? 1 : 0) |
-          (matAt(c+1, r  ) === 2 ? 2 : 0) |
-          (matAt(c,   r+1) === 2 ? 4 : 0) |
-          (matAt(c-1, r  ) === 2 ? 8 : 0);
-        [col, row] = AUTOTILE_WATER[mask] || AUTOTILE_WATER[0];
-        url = WATER_TILESET_URL;
-      } else {
-        [col, row] = GRASS_FILL;
-      }
-      const bg = sheetBg(col, row, TILE, mat === 2 ? WATER_ROWS : TILESET_ROWS);
-      cell.style.backgroundImage = `url('${url}')`;
-      cell.style.backgroundSize = bg.size;
-      cell.style.backgroundPosition = bg.pos;
+    function revealTile(tileEl, data){
+      tileEl.classList.add('revealing');
+      var emoji = TIER_EMOJI[data.tier] || TIER_EMOJI.nothing;
+      if (data.legendary){ tileEl.classList.add('legendary-win'); emoji = TIER_EMOJI.legendary; }
+      else { tileEl.classList.add('dug'); }
+      tileEl.textContent = emoji;
+      vibrate(data.legendary ? [30,40,60] : 15);
     }
-
-    // After painting (c,r), repaint it + its 4 orthogonal neighbors so their
-    // borders update too.
-    function repaintAround(c, r) {
-      paintCell(c, r);
-      paintCell(c, r-1); paintCell(c, r+1);
-      paintCell(c-1, r); paintCell(c+1, r);
-    }
-
-    function renderObstacles() {
-      obstacles.forEach(ob => {
-        if (state.clearedObstacles[ob.id]) return;
-
-        const shadow = document.createElement('div');
-        const shClass = (ob.type.key === 'stump') ? 'shadow-log'
-          : (ob.type.key === 'bush') ? 'shadow-mushroom' : 'shadow-rock';
-        shadow.className = 'iso-shadow ' + shClass;
-        shadow.dataset.shadowFor = ob.id;
-        const shScale = (shClass === 'shadow-rock') ? 0.65 : 0.7;
-        placeShadow(shadow, ob.x, ob.y, ob.type.size * shScale, ob.type.size * shScale * 0.5);
-        worldEl.appendChild(shadow);
-
-        const el = document.createElement('div');
-        el.className = 'sprite iso-lift';
-        el.dataset.id = ob.id;
-        placeIso(el, ob.x, ob.y, ob.type.height);
-        el.style.width = ob.type.size + 'px';
-        el.style.height = ob.type.size + 'px';
-        el.innerHTML = spriteHTML(ob.type.key, ob.type.emoji, ob.type.size);
-        bindTap(el, () => hitObstacle(ob, el, shadow));
-        worldEl.appendChild(el);
-      });
-    }
-
-    function hitObstacle(ob, el, shadow) {
-      if (state.clearedObstacles[ob.id] || !el.isConnected) return;
-      ob.hp -= 1;
-      el.classList.remove('hit');
-      void el.offsetWidth;
-      el.classList.add('hit');
-      vibrate(12);
-
-      if (ob.hp <= 0) {
-        state.clearedObstacles[ob.id] = true;
-        const gems = ob.type.gems[0] + Math.floor(rand() * (ob.type.gems[1] - ob.type.gems[0] + 1));
-        state.gems += gems;
-        grantXP(6);
-        vibrate(25);
-
-        const { ix, iy } = toIso(ob.x, ob.y);
-        const ft = document.createElement('div');
-        ft.className = 'float-text';
-        ft.textContent = `+${gems} \u{1F48E}`;
-        ft.style.color = 'var(--blue)';
-        ft.style.left = ix + 'px';
-        ft.style.top = (iy - ob.type.height - 10) + 'px';
-        worldEl.appendChild(ft);
-        setTimeout(() => ft.remove(), 900);
-
-        el.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
-        el.style.transform = 'translate(-50%,-100%) scale(0)';
-        el.style.opacity = '0';
-        setTimeout(() => el.remove(), 250);
-        if (shadow) shadow.remove();
-        updateHUD();
-      } else {
-        el.style.opacity = String(0.4 + 0.6 * (ob.hp / ob.type.hp));
-      }
-    }
-
-    const HOUR = 60 * 60 * 1000;
-    const DAY = 24 * HOUR;
-    const RARE_TYPES = ['red', 'blue', 'purple', 'golden'];
-    const MUSHROOM_HEIGHT = 3;
-
-    const MUSHROOM_TYPES = {
-      brown:  { label: 'Brown',  emoji: '\u{1F344}', hue: 15,  sat: 0.7,  glow: '#a9702f', intervalMs: HOUR, maxOnMap: 24, value: [1, 50], streak: false },
-      red:    { label: 'Red',    emoji: '\u{1F344}', hue: 0,   sat: 1.3,  glow: '#fd464f', intervalMs: DAY,  maxOnMap: 24, value: 50,      streak: true },
-      blue:   { label: 'Blue',   emoji: '\u{1F344}', hue: 195, sat: 1.4,  glow: '#4fa8fd', intervalMs: DAY,  maxOnMap: 24, value: 100,     streak: true },
-      purple: { label: 'Purple', emoji: '\u{1F344}', hue: 265, sat: 1.4,  glow: '#b06ffd', intervalMs: DAY,  maxOnMap: 24, value: 200,     streak: true },
-      golden: { label: 'Golden', emoji: '\u{1F344}', hue: 45,  sat: 1.5,  glow: '#fece00', intervalMs: DAY,  maxOnMap: 24, value: 300,     streak: true },
-    };
-
-    const OBSTACLE_TYPES = [
-      { key: 'rock',  emoji: '\u{1FAA8}', hp: 3, size: ts(SIZE.rock),  height: 2, gems: [2, 4] },
-      { key: 'rock2', emoji: '\u{1FAA8}', hp: 4, size: ts(SIZE.rock2), height: 3, gems: [5, 9] },
-      { key: 'stump', emoji: '\u{1FAB5}', hp: 4, size: ts(SIZE.stump), height: 3, gems: [4, 7] },
-      { key: 'bush',  emoji: '\u{1F333}', hp: 2, size: ts(SIZE.bush),  height: 4, gems: [1, 3] },
-    ];
-    const OBSTACLE_COUNT = 46;
-    const MIN_OBSTACLE_SPACING = 130;
-    const obstacles = [];
-    {
-      let attempts = 0;
-      while (obstacles.length < OBSTACLE_COUNT && attempts < OBSTACLE_COUNT * 40) {
-        attempts++;
-        const x = 80 + seedRand() * (WORLD_SIZE - 160);
-        const y = 80 + seedRand() * (WORLD_SIZE - 160);
-        let tooClose = false;
-        for (let i = 0; i < obstacles.length; i++) {
-          const dx = x - obstacles[i].x, dy = y - obstacles[i].y;
-          if (Math.sqrt(dx * dx + dy * dy) < MIN_OBSTACLE_SPACING) { tooClose = true; break; }
-        }
-        if (tooClose) continue;
-        const type = OBSTACLE_TYPES[Math.floor(seedRand() * OBSTACLE_TYPES.length)];
-        obstacles.push({ id: 'ob_' + obstacles.length, type, x, y, hp: type.hp });
-      }
-    }
-
-    function rollBrownValue(streak) {
-      const power = 1 / (1 + Math.min(streak, 12) * 0.12);
-      const r = Math.pow(rand(), power);
-      return Math.max(1, Math.round(1 + r * 49));
-    }
-
-    const MUSHROOM_TOTAL = 24;          // max mushrooms on map at once
-    const MUSHROOM_MIN_SPACING = 70;    // no overlap with mushrooms/obstacles
-
-    function spotIsClear(x, y) {
-      if (isWaterAt(x, y)) return false;   // no mushrooms on water
-      // reject if too close to an existing mushroom
-      for (const id in state.mushrooms) {
-        const m = state.mushrooms[id];
-        const dx = x - m.x, dy = y - m.y;
-        if (dx * dx + dy * dy < MUSHROOM_MIN_SPACING * MUSHROOM_MIN_SPACING) return false;
-      }
-      // reject if too close to a live obstacle
-      for (let i = 0; i < obstacles.length; i++) {
-        const ob = obstacles[i];
-        if (state.clearedObstacles[ob.id]) continue;
-        const dx = x - ob.x, dy = y - ob.y;
-        if (dx * dx + dy * dy < MUSHROOM_MIN_SPACING * MUSHROOM_MIN_SPACING) return false;
-      }
-      return true;
-    }
-
-    function randomMushroomSpot() {
-      // try several times to find a non-overlapping spot
-      for (let attempt = 0; attempt < 30; attempt++) {
-        const x = 60 + rand() * (WORLD_SIZE - 120);
-        const y = 60 + rand() * (WORLD_SIZE - 120);
-        if (spotIsClear(x, y)) return { x, y };
-      }
-      return null; // no room found this attempt
-    }
-
-    function currentMushroomCount() {
-      return Object.keys(state.mushrooms).length;
-    }
-
-    // Top the map up toward MUSHROOM_TOTAL. Picks rarity per mushroom.
-    function spawnMushroomCrop() {
-      let need = MUSHROOM_TOTAL - currentMushroomCount();
-      if (need <= 0) return;
-      const now = Date.now();
-      const keys = Object.keys(MUSHROOM_TYPES);
-      for (let i = 0; i < need; i++) {
-        const spot = randomMushroomSpot();
-        if (!spot) break; // map full / no room
-        // weighted rarity: mostly brown, some rares
-        const roll = rand();
-        let typeKey;
-        if (roll < 0.55) typeKey = 'brown';
-        else if (roll < 0.72) typeKey = 'red';
-        else if (roll < 0.85) typeKey = 'blue';
-        else if (roll < 0.95) typeKey = 'purple';
-        else typeKey = 'golden';
-        const id = 'm_' + typeKey + '_' + now + '_' + Math.floor(rand() * 1e6) + '_' + i;
-        state.mushrooms[id] = { typeKey, x: spot.x, y: spot.y };
-        renderMushroom(id, state.mushrooms[id]);
-      }
-      saveState();
-    }
-
-    function countOnMap(typeKey) {
-      let n = 0;
-      for (const id in state.mushrooms) if (state.mushrooms[id].typeKey === typeKey) n++;
-      return n;
-    }
-
-    // Which game-day we last dropped the 7 AM crop, so it fires once per morning.
-    // gameDay = whole days since epoch on the accelerated clock (1 real min = 1 hr).
-    function gameDayIndex() { return Math.floor(Date.now() / 60000 / 24); }
-
-    function processSpawns() {
-      const h = gameHour();
-      const today = gameDayIndex();
-      // Fire once when the clock is at/after 7 AM and we haven't seeded today.
-      if (h >= 7 && state.lastMushroomCropDay !== today) {
-        state.lastMushroomCropDay = today;
-        spawnMushroomCrop();
-        saveState();
-      }
-    }
-
-    function checkDayRollover() {
-      const today = new Date().toDateString();
-      if (state.lastCheckedDate && state.lastCheckedDate !== today) {
-        if (state.streakCreditedDate !== state.lastCheckedDate) {
-          if (state.streak > 0) showToast('Streak reset - missed a full daily set');
-          state.streak = 0;
-        }
-      }
-      if (!state.dailyCollected || state.dailyCollected.date !== today) {
-        state.dailyCollected = { date: today, types: {} };
-      }
-      state.lastCheckedDate = today;
-      saveState();
-    }
-
-    function markDailyCollected(typeKey) {
-      const today = new Date().toDateString();
-      if (!state.dailyCollected || state.dailyCollected.date !== today) {
-        state.dailyCollected = { date: today, types: {} };
-      }
-      state.dailyCollected.types[typeKey] = true;
-      const allFour = RARE_TYPES.every(t => state.dailyCollected.types[t]);
-      if (allFour && state.streakCreditedDate !== today) {
-        state.streak = (state.streak || 0) + 1;
-        state.streakCreditedDate = today;
-        vibrate([15, 30, 15, 30, 15]);
-        showToast(`Daily streak! \u{1F525} ${state.streak} day${state.streak > 1 ? 's' : ''}`);
-      }
-    }
-
-    function renderMushroom(id, m) {
-      const type = MUSHROOM_TYPES[m.typeKey];
-
-      const shadow = document.createElement('div');
-      shadow.className = 'iso-shadow shadow-mushroom mushroom-shadow';
-      shadow.dataset.shadowFor = id;
-      placeShadow(shadow, m.x, m.y, 22, 9);
-      worldEl.appendChild(shadow);
-
-      const el = document.createElement('div');
-      el.className = 'mushroom-sprite iso-lift';
-      el.dataset.id = id;
-      placeIso(el, m.x, m.y, MUSHROOM_HEIGHT);
-      el.innerHTML = `<span class="glow-dot" style="background:${type.glow}"></span><span class="emoji" style="font-size:${ts(SIZE.mushroom)}px; filter:hue-rotate(${type.hue}deg) saturate(${type.sat}) drop-shadow(0 3px 3px rgba(0,0,0,0.5))">${type.emoji}</span>`;
-      bindTap(el, () => collectMushroom(id, el, shadow));
-      worldEl.appendChild(el);
-    }
-
-    function collectMushroom(id, el, shadow) {
-      const m = state.mushrooms[id];
-      if (!m || !el || !el.isConnected) return;
-      const type = MUSHROOM_TYPES[m.typeKey];
-      const value = Array.isArray(type.value) ? rollBrownValue(state.streak) : type.value;
-
-      delete state.mushrooms[id];
-
-      state.shrooms += value;
-      grantXP(type.streak ? 12 : 3);
-      vibrate(18);
-
-      const { ix, iy } = toIso(m.x, m.y);
-      const ft = document.createElement('div');
-      ft.className = 'float-text';
-      ft.textContent = `+${value} \u{1F344}`;
-      ft.style.color = type.glow;
-      ft.style.left = ix + 'px';
-      ft.style.top = (iy - MUSHROOM_HEIGHT - 8) + 'px';
-      worldEl.appendChild(ft);
-      setTimeout(() => ft.remove(), 900);
-
-      if (type.streak) markDailyCollected(m.typeKey);
-
-      el.classList.add('pop');
-      setTimeout(() => el.remove(), 280);
-      if (shadow) shadow.remove();
-      updateHUD();
-    }
-
-    function renderLegend() {
-      const list = document.getElementById('legend-list');
-      list.innerHTML = Object.keys(MUSHROOM_TYPES).map(key => {
-        const t = MUSHROOM_TYPES[key];
-        const valLabel = Array.isArray(t.value) ? `1-${t.value[1]}` : t.value;
-        const freq = t.intervalMs === HOUR ? 'hourly, 24 max' : 'daily, 24 max';
-        return `<div class="legend-row">
-          <div class="legend-left"><span class="legend-dot" style="background:${t.glow}"></span>${t.label}</div>
-          <span class="legend-val">\u{1F344} ${valLabel} &middot; ${freq}</span>
-        </div>`;
-      }).join('');
-    }
-
-    const HOUSE_UPGRADE_COSTS = [
-      { gems: 40, shrooms: 20 },
-      { gems: 70, shrooms: 35 },
-      { gems: 110, shrooms: 55 },
-      { gems: 160, shrooms: 80 },
-    ];
-    const HOUSE_VISUALS = {
-      1: { emoji: '\u{1F3DA}\uFE0F', filter: 'saturate(0.35) brightness(0.7)',  decor: '',   name: 'Ruins' },
-      2: { emoji: '\u{1F3DA}\uFE0F', filter: 'saturate(0.6) brightness(0.85)',  decor: '\u{1FAB5}', name: 'Patched' },
-      3: { emoji: '\u{1F3E1}', filter: 'saturate(0.8) brightness(0.95)',  decor: '\u{1F33E}', name: 'Rebuilt' },
-      4: { emoji: '\u{1F3E1}', filter: 'saturate(1) brightness(1)',       decor: '\u{1F33B}', name: 'Restored' },
-      5: { emoji: '\u{1F3E1}', filter: 'none',                            decor: '\u2728', name: 'Homestead' },
-    };
-    const HOUSE_HEIGHT = 8;
-
-    let houseEl = null;
-    let houseShadowEl = null;
-    function renderHouse() {
-      if (!state.housePlaced) return;
-      if (houseEl) houseEl.remove();
-      if (houseShadowEl) houseShadowEl.remove();
-      const { x, y } = state.housePosition;
-      const visual = HOUSE_VISUALS[state.houseLevel];
-
-      houseShadowEl = document.createElement('div');
-      houseShadowEl.className = 'iso-shadow shadow-soft';
-      placeShadow(houseShadowEl, x, y, 96, 42);
-      worldEl.appendChild(houseShadowEl);
-
-      houseEl = document.createElement('div');
-      houseEl.id = 'farmhouse';
-      houseEl.className = 'iso-lift';
-      placeIso(houseEl, x, y, HOUSE_HEIGHT);
-      houseEl.innerHTML = `<div class="ring"></div><span class="house-emoji" style="filter:${visual.filter}">${visual.emoji}</span>${visual.decor ? `<span class="house-decor">${visual.decor}</span>` : ''}`;
-      bindTap(houseEl, openHouseModal);
-      worldEl.appendChild(houseEl);
-    }
-
-    function openHouseModal() {
-      const backdrop = document.getElementById('house-modal');
-      const level = state.houseLevel;
-      const visual = HOUSE_VISUALS[level];
-      const titleEl = document.getElementById('house-title');
-      const descEl = document.getElementById('house-desc');
-      const fillEl = document.getElementById('house-repair-fill');
-      const costRow = document.getElementById('house-cost-row');
-      const btn = document.getElementById('house-repair-btn');
-
-      fillEl.style.width = (level / 5 * 100) + '%';
-      titleEl.textContent = `Farmhouse: Level ${level} - ${visual.name}`;
-
-      if (level >= 5) {
-        descEl.textContent = 'Fully restored homestead. This is home base.';
-        costRow.innerHTML = '';
-        btn.style.display = 'none';
-      } else {
-        const cost = HOUSE_UPGRADE_COSTS[level - 1];
-        descEl.textContent = `Upgrade to Level ${level + 1} - ${HOUSE_VISUALS[level + 1].name}.`;
-        costRow.innerHTML = `<span style="color:var(--blue)">\u{1F48E} ${cost.gems}</span><span style="color:var(--red)">\u{1F344} ${cost.shrooms}</span>`;
-        btn.style.display = 'block';
-        const affordable = state.gems >= cost.gems && state.shrooms >= cost.shrooms;
-        btn.disabled = !affordable;
-        btn.textContent = affordable ? 'Upgrade' : 'Not enough resources';
-        btn.onclick = () => {
-          if (state.gems < cost.gems || state.shrooms < cost.shrooms) return;
-          state.gems -= cost.gems;
-          state.shrooms -= cost.shrooms;
-          state.houseLevel += 1;
-          grantXP(15);
-          vibrate(25);
-          updateHUD();
-          renderHouse();
-          showToast(state.houseLevel >= 5 ? 'Farmhouse fully restored!' : 'Farmhouse upgraded!');
-          openHouseModal();
-        };
-      }
-      backdrop.classList.add('open');
-    }
-
-    const FARM_UPGRADE_COSTS = [
-      { gems: 150, spores: 20 },
-      { gems: 300, spores: 50 },
-      { gems: 500, spores: 90 },
-      { gems: 800, spores: 140 },
-      { gems: 1200, spores: 200 },
-    ];
-    const farmPlotsForLevel = lvl => lvl * 7;
-
-    const PLANT_COST_SHROOMS = 2;
-    const GROW_TIME_MS = 60 * 1000;
-    const SPORE_YIELD = [4, 8];
-
-    let activePlotId = null;
-
-    function renderFarm() {
-      if (!state.farmPlaced) return;
-      document.querySelectorAll('.farm-hub-wrap, .plot, .plot-shadow, .hub-shadow').forEach(e => e.remove());
-      fenceSvg.innerHTML = '';
-
-      const { x, y } = state.farmPosition;
-      const plotsCount = farmPlotsForLevel(state.farmLevel);
-      const cols = 7;
-      const rows = Math.ceil(plotsCount / cols);
-      const cellSize = 52, gap = 10;
-      const gridW = cols * cellSize + (cols - 1) * gap;
-      const gridH = rows * cellSize + (rows - 1) * gap;
-      const startX = x - gridW / 2;
-      const startY = y - gridH / 2;
-
-      const pad = 30;
-      const corners = [
-        [startX - pad, startY - pad],
-        [startX + gridW + pad, startY - pad],
-        [startX + gridW + pad, startY + gridH + pad],
-        [startX - pad, startY + gridH + pad]
-      ].map(([cx, cy]) => toIso(cx, cy));
-      const pointsAttr = corners.map(c => `${c.ix.toFixed(1)},${c.iy.toFixed(1)}`).join(' ');
-      const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-      poly.setAttribute('points', pointsAttr);
-      poly.setAttribute('fill', 'rgba(90,60,30,0.10)');
-      poly.setAttribute('stroke', '#8a6a3f');
-      poly.setAttribute('stroke-width', '4');
-      poly.setAttribute('stroke-dasharray', '10 8');
-      fenceSvg.appendChild(poly);
-      fenceSvg.style.zIndex = String(1000 + depthIndex(startX, startY) - 1);
-
-      const hubShadow = document.createElement('div');
-      hubShadow.className = 'iso-shadow hub-shadow';
-      placeShadow(hubShadow, x, startY - pad - 8, 30, 14);
-      worldEl.appendChild(hubShadow);
-
-      const hubWrap = document.createElement('div');
-      hubWrap.className = 'iso-lift farm-hub-wrap';
-      placeIso(hubWrap, x, startY - pad - 8, 6);
-      hubWrap.innerHTML = `<span class="farm-hub">\u{1FAA7}</span>`;
-      bindTap(hubWrap, openFarmModal);
-      worldEl.appendChild(hubWrap);
-
-      for (let i = 0; i < plotsCount; i++) {
-        const col = i % cols, row = Math.floor(i / cols);
-        const px = startX + col * (cellSize + gap) + cellSize / 2;
-        const py = startY + row * (cellSize + gap) + cellSize / 2;
-        const plotId = 'plot_' + i;
-
-        const shadow = document.createElement('div');
-        shadow.className = 'iso-shadow shadow-soft plot-shadow';
-        placeShadow(shadow, px, py, 40, 18);
-        worldEl.appendChild(shadow);
-
-        const el = document.createElement('div');
-        el.className = 'plot';
-        el.dataset.id = plotId;
-        const { ix, iy } = toIso(px, py);
-        el.style.left = ix + 'px';
-        el.style.top = iy + 'px';
-        el.style.zIndex = String(1000 + depthIndex(px, py));
-        bindTap(el, () => openPlotModal(plotId));
-        worldEl.appendChild(el);
-        refreshPlotVisual(plotId, el);
-      }
-    }
-
-    function openFarmModal() {
-      const backdrop = document.getElementById('farm-modal');
-      const level = state.farmLevel;
-      const plots = farmPlotsForLevel(level);
-      const titleEl = document.getElementById('farm-title');
-      const descEl = document.getElementById('farm-desc');
-      const fillEl = document.getElementById('farm-repair-fill');
-      const costRow = document.getElementById('farm-cost-row');
-      const btn = document.getElementById('farm-upgrade-btn');
-
-      fillEl.style.width = (plots / 42 * 100) + '%';
-      titleEl.textContent = `Mushroom Farm: Level ${level}`;
-
-      if (level >= 6) {
-        descEl.textContent = `Fully expanded with all 42 plots. Plant shrooms here to grow spores.`;
-        costRow.innerHTML = '';
-        btn.style.display = 'none';
-      } else {
-        const nextPlots = farmPlotsForLevel(level + 1);
-        const cost = FARM_UPGRADE_COSTS[level - 1];
-        descEl.textContent = `${plots} of 42 plots unlocked. Upgrade to expand to ${nextPlots} plots.`;
-        costRow.innerHTML = `<span style="color:var(--blue)">\u{1F48E} ${cost.gems}</span><span style="color:var(--gold)">\u2728 ${cost.spores}</span>`;
-        btn.style.display = 'block';
-        const affordable = state.gems >= cost.gems && state.spores >= cost.spores;
-        btn.disabled = !affordable;
-        btn.textContent = affordable ? 'Upgrade' : 'Not enough resources';
-        btn.onclick = () => {
-          if (state.gems < cost.gems || state.spores < cost.spores) return;
-          state.gems -= cost.gems;
-          state.spores -= cost.spores;
-          state.farmLevel += 1;
-          grantXP(20);
-          vibrate(25);
-          updateHUD();
-          renderFarm();
-          showToast(state.farmLevel >= 6 ? 'Mushroom Farm fully expanded!' : 'Mushroom Farm expanded!');
-          openFarmModal();
-        };
-      }
-      backdrop.classList.add('open');
-    }
-
-    function refreshPlotVisual(plotId, el) {
-      const data = state.plots[plotId];
-      el = el || worldEl.querySelector(`.plot[data-id="${plotId}"]`);
-      if (!el) return;
-      if (!data) { el.classList.remove('planted'); el.innerHTML = '\u{1F573}\uFE0F'; return; }
-      const elapsed = Date.now() - data.plantedAt;
-      el.classList.add('planted');
-      el.innerHTML = elapsed >= GROW_TIME_MS ? '\u2728' : '\u{1F331}';
-    }
-
-    function openPlotModal(plotId) {
-      activePlotId = plotId;
-      const backdrop = document.getElementById('plot-modal');
-      const titleEl = document.getElementById('plot-title');
-      const descEl = document.getElementById('plot-desc');
-      const costRow = document.getElementById('plot-cost-row');
-      const btn = document.getElementById('plot-action-btn');
-      const data = state.plots[plotId];
-
-      if (!data) {
-        titleEl.textContent = 'Empty Plot';
-        descEl.textContent = `Plant a shroom here. It'll take a little while to grow into spores.`;
-        costRow.innerHTML = `<span style="color:var(--red)">\u{1F344} ${PLANT_COST_SHROOMS}</span>`;
-        btn.textContent = 'Plant Shroom';
-        btn.disabled = state.shrooms < PLANT_COST_SHROOMS;
-        btn.onclick = () => {
-          if (state.shrooms < PLANT_COST_SHROOMS) return;
-          state.shrooms -= PLANT_COST_SHROOMS;
-          state.plots[plotId] = { plantedAt: Date.now() };
-          grantXP(4);
-          vibrate(18);
-          updateHUD();
-          refreshPlotVisual(plotId);
-          showToast('Shroom planted \u{1F331}');
-          backdrop.classList.remove('open');
-        };
-      } else {
-        const elapsed = Date.now() - data.plantedAt;
-        if (elapsed >= GROW_TIME_MS) {
-          titleEl.textContent = 'Ready to Harvest';
-          descEl.textContent = 'Your shroom has fully grown. Harvest it for spores.';
-          costRow.innerHTML = '';
-          btn.textContent = 'Harvest';
-          btn.disabled = false;
-          btn.onclick = () => {
-            const yieldAmt = SPORE_YIELD[0] + Math.floor(rand() * (SPORE_YIELD[1] - SPORE_YIELD[0] + 1));
-            state.spores += yieldAmt;
-            delete state.plots[plotId];
-            grantXP(10);
-            vibrate(22);
-            updateHUD();
-            refreshPlotVisual(plotId);
-            showToast(`Harvested +${yieldAmt} \u2728 spores`);
-            backdrop.classList.remove('open');
-          };
-        } else {
-          const remainMin = Math.ceil((GROW_TIME_MS - elapsed) / 1000 / 60) || 1;
-          titleEl.textContent = 'Growing...';
-          descEl.textContent = `Still growing. Ready in about ${remainMin} min.`;
-          costRow.innerHTML = '';
-          btn.textContent = 'Still Growing';
-          btn.disabled = true;
-          btn.onclick = null;
-        }
-      }
-      backdrop.classList.add('open');
-    }
-
-    setInterval(() => {
-      if (!document.getElementById('plot-modal').classList.contains('open')) return;
-      if (activePlotId) openPlotModal(activePlotId);
-    }, 5000);
-
-    let placingKind = null;
-    let activeDecorType = null;
-    let ghostEl = null;
-    let ghostShadowEl = null;
-    let ghostWorldPos = null;
-
-    function canPlaceHouse() { return state.level >= 2 && !state.housePlaced; }
-    function canPlaceFarm()  { return state.level >= 3 && !state.farmPlaced; }
-
-    function updateBuildButtons() {
-      document.getElementById('build-house-btn').classList.toggle('show', canPlaceHouse());
-      document.getElementById('build-farm-btn').classList.toggle('show', canPlaceFarm());
-    }
-
-    function startPlacement(kind) {
-      if (placingKind) return;
-      if (kind === 'house' && !canPlaceHouse()) return;
-      if (kind === 'farm' && !canPlaceFarm()) return;
-      placingKind = kind;
-      dragging = false;
-      moved = false;
-      placeTouchStart = null;
-      worldEl.classList.add('placing');
-      const banner = document.getElementById('placement-banner');
-      document.getElementById('placement-banner-text').textContent = kind === 'house' ? 'Tap the grass to place your farmhouse' : 'Tap the grass to place your mushroom farm';
-      document.getElementById('decor-done-btn').style.display = 'none';
-      banner.classList.add('show');
-
-      ghostShadowEl = document.createElement('div');
-      ghostShadowEl.className = 'iso-shadow';
-      ghostShadowEl.style.width = (kind === 'house' ? 70 : 60) + 'px';
-      ghostShadowEl.style.height = (kind === 'house' ? 34 : 28) + 'px';
-      worldEl.appendChild(ghostShadowEl);
-
-      ghostEl = document.createElement('div');
-      ghostEl.className = 'iso-lift';
-      if (kind === 'house') {
-        ghostEl.innerHTML = `<span class="house-emoji" style="opacity:0.6;">\u{1F3DA}\uFE0F</span>`;
-      } else {
-        ghostEl.innerHTML = `<span class="farm-hub" style="font-size:2.6rem; opacity:0.7;">\u{1F344}\u{1F3D7}\uFE0F</span>`;
-      }
-      ghostEl.style.left = '-999px';
-      worldEl.appendChild(ghostEl);
-      ghostWorldPos = null;
-    }
-    document.getElementById('build-house-btn').addEventListener('click', () => startPlacement('house'));
-    document.getElementById('build-farm-btn').addEventListener('click', () => startPlacement('farm'));
-
-    function moveGhost(screenX, screenY) {
-      if (!placingKind || !ghostEl) return;
-      const rect = viewportEl.getBoundingClientRect();
-      const isoX = (screenX - rect.left - tx) / scale;
-      const isoY = (screenY - rect.top - ty) / scale;
-      const { x, y } = fromIso(isoX, isoY);
-      const cx = Math.max(120, Math.min(WORLD_SIZE - 120, x));
-      const cy = Math.max(120, Math.min(WORLD_SIZE - 120, y));
-      ghostWorldPos = { x: cx, y: cy };
-      if (placingKind === 'decor') {
-        const catalog = DECOR_CATALOG[activeDecorType];
-        if (catalog) {
-          placeIso(ghostEl, cx, cy, catalog.height);
-          const shW = catalog.kind === 'tile' ? catalog.w * 0.8 : catalog.size * 0.6;
-          const shH = catalog.kind === 'tile' ? catalog.h * 0.6 : catalog.size * 0.3;
-          if (ghostShadowEl) placeShadow(ghostShadowEl, cx, cy, shW, shH);
-        }
+    function showResult(data){
+      var result = $('dig-result'), status = $('dig-status');
+      if (data.legendary){
+        status.innerHTML = '<span class="ok">LEGENDARY CHEST!</span>';
+        result.innerHTML = '<div class="r-legendary">&#x1F451; ' + data.label + '</div><div class="r-amount">+' + Number(data.amount).toLocaleString() + ' SHROOM</div>';
         return;
       }
-      const height = placingKind === 'house' ? 8 : 6;
-      placeIso(ghostEl, cx, cy, height);
-      if (ghostShadowEl) placeShadow(ghostShadowEl, cx, cy, placingKind === 'house' ? 70 : 60, placingKind === 'house' ? 34 : 28);
-    }
-
-    function confirmPlacement(screenX, screenY) {
-      const kind = placingKind;
-      if (!kind) return;
-      const rect = viewportEl.getBoundingClientRect();
-      const isoX = (screenX - rect.left - tx) / scale;
-      const isoY = (screenY - rect.top - ty) / scale;
-      const { x: rawX, y: rawY } = fromIso(isoX, isoY);
-      const x = Math.max(120, Math.min(WORLD_SIZE - 120, rawX));
-      const y = Math.max(120, Math.min(WORLD_SIZE - 120, rawY));
-
-      if (kind === 'decor') {
-        placeDecorAt(x, y);
-        return;
-      }
-
-      placingKind = null;
-      worldEl.classList.remove('placing');
-      document.getElementById('placement-banner').classList.remove('show');
-      if (ghostEl) { ghostEl.remove(); ghostEl = null; }
-      if (ghostShadowEl) { ghostShadowEl.remove(); ghostShadowEl = null; }
-      ghostWorldPos = null;
-
-      if (kind === 'house') {
-        state.housePlaced = true;
-        state.housePosition = { x, y };
-        state.houseLevel = 1;
-        vibrate(30);
-        showToast('Farmhouse placed!');
-        renderHouse();
-      } else {
-        state.farmPlaced = true;
-        state.farmPosition = { x, y };
-        state.farmLevel = 1;
-        vibrate(30);
-        showToast('Mushroom Farm placed!');
-        renderFarm();
-      }
-      updateBuildButtons();
-      updateHUD();
-    }
-
-    const DECOR_CATALOG = {
-      flower_tulip:  { kind: 'emoji', emoji: '\u{1F337}', label: 'Tulip',   cost: { gems: 2 },  height: 1,  size: 18 },
-      flower_daisy:  { kind: 'emoji', emoji: '\u{1F33C}', label: 'Daisy',   cost: { gems: 2 },  height: 1,  size: 18 },
-      flower_bloom:  { kind: 'emoji', emoji: '\u{1F338}', label: 'Blossom', cost: { gems: 2 },  height: 1,  size: 18 },
-      tree_pine:     { kind: 'emoji', emoji: '\u{1F332}', label: 'Pine',    cost: { gems: 12 }, height: 12, size: 34 },
-      tree_round:    { kind: 'emoji', emoji: '\u{1F333}', label: 'Tree',    cost: { gems: 12 }, height: 12, size: 34 },
-      fence:         { kind: 'tile',  color: '#8a6a3f', label: 'Fence',   cost: { gems: 3 }, height: 5, w: 40, h: 10 },
-      walkway:       { kind: 'tile',  color: '#c9b384', label: 'Walkway', cost: { gems: 1 }, height: 0, w: 42, h: 42, diamond: false },
-      campfire:      { kind: 'fire',  label: 'Campfire', cost: { gems: 8 }, height: 4, size: 30 },
-    };
-
-    function renderDecorPalette() {
-      const grid = document.getElementById('decor-palette-grid');
-      grid.innerHTML = Object.keys(DECOR_CATALOG).map(key => {
-        const d = DECOR_CATALOG[key];
-        const icon = d.kind === 'emoji' ? d.emoji : d.kind === 'fire' ? '\u{1F525}' : (d.diamond ? '\u{1F7EB}' : '\u2796');
-        return `<div class="decor-palette-item" data-decor-key="${key}">
-          <span class="dp-icon">${icon}</span>
-          <span class="dp-label">${d.label}</span>
-          <span class="dp-cost">gems ${d.cost.gems}</span>
-        </div>`;
-      }).join('');
-      grid.querySelectorAll('.decor-palette-item').forEach(el => {
-        bindTap(el, () => {
-          document.getElementById('decor-modal').classList.remove('open');
-          startDecorPlacement(el.dataset.decorKey);
-        });
-      });
-    }
-    renderDecorPalette();
-
-    document.getElementById('build-decor-btn').addEventListener('click', () => {
-      document.getElementById('decor-modal').classList.add('open');
-    });
-
-    let decorIdCounter = 0;
-    function renderDecoration(id, d) {
-      const catalog = DECOR_CATALOG[d.type];
-      if (!catalog) return;
-
-      const shadow = document.createElement('div');
-      shadow.className = 'iso-shadow';
-      shadow.dataset.decorShadowFor = id;
-      const shW = catalog.kind === 'tile' ? catalog.w * 0.8 : catalog.size * 0.6;
-      const shH = catalog.kind === 'tile' ? catalog.h * 0.6 : catalog.size * 0.3;
-      placeShadow(shadow, d.x, d.y, shW, shH);
-      worldEl.appendChild(shadow);
-
-      const el = document.createElement('div');
-      el.dataset.decorId = id;
-      if (catalog.kind === 'fire') {
-        el.className = 'iso-lift campfire-sprite';
-        placeIso(el, d.x, d.y, catalog.height);
-        el.innerHTML =
-          '<div class="stick"></div>' +
-          '<div class="wrap"></div>' +
-          '<div class="flame"></div>' +
-          '<div class="flame inner"></div>';
-        // project a real light into the light layer (above the dark overlay)
-        const lt = document.createElement('div');
-        lt.className = 'torch-light';
-        lt.dataset.lightFor = id;
-        lt.style.left = d.x + 'px';
-        lt.style.top = (d.y - catalog.height - 18) + 'px';
-        lightLayerEl.appendChild(lt);
-      } else if (catalog.kind === 'emoji') {
-        el.className = 'iso-lift';
-        placeIso(el, d.x, d.y, catalog.height);
-        el.innerHTML = `<span style="font-size:${catalog.size}px; filter:drop-shadow(0 3px 3px rgba(0,0,0,0.5));">${catalog.emoji}</span>`;
-      } else {
-        el.className = 'iso-lift decor-tile';
-        placeIso(el, d.x, d.y, catalog.height);
-        const shape = catalog.diamond
-          ? `clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);`
-          : `border-radius:3px;`;
-        el.innerHTML = `<div style="width:${catalog.w}px; height:${catalog.h}px; background:${catalog.color}; ${shape} box-shadow:0 3px 3px rgba(0,0,0,0.4);"></div>`;
-      }
-      bindTap(el, () => removeDecoration(id, el, shadow));
-      worldEl.appendChild(el);
-    }
-
-    function removeDecoration(id, el, shadow) {
-      if (placingKind) return;
-      if (!state.decorations[id]) return;
-      delete state.decorations[id];
-      if (el) el.remove();
-      if (shadow) shadow.remove();
-      const lt = lightLayerEl.querySelector(`[data-light-for="${id}"]`);
-      if (lt) lt.remove();
-      saveState();
-    }
-
-    function startDecorPlacement(typeKey) {
-      if (placingKind) return;
-      const catalog = DECOR_CATALOG[typeKey];
-      if (!catalog) return;
-      placingKind = 'decor';
-      activeDecorType = typeKey;
-      dragging = false; moved = false; placeTouchStart = null;
-      worldEl.classList.add('placing');
-      document.getElementById('placement-banner-text').textContent = `Tap to place ${catalog.label} (gems ${catalog.cost.gems} each)`;
-      document.getElementById('decor-done-btn').style.display = 'inline-block';
-      document.getElementById('placement-banner').classList.add('show');
-
-      ghostShadowEl = document.createElement('div');
-      ghostShadowEl.className = 'iso-shadow';
-      worldEl.appendChild(ghostShadowEl);
-
-      ghostEl = document.createElement('div');
-      ghostEl.className = 'iso-lift';
-      if (catalog.kind === 'fire') {
-        ghostEl.innerHTML = `<span style="font-size:${catalog.size}px; opacity:0.7;">\u{1F525}</span>`;
-      } else if (catalog.kind === 'emoji') {
-        ghostEl.innerHTML = `<span style="font-size:${catalog.size}px; opacity:0.65;">${catalog.emoji}</span>`;
-      } else {
-        const shape = catalog.diamond ? `clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);` : `border-radius:3px;`;
-        ghostEl.innerHTML = `<div style="width:${catalog.w}px; height:${catalog.h}px; background:${catalog.color}; opacity:0.65; ${shape}"></div>`;
-      }
-      ghostEl.style.left = '-999px';
-      worldEl.appendChild(ghostEl);
-      ghostWorldPos = null;
-    }
-
-    function exitDecorPlacement() {
-      placingKind = null;
-      activeDecorType = null;
-      worldEl.classList.remove('placing');
-      document.getElementById('placement-banner').classList.remove('show');
-      document.getElementById('decor-done-btn').style.display = 'none';
-      if (ghostEl) { ghostEl.remove(); ghostEl = null; }
-      if (ghostShadowEl) { ghostShadowEl.remove(); ghostShadowEl = null; }
-      ghostWorldPos = null;
-    }
-    document.getElementById('decor-done-btn').addEventListener('click', exitDecorPlacement);
-
-    function placeDecorAt(x, y) {
-      const catalog = DECOR_CATALOG[activeDecorType];
-      if (!catalog) return;
-      const cost = catalog.cost.gems || 0;
-      if (state.gems < cost) { showToast('Not enough gemstones'); return; }
-      state.gems -= cost;
-      const id = 'd_' + (decorIdCounter++) + '_' + Date.now();
-      state.decorations[id] = { type: activeDecorType, x, y };
-      renderDecoration(id, state.decorations[id]);
-      grantXP(1);
-      vibrate(14);
-      updateHUD();
-    }
-
-    let scale = 1, minScale = 0.3, maxScale = 2.5;
-    let tx = 0, ty = 0;
-    let dragging = false, lastX = 0, lastY = 0;
-    let pinchStartDist = 0, pinchStartScale = 1;
-
-    function applyTransform() {
-      const t = `translate(${tx}px, ${ty}px) scale(${scale})`;
-      worldEl.style.transform = t;
-      if (lightLayerEl) lightLayerEl.style.transform = t;
-    }
-
-    function fitToScreen() {
-      const vw = viewportEl.clientWidth;
-      const vh = viewportEl.clientHeight;
-      if (!vw || !vh) { requestAnimationFrame(fitToScreen); return; }
-      const coverScale = Math.max(vw / ISO_W, vh / ISO_H);
-      minScale = coverScale;
-      const defaultScale = coverScale * 1.8;
-      maxScale = Math.max(defaultScale * 2.2, 2.5);
-      scale = defaultScale;
-      tx = (vw - ISO_W * scale) / 2;
-      ty = (vh - ISO_H * scale) / 2;
-      clampPan();
-      applyTransform();
-    }
-
-    function clampPan() {
-      const vw = viewportEl.clientWidth;
-      const vh = viewportEl.clientHeight;
-      const worldW = ISO_W * scale;
-      const worldH = ISO_H * scale;
-      const margin = ISO_MARGIN * scale;
-      const minTx = Math.min(0, vw - worldW) - margin;
-      const maxTx = margin;
-      const minTy = Math.min(0, vh - worldH) - margin;
-      const maxTy = margin;
-      tx = Math.max(minTx, Math.min(maxTx, tx));
-      ty = Math.max(minTy, Math.min(maxTy, ty));
-    }
-
-    function dist(t1, t2) {
-      const dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY;
-      return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    let moved = false;
-    let placeTouchStart = null;
-
-    viewportEl.addEventListener('touchstart', e => {
-      if (placingKind) {
-        const t = e.touches[0];
-        placeTouchStart = { x: t.clientX, y: t.clientY };
-        return;
-      }
-      moved = false;
-      if (e.touches.length === 1) {
-        dragging = true;
-        lastX = e.touches[0].clientX;
-        lastY = e.touches[0].clientY;
-      } else if (e.touches.length === 2) {
-        dragging = false;
-        pinchStartDist = dist(e.touches[0], e.touches[1]);
-        pinchStartScale = scale;
-      }
-    }, { passive: true });
-
-    viewportEl.addEventListener('touchmove', e => {
-      if (placingKind) { moveGhost(e.touches[0].clientX, e.touches[0].clientY); return; }
-      if (e.touches.length === 1 && dragging) {
-        const dx = e.touches[0].clientX - lastX;
-        const dy = e.touches[0].clientY - lastY;
-        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
-        tx += dx; ty += dy;
-        lastX = e.touches[0].clientX;
-        lastY = e.touches[0].clientY;
-        clampPan();
-        applyTransform();
-      } else if (e.touches.length === 2) {
-        const d = dist(e.touches[0], e.touches[1]);
-        scale = Math.max(minScale, Math.min(maxScale, pinchStartScale * (d / pinchStartDist)));
-        clampPan();
-        applyTransform();
-      }
-    }, { passive: true });
-
-    viewportEl.addEventListener('touchend', e => {
-      if (shovelMode && !moved) {
-        const t = e.changedTouches[0];
-        paintTileAt(t.clientX, t.clientY);
-        return;
-      }
-      if (placingKind) {
-        const t = e.changedTouches[0];
-        let ok = true;
-        if (placeTouchStart) {
-          const dx = t.clientX - placeTouchStart.x, dy = t.clientY - placeTouchStart.y;
-          ok = Math.sqrt(dx * dx + dy * dy) < 20;
-        }
-        placeTouchStart = null;
-        if (ok) confirmPlacement(t.clientX, t.clientY);
-        return;
-      }
-      dragging = false;
-    }, { passive: true });
-
-    viewportEl.addEventListener('mousedown', e => {
-      if (placingKind) return;
-      dragging = true; lastX = e.clientX; lastY = e.clientY; moved = false;
-    });
-    window.addEventListener('mousemove', e => {
-      if (placingKind) { moveGhost(e.clientX, e.clientY); return; }
-      if (!dragging) return;
-      if (Math.abs(e.clientX - lastX) > 3 || Math.abs(e.clientY - lastY) > 3) moved = true;
-      tx += e.clientX - lastX; ty += e.clientY - lastY;
-      lastX = e.clientX; lastY = e.clientY;
-      clampPan(); applyTransform();
-    });
-    window.addEventListener('mouseup', () => { dragging = false; });
-    viewportEl.addEventListener('click', e => {
-      if (shovelMode) { paintTileAt(e.clientX, e.clientY); return; }
-      if (placingKind) { confirmPlacement(e.clientX, e.clientY); return; }
-    });
-    viewportEl.addEventListener('wheel', e => {
-      if (placingKind) return;
-      e.preventDefault();
-      scale = Math.max(minScale, Math.min(maxScale, scale - e.deltaY * 0.001));
-      clampPan(); applyTransform();
-    }, { passive: false });
-
-    document.getElementById('zoom-in').addEventListener('click', () => {
-      scale = Math.min(maxScale, scale + 0.25); clampPan(); applyTransform();
-    });
-    document.getElementById('zoom-out').addEventListener('click', () => {
-      scale = Math.max(minScale, scale - 0.25); clampPan(); applyTransform();
-    });
-    const zoomResetBtn = document.getElementById('zoom-reset');
-    function isMobileViewport() {
-      return window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches;
-    }
-    zoomResetBtn.addEventListener('click', () => {
-      if (!isMobileViewport()) { fitToScreen(); return; }
-      const frame = viewportEl.closest('.field-frame');
-      const goingFull = !frame.classList.contains('map-fullscreen');
-      frame.classList.toggle('map-fullscreen', goingFull);
-      document.body.classList.toggle('map-locked', goingFull);
-      zoomResetBtn.innerHTML = goingFull ? '&times;' : '\u2922';
-      requestAnimationFrame(() => requestAnimationFrame(fitToScreen));
-    });
-
-    window.addEventListener('resize', fitToScreen);
-    window.addEventListener('orientationchange', () => {
-      setTimeout(fitToScreen, 50);
-      setTimeout(fitToScreen, 300);
-    });
-
-    // ---- Day/Night cycle: 1 real min = 1 game hour, real-time synced ----
-    const overlayEl = document.getElementById('daynight-overlay');
-    const sunTimeEl = document.getElementById('sun-time');
-    const sunIconEl = document.getElementById('sun-icon');
-
-    function gameHour() { return (Date.now() / 60000) % 24; }
-
-    // lerp helper for [r,g,b,a]
-    function lerp(a, b, t) { return a + (b - a) * t; }
-    function mixTint(stops, h) {
-      // stops: sorted [{h, c:[r,g,b]}]; wraps around 24
-      for (let i = 0; i < stops.length; i++) {
-        const cur = stops[i], nxt = stops[(i + 1) % stops.length];
-        let span = (nxt.h - cur.h + 24) % 24;
-        let into = (h - cur.h + 24) % 24;
-        if (into <= span || i === stops.length - 1) {
-          const t = span === 0 ? 0 : into / span;
-          return [
-            Math.round(lerp(cur.c[0], nxt.c[0], t)),
-            Math.round(lerp(cur.c[1], nxt.c[1], t)),
-            Math.round(lerp(cur.c[2], nxt.c[2], t)),
-          ];
-        }
-      }
-      return stops[0].c;
-    }
-
-    // Tint keyframes (multiply blend): white=full daylight, dark blue=night
-    const TINT_STOPS = [
-      { h: 0,  c: [40, 48, 82] },    // midnight - deep blue
-      { h: 5,  c: [70, 68, 100] },   // pre-dawn
-      { h: 6.5,c: [200, 150, 130] }, // dawn - warm
-      { h: 9,  c: [252, 252, 250] }, // morning - near white
-      { h: 13, c: [255, 255, 255] }, // noon - full light
-      { h: 17, c: [250, 240, 225] }, // afternoon
-      { h: 18.5,c:[235, 150, 110] }, // dusk - orange
-      { h: 20, c: [90, 80, 120] },   // twilight
-      { h: 22, c: [45, 52, 88] },    // night
-    ];
-
-    let FROZEN_HOUR = null; // when set, day/night clock is frozen at this hour
-    function updateDayNight() {
-      const h = FROZEN_HOUR != null ? FROZEN_HOUR : gameHour();
-
-      // --- tint overlay ---
-      const c = mixTint(TINT_STOPS, h);
-      overlayEl.style.background = `rgb(${c[0]},${c[1]},${c[2]})`;
-
-      // --- sun angle -> shadow direction & length ---
-      // day runs ~6:00 (sunrise) to 18:00 (sunset). Sun crosses overhead.
-      // Shadow points AWAY from sun: long east at dawn, none at noon, long west at dusk.
-      const isDay = h > 5.5 && h < 18.5;
-      let rot, len, op;
-      if (isDay) {
-        const dayT = (h - 6) / 12;                 // 0 at 6:00 -> 1 at 18:00
-        // shadow direction sweeps from ~ -70deg (dawn, pointing left) to +70deg (dusk, right)
-        rot = (-70 + dayT * 140);
-        // length: long at edges, short at noon (dayT=0.5)
-        const noonDist = Math.abs(dayT - 0.5) * 2;  // 0 at noon -> 1 at edges
-        len = 0.55 + noonDist * 1.6;
-        op = 1;
-      } else {
-        // night: faint ambient, straight down, moonlight
-        rot = 0; len = 0.7; op = 0.35;
-      }
-      worldEl.style.setProperty('--sun-rot', rot.toFixed(1) + 'deg');
-      worldEl.style.setProperty('--sun-len', len.toFixed(2));
-      worldEl.style.setProperty('--sun-op', op.toFixed(2));
-      // torch brightness: near-zero in daylight, moderate at night (not blown out)
-      const isNight = !isDay;
-      worldEl.style.setProperty('--fire-light', (isNight ? 0.85 : (h < 8 || h > 16 ? 0.35 : 0.04)).toFixed(2));
-
-      // --- clock readout ---
-      const hh = Math.floor(h);
-      const mm = Math.floor((h - hh) * 60);
-      sunTimeEl.textContent = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
-      sunIconEl.textContent = isDay ? (h < 8 || h > 16 ? '\u{1F324}\uFE0F' : '\u2600\uFE0F') : '\u{1F319}';
-    }
-
-    // Re-scatter a completely fresh set of obstacles. Wipes current sprites,
-    // regenerates positions, and resets the cleared set for the new batch.
-    function rescatterObstacles() {
-      // remove existing obstacle sprites + their shadows
-      obstacles.forEach(ob => {
-        worldEl.querySelectorAll(`[data-id="${ob.id}"], [data-shadow-for="${ob.id}"]`).forEach(e => e.remove());
-      });
-      obstacles.length = 0;
-      state.clearedObstacles = {};
-
-      let attempts = 0;
-      while (obstacles.length < OBSTACLE_COUNT && attempts < OBSTACLE_COUNT * 40) {
-        attempts++;
-        const x = 80 + rand() * (WORLD_SIZE - 160);
-        const y = 80 + rand() * (WORLD_SIZE - 160);
-        if (isWaterAt(x, y)) continue;
-        let tooClose = false;
-        for (let i = 0; i < obstacles.length; i++) {
-          const dx = x - obstacles[i].x, dy = y - obstacles[i].y;
-          if (Math.sqrt(dx * dx + dy * dy) < MIN_OBSTACLE_SPACING) { tooClose = true; break; }
-        }
-        if (tooClose) continue;
-        const type = OBSTACLE_TYPES[Math.floor(rand() * OBSTACLE_TYPES.length)];
-        obstacles.push({ id: 'ob_' + Date.now() + '_' + obstacles.length, type, x, y, hp: type.hp });
-      }
-      renderObstacles();
-      saveState();
-    }
-
-    // Pick 2-4 random game-hours each day for a re-scatter. Deterministic per
-    // game-day so all clients agree, using a seeded RNG off the day index.
-    function obstacleScatterHoursFor(dayIdx) {
-      const r = mulberry32(dayIdx * 2654435761 >>> 0);
-      const count = 2 + Math.floor(r() * 3); // 2,3, or 4
-      const hours = [];
-      while (hours.length < count) {
-        const hr = Math.floor(r() * 24);
-        if (!hours.includes(hr)) hours.push(hr);
-      }
-      return hours.sort((a, b) => a - b);
-    }
-
-    function processObstacleScatter() {
-      const today = gameDayIndex();
-      const h = Math.floor(gameHour());
-      const hours = obstacleScatterHoursFor(today);
-      // find the latest scheduled hour we've reached today
-      let due = null;
-      for (const hr of hours) { if (h >= hr) due = hr; }
-      if (due == null) return;
-      const marker = today + ':' + due;
-      if (state.lastObstacleScatter !== marker) {
-        state.lastObstacleScatter = marker;
-        rescatterObstacles();
-      }
-    }
-    // ---- Shovel / tile-paint tool ----
-    let shovelMode = false;
-    let selectedMaterial = 1; // default to painting dirt (grass is the base)
-
-    function buildTilePalette() {
-      const bar = document.getElementById('tile-palette');
-      let html = MATERIALS.map((m, i) => {
-        const isWater = m.sheet === 'water';
-        const url = isWater ? WATER_TILESET_URL : TILESET_URL;
-        const bg = sheetBg(m.fill[0], m.fill[1], 40, isWater ? WATER_ROWS : TILESET_ROWS);
-        return `<div class="palette-tile${i === selectedMaterial ? ' selected' : ''}" data-idx="${i}"
-          style="background-image:url('${url}'); background-size:${bg.size}; background-position:${bg.pos};"
-          title="${m.label}"></div>`;
-      }).join('');
-      html += `<button id="tile-debug-btn" style="flex:0 0 auto;align-self:center;background:#4fa8fd;color:#0f0f0f;border:none;border-radius:8px;padding:0.4rem 0.6rem;font-weight:700;font-size:0.68rem;cursor:pointer;">Debug</button>`;
-      html += `<button id="tile-done-btn">Done</button>`;
-      bar.innerHTML = html;
-      bar.querySelectorAll('.palette-tile').forEach(el => {
-        el.addEventListener('click', () => {
-          selectedMaterial = parseInt(el.dataset.idx);
-          bar.querySelectorAll('.palette-tile').forEach(p => p.classList.toggle('selected', p === el));
-        });
-      });
-      document.getElementById('tile-done-btn').addEventListener('click', exitShovel);
-      document.getElementById('tile-debug-btn').addEventListener('click', showAutotileDebug);
-    }
-
-    // Debug: paint a known dirt shape so all 16 corner-combos appear, labeled.
-    // Screenshot this; wrong-looking corners tell us which AUTOTILE_DIRT entry to fix.
-    function showAutotileDebug() {
-      state.tiles = {};
-      // 3x3 solid dirt -> shows all outer corners + edges + center
-      for (let r = 3; r <= 5; r++) for (let c = 3; c <= 5; c++) state.tiles[c+'_'+r] = 1;
-      // an L / diagonal to exercise more masks
-      state.tiles['8_3']=1; state.tiles['8_4']=1; state.tiles['9_4']=1; state.tiles['9_5']=1;
-      renderIsoGrid();
-      saveState();
-      showToast('Debug painted - dirt should have smooth grass borders');
-    }
-
-    function enterShovel() {
-      if (placingKind) return;
-      shovelMode = true;
-      document.getElementById('tile-host').classList.add('editing');
-      document.getElementById('tile-palette').classList.add('show');
-      buildTilePalette();
-      showToast('Tap tiles to paint. Pick a tile below.');
-    }
-    function exitShovel() {
-      shovelMode = false;
-      const host = document.getElementById('tile-host');
-      if (host) host.classList.remove('editing');
-      document.getElementById('tile-palette').classList.remove('show');
-      saveState();
-    }
-    document.getElementById('shovel-btn').addEventListener('click', () => {
-      shovelMode ? exitShovel() : enterShovel();
-    });
-
-    function paintTileAt(screenX, screenY) {
-      const rect = viewportEl.getBoundingClientRect();
-      const wx = (screenX - rect.left - tx) / scale;
-      const wy = (screenY - rect.top - ty) / scale;
-      const c = Math.floor(wx / TILE), r = Math.floor(wy / TILE);
-      if (c < 0 || r < 0 || c >= GRID_TILES || r >= GRID_TILES) return;
-      if (selectedMaterial === 2) {
-        const cellCX = c * TILE + TILE / 2, cellCY = r * TILE + TILE / 2;
-        for (let i = 0; i < obstacles.length; i++) {
-          const ob = obstacles[i];
-          if (state.clearedObstacles[ob.id]) continue;
-          if (Math.abs(ob.x - cellCX) < TILE && Math.abs(ob.y - cellCY) < TILE) {
-            showToast('Clear the obstacle here first');
-            vibrate(20);
-            return;
-          }
-        }
-      }
-      const key = c + '_' + r;
-      if (selectedMaterial === DEFAULT_MATERIAL) delete state.tiles[key];
-      else state.tiles[key] = selectedMaterial;
-      repaintAround(c, r);
-      vibrate(8);
-    }
-    document.getElementById('demo-day').addEventListener('click', () => {
-      FROZEN_HOUR = 12; updateDayNight(); showToast('Day frozen (noon)');
-    });
-    document.getElementById('demo-night').addEventListener('click', () => {
-      FROZEN_HOUR = 0; updateDayNight(); showToast('Night frozen (midnight)');
-    });
-    document.getElementById('demo-clock').addEventListener('click', () => {
-      FROZEN_HOUR = null; updateDayNight(); showToast('Clock resumed');
-    });
-    document.getElementById('demo-reset').addEventListener('click', () => {
-      if (confirm('Reset all game progress? This clears everything and reloads.')) {
-        try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-        location.reload();
-      }
-    });
-    function initGame() {
-      checkDayRollover();
-      updateDayNight();
-      setInterval(updateDayNight, 1000);
-      renderIsoGrid();
-      renderObstacles();
-      Object.keys(state.mushrooms).forEach(id => renderMushroom(id, state.mushrooms[id]));
-      processSpawns();
-      processObstacleScatter();
-      if (state.housePlaced) renderHouse();
-      if (state.farmPlaced) renderFarm();
-      Object.keys(state.decorations).forEach(id => renderDecoration(id, state.decorations[id]));
-      renderLegend();
-      updateBuildButtons();
-      updateHUD();
-      fitToScreen();
-
-      setInterval(() => {
-        checkDayRollover();
-        processSpawns();
-        processObstacleScatter();
-      }, 15 * 1000);
-
-      setInterval(() => {
-        document.querySelectorAll('.plot').forEach(el => refreshPlotVisual(el.dataset.id, el));
-      }, 10 * 1000);
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initGame);
-    } else {
-      initGame();
+      if (data.tier === 'nothing'){ status.textContent = 'Nothing this time. Come back tomorrow!'; result.innerHTML = '<div class="r-label">' + data.label + '</div>'; return; }
+      status.innerHTML = '<span class="ok">You found treasure!</span>';
+      result.innerHTML = '<div class="r-label">' + data.label + '</div><div class="r-amount">+' + Number(data.amount).toLocaleString() + ' SHROOM</div>';
     }
   })();
   </script>
+
 </body>
 </html>

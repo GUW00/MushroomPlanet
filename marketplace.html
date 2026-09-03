@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Marketplace | Mushroom Planet</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne+Mono&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body { padding-top: 100px !important; }
+    :root {
+      --cream: #ffffe1; --yellow: #fd464f; --red: #fd464f; --blue: #4fa8fd;
+      --dark: #0f0f0f; --dark2: #1a1a1a; --dark3: #242424;
+      --green: #22c55e; --purple: #c084fc; --gold: #fece00;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--dark); color: var(--cream); font-family: 'Space Grotesk', sans-serif; overflow-x: hidden; }
+    #starfield { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+    .star { position: absolute; border-radius: 50%; background: var(--cream); opacity: 0; animation: twinkle var(--dur) var(--delay) infinite; }
+    @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: var(--op); transform: scale(1); } }
+
+    .guide-hero { position: relative; z-index: 1; text-align: center; padding: 5rem 1rem 2rem; }
+    .guide-hero .eyebrow { font-family: 'Space Grotesk', monospace; font-size: 0.75rem; letter-spacing: 0.3em; color: var(--red); text-transform: uppercase; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.2s forwards; }
+    .guide-hero h1 { font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 700; line-height: 1.1; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.6s 0.4s forwards; }
+    .guide-hero h1 span { color: var(--blue); }
+    .guide-hero p { font-size: 1.05rem; max-width: 640px; margin: 0 auto 1.5rem; color: rgba(255,255,225,0.65); opacity: 0; animation: fadeUp 0.6s 0.6s forwards; }
+
+    .mkt-balance { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Space Grotesk', monospace; font-size: 0.8rem; padding: 0.5rem 1.1rem; border-radius: 999px; border: 1px solid rgba(34,197,94,0.3); background: rgba(34,197,94,0.08); color: var(--green); opacity: 0; animation: fadeUp 0.6s 0.7s forwards; }
+    .mkt-balance img { width: 18px; height: 18px; object-fit: contain; }
+
+    .guide-tabs { position: relative; z-index: 1; display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; padding: 1.5rem 1rem 2rem; opacity: 0; animation: fadeUp 0.6s 0.8s forwards; }
+    .guide-tab { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.4rem; border-radius: 999px; border: 1.5px solid rgba(255,255,225,0.12); background: transparent; color: rgba(255,255,225,0.5); font-family: 'Space Grotesk', monospace; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.22s; letter-spacing: 0.05em; }
+    .guide-tab:hover { border-color: rgba(255,255,225,0.3); color: var(--cream); }
+    .guide-tab.active { border-color: var(--blue); color: var(--blue); background: rgba(79,168,253,0.08); }
+    @media (max-width: 600px), (display-mode: standalone) {
+      .guide-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 0 1rem 1.5rem; }
+      .guide-tab { justify-content: center; padding: 0.55rem 0.5rem; font-size: 0.65rem; }
+    }
+
+    .guide-section { position: relative; z-index: 1; display: none; max-width: 1000px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+    .guide-section.active { display: block; }
+    .section-label { font-family: 'Space Grotesk', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red); margin-bottom: 0.4rem; }
+    .section-title { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; margin-bottom: 0.5rem; }
+    .section-sub { font-size: 0.85rem; color: rgba(255,255,225,0.55); margin-bottom: 1.75rem; line-height: 1.6; }
+
+    .mkt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+    @media (max-width: 560px) { .mkt-grid { grid-template-columns: 1fr; } }
+
+    .potion-card { background: var(--dark2); border: 1px solid rgba(255,255,225,0.07); border-radius: 1.25rem; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; transition: border-color 0.3s, transform 0.2s; }
+    .potion-card:hover { border-color: rgba(79,168,253,0.35); transform: translateY(-2px); }
+    .pc-head { display: flex; align-items: center; gap: 0.6rem; }
+    .pc-img { width: 30px; height: 30px; object-fit: contain; flex-shrink: 0; }
+    .pc-name { font-size: 0.95rem; font-weight: 700; color: var(--cream); flex: 1; word-break: break-word; }
+    .pc-score { font-family: 'Space Grotesk', monospace; font-size: 0.65rem; padding: 0.2em 0.6em; border-radius: 999px; border: 1px solid rgba(192,132,252,0.4); background: rgba(192,132,252,0.1); color: var(--purple); white-space: nowrap; }
+    .pc-stats { display: flex; flex-direction: column; gap: 0.3rem; border-top: 1px solid rgba(255,255,225,0.06); border-bottom: 1px solid rgba(255,255,225,0.06); padding: 0.6rem 0; }
+    .pc-stat { display: flex; justify-content: space-between; font-family: 'Space Grotesk', monospace; font-size: 0.7rem; }
+    .pc-stat span:first-child { color: rgba(255,255,225,0.55); }
+    .pc-stat span:last-child { color: var(--blue); font-weight: 600; }
+    .pc-seller { font-family: 'Space Grotesk', monospace; font-size: 0.62rem; color: rgba(255,255,225,0.4); letter-spacing: 0.03em; }
+    .pc-price { display: flex; align-items: center; gap: 0.4rem; font-family: 'Space Grotesk', monospace; font-size: 1rem; font-weight: 700; color: var(--green); }
+    .pc-price img { width: 20px; height: 20px; object-fit: contain; }
+    .pc-actions { display: flex; gap: 0.5rem; margin-top: auto; }
+
+    .btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; font-family: 'Space Grotesk', monospace; font-size: 0.72rem; font-weight: 600; padding: 0.65em 1em; border-radius: 999px; border: 1px solid; cursor: pointer; transition: all 0.2s; text-decoration: none; letter-spacing: 0.04em; background: transparent; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-green { color: var(--green); background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.3); }
+    .btn-green:hover:not(:disabled) { background: rgba(34,197,94,0.18); border-color: rgba(34,197,94,0.6); }
+    .btn-blue { color: var(--blue); background: rgba(79,168,253,0.08); border-color: rgba(79,168,253,0.3); }
+    .btn-blue:hover:not(:disabled) { background: rgba(79,168,253,0.18); border-color: rgba(79,168,253,0.6); }
+    .btn-red { color: var(--red); background: rgba(253,70,79,0.08); border-color: rgba(253,70,79,0.3); }
+    .btn-red:hover:not(:disabled) { background: rgba(253,70,79,0.18); border-color: rgba(253,70,79,0.6); }
+
+    .empty { text-align: center; padding: 3rem 1rem; color: rgba(255,255,225,0.4); font-family: 'Space Grotesk', monospace; font-size: 0.85rem; }
+    .empty img { width: 48px; height: 48px; object-fit: contain; opacity: 0.35; margin-bottom: 0.75rem; }
+    .loading { text-align: center; padding: 3rem; color: rgba(255,255,225,0.4); font-family: 'Space Grotesk', monospace; font-size: 0.8rem; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .mkt-modal { background: var(--dark2); border: 1px solid rgba(255,255,225,0.12); border-radius: 1.5rem; padding: 1.75rem; max-width: 380px; width: 100%; }
+    .mkt-modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
+    .mkt-modal p { font-size: 0.8rem; color: rgba(255,255,225,0.6); line-height: 1.6; margin-bottom: 1rem; }
+    .mkt-modal label { display: block; font-family: 'Space Grotesk', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,225,0.45); margin-bottom: 0.4rem; }
+    .mkt-modal input { width: 100%; background: var(--dark3); border: 1px solid rgba(255,255,225,0.12); border-radius: 0.75rem; padding: 0.7rem 0.9rem; color: var(--cream); font-family: 'Space Grotesk', monospace; font-size: 0.9rem; margin-bottom: 1.1rem; }
+    .mkt-modal input:focus { outline: none; border-color: var(--blue); }
+    .modal-actions { display: flex; gap: 0.6rem; }
+    .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--dark3); border: 1px solid rgba(255,255,225,0.15); border-radius: 999px; padding: 0.7rem 1.4rem; font-family: 'Space Grotesk', monospace; font-size: 0.75rem; z-index: 3000; opacity: 0; transition: opacity 0.3s; pointer-events: none; max-width: 90vw; text-align: center; }
+    .toast.show { opacity: 1; }
+    .toast.ok { color: var(--green); border-color: rgba(34,197,94,0.4); }
+    .toast.err { color: var(--red); border-color: rgba(253,70,79,0.4); }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+
+    .header-icons { display: none; }
+    .header-icons img { width: 22px !important; height: 22px !important; object-fit: contain !important; border-radius: 0 !important; border: none !important; margin: 0 !important; opacity: 0.85; }
+    .header-icons #header-profile-icon { border-radius: 50% !important; object-fit: cover !important; }
+    @media (max-width: 768px) { .header-icons { display: flex; gap: 0.75rem; align-items: center; } }
+    @media (display-mode: standalone) { .header-icons { display: none !important; } }
+    .pwa-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #111; border-top: 1px solid rgba(255,255,225,0.08); display: none; align-items: stretch; z-index: 999; padding-bottom: env(safe-area-inset-bottom); }
+    @media (display-mode: standalone) { .pwa-nav { display: flex; } body { padding-bottom: 65px !important; } }
+    .pwa-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; text-decoration: none; color: rgba(255,255,225,0.35); font-family: 'Space Grotesk', monospace; font-size: 0.55rem; letter-spacing: 0.05em; transition: color 0.2s; }
+    .pwa-tab span:first-child { font-size: 1.3rem; display: flex; align-items: center; justify-content: center; }
+    .pwa-tab.active { color: #c084fc; }
+    @media (display-mode: standalone) {
+      header { display: none !important; } #global-menu { display: none !important; }
+      html body { padding-top: 0 !important; }
+      .guide-hero { padding: 1.25rem 1rem 0.75rem !important; }
+      .guide-hero h1 { font-size: 1.75rem !important; margin-bottom: 0.35rem !important; }
+      .guide-hero p { font-size: 0.8rem !important; margin-bottom: 0.75rem !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="starfield"></div>
+
+  <header>
+    <nav class="container">
+      <a href="earn.html" class="logo">Mushroom Planet</a>
+      <ul class="nav-links">
+        <li><a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank" rel="noopener noreferrer">REDDIT</a></li>
+        <li><a href="https://discord.com/invite/ECauU2KSSt" target="_blank" rel="noopener noreferrer">DISCORD</a></li>
+        <li><a href="/profile.html">PROFILE</a></li>
+      </ul>
+      <div class="header-icons">
+        <a href="https://www.reddit.com/r/MushroomPlanet/" target="_blank"><img src="/images/reddit.png" alt="Reddit"></a>
+        <a href="https://discord.com/invite/ECauU2KSSt" target="_blank"><img src="/images/discord.png" alt="Discord"></a>
+        <a href="/profile.html"><img id="header-profile-icon" src="/images/profile1.png" alt="Profile" style="border-radius:50%;"></a>
+      </div>
+    </nav>
+  </header>
+  <div id="global-menu"></div>
+
+  <div class="guide-hero">
+    <div class="eyebrow">Open Market</div>
+    <h1><span style="color:var(--red);">Potion</span> <span>Marketplace</span></h1>
+    <p>Buy and sell brewed potions with other Shroomies. Sellers set their own price in SPORE - the market decides the rest.</p>
+    <div class="mkt-balance" id="balance-pill" style="display:none;">
+      <img src="/images/spore.png" alt="Spore" onerror="this.style.display='none'">
+      <span id="spore-balance">0</span> SPORE
+    </div>
+  </div>
+
+  <div class="guide-tabs">
+    <button class="guide-tab active" onclick="showTab('browse', this)">Browse Market</button>
+    <button class="guide-tab" onclick="showTab('sell', this)">Sell a Potion</button>
+    <button class="guide-tab" onclick="showTab('mine', this)">My Listings</button>
+  </div>
+
+  <!-- BROWSE -->
+  <div class="guide-section active" id="tab-browse">
+    <div class="section-label">Live Listings</div>
+    <div class="section-title">Potions for Sale</div>
+    <div class="section-sub">Buying transfers SPORE from your wallet to the seller and drops the potion straight into your brew inventory.</div>
+    <div id="browse-list"><div class="loading">Loading listings...</div></div>
+  </div>
+
+  <!-- SELL -->
+  <div class="guide-section" id="tab-sell">
+    <div class="section-label">Your Inventory</div>
+    <div class="section-title">List a Potion</div>
+    <div class="section-sub">Pick a stored potion and set a price. While listed, the potion leaves your inventory and can't be activated or discarded until it sells or you delist it.</div>
+    <div id="sell-list"><div class="loading">Loading your potions...</div></div>
+  </div>
+
+  <!-- MY LISTINGS -->
+  <div class="guide-section" id="tab-mine">
+    <div class="section-label">Active</div>
+    <div class="section-title">My Listings</div>
+    <div class="section-sub">Delist any time to return the potion to your inventory.</div>
+    <div id="mine-list"><div class="loading">Loading...</div></div>
+  </div>
+
+  <!-- SELL MODAL -->
+  <div class="modal-overlay" id="sell-modal">
+    <div class="mkt-modal">
+      <h3 id="sell-modal-title">List Potion</h3>
+      <p id="sell-modal-sub"></p>
+      <label for="price-input">Price (SPORE)</label>
+      <input type="number" id="price-input" min="1" step="1" placeholder="e.g. 250000" />
+      <div class="modal-actions">
+        <button class="btn btn-red" onclick="closeSellModal()">Cancel</button>
+        <button class="btn btn-green" id="confirm-sell-btn" onclick="confirmSell()">List It</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <nav class="pwa-nav">
+    <a href="/profile.html" class="pwa-tab" data-page="profile"><span><img src="/images/icon-192.png" style="width:22px;height:22px;object-fit:contain;border-radius:50%;" onerror="this.style.display='none'"></span><span>Profile</span></a>
+    <a href="/earn.html" class="pwa-tab" data-page="guide"><span><img src="/images/earn.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span><span>Earn</span></a>
+    <a href="/marketplace.html" class="pwa-tab active" data-page="marketplace"><span><img src="/images/potion.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span><span>Market</span></a>
+    <a href="/convert.html" class="pwa-tab" data-page="convert"><span><img src="/images/swaps.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span><span>Convert</span></a>
+    <a href="/guides.html" class="pwa-tab" data-page="guide"><span><img src="/images/guide.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'"></span><span>Guide</span></a>
+  </nav>
+
+  <script type="module">
+    import config from './config.js';
+    window.addEventListener('DOMContentLoaded', () => {
+      const t = document.getElementById('global-menu');
+      if (t) t.innerHTML = config.menu.html;
+    });
+  </script>
+
+  <script>
+    // ---- config ----
+    const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:3001'
+      : 'https://api.mushroomplanet.earth';
+
+    const user = JSON.parse(localStorage.getItem('mp_profile_user') || '{}');
+    const DISCORD_ID = user.discord_id || null;
+
+    // Non-stat keys we never render as potion stats
+    const NON_STAT = new Set(['name','emoji','Potion_Score','Potion Score','version']);
+    const COUNT_STATS = new Set(['Extra_Brews','Extra Brews','Plant_Limit','Plant Limit']);
+
+    let sporeBalance = 0;
+    let pendingSlotKey = null;
+
+    // ---- helpers ----
+    function fmt(n) { return Number(n || 0).toLocaleString(); }
+
+    function toast(msg, ok) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show ' + (ok ? 'ok' : 'err');
+      setTimeout(() => { t.className = 'toast'; }, 3200);
+    }
+
+    async function api(path, opts) {
+      opts = opts || {};
+      opts.headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+      if (DISCORD_ID) opts.headers['x-discord-id'] = DISCORD_ID;
+      opts.credentials = 'include';
+      const r = await fetch(API_BASE + path, opts);
+      const text = await r.text();
+      let data; try { data = JSON.parse(text); } catch(e) { data = { ok: false, message: 'Server error' }; }
+      return data;
+    }
+
+    function statRows(potion) {
+      const rows = [];
+      for (const k in potion) {
+        if (NON_STAT.has(k)) continue;
+        const v = potion[k];
+        if (typeof v !== 'number') continue;
+        const label = k.replace(/_/g, ' ');
+        const val = COUNT_STATS.has(k) ? fmt(v) : v + '%';
+        rows.push('<div class="pc-stat"><span>' + label + '</span><span>' + val + '</span></div>');
+      }
+      return rows.join('') || '<div class="pc-stat"><span>No stats</span><span>-</span></div>';
+    }
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    // Strip raw discord emoji strings like <:potion2:1360...> out of text
+    function cleanEmoji(str) {
+      return str ? String(str).replace(/<:[^:]+:\d+>/g, '').trim() : '';
+    }
+
+    // Resolve a potion's emoji field to a local image, mirroring profile.html
+    function potionImgTag(potion) {
+      const raw = potion && potion.emoji || '';
+      const id = (raw.match(/:potion(\d+):/) || [])[1];
+      const src = id ? '/images/potion' + id + '.png' : '/images/potion2.png';
+      return '<img class="pc-img" src="' + src + '" onerror="this.src=\'/images/potion2.png\'">';
+    }
+
+    // ---- balance ----
+    async function loadBalance() {
+      if (!DISCORD_ID) return;
+      try {
+        const d = await api('/api/user/' + DISCORD_ID);
+        sporeBalance = Number(d?.pixie?.Wallet?.spore_wallet || 0);
+        document.getElementById('spore-balance').textContent = fmt(sporeBalance);
+        document.getElementById('balance-pill').style.display = 'inline-flex';
+      } catch(e) {}
+    }
+
+    // ---- browse ----
+    async function loadBrowse() {
+      const el = document.getElementById('browse-list');
+      el.innerHTML = '<div class="loading">Loading listings...</div>';
+      const d = await api('/api/marketplace/listings');
+      const listings = (d && d.ok && d.listings) ? d.listings : [];
+      if (!listings.length) {
+        el.innerHTML = '<div class="empty"><img src="/images/potion.png" onerror="this.style.display=\'none\'"><div>No potions listed right now. Be the first to sell!</div></div>';
+        return;
+      }
+      // cheapest first
+      listings.sort((a, b) => (a.price || 0) - (b.price || 0));
+      el.innerHTML = '<div class="mkt-grid">' + listings.map(l => {
+        const p = l.potion || {};
+        const mine = DISCORD_ID && String(l.seller_id) === String(DISCORD_ID);
+        const canAfford = sporeBalance >= (l.price || 0);
+        const score = (p['Potion Score'] || 0);
+        let btn;
+        if (mine) {
+          btn = '<button class="btn btn-red" onclick="delist(\'' + esc(l.id) + '\')">Delist</button>';
+        } else {
+          btn = '<button class="btn btn-green" ' + (DISCORD_ID && canAfford ? '' : 'disabled') + ' onclick="buy(\'' + esc(l.id) + '\',' + (l.price||0) + ')">'
+              + (!DISCORD_ID ? 'Log in' : (canAfford ? 'Buy' : 'Too pricey')) + '</button>';
+        }
+        return '<div class="potion-card">'
+          + '<div class="pc-head">' + potionImgTag(p)
+          + '<span class="pc-name">' + esc(cleanEmoji(p.name) || 'Unnamed Potion') + '</span>'
+          + '<span class="pc-score">' + Number(score).toFixed(1) + '</span></div>'
+          + '<div class="pc-stats">' + statRows(p) + '</div>'
+          + '<div class="pc-seller">Seller: ' + esc(cleanEmoji(l.seller_name) || 'Shroomie') + (mine ? ' (you)' : '') + '</div>'
+          + '<div class="pc-price"><img src="/images/spore.png" onerror="this.style.display=\'none\'">' + fmt(l.price) + '</div>'
+          + '<div class="pc-actions">' + btn + '</div>'
+          + '</div>';
+      }).join('') + '</div>';
+    }
+
+    // ---- sell (my inventory) ----
+    async function loadSell() {
+      const el = document.getElementById('sell-list');
+      if (!DISCORD_ID) { el.innerHTML = '<div class="empty">Log in on your <a href="/profile.html" style="color:var(--blue)">profile</a> to sell potions.</div>'; return; }
+      el.innerHTML = '<div class="loading">Loading your potions...</div>';
+      const d = await api('/api/user/' + DISCORD_ID);
+      const potions = d?.sporebot?.Inventory?.Potions || {};
+      const entries = Object.entries(potions).filter(([k, v]) => k.startsWith('Potion_') && v && typeof v === 'object');
+      entries.sort((a, b) => (b[1]['Potion Score'] || 0) - (a[1]['Potion Score'] || 0));
+      if (!entries.length) {
+        el.innerHTML = '<div class="empty"><img src="/images/potion.png" onerror="this.style.display=\'none\'"><div>No potions to sell. Brew some first!</div></div>';
+        return;
+      }
+      el.innerHTML = '<div class="mkt-grid">' + entries.map(([key, p]) => {
+        const score = (p['Potion Score'] || 0);
+        const pname = cleanEmoji(p.name) || 'Unnamed Potion';
+        return '<div class="potion-card">'
+          + '<div class="pc-head">' + potionImgTag(p)
+          + '<span class="pc-name">' + esc(pname) + '</span>'
+          + '<span class="pc-score">' + Number(score).toFixed(1) + '</span></div>'
+          + '<div class="pc-stats">' + statRows(p) + '</div>'
+          + '<div class="pc-actions"><button class="btn btn-blue" data-slot="' + esc(key) + '" data-name="' + esc(pname) + '" onclick="openSellModal(this.dataset.slot, this.dataset.name)">Set Price &amp; List</button></div>'
+          + '</div>';
+      }).join('') + '</div>';
+    }
+
+    // ---- my listings ----
+    async function loadMine() {
+      const el = document.getElementById('mine-list');
+      if (!DISCORD_ID) { el.innerHTML = '<div class="empty">Log in on your <a href="/profile.html" style="color:var(--blue)">profile</a> to view your listings.</div>'; return; }
+      el.innerHTML = '<div class="loading">Loading...</div>';
+      const d = await api('/api/marketplace/listings');
+      const listings = ((d && d.ok && d.listings) ? d.listings : []).filter(l => String(l.seller_id) === String(DISCORD_ID));
+      if (!listings.length) {
+        el.innerHTML = '<div class="empty"><img src="/images/potion.png" onerror="this.style.display=\'none\'"><div>You have no active listings.</div></div>';
+        return;
+      }
+      el.innerHTML = '<div class="mkt-grid">' + listings.map(l => {
+        const p = l.potion || {};
+        const score = (p['Potion Score'] || 0);
+        return '<div class="potion-card">'
+          + '<div class="pc-head">' + potionImgTag(p)
+          + '<span class="pc-name">' + esc(cleanEmoji(p.name) || 'Unnamed Potion') + '</span>'
+          + '<span class="pc-score">' + Number(score).toFixed(1) + '</span></div>'
+          + '<div class="pc-stats">' + statRows(p) + '</div>'
+          + '<div class="pc-price"><img src="/images/spore.png" onerror="this.style.display=\'none\'">' + fmt(l.price) + '</div>'
+          + '<div class="pc-actions"><button class="btn btn-red" onclick="delist(\'' + esc(l.id) + '\')">Delist</button></div>'
+          + '</div>';
+      }).join('') + '</div>';
+    }
+
+    // ---- actions ----
+    window.openSellModal = function(slotKey, name) {
+      pendingSlotKey = slotKey;
+      document.getElementById('sell-modal-title').textContent = 'List Potion';
+      document.getElementById('sell-modal-sub').textContent = 'Listing: ' + name;
+      document.getElementById('price-input').value = '';
+      document.getElementById('sell-modal').classList.add('show');
+      setTimeout(() => document.getElementById('price-input').focus(), 50);
+    };
+    window.closeSellModal = function() {
+      document.getElementById('sell-modal').classList.remove('show');
+      pendingSlotKey = null;
+    };
+
+    window.confirmSell = async function() {
+      const price = parseInt(document.getElementById('price-input').value, 10);
+      if (!price || price < 1) { toast('Enter a valid price.', false); return; }
+      const btn = document.getElementById('confirm-sell-btn');
+      btn.disabled = true; btn.textContent = 'Listing...';
+      const d = await api('/api/marketplace/list', { method: 'POST', body: JSON.stringify({ slot_key: pendingSlotKey, price }) });
+      btn.disabled = false; btn.textContent = 'List It';
+      if (d.ok) {
+        toast('Potion listed!', true);
+        closeSellModal();
+        await Promise.all([loadSell(), loadMine(), loadBrowse()]);
+      } else {
+        toast(d.message || 'Could not list potion.', false);
+      }
+    };
+
+    window.buy = async function(listingId, price) {
+      if (!confirm('Buy this potion for ' + fmt(price) + ' SPORE?')) return;
+      const d = await api('/api/marketplace/buy', { method: 'POST', body: JSON.stringify({ listing_id: listingId }) });
+      if (d.ok) {
+        toast('Purchased! Potion added to your inventory.', true);
+        await loadBalance();
+        await Promise.all([loadBrowse(), loadMine()]);
+      } else {
+        toast(d.message || 'Purchase failed.', false);
+        await loadBrowse();
+      }
+    };
+
+    window.delist = async function(listingId) {
+      if (!confirm('Delist this potion and return it to your inventory?')) return;
+      const d = await api('/api/marketplace/delist', { method: 'POST', body: JSON.stringify({ listing_id: listingId }) });
+      if (d.ok) {
+        toast('Delisted - potion returned to inventory.', true);
+        await Promise.all([loadBrowse(), loadMine(), loadSell()]);
+      } else {
+        toast(d.message || 'Could not delist.', false);
+      }
+    };
+
+    // ---- tabs ----
+    window.showTab = function(id, btn) {
+      document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + id).classList.add('active');
+      if (btn) btn.classList.add('active');
+      if (id === 'browse') loadBrowse();
+      if (id === 'sell') loadSell();
+      if (id === 'mine') loadMine();
+    };
+
+    // ---- init ----
+    (function() {
+      // starfield
+      const sf = document.getElementById('starfield');
+      for (let i = 0; i < 80; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        const sz = Math.random() * 2.5 + 0.5;
+        s.style.cssText = ['width:'+sz+'px','height:'+sz+'px','top:'+(Math.random()*100)+'%','left:'+(Math.random()*100)+'%','--dur:'+(3+Math.random()*5)+'s','--delay:'+(Math.random()*6)+'s','--op:'+(0.2+Math.random()*0.5)].join(';');
+        sf.appendChild(s);
+      }
+      // pwa avatar
+      try {
+        if (user.discord_id && user.avatar) {
+          const wrap = document.querySelector('.pwa-tab[data-page="profile"] span:first-child');
+          if (wrap) wrap.innerHTML = '<img src="https://cdn.discordapp.com/avatars/' + user.discord_id + '/' + user.avatar + '.png" style="width:22px;height:22px;object-fit:cover;border-radius:50%;">';
+        }
+      } catch(e) {}
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+      loadBalance();
+      loadBrowse();
+    })();
+  </script>
+</body>
+</html>
