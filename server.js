@@ -2245,7 +2245,8 @@ app.get('/api/ecosystem/balances/:id', async (req, res) => {
 // ----------------------------------------------------------------
 const BD_SPORE_SOURCES = ['sporulation','spores generated','cave','spore','spores','reddit_spores',
   'totem rewards','link spores','papa_visit','papa visit','goodshroom','staking claim'];
-const BD_COST_SOURCES = ['animal feed'];
+const BD_COST_SOURCES = [];
+const BD_SKIP_SOURCES = ['animal feed']; // feed goes to the jackpot, not counted here
 
 // Display names for breakdown keys. Anything not listed falls back to Title Case.
 const BD_LABELS = {
@@ -2302,6 +2303,7 @@ app.get('/api/ecosystem/breakdown', async (req, res) => {
         seen.add(kl);
         const val = parseInt(v, 10);
         if (isNaN(val)) return;
+        if (BD_SKIP_SOURCES.some(s => kl.includes(s))) return;
         if (category === 'discord' && (kl === 'nft reward' || kl.includes('link'))) return;
 
         const lbl = bdLabel(k);
