@@ -385,7 +385,7 @@ app.post('/api/actions/dig', (req, res) => proxyToFastAPI('dig', req, res, 'DIG'
 // ================================================================
 
 // --- Marketplace test mode + trade tax ---
-const MKT_TEST_MODE = true;                       // set false to go fully live
+const MKT_TEST_MODE = false;                       // set false to go fully live
 const MKT_TEST_ID   = '1233612802883719261';     // only this ID can list/buy in test mode
 const MKT_TAX_RATE  = 0.042;                       // 4.2% haircut on seller payout
 

@@ -235,7 +235,7 @@
     const DISCORD_ID = user.discord_id || null;
 
     // Test mode: let the test user buy their own listings
-    const MARKETPLACE_TEST_MODE = true;
+    const MARKETPLACE_TEST_MODE = false;
     const MARKETPLACE_TEST_ID   = '1233612802883719261'; // same ID as server.js
     const allowSelfBuy = MARKETPLACE_TEST_MODE && String(DISCORD_ID) === String(MARKETPLACE_TEST_ID);
 
@@ -356,7 +356,10 @@
       el.innerHTML = '<div class="loading">Loading your potions...</div>';
       const d = await api('/api/user/' + DISCORD_ID);
       const potions = d?.sporebot?.Inventory?.Potions || {};
-      const entries = Object.entries(potions).filter(([k, v]) => k.startsWith('Potion_') && v && typeof v === 'object');
+      const entries = Object.entries(potions).filter(([k, v]) =>
+        k.startsWith('Potion_') && v && typeof v === 'object'
+        && (allowSelfBuy || Number(v.version) === 2)  // hide non-v2 potions in live mode
+      );
       entries.sort((a, b) => (b[1]['Potion Score'] || 0) - (a[1]['Potion Score'] || 0));
       if (!entries.length) {
         el.innerHTML = '<div class="empty"><img src="/images/potion.png" onerror="this.style.display=\'none\'"><div>No potions to sell. Brew some first!</div></div>';
