@@ -384,6 +384,11 @@ app.post('/api/actions/dig', (req, res) => proxyToFastAPI('dig', req, res, 'DIG'
 // double-sold or activated. All balance moves are atomic.
 // ================================================================
 
+// --- Marketplace test mode + trade tax ---
+const MKT_TEST_MODE = true;                       // set false to go fully live
+const MKT_TEST_ID   = '1233612802883719261';     // only this ID can list/buy in test mode
+const MKT_TAX_RATE  = 0.042;                       // 4.2% haircut on seller payout
+
 // GET /api/marketplace/listings — all active listings (public)
 app.get('/api/marketplace/listings', async (req, res) => {
   try {
@@ -402,6 +407,8 @@ app.post('/api/marketplace/list', async (req, res) => {
   const sessionUser = getSessionUser(req);
   if (!sessionUser) return res.status(401).json({ ok: false, message: 'Not authenticated' });
   const discord_id = sessionUser.discord_id;
+  if (MKT_TEST_MODE && String(discord_id) !== String(MKT_TEST_ID))
+    return res.status(403).json({ ok: false, message: 'Marketplace is in test mode.' });
   const { slot_key } = req.body;
   const price = parseInt(req.body.price, 10);
   if (!slot_key || !String(slot_key).startsWith('Potion_'))
@@ -416,6 +423,10 @@ app.post('/api/marketplace/list', async (req, res) => {
     const potion = potions[slot_key];
     if (!potion || typeof potion !== 'object')
       return res.status(404).json({ ok: false, message: 'Potion not found in that slot' });
+
+    // Live mode: only version 2 potions may be listed. Test mode allows any.
+    if (!MKT_TEST_MODE && Number(potion.version) !== 2)
+      return res.status(400).json({ ok: false, message: 'Only version 2 potions can be listed on the marketplace.' });
 
     // Resolve a display name for the seller
     let seller_name = sessionUser.username;
@@ -503,6 +514,12 @@ app.post('/api/marketplace/buy', async (req, res) => {
   const { listing_id } = req.body;
   if (!listing_id) return res.status(400).json({ ok: false, message: 'Missing listing' });
 
+  if (MKT_TEST_MODE && String(buyer_id) !== String(MKT_TEST_ID))
+    return res.status(403).json({ ok: false, message: 'Marketplace is in test mode.' });
+
+  // In test mode, the test user is allowed to buy their own listings.
+  const allowSelfBuy = MKT_TEST_MODE && String(buyer_id) === String(MKT_TEST_ID);
+
   try {
     const listingRef = db.ref(`Sporebot/Marketplace/Listings/${listing_id}`);
 
@@ -510,7 +527,7 @@ app.post('/api/marketplace/buy', async (req, res) => {
     let claimed = null;
     await listingRef.transaction(cur => {
       if (!cur) return cur;                              // already sold/gone
-      if (String(cur.seller_id) === String(buyer_id)) return; // can't buy own -> abort
+      if (!allowSelfBuy && String(cur.seller_id) === String(buyer_id)) return; // can't buy own -> abort
       claimed = cur;
       return null;                                       // remove listing (reserved for this buyer)
     });
@@ -538,19 +555,85 @@ app.post('/api/marketplace/buy', async (req, res) => {
     const buyerPotions = buyerPotionsSnap.val() || {};
     let i = 1; while (buyerPotions[`Potion_${i}`]) i++;
 
+    // 4.2% trade tax: buyer pays full price, seller receives price - tax.
+    // The tax remainder never leaves the counted balance pool, so it stays
+    // in the treasury automatically (no separate fund write). floor() on the
+    // payout guarantees no fractional SPORE is created.
+    const sellerPayout = Math.floor(price * (1 - MKT_TAX_RATE));
+    const tax = price - sellerPayout;
+
+    // Self-buy in test mode: buyer and seller are the same wallet. Net the
+    // moves so we don't debit full price then re-credit a stale balance.
+    const sameWallet = String(buyer_id) === String(seller_id);
+
     // Atomic settlement: pay seller, charge buyer, deliver potion. Listing already removed.
     const updates = {};
-    updates[`Pixie/Users/${buyer_id}/Wallet/spore_wallet`]  = buyerSpore - price;
-    updates[`Pixie/Users/${seller_id}/Wallet/spore_wallet`] = sellerSpore + price;
+    if (sameWallet) {
+      // One wallet: only the tax actually leaves it.
+      updates[`Pixie/Users/${buyer_id}/Wallet/spore_wallet`] = buyerSpore - tax;
+    } else {
+      updates[`Pixie/Users/${buyer_id}/Wallet/spore_wallet`]  = buyerSpore - price;
+      updates[`Pixie/Users/${seller_id}/Wallet/spore_wallet`] = sellerSpore + sellerPayout;
+    }
     updates[`Sporebot/Users/${buyer_id}/Inventory/Potions/Potion_${i}`] = claimed.potion;
+
+    // Record the completed sale (atomic with settlement, single write).
+    const historyId = db.ref('Sporebot/Marketplace/History').push().key;
+    updates[`Sporebot/Marketplace/History/${historyId}`] = {
+      buyer_id,
+      seller_id,
+      buyer_name:  sessionUser.username || null,
+      seller_name: claimed.seller_name || 'Shroomie',
+      potion_name: claimed.potion?.name || 'Unnamed',
+      potion_emoji: claimed.potion?.emoji || null,
+      price,
+      tax,
+      seller_payout: sameWallet ? 0 : sellerPayout,
+      sold_at: new Date().toISOString(),
+    };
     await db.ref().update(updates);
 
-    console.log(`[MKT-BUY] ${buyer_id} bought ${listing_id} from ${seller_id} for ${price} SPORE`);
+    const finalBuyerBal = sameWallet ? (buyerSpore - tax) : (buyerSpore - price);
+    console.log(`[MKT-BUY] ${buyer_id} bought ${listing_id} from ${seller_id} for ${price} SPORE (tax ${tax}, seller got ${sameWallet ? 0 : sellerPayout})`);
     discordLog(buyer_id,  `Bought potion **${claimed.potion?.name || 'Unnamed'}** for ${price.toLocaleString()} SPORE`).catch(() => {});
-    discordLog(seller_id, `Sold potion **${claimed.potion?.name || 'Unnamed'}** for ${price.toLocaleString()} SPORE`).catch(() => {});
-    res.json({ ok: true, spore_wallet: buyerSpore - price });
+    discordLog(seller_id, `Sold potion **${claimed.potion?.name || 'Unnamed'}** for ${sellerPayout.toLocaleString()} SPORE (after ${tax.toLocaleString()} tax)`).catch(() => {});
+    res.json({ ok: true, spore_wallet: finalBuyerBal });
   } catch (err) {
     console.error('[MKT-BUY]', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
+// GET /api/marketplace/history — public sales feed (most recent 50)
+app.get('/api/marketplace/history', async (req, res) => {
+  try {
+    const snap = await db.ref('Sporebot/Marketplace/History').get();
+    const raw = snap.val() || {};
+    const sales = Object.entries(raw)
+      .map(([id, s]) => ({ id, ...s }))
+      .sort((a, b) => new Date(b.sold_at) - new Date(a.sold_at))
+      .slice(0, 50);
+    res.json({ ok: true, sales });
+  } catch (err) {
+    console.error('[MKT-HISTORY]', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
+
+// GET /api/marketplace/history/:discord_id — one user's buys + sells
+app.get('/api/marketplace/history/:discord_id', async (req, res) => {
+  const uid = String(req.params.discord_id);
+  try {
+    const snap = await db.ref('Sporebot/Marketplace/History').get();
+    const raw = snap.val() || {};
+    const sales = Object.entries(raw)
+      .map(([id, s]) => ({ id, ...s }))
+      .filter(s => String(s.buyer_id) === uid || String(s.seller_id) === uid)
+      .sort((a, b) => new Date(b.sold_at) - new Date(a.sold_at))
+      .slice(0, 50);
+    res.json({ ok: true, sales });
+  } catch (err) {
+    console.error('[MKT-HISTORY-USER]', err);
     res.status(500).json({ ok: false, message: 'Server error' });
   }
 });

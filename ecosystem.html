@@ -737,7 +737,7 @@
       <div class="desc" id="pct-desc">Reading treasury reserves...</div>
     </div>
 
-    <div class="feed-btn-wrap"><button type="button" class="feed-btn" id="feed-btn">Feed the Mushroom</button></div>
+    <div class="feed-btn-wrap" style="display:none;"><button type="button" class="feed-btn" id="feed-btn">Feed the Mushroom</button></div>
 
     <div class="gauge-wrap" id="gauge-wrap">
       <div class="gauge-track">
@@ -759,7 +759,7 @@
         </span>
       </h2>
       <div id="sporebot-remaining-body" style="font-family:'Space Grotesk',monospace;font-size:0.8rem;color:rgba(255,255,225,0.6);padding:0.5rem 0;">Loading live balance...</div>
-      <div class="snapshot-note" id="remaining-note"><strong>Remaining</strong> = initial Sporebot fund - tokens withdrawn onchain - tokens still held in-bot (Discord + Reddit + farms + staking) + Donations (feeding the mushroom).<span id="remaining-pct"></span>
+      <div class="snapshot-note" id="remaining-note"><strong>Remaining</strong> = initial Sporebot fund - tokens withdrawn onchain - tokens still held in-bot (Discord + Reddit + farms + staking).<span id="remaining-pct"></span>
         <div id="remaining-legend" style="font-size:0.6rem;color:rgba(255,255,225,0.3);padding-top:0.4rem;"></div>
       </div>
     </div>
@@ -1325,18 +1325,16 @@
       + '<span style="color:var(--blue);">' + n(sp) + '</span>';
     const eqv = (sh, sp, eq) => duo(sh, sp) + '<wbr>'
       + '<span style="opacity:0.3;margin:0 0.4rem;">=</span><wbr>'
-      + '<span style="color:var(--yellow);">' + n(eq) + '</span>';
+      + '<span style="color:#a78bfa;">' + n(eq) + '</span>';
     if (!showBreakdown) {
       if (!d.hasOnchain) { el.textContent = 'Onchain balance unavailable - breakdown still available via the button above.'; return; }
       const tw = d.totals;
       const wdSh = tw.withdrawn_shrooms || 0, wdSp = tw.withdrawn_spores || 0;
-      const dSh = d.donShroom || 0, dSp = d.donSpore || 0;
       
       el.innerHTML =
         line('Initial Sporebot Fund', eqv(INITIAL_FUND_SHROOM, INITIAL_FUND_SPORE, INITIAL_FUND_EQ), 'inherit')
         + line('Less: Withdrawn Onchain', eqv(wdSh, wdSp, wdSh + wdSp / 100), 'inherit')
         + line('Less: Still in Sporebot', eqv(d.oweShroom, d.oweSpore, d.oweShroom + d.oweSpore / 100), 'inherit')
-        + line('Plus: Donations Received', eqv(dSh, dSp, dSh + dSp / 100), 'inherit')
         + line('Remaining', eqv(d.remShroom, d.remSpore, d.remShroom + d.remSpore / 100), 'inherit', true)
         
         + (d.remShroom < 0 || d.remSpore < 0
@@ -1356,9 +1354,9 @@
         + line('Staked Spores', n(t.staked_spores || 0), 'var(--blue)')
         + line('Still in Sporebot', eqv(inBotShroom, inBotSpore, inBotEq), 'inherit', true)
         + line('Withdrawn Onchain', eqv(t.withdrawn_shrooms || 0, t.withdrawn_spores || 0, wdEq), 'inherit')
-        + line('Grand Total (all-time)', n(grandEq), 'var(--yellow)', true)
+        + line('Grand Total (all-time)', n(grandEq), '#a78bfa', true)
         + '<div style="font-size:0.6rem;color:rgba(255,255,225,0.3);padding-top:0.3rem;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;">'
-        + '<span><span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; <span style="color:var(--gold);">100 SPORE = 1 SHROOM</span></span>'
+        + '<span><span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; <span style="color:#a78bfa;">100 SPORE = 1 SHROOM</span></span>'
         + '<span>' + (t.timestamp ? 'Last updated: ' + new Date(t.timestamp).toLocaleString() : '') + '</span></div>';
     }
   }
@@ -1409,7 +1407,7 @@
     const lg = document.getElementById('remaining-legend');
     if (lg) {
       lg.style.cssText = 'font-size:0.6rem;color:rgba(255,255,225,0.3);padding-top:0.4rem;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;';
-      lg.innerHTML = '<span><span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; <span style="color:var(--gold);">100 SPORE = 1 SHROOM</span></span>'
+      lg.innerHTML = '<span><span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; <span style="color:#a78bfa;">100 SPORE = 1 SHROOM</span></span>'
         + '<span>' + (t.totals.timestamp ? 'Last updated: ' + new Date(t.totals.timestamp).toLocaleString() : '') + '</span>';
     }
 
@@ -1436,7 +1434,7 @@
     const lg = document.getElementById('remaining-legend');
     if (lg) {
       lg.style.cssText = 'font-size:0.6rem;color:rgba(255,255,225,0.3);padding-top:0.4rem;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;';
-      lg.innerHTML = '<span><span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; <span style="color:var(--gold);">100 SPORE = 1 SHROOM</span></span>'
+      lg.innerHTML = '<span><span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; <span style="color:#a78bfa;">100 SPORE = 1 SHROOM</span></span>'
         + '<span>' + (t.totals.timestamp ? 'Last updated: ' + new Date(t.totals.timestamp).toLocaleString() : '') + '</span>';
     }
   });

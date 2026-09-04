@@ -146,6 +146,7 @@
     <button class="guide-tab active" onclick="showTab('browse', this)">Browse Market</button>
     <button class="guide-tab" onclick="showTab('sell', this)">Sell a Potion</button>
     <button class="guide-tab" onclick="showTab('mine', this)">My Listings</button>
+    <button class="guide-tab" onclick="showTab('history', this)">Sales Feed</button>
   </div>
 
   <!-- BROWSE -->
@@ -172,6 +173,14 @@
     <div id="mine-list"><div class="loading">Loading...</div></div>
   </div>
 
+  <!-- SALES FEED -->
+  <div class="guide-section" id="tab-history">
+    <div class="section-label">Public</div>
+    <div class="section-title">Sales Feed</div>
+    <div class="section-sub">Every completed potion sale across the marketplace, newest first.</div>
+    <div id="history-list"><div class="loading">Loading sales...</div></div>
+  </div>
+
   <!-- SELL MODAL -->
   <div class="modal-overlay" id="sell-modal">
     <div class="mkt-modal">
@@ -182,6 +191,18 @@
       <div class="modal-actions">
         <button class="btn btn-red" onclick="closeSellModal()">Cancel</button>
         <button class="btn btn-green" id="confirm-sell-btn" onclick="confirmSell()">List It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUY CONFIRM MODAL -->
+  <div class="modal-overlay" id="buy-modal">
+    <div class="mkt-modal">
+      <h3 id="buy-modal-title">Confirm Purchase</h3>
+      <p id="buy-modal-sub"></p>
+      <div class="modal-actions">
+        <button class="btn btn-red" onclick="closeBuyModal()">Cancel</button>
+        <button class="btn btn-green" id="confirm-buy-btn">Buy</button>
       </div>
     </div>
   </div>
@@ -212,6 +233,11 @@
 
     const user = JSON.parse(localStorage.getItem('mp_profile_user') || '{}');
     const DISCORD_ID = user.discord_id || null;
+
+    // Test mode: let the test user buy their own listings
+    const MARKETPLACE_TEST_MODE = true;
+    const MARKETPLACE_TEST_ID   = '1233612802883719261'; // same ID as server.js
+    const allowSelfBuy = MARKETPLACE_TEST_MODE && String(DISCORD_ID) === String(MARKETPLACE_TEST_ID);
 
     // Non-stat keys we never render as potion stats
     const NON_STAT = new Set(['name','emoji','Potion_Score','Potion Score','version']);
@@ -300,7 +326,12 @@
         const canAfford = sporeBalance >= (l.price || 0);
         const score = (p['Potion Score'] || 0);
         let btn;
-        if (mine) {
+        if (mine && allowSelfBuy) {
+          // Test mode: show BOTH buy and delist on your own listing
+          btn = '<button class="btn btn-green" ' + (canAfford ? '' : 'disabled') + ' onclick="buy(\'' + esc(l.id) + '\',' + (l.price||0) + ')">'
+              + (canAfford ? 'Buy (test)' : 'Too pricey') + '</button>'
+              + '<button class="btn btn-red" onclick="delist(\'' + esc(l.id) + '\')">Delist</button>';
+        } else if (mine) {
           btn = '<button class="btn btn-red" onclick="delist(\'' + esc(l.id) + '\')">Delist</button>';
         } else {
           btn = '<button class="btn btn-green" ' + (DISCORD_ID && canAfford ? '' : 'disabled') + ' onclick="buy(\'' + esc(l.id) + '\',' + (l.price||0) + ')">'
@@ -353,8 +384,7 @@
       const listings = ((d && d.ok && d.listings) ? d.listings : []).filter(l => String(l.seller_id) === String(DISCORD_ID));
       if (!listings.length) {
         el.innerHTML = '<div class="empty"><img src="/images/potion.png" onerror="this.style.display=\'none\'"><div>You have no active listings.</div></div>';
-        return;
-      }
+      } else {
       el.innerHTML = '<div class="mkt-grid">' + listings.map(l => {
         const p = l.potion || {};
         const score = (p['Potion Score'] || 0);
@@ -367,6 +397,51 @@
           + '<div class="pc-actions"><button class="btn btn-red" onclick="delist(\'' + esc(l.id) + '\')">Delist</button></div>'
           + '</div>';
       }).join('') + '</div>';
+      }
+
+      // Append this user's completed buy/sell history below their active listings
+      const h = await api('/api/marketplace/history/' + DISCORD_ID);
+      const mySales = (h && h.ok && h.sales) ? h.sales : [];
+      if (mySales.length) {
+        el.innerHTML += '<div class="section-label" style="margin-top:2rem;">Your History</div>'
+          + '<div class="section-title" style="font-size:1.2rem;margin-bottom:1rem;">Completed Trades</div>'
+          + '<div class="mkt-grid">' + mySales.map(s => saleRow(s, DISCORD_ID)).join('') + '</div>';
+      }
+    }
+
+    // ---- shared sale-row renderer ----
+    function saleRow(s, youId) {
+      const emojiId = (String(s.potion_emoji || '').match(/:potion(\d+):/) || [])[1];
+      const img = emojiId ? '/images/potion' + emojiId + '.png' : '/images/potion2.png';
+      const buyerYou  = youId && String(s.buyer_id) === String(youId);
+      const sellerYou = youId && String(s.seller_id) === String(youId);
+      const when = s.sold_at ? new Date(s.sold_at).toLocaleString() : '';
+      return '<div class="potion-card" style="gap:0.5rem;">'
+        + '<div class="pc-head"><img class="pc-img" src="' + img + '" onerror="this.src=\'/images/potion2.png\'">'
+        + '<span class="pc-name">' + esc(cleanEmoji(s.potion_name) || 'Unnamed Potion') + '</span></div>'
+        + '<div class="pc-seller">'
+          + esc(cleanEmoji(s.seller_name) || 'Shroomie') + (sellerYou ? ' (you)' : '')
+          + ' &rarr; ' + esc(cleanEmoji(s.buyer_name) || 'Shroomie') + (buyerYou ? ' (you)' : '')
+        + '</div>'
+        + '<div class="pc-price"><img src="/images/spore.png" onerror="this.style.display=\'none\'">' + fmt(s.price) + ' SPORE</div>'
+        + '<div class="pc-seller" style="opacity:0.7;">'
+          + 'Seller received <span style="color:var(--green);">' + fmt(Math.floor(s.price * 0.958)) + '</span> SPORE'
+          + ' <span style="opacity:0.6;">(after 4.2% fee: -' + fmt(s.price - Math.floor(s.price * 0.958)) + ')</span></div>'
+        + '<div class="pc-seller" style="opacity:0.6;">' + esc(when) + '</div>'
+        + '</div>';
+    }
+
+    // ---- public sales feed ----
+    async function loadHistory() {
+      const el = document.getElementById('history-list');
+      el.innerHTML = '<div class="loading">Loading sales...</div>';
+      const d = await api('/api/marketplace/history');
+      const sales = (d && d.ok && d.sales) ? d.sales : [];
+      if (!sales.length) {
+        el.innerHTML = '<div class="empty"><img src="/images/potion.png" onerror="this.style.display=\'none\'"><div>No sales yet. The market is quiet.</div></div>';
+        return;
+      }
+      el.innerHTML = '<div class="mkt-grid">' + sales.map(s => saleRow(s, DISCORD_ID)).join('') + '</div>';
     }
 
     // ---- actions ----
@@ -399,17 +474,32 @@
       }
     };
 
-    window.buy = async function(listingId, price) {
-      if (!confirm('Buy this potion for ' + fmt(price) + ' SPORE?')) return;
-      const d = await api('/api/marketplace/buy', { method: 'POST', body: JSON.stringify({ listing_id: listingId }) });
-      if (d.ok) {
-        toast('Purchased! Potion added to your inventory.', true);
-        await loadBalance();
-        await Promise.all([loadBrowse(), loadMine()]);
-      } else {
-        toast(d.message || 'Purchase failed.', false);
-        await loadBrowse();
-      }
+    window.closeBuyModal = function() {
+      document.getElementById('buy-modal').classList.remove('show');
+    };
+
+    window.buy = function(listingId, price) {
+      const modal = document.getElementById('buy-modal');
+      document.getElementById('buy-modal-sub').textContent =
+        'This will buy the potion for ' + fmt(price) + ' SPORE and drop it into your brew inventory.';
+      const btn = document.getElementById('confirm-buy-btn');
+      btn.textContent = 'Buy for ' + fmt(price);
+      btn.disabled = false;
+      // Replace the click handler each time so it targets this listing
+      btn.onclick = async function() {
+        btn.disabled = true; btn.textContent = 'Buying...';
+        const d = await api('/api/marketplace/buy', { method: 'POST', body: JSON.stringify({ listing_id: listingId }) });
+        closeBuyModal();
+        if (d.ok) {
+          toast('Purchased! Potion added to your inventory.', true);
+          await loadBalance();
+          await Promise.all([loadBrowse(), loadMine()]);
+        } else {
+          toast(d.message || 'Purchase failed.', false);
+          await loadBrowse();
+        }
+      };
+      modal.classList.add('show');
     };
 
     window.delist = async function(listingId) {
@@ -432,6 +522,7 @@
       if (id === 'browse') loadBrowse();
       if (id === 'sell') loadSell();
       if (id === 'mine') loadMine();
+      if (id === 'history') loadHistory();
     };
 
     // ---- init ----
@@ -453,6 +544,8 @@
         }
       } catch(e) {}
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+      const bm = document.getElementById('buy-modal');
+      bm.addEventListener('click', (e) => { if (e.target === bm) closeBuyModal(); });
       loadBalance();
       loadBrowse();
     })();
