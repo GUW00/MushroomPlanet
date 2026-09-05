@@ -384,8 +384,43 @@ app.post('/api/actions/dig', (req, res) => proxyToFastAPI('dig', req, res, 'DIG'
 // double-sold or activated. All balance moves are atomic.
 // ================================================================
 
+// Bond 5 = 42 accumulated days (mirrors BOND_LEVELS in companions.py).
+const DEER_MAX_BOND_DAYS = 42;
+
+// Returns 10 if the user's ACTIVE Deer (primary or Owl-party) is at max bond,
+// else 5. Mirrors has_unique_ability(user_data, "extra_market_listings").
+async function getMarketplaceListingLimit(discord_id) {
+  try {
+    const compSnap = await db.ref(`Sporebot/Users/${discord_id}/Companion`).get();
+    const comp = compSnap.val() || {};
+    const activeKey = comp.active;
+    const pets = comp.pets || {};
+
+    // Build the list of currently-active companion keys (primary + Owl party extras).
+    const activeKeys = [];
+    if (activeKey) activeKeys.push(activeKey);
+    if (Array.isArray(comp.active_companions)) {
+      for (const k of comp.active_companions) if (!activeKeys.includes(k)) activeKeys.push(k);
+    }
+    if (!activeKeys.includes('deer')) return 5;  // deer not active -> no bonus
+
+    // Deer's accumulated days; add elapsed-since-activation only if deer is the primary.
+    let deerDays = (pets.deer && pets.deer.total_days) || 0;
+    if (activeKey === 'deer' && comp.adopted_at) {
+      const adopted = new Date(comp.adopted_at.replace(' ', 'T') + 'Z');
+      if (!isNaN(adopted)) {
+        deerDays += Math.floor((Date.now() - adopted.getTime()) / 86400000);
+      }
+    }
+    return deerDays >= DEER_MAX_BOND_DAYS ? 10 : 5;
+  } catch (e) {
+    console.error('[MKT-LIMIT]', e);
+    return 5;  // fail closed to the base limit
+  }
+}
+
 // --- Marketplace test mode + trade tax ---
-const MKT_TEST_MODE = false;                       // set false to go fully live
+const MKT_TEST_MODE = true;                       // set false to go fully live
 const MKT_TEST_ID   = '1233612802883719261';     // only this ID can list/buy in test mode
 const MKT_TAX_RATE  = 0.042;                       // 4.2% haircut on seller payout
 
@@ -427,6 +462,15 @@ app.post('/api/marketplace/list', async (req, res) => {
     // Live mode: only version 2 potions may be listed. Test mode allows any.
     if (!MKT_TEST_MODE && Number(potion.version) !== 2)
       return res.status(400).json({ ok: false, message: 'Only version 2 potions can be listed on the marketplace.' });
+
+    // Enforce listing cap: 5 base, 10 if active Deer at Bond 5 (max bond).
+    // Mirrors has_unique_ability(user_data, "extra_market_listings") in companions.py.
+    const listingLimit = await getMarketplaceListingLimit(discord_id);
+    const allListingsSnap = await db.ref('Sporebot/Marketplace/Listings').get();
+    const myActiveCount = Object.values(allListingsSnap.val() || {})
+      .filter(l => l && String(l.seller_id) === String(discord_id)).length;
+    if (myActiveCount >= listingLimit)
+      return res.status(400).json({ ok: false, message: `Listing limit reached (${listingLimit}). Delist one first.` });
 
     // Resolve a display name for the seller
     let seller_name = sessionUser.username;
@@ -559,7 +603,7 @@ app.post('/api/marketplace/buy', async (req, res) => {
     // The tax remainder never leaves the counted balance pool, so it stays
     // in the treasury automatically (no separate fund write). floor() on the
     // payout guarantees no fractional SPORE is created.
-    const sellerPayout = Math.floor(price * (1 - MKT_TAX_RATE));
+    const sellerPayout = Math.round(price * (1 - MKT_TAX_RATE));
     const tax = price - sellerPayout;
 
     // Self-buy in test mode: buyer and seller are the same wallet. Net the
@@ -586,6 +630,7 @@ app.post('/api/marketplace/buy', async (req, res) => {
       seller_name: claimed.seller_name || 'Shroomie',
       potion_name: claimed.potion?.name || 'Unnamed',
       potion_emoji: claimed.potion?.emoji || null,
+      potion_score: claimed.potion?.['Potion Score'] || 0,
       price,
       tax,
       seller_payout: sameWallet ? 0 : sellerPayout,
@@ -1175,7 +1220,7 @@ const HOLDINGS_TOKENS_LIST = [
   { symbol: '$HROOM', contract: '0x924B16Dfb993EEdEcc91c6D08b831e94135dEaE1', decimals: 18 },
   { symbol: 'SPORE',  contract: '0x089582AC20ea563c69408a79E1061de594b61bED', decimals: 18 },
   { symbol: 'WETH',   contract: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', decimals: 18 },
-  { symbol: 'WBTC',   contract: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6', decimals: 8  },
+  { symbol: 'USDC',   contract: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359', decimals: 6  },
 ];
 
 app.get('/api/treasury-holdings', async (req, res) => {

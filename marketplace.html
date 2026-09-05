@@ -235,7 +235,7 @@
     const DISCORD_ID = user.discord_id || null;
 
     // Test mode: let the test user buy their own listings
-    const MARKETPLACE_TEST_MODE = false;
+    const MARKETPLACE_TEST_MODE = true;
     const MARKETPLACE_TEST_ID   = '1233612802883719261'; // same ID as server.js
     const allowSelfBuy = MARKETPLACE_TEST_MODE && String(DISCORD_ID) === String(MARKETPLACE_TEST_ID);
 
@@ -356,6 +356,26 @@
       el.innerHTML = '<div class="loading">Loading your potions...</div>';
       const d = await api('/api/user/' + DISCORD_ID);
       const potions = d?.sporebot?.Inventory?.Potions || {};
+
+      // Show active listing count vs limit (5 base, 10 with active max-bond Deer)
+      const comp = d?.sporebot?.Companion || {};
+      const activeKeys = [comp.active, ...(Array.isArray(comp.active_companions) ? comp.active_companions : [])];
+      let deerDays = (comp.pets?.deer?.total_days) || 0;
+      if (comp.active === 'deer' && comp.adopted_at) {
+        const adopted = new Date(comp.adopted_at.replace(' ', 'T') + 'Z');
+        if (!isNaN(adopted)) deerDays += Math.floor((Date.now() - adopted.getTime()) / 86400000);
+      }
+      const listLimit = (activeKeys.includes('deer') && deerDays >= 42) ? 10 : 5;
+      const ld = await api('/api/marketplace/listings');
+      const activeCount = ((ld && ld.ok && ld.listings) ? ld.listings : [])
+        .filter(l => String(l.seller_id) === String(DISCORD_ID)).length;
+      const countEl = document.querySelector('#tab-sell .section-sub');
+      if (countEl) {
+        countEl.innerHTML = 'Pick a stored potion and set a price. While listed, the potion leaves your inventory and can\'t be activated or discarded until it sells or you delist it.'
+          + '<br><span style="color:' + (activeCount >= listLimit ? 'var(--red)' : 'var(--green)') + ';font-weight:600;">'
+          + activeCount + '/' + listLimit + ' active listings used'
+          + (listLimit === 10 ? ' (Deer bonus active)' : '') + '</span>';
+      }
       const entries = Object.entries(potions).filter(([k, v]) =>
         k.startsWith('Potion_') && v && typeof v === 'object'
         && (allowSelfBuy || Number(v.version) === 2)  // hide non-v2 potions in live mode
@@ -419,17 +439,19 @@
       const buyerYou  = youId && String(s.buyer_id) === String(youId);
       const sellerYou = youId && String(s.seller_id) === String(youId);
       const when = s.sold_at ? new Date(s.sold_at).toLocaleString() : '';
+      const scoreTag = s.potion_score ? '<span class="pc-score">' + Number(s.potion_score).toFixed(1) + '</span>' : '';
       return '<div class="potion-card" style="gap:0.5rem;">'
         + '<div class="pc-head"><img class="pc-img" src="' + img + '" onerror="this.src=\'/images/potion2.png\'">'
-        + '<span class="pc-name">' + esc(cleanEmoji(s.potion_name) || 'Unnamed Potion') + '</span></div>'
+        + '<span class="pc-name">' + esc(cleanEmoji(s.potion_name) || 'Unnamed Potion') + '</span>'
+        + scoreTag + '</div>'
         + '<div class="pc-seller">'
           + esc(cleanEmoji(s.seller_name) || 'Shroomie') + (sellerYou ? ' (you)' : '')
           + ' &rarr; ' + esc(cleanEmoji(s.buyer_name) || 'Shroomie') + (buyerYou ? ' (you)' : '')
         + '</div>'
         + '<div class="pc-price"><img src="/images/spore.png" onerror="this.style.display=\'none\'">' + fmt(s.price) + ' SPORE</div>'
         + '<div class="pc-seller" style="opacity:0.7;">'
-          + 'Seller received <span style="color:var(--green);">' + fmt(Math.floor(s.price * 0.958)) + '</span> SPORE'
-          + ' <span style="opacity:0.6;">(after 4.2% fee: -' + fmt(s.price - Math.floor(s.price * 0.958)) + ')</span></div>'
+          + 'Seller received <span style="color:var(--green);">' + fmt(Math.round(s.price * 0.958)) + '</span> SPORE'
+          + ' <span style="opacity:0.6;">(after 4.2% fee: -' + fmt(s.price - Math.round(s.price * 0.958)) + ')</span></div>'
         + '<div class="pc-seller" style="opacity:0.6;">' + esc(when) + '</div>'
         + '</div>';
     }
@@ -549,8 +571,7 @@
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
       const bm = document.getElementById('buy-modal');
       bm.addEventListener('click', (e) => { if (e.target === bm) closeBuyModal(); });
-      loadBalance();
-      loadBrowse();
+      loadBalance().then(loadBrowse);
     })();
   </script>
 </body>

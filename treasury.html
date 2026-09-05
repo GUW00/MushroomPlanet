@@ -557,16 +557,7 @@ async function loadSporebotTotals() {
         </div>
       </div>
 
-      <div class="tl-section">
-        <div class="tl-section-head"><span>3</span> Sporebot Farm Data</div>
-        <div style="display:flex;gap:1rem;margin-bottom:0.75rem;font-family:'Space Grotesk',monospace;font-size:0.58rem;letter-spacing:0.1em;">
-          <span style="color:var(--red);">-- SHROOM</span>
-          <span style="color:var(--blue);">-- SPORE</span>
-        </div>
-        <div id="sporebot-grid" class="tl-farm-row">
-          <div class="tx-loading" style="grid-column:1/-1;font-size:0.75rem;">Loading...</div>
-        </div>
-      </div>
+
     </div>
 
     <!-- SHROOM + SPORE COMBINED -->
@@ -653,6 +644,26 @@ async function loadSporebotTotals() {
           <div class="stat-key">Launched</div>
           <div class="stat-val" style="font-size:1rem;">Jan 12, 2025</div>
           <div class="stat-sub">Governance token · 18 decimals · Polygon</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sporebot Wallet Remaining (mirrors ecosystem.html) -->
+    <div class="reveal" style="margin-bottom:2rem;">
+      <div class="section-label">Sporebot Ecosystem</div>
+      <div class="section-title">Sporebot Wallet Remaining</div>
+      <div class="bar-section" id="sbf-remaining-panel" style="margin-bottom:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+          <span style="font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,225,0.4);font-weight:600;">In-Bot vs Onchain</span>
+          <span style="display:flex;align-items:center;gap:0.5rem;">
+            <button type="button" id="sbf-flip" style="font-family:'Space Grotesk',monospace;font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,225,0.6);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,225,0.15);border-radius:999px;padding:0.3em 0.8em;cursor:pointer;">Breakdown</button>
+            <span style="font-family:'Space Grotesk',monospace;font-size:0.6rem;padding:0.2em 0.6em;background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3);border-radius:999px;">LIVE</span>
+          </span>
+        </div>
+        <div id="sbf-body" style="font-family:'Space Grotesk',monospace;font-size:0.8rem;color:rgba(255,255,225,0.6);padding:0.5rem 0;">Loading live balance...</div>
+        <div id="sbf-note" style="font-family:'Space Grotesk',monospace;font-size:0.65rem;color:rgba(255,255,225,0.25);line-height:1.6;border-top:1px solid rgba(255,255,225,0.06);padding-top:0.9rem;margin-top:0.5rem;">
+          <span style="color:rgba(255,255,225,0.45);">Remaining</span> = initial Sporebot fund - tokens withdrawn onchain - tokens still held in-bot (Discord + Reddit + farms + staking).<span id="sbf-pct"></span>
+          <div id="sbf-legend" style="font-size:0.6rem;color:rgba(255,255,225,0.3);padding-top:0.4rem;"></div>
         </div>
       </div>
     </div>
@@ -1012,7 +1023,6 @@ async function loadSporebotTotals() {
   };
 
   const combinedBars = [
-    { img: '/images/sporebot.png',      label: 'Sporebot Rewards',       key: 'sporebot',      pct: 20, shroom: '875,000,000',  spore: '60,000,000,000',  baseShroom: 875_000_000,  baseSpore: 60_000_000_000  },
     { img: '/images/sporulation1.webp', label: 'LP Rewards',             key: 'lp',            pct: 20, shroom: '613,000,000',  spore: '80,700,000,000',  baseShroom: 613_000_000,  baseSpore: 80_700_000_000  },
     { img: '/images/nft.png',           label: 'NFT Rewards',            key: 'nft',           pct: 20, shroom: '600,000,000',  spore: '60,000,000,000',  baseShroom: 600_000_000,  baseSpore: 60_000_000_000  },
     { emoji: '🤝',                      label: 'Partnerships / Collabs', key: null,            pct: 10, shroom: '250,000,000',  spore: '25,000,000,000',  baseShroom: 250_000_000,  baseSpore: 25_000_000_000  },
@@ -1021,8 +1031,7 @@ async function loadSporebotTotals() {
     { img: '/images/swaps.png',         label: 'Swap Function',          key: null,            pct: 5,  shroom: '150,000,000',  spore: '15,000,000,000',  baseShroom: 150_000_000,  baseSpore: 15_000_000_000  },
     { img: '/images/emergency-funds.png', label: 'Emergency Fund',       key: null,            pct: 5,  shroom: '150,000,000',  spore: '15,000,000,000',  baseShroom: 150_000_000,  baseSpore: 15_000_000_000  },
     { img: '/images/blockchain.png',    label: 'Onchain Rewards',        key: 'spore_rewards', pct: 0,  shroom: '0',            spore: '68,740,000,000',  baseShroom: 0,            baseSpore: 68_740_000_000, sporeOnly: true },
-    { img: '/images/vote.png',          label: 'Governance',             key: 'governance',    pct: 5,  shroom: '0',            spore: '15,000,000,000',  baseShroom: 0,            baseSpore: 15_000_000_000, sporeOnly: true, govPurple: true },
-    { img: '/images/nft.png',           label: 'NFT Offchain Rewards',   key: 'nft_offchain',  pct: 0,  shroom: '0',            spore: '68,740,000,000',  baseShroom: 0,            baseSpore: 68_740_000_000, sporeOnly: true, purple: true },
+
   ];
 
   // NFT Offchain emission schedule — May 7 2026 start, tapers annually
@@ -1057,6 +1066,14 @@ async function loadSporebotTotals() {
     return Math.min(spent, 68_740_000_000);
   }
 
+  // Ecosystem Sporebot Fund constants (mirror ecosystem.html)
+  const SBF_INITIAL_SHROOM = 1_500_000_000;
+  const SBF_INITIAL_SPORE  = 150_000_000_000;
+  const SBF_TEMP_SHROOM    = 1_200_970_065; // pending treasury->funding transfer, set 0 when it lands
+  const SBF_TEMP_SPORE     = 137_346_117_560;
+  window._sbfDonShroom = window._sbfDonShroom || 0;
+  window._sbfDonSpore  = window._sbfDonSpore  || 0;
+
   function buildCombinedBars(id, items, spent) {
     const c = document.getElementById(id);
     if (!c) return;
@@ -1088,6 +1105,21 @@ async function loadSporebotTotals() {
         spentSpore  = item.baseSpore  - remSpore;
       }
 
+      // Sporebot Fund: remaining = temp + onchain wallet + donations - in-bot obligations
+      // (exact ecosystem.html math). Spent = withdrawn onchain + still-in-bot.
+      let sbfInBotShroom = 0, sbfInBotSpore = 0, sbfWdShroom = 0, sbfWdSpore = 0;
+      if (item.sporebotFund && window._sporebotTotals) {
+        const t = window._sporebotTotals;
+        sbfWdShroom = t.withdrawn_shrooms || 0;
+        sbfWdSpore  = t.withdrawn_spores  || 0;
+        sbfInBotShroom = (t.grand_total_shrooms || 0) - sbfWdShroom;
+        sbfInBotSpore  = (t.grand_total_spores  || 0) - sbfWdSpore;
+        remShroom   = Math.max(0, item.baseShroom - sbfWdShroom - sbfInBotShroom);
+        remSpore    = Math.max(0, item.baseSpore  - sbfWdSpore  - sbfInBotSpore);
+        spentShroom = item.baseShroom - remShroom;
+        spentSpore  = item.baseSpore  - remSpore;
+      }
+
       const totalShroom = item.baseShroom;
       const totalSpore  = item.baseSpore;
 
@@ -1099,7 +1131,7 @@ async function loadSporebotTotals() {
 
       const fmtNum = v => v >= 1e9 ? (v/1e9).toFixed(2)+'B' : v >= 1e6 ? (v/1e6).toFixed(2)+'M' : v >= 1e3 ? (v/1e3).toFixed(2)+'K' : v.toFixed(0);
 
-      const shroomLine = item.sporeOnly ? '' :
+      const shroomLine = (item.sporeOnly || item.sporebotFund) ? '' :
         `<span style="color:rgba(253,70,79,0.7);">${fmtNum(remShroom)} SHROOM</span>`;
 
       const nftOffchainRemDisplay = item.key === 'sporebot'
@@ -1107,7 +1139,9 @@ async function loadSporebotTotals() {
         : 0;
       const inBotSporeDisplay = (item.key === 'sporebot' && window._sporebotTotals) ? window._sporebotTotals.grand_total_spores || 0 : 0;
       const govRemDisplay = Math.max(0, 15_000_000_000);
-      const sporeLine = item.key === 'sporebot'
+      const sporeLine = item.sporebotFund
+        ? `<span style="color:rgba(253,70,79,0.7);">${fmtNum(remShroom)} SHROOM rem</span><span style="color:rgba(79,168,253,0.7);">${fmtNum(remSpore)} SPORE rem</span><span style="color:rgba(34,197,94,0.7);cursor:pointer;" onclick="openSporebotModal()">Sporebot (view totals)</span>`
+        : item.key === 'sporebot'
         ? `<span style="color:rgba(79,168,253,0.7);">${fmtNum(remSpore)} SPORE</span><span style="color:rgba(168,85,247,0.7);">${fmtNum(nftOffchainRemDisplay)} NFT Pool</span><span style="color:rgba(192,132,252,0.7);">${fmtNum(govRemDisplay)} Gov</span><span style="color:rgba(34,197,94,0.7);cursor:pointer;" onclick="openSporebotModal()">Sporebot (view totals)</span>`
         : `<span style="color:rgba(79,168,253,0.7);">${fmtNum(remSpore)} SPORE</span>`;
 
@@ -1139,6 +1173,20 @@ async function loadSporebotTotals() {
         const sp = sporeSpentPct * 2;
         gradient = `linear-gradient(90deg, var(--blue) ${rp}%, rgba(255,255,255,0.12) ${rp}%, rgba(255,255,255,0.12) ${rp+sp}%, transparent ${rp+sp}%)`;
         totalPct = rp + sp;
+      } else if (item.sporebotFund) {
+        // 3-segment SHROOM-eq bar: Remaining | Still in-bot | Withdrawn onchain
+        const SBF_EQ = item.baseShroom + (item.baseSpore / 100);
+        const remEq  = remShroom      + (remSpore      / 100);
+        const inBotEq = sbfInBotShroom + (sbfInBotSpore / 100);
+        const wdEq    = sbfWdShroom    + (sbfWdSpore    / 100);
+        const rp = SBF_EQ > 0 ? (remEq   / SBF_EQ) * 100 : 0;
+        const ip = SBF_EQ > 0 ? (inBotEq / SBF_EQ) * 100 : 0;
+        const wp = SBF_EQ > 0 ? (wdEq    / SBF_EQ) * 100 : 0;
+        const p1 = rp;
+        const p2 = rp + ip;
+        const p3 = rp + ip + wp;
+        gradient = `linear-gradient(90deg, #22c55e ${p1}%, rgba(34,197,94,0.35) ${p1}%, rgba(34,197,94,0.35) ${p2}%, rgba(255,255,255,0.12) ${p2}%, rgba(255,255,255,0.12) ${p3}%, transparent ${p3}%)`;
+        totalPct = Math.min(100, p3);
       } else {
         const a = shroomRemPct - inBotShroomPct;
         const b = shroomRemPct;
@@ -1185,7 +1233,7 @@ async function loadSporebotTotals() {
         ? `<span style="color:var(--blue);">SPORE: ${sporeRemPctOfAlloc}%</span>`
         : `<span style="color:var(--red);">SHROOM: ${shroomRemPctOfAlloc}%</span> &nbsp;·&nbsp; <span style="color:var(--blue);">SPORE: ${sporeRemPctOfAlloc}%</span>`;
 
-      const isSporebot = item.key === 'sporebot';
+      const isSporebot = item.key === 'sporebot' || item.sporebotFund;
     c.insertAdjacentHTML('beforeend', `
         <div class="bar-item" style="position:relative;${isSporebot ? 'cursor:pointer;' : ''}">
           <div class="bar-meta">
@@ -1569,7 +1617,124 @@ async function loadSporebotTotals() {
   window.addEventListener('DOMContentLoaded', () => {
     buildCombinedBars('combined-bars', combinedBars, {});
     loadFeed();
+    loadSbfRemaining();
   });
+
+  // ---- Sporebot Wallet Remaining (mirrors ecosystem.html) ----
+
+  const SBF_INIT_SHROOM = 1500000000;
+  const SBF_INIT_SPORE  = 150000000000;
+  const SBF_INIT_EQ     = SBF_INIT_SHROOM + (SBF_INIT_SPORE / 100);
+  const SBF_HEALTH_FULL_EQ = SBF_INIT_EQ / 2;
+  let _sbfData = null, _sbfFlipped = false;
+
+  function sbfFmtN(v) { return Math.round(v).toLocaleString(); }
+  function sbfRender(showBreakdown) {
+    const el = document.getElementById('sbf-body');
+    if (!el) return;
+    if (!_sbfData) { el.textContent = 'Live balance unavailable right now.'; return; }
+    const d = _sbfData;
+    const line = (label, val, color, bold) =>
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.5rem;flex-wrap:wrap;padding:0.3rem 0;'
+      + (bold ? 'border-top:1px solid rgba(255,255,225,0.1);margin-top:0.25rem;padding-top:0.5rem;' : '')
+      + '"><span style="flex:1 1 auto;min-width:0;' + (bold ? 'font-weight:700;' : 'color:rgba(255,255,225,0.5);') + '">' + label + '</span>'
+      + '<span style="flex:0 1 auto;min-width:0;text-align:right;color:' + color + ';font-weight:' + (bold ? 700 : 600) + ';">' + val + '</span></div>';
+    const n = sbfFmtN;
+    const duo = (sh, sp) =>
+      '<span style="color:var(--red);">' + n(sh) + '</span>'
+      + '<span style="opacity:0.35;margin:0 0.35rem;">/</span><wbr>'
+      + '<span style="color:var(--blue);">' + n(sp) + '</span>';
+    const eqv = (sh, sp, eq) => duo(sh, sp) + '<wbr>'
+      + '<span style="opacity:0.3;margin:0 0.4rem;">=</span><wbr>'
+      + '<span style="color:#a78bfa;">' + n(eq) + '</span>';
+    if (!showBreakdown) {
+      if (!d.hasOnchain) { el.textContent = 'Onchain balance unavailable - breakdown still available via the button above.'; return; }
+      const tw = d.totals;
+      const wdSh = tw.withdrawn_shrooms || 0, wdSp = tw.withdrawn_spores || 0;
+      el.innerHTML =
+        line('Initial Sporebot Fund', eqv(SBF_INIT_SHROOM, SBF_INIT_SPORE, SBF_INIT_EQ), 'inherit')
+        + line('Less: Withdrawn Onchain', eqv(wdSh, wdSp, wdSh + wdSp / 100), 'inherit')
+        + line('Less: Still in Sporebot', eqv(d.oweShroom, d.oweSpore, d.oweShroom + d.oweSpore / 100), 'inherit')
+        + line('Remaining', eqv(d.remShroom, d.remSpore, d.remShroom + d.remSpore / 100), 'inherit', true)
+        + (d.remShroom < 0 || d.remSpore < 0
+          ? '<div style="font-size:0.65rem;color:var(--red);padding-top:0.3rem;">Wallets hold less than in-bot obligations - top up needed.</div>' : '');
+    } else {
+      const t = d.totals;
+      const grandEq = (t.grand_total_shrooms || 0) + (t.grand_total_spores || 0) / 100;
+      const inBotShroom = (t.grand_total_shrooms || 0) - (t.withdrawn_shrooms || 0);
+      const inBotSpore  = (t.grand_total_spores  || 0) - (t.withdrawn_spores  || 0);
+      const inBotEq = inBotShroom + inBotSpore / 100;
+      const wdEq    = (t.withdrawn_shrooms || 0) + (t.withdrawn_spores || 0) / 100;
+      el.innerHTML =
+        line('Farm Balances', duo(t.farm_shrooms || 0, t.farm_spores || 0), 'inherit')
+        + line('Discord Wallets', duo(t.discord_shroom_wallet || 0, t.discord_spore_wallet || 0), 'inherit')
+        + line('Reddit Balances', duo(t.reddit_shrooms || 0, t.reddit_spores || 0), 'inherit')
+        + line('Staked Spores', n(t.staked_spores || 0), 'var(--blue)')
+        + line('Still in Sporebot', eqv(inBotShroom, inBotSpore, inBotEq), 'inherit', true)
+        + line('Withdrawn Onchain', eqv(t.withdrawn_shrooms || 0, t.withdrawn_spores || 0, wdEq), 'inherit')
+        + line('Grand Total (all-time)', n(grandEq), '#a78bfa', true)
+        + '<div style="font-size:0.6rem;color:rgba(255,255,225,0.3);padding-top:0.3rem;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;">'
+        + '<span><span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; <span style="color:#a78bfa;">100 SPORE = 1 SHROOM</span></span>'
+        + '<span>' + (t.timestamp ? 'Last updated: ' + new Date(t.timestamp).toLocaleString() : '') + '</span></div>';
+    }
+  }
+  function sbfLegend() {
+    const lg = document.getElementById('sbf-legend');
+    if (!lg || !_sbfData) return;
+    const t = _sbfData.totals;
+    lg.style.cssText = 'font-size:0.6rem;color:rgba(255,255,225,0.3);padding-top:0.4rem;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;';
+    lg.innerHTML = '<span><span style="color:var(--red);">SHROOM</span> / <span style="color:var(--blue);">SPORE</span> &middot; <span style="color:#a78bfa;">100 SPORE = 1 SHROOM</span></span>'
+      + '<span>' + (t.timestamp ? 'Last updated: ' + new Date(t.timestamp).toLocaleString() : '') + '</span>';
+  }
+  async function sbfFetch(url, tag) {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) { console.error('[SBF] ' + tag + ' HTTP ' + r.status); return null; }
+      const j = await r.json();
+      if (!j.ok) { console.error('[SBF] ' + tag + ' ok:false'); return null; }
+      return j;
+    } catch (e) { console.error('[SBF] ' + tag + ' failed:', e); return null; }
+  }
+  async function loadSbfRemaining() {
+    const el = document.getElementById('sbf-body');
+    if (!el) return;
+    const [h, t, dn] = await Promise.all([
+      sbfFetch(window.API_BASE + '/api/treasury-holdings', 'holdings'),
+      sbfFetch(window.API_BASE + '/api/sporebot-totals', 'totals'),
+      sbfFetch(window.API_BASE + '/api/ecosystem/donors', 'donors'),
+    ]);
+    if (!t) { el.textContent = 'Live balance unavailable right now.'; return; }
+    const donShroom = (dn && dn.totals) ? dn.totals.shroom : 0;
+    const donSpore  = (dn && dn.totals) ? dn.totals.spore  : 0;
+    const oweShroom = (t.totals.grand_total_shrooms || 0) - (t.totals.withdrawn_shrooms || 0);
+    const oweSpore  = (t.totals.grand_total_spores  || 0) - (t.totals.withdrawn_spores  || 0);
+    _sbfData = {
+      hasOnchain: !!h,
+      oweShroom, oweSpore,
+      remShroom: h ? SBF_TEMP_SHROOM + (h.wallet2_shroom || 0) + (h.sporebot_shroom || 0) + donShroom - oweShroom : 0,
+      remSpore:  h ? SBF_TEMP_SPORE  + (h.wallet2_spore  || 0) + (h.sporebot_spore  || 0) + donSpore  - oweSpore  : 0,
+      totals: t.totals,
+    };
+    sbfRender(_sbfFlipped);
+    sbfLegend();
+    const pctEl = document.getElementById('sbf-pct');
+    if (pctEl && _sbfData.remShroom >= 0 && _sbfData.remSpore >= 0) {
+      const remEq = _sbfData.remShroom + _sbfData.remSpore / 100;
+      const pct = Math.max(0, Math.min(200, Math.round((remEq / SBF_HEALTH_FULL_EQ) * 100)));
+      pctEl.textContent = ' ' + (pct / 2).toFixed(1) + '% of the launch supply is still unspent.';
+    }
+    const flip = document.getElementById('sbf-flip');
+    if (flip && !flip._wired) {
+      flip._wired = true;
+      flip.addEventListener('click', function() {
+        _sbfFlipped = !_sbfFlipped;
+        this.textContent = _sbfFlipped ? 'Show remaining' : 'Breakdown';
+        document.getElementById('sbf-note').style.display = _sbfFlipped ? 'none' : '';
+        sbfRender(_sbfFlipped);
+        sbfLegend();
+      });
+    }
+  }
 
   function applyAndRender() {
     _filtered  = _dir === 'all' ? _raw : _raw.filter(b => {
@@ -1625,6 +1790,7 @@ async function loadSporebotTotals() {
     { symbol: 'WETH',   contract: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', color: '#9b8cff',     decimals: 18 },
     { symbol: 'POL',    contract: null,                                           color: '#8247e5',     decimals: 18 },
     { symbol: 'WBTC',   contract: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6', color: '#f7931a',     decimals: 8  },
+    { symbol: 'USDC',   contract: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359', color: '#2775ca',     decimals: 6  },
   ];
   const TREAS = '0x5873002348cd4df2abd2624a6fc30e90573019f5';
   const POLY_RPC = 'https://rpc.ankr.com/polygon';
@@ -1644,12 +1810,13 @@ async function loadSporebotTotals() {
   }
   function fmtBal(val, sym) {
     if (sym === 'WBTC') return val.toFixed(4) + ' ' + sym;
+    if (sym === 'USDC') return val.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' ' + sym;
     if (val >= 1e9) return (val/1e9).toFixed(3) + 'B ' + sym;
     if (val >= 1e6) return (val/1e6).toFixed(2) + 'M ' + sym;
     if (val >= 1e3) return (val/1e3).toFixed(2) + 'K ' + sym;
     return val.toFixed(2) + ' ' + sym;
   }
-  const HOLDINGS_COLORS = { '$HROOM': 'var(--red)', 'SPORE': 'var(--blue)', 'WETH': '#9b8cff', 'WBTC': '#f7931a', 'POL': '#8247e5' };
+  const HOLDINGS_COLORS = { '$HROOM': 'var(--red)', 'SPORE': 'var(--blue)', 'WETH': '#9b8cff', 'WBTC': '#f7931a', 'POL': '#8247e5', 'USDC': '#2775ca' };
 
   async function loadHoldings() {
     const grid = document.getElementById('holdings-grid');
@@ -1659,6 +1826,8 @@ async function loadSporebotTotals() {
       if (!data.ok) throw new Error('bad response');
       grid.innerHTML = '';
       data.balances.forEach(t => {
+        // Hide USDC and WBTC cards when their balance is zero
+        if ((t.symbol === 'USDC' || t.symbol === 'WBTC') && (!t.balance || t.balance <= 0)) return;
         const color   = HOLDINGS_COLORS[t.symbol] || 'var(--cream)';
         const display = fmtBal(t.balance, '');
         // Update live SHROOM treasury stat if present
@@ -1722,7 +1891,6 @@ async function loadSporebotTotals() {
 
   async function loadLPHoldings() {
     const lpGrid    = document.getElementById('lp-grid');
-    const sbGrid    = document.getElementById('sporebot-grid');
     try {
       const res  = await fetch(`${window.API_BASE}/api/lp-holdings`);
       const data = await res.json();
@@ -1754,21 +1922,8 @@ async function loadSporebotTotals() {
           </a>`);
       });
 
-      // Sporebot wallet
-      sbGrid.innerHTML = '';
-      const sbc = HOLDINGS_COLORS['$HROOM'] || 'var(--red)';
-      sbGrid.insertAdjacentHTML('beforeend', `
-        <a href="https://polygonscan.com/address/0xa00C9a4c1F40cdB30105E1402dD4c0ac7048863A" target="_blank" style="text-decoration:none;display:contents;">
-          <div class="tl-token-card" style="cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,225,0.18)'" onmouseout="this.style.borderColor='rgba(255,255,225,0.05)'">
-            <div class="tl-label">Sporebot Wallet</div>
-            <div class="tl-val" style="color:${sbc};">${fmtBal(data.sporebot_shroom, '')}</div>
-            <div class="tl-val" style="color:var(--blue);">${fmtBal(data.sporebot_spore, '')}</div>
-          </div>
-        </a>`);
-
     } catch {
       lpGrid.innerHTML    = '<div class="tx-loading">Failed to load LP data.</div>';
-      sbGrid.innerHTML    = '<div class="tx-loading">Failed to load.</div>';
     }
   }
 

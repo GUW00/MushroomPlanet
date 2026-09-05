@@ -805,11 +805,11 @@
       </h2>
       <div id="sgr-view">
       <p class="sgr-intro">
-        Your <strong>Spore Generation Rate (SGR)</strong> is built from four in-game sources, each worth up to
-        <strong>25%</strong>, for a base rate of up to <strong>100%</strong>. The mushroom's health above is applied
-        on top as a multiplier on everything you've earned. Your <strong>off-chain SGR</strong> is NOT affected about this.
+        Your <strong>Spore Generation Rate (SGR)</strong> is built from six in-game sources for a base
+        rate of up to <strong>75%</strong>. The mushroom's health above is applied on top as a multiplier
+        on everything you've earned in-game. Your <strong>on-chain bonuses</strong> are NOT affected by this.
       </p>
-      <div class="sgr-sources">
+      <div class="sgr-sources" style="grid-template-columns:repeat(3,1fr);">
         <div class="sgr-tile">
           <input type="number" class="sgr-tile-input" id="sgr-stage" min="0" max="25" step="0.1" value="0" style="color:var(--red);" />
           <div class="sgr-tile-cap">/ 25%</div>
@@ -821,16 +821,30 @@
           <div class="sgr-tile-label">Rank Bonus</div>
         </div>
         <div class="sgr-tile">
-          <input type="number" class="sgr-tile-input" id="sgr-gem" min="0" max="25" step="0.1" value="0" style="color:#a78bfa;" />
-          <div class="sgr-tile-cap">/ 25%</div>
-          <div class="sgr-tile-label">Gemstones</div>
+          <input type="number" class="sgr-tile-input" id="sgr-potion" min="0" max="10" step="0.1" value="0" style="color:#8fd15a;" />
+          <div class="sgr-tile-cap">/ 10%</div>
+          <div class="sgr-tile-label">Potion</div>
         </div>
         <div class="sgr-tile">
-          <input type="number" class="sgr-tile-input" id="sgr-sporebot" min="0" max="25" step="0.1" value="0" style="color:var(--blue);" />
-          <div class="sgr-tile-cap">/ 25%</div>
-          <div class="sgr-tile-label">In-Game Sporebot</div>
+          <input type="number" class="sgr-tile-input" id="sgr-skilltree" min="0" max="5" step="0.1" value="0" style="color:var(--blue);" />
+          <div class="sgr-tile-cap">/ 5%</div>
+          <div class="sgr-tile-label">Skill Tree</div>
+        </div>
+        <div class="sgr-tile">
+          <input type="number" class="sgr-tile-input" id="sgr-gem" min="0" max="5" step="0.1" value="0" style="color:#a78bfa;" />
+          <div class="sgr-tile-cap">/ 5%</div>
+          <div class="sgr-tile-label">Gemstone</div>
+        </div>
+        <div class="sgr-tile">
+          <input type="number" class="sgr-tile-input" id="sgr-gs" min="0" max="5" step="0.1" value="0" style="color:var(--gold);" />
+          <div class="sgr-tile-cap">/ 5%</div>
+          <div class="sgr-tile-label">Golden Sporulation</div>
         </div>
       </div>
+      <div class="sgr-total-row" style="margin:1.25rem 0 0.75rem;border:none;padding:0;color:rgba(255,255,225,0.35);">
+        <span>On-chain bonuses (always full rate, no cap)</span>
+      </div>
+      <div class="sgr-sources" id="sgr-onchain-tiles" style="grid-template-columns:repeat(3,1fr);"></div>
       <div class="sgr-source-hint">Log in on the Profile page to load your real numbers automatically.</div>
 
       <div class="sgr-total-row">
@@ -1096,7 +1110,15 @@
     });
   }
 
-  const SGR_SOURCE_IDS = ['sgr-stage', 'sgr-rank', 'sgr-gem', 'sgr-sporebot'];
+  const SGR_SOURCE_IDS = ['sgr-stage', 'sgr-rank', 'sgr-potion', 'sgr-skilltree', 'sgr-gem', 'sgr-gs'];
+  const SGR_SOURCE_CAPS = { 'sgr-stage':25, 'sgr-rank':25, 'sgr-potion':10, 'sgr-skilltree':5, 'sgr-gem':5, 'sgr-gs':5 };
+  const SGR_ONCHAIN = [
+    { key: 'sporebot_bonus',      label: 'NFT Sporebot',  color: 'var(--red)' },
+    { key: 'lp_bonus',            label: 'LP Bonus',      color: 'var(--yellow)' },
+    { key: 'guwoo_bonus',         label: 'Guwoo',         color: '#8fd15a' },
+    { key: 'mooshie_bonus',       label: 'LP NFTs',       color: 'var(--blue)' },
+    { key: 'onchain_spore_bonus', label: 'On-Chain SPORE',color: '#a78bfa' },
+  ];
 
   function getEarnedSgr() {
     let total = 0;
@@ -1104,11 +1126,12 @@
       const el = document.getElementById(id);
       let v = parseFloat(el.value);
       if (isNaN(v) || v < 0) v = 0;
-      if (v > 25) { v = 25; el.value = v; }
+      const cap = SGR_SOURCE_CAPS[id] || 25;
+      if (v > cap) { v = cap; el.value = v; }
       total += v;
     });
-    if (profileTotalSgr !== null) return profileTotalSgr; // real full APY from profile
-    return Math.min(100, total);
+    // "Earned" = in-game tiles (capped 75) + on-chain bonuses (always full)
+    return Math.min(75, total) + (profileTotalSgr !== null ? profileOnchainSgr : 0);
   }
   let profileTotalSgr = null;
   let profileOnchainSgr = 0; // portion NOT affected by treasury health
@@ -1117,11 +1140,13 @@
     const earned = getEarnedSgr();
     const multiplier = pct / 100;
     const onchain = profileTotalSgr !== null ? profileOnchainSgr : 0;
-    const ingame = Math.max(0, earned - onchain);
+    const ingame = Math.max(0, earned - onchain); // = capped tile sum
     const effective = (ingame * multiplier) + onchain; // health only affects in-game
     const delta = effective - earned;
 
-    document.getElementById('sgr-total-val').textContent = earned.toFixed(1) + '%';
+    const ocTotal = (profileTotalSgr !== null ? profileOnchainSgr : 0);
+    document.getElementById('sgr-total-val').textContent = earned.toFixed(1) + '%'
+      + (ocTotal > 0 ? ' (' + Math.max(0, earned - ocTotal).toFixed(1) + '% in-game + ' + ocTotal.toFixed(1) + '% on-chain)' : '');
     document.getElementById('sgr-health-echo').textContent = pct + '%';
     document.getElementById('sgr-effective').textContent = effective.toFixed(1) + '%';
     document.getElementById('sgr-effective').style.setProperty('--stage-color', stageFor(pct).color);
@@ -1193,19 +1218,30 @@
       const farm = (d.sporebot || {}).Farm || {};
       const b = farm.APY_Breakdown || {};
       if (!Object.keys(b).length) return;
-      const gems = (b.collector_bonus||0) + (b.rootsong_bonus||0) + (b.sunspore_bonus||0) + (b.brewing_bonus||0);
-      document.getElementById('sgr-stage').value    = (b.stage_bonus||0).toFixed(1);
-      document.getElementById('sgr-rank').value     = (b.rank_bonus||0).toFixed(1);
-      document.getElementById('sgr-gem').value      = gems.toFixed(1);
-      document.getElementById('sgr-sporebot').value = (b.ingame_sporebot_bonus||0).toFixed(1);
+      const gems = (b.sunspore_bonus||0) + (b.rootsong_bonus||0);
+      document.getElementById('sgr-stage').value     = (b.stage_bonus||0).toFixed(1);
+      document.getElementById('sgr-rank').value      = (b.rank_bonus||0).toFixed(1);
+      document.getElementById('sgr-potion').value    = (b.potion_bonus||0).toFixed(1);
+      document.getElementById('sgr-skilltree').value = (b.skilltree_spore_bonus||0).toFixed(1);
+      document.getElementById('sgr-gem').value       = gems.toFixed(1);
+      document.getElementById('sgr-gs').value        = (b.gs_spore_bonus||0).toFixed(1);
       profileTotalSgr = Math.round((farm.APY || 0) * 100);
       // On-chain bonuses are immune to treasury health. lake_bonus is already
       // inside mooshie_bonus, so it is NOT added here (would double-count).
       profileOnchainSgr = (b.sporebot_bonus||0) + (b.lp_bonus||0) + (b.guwoo_bonus||0)
         + (b.mooshie_bonus||0) + (b.onchain_spore_bonus||0);
+      const ocWrap = document.getElementById('sgr-onchain-tiles');
+      if (ocWrap) ocWrap.innerHTML = SGR_ONCHAIN.map(s =>
+        '<div class="sgr-tile"><div class="sgr-tile-input" style="color:' + s.color + ';">'
+        + (b[s.key]||0).toFixed(1) + '</div><div class="sgr-tile-cap">on-chain</div>'
+        + '<div class="sgr-tile-label">' + s.label + '</div></div>').join('');
+      const tileSum = Math.min(75,
+        (b.stage_bonus||0) + (b.rank_bonus||0) + (b.potion_bonus||0)
+        + (b.skilltree_spore_bonus||0) + (b.sunspore_bonus||0) + (b.rootsong_bonus||0)
+        + (b.gs_spore_bonus||0));
       const hint = document.querySelector('.sgr-source-hint');
       if (hint) hint.textContent = 'Loaded from your profile: '
-        + (profileTotalSgr - profileOnchainSgr).toFixed(1) + '% in-game (affected by health) + '
+        + tileSum.toFixed(1) + '% in-game (affected by health) + '
         + profileOnchainSgr.toFixed(1) + '% on-chain (always full rate).';
       updateSgrCalc(currentPct);
     } catch (e) { console.error('[SGR profile]', e); }
