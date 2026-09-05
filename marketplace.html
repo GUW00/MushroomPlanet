@@ -235,7 +235,7 @@
     const DISCORD_ID = user.discord_id || null;
 
     // Test mode: let the test user buy their own listings
-    const MARKETPLACE_TEST_MODE = true;
+    const MARKETPLACE_TEST_MODE = false;
     const MARKETPLACE_TEST_ID   = '1233612802883719261'; // same ID as server.js
     const allowSelfBuy = MARKETPLACE_TEST_MODE && String(DISCORD_ID) === String(MARKETPLACE_TEST_ID);
 
