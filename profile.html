@@ -3254,7 +3254,7 @@ async function doBrew() {
         + '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">'
         + '<img src="' + pImg + '" style="width:24px;height:24px;object-fit:contain;" onerror="this.style.display=\'none\'">'
         + '<span style="font-family:Space Grotesk,sans-serif;font-size:0.9rem;font-weight:700;color:var(--purple);">' + (p.name||'Potion') + '</span>'
-        + '<span style="font-family:Space Grotesk,monospace;font-size:0.7rem;color:rgba(255,255,225,0.4);">' + (p['Potion Score'] != null ? Number(p['Potion Score']).toFixed(2) : '?') + '/10</span>'
+        + '<span style="font-family:Space Grotesk,monospace;font-size:0.7rem;color:rgba(255,255,225,0.4);">' + (p['Potion Score'] != null ? Number(p['Potion Score']).toFixed(2) : '?') + '</span>'
         + '</div>'
         + '<div style="margin-top:0.25rem;">' + statLines + '</div>'
         + (data.leveled_up ? '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:var(--yellow);margin-top:0.35rem;">Brewing Level Up! Now Lv.' + data.brewing_level + '</div>' : '')
@@ -3319,7 +3319,7 @@ async function doBrewWithIngredients(ings) {
       toast.innerHTML = '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">'
         + '<img src="'+pImg+'" style="width:24px;height:24px;object-fit:contain;" onerror="this.style.display=\'none\'">'
         + '<span style="font-size:0.9rem;font-weight:700;color:var(--purple);">'+cleanEmoji(p.name||'Potion')+'</span>'
-        + '<span style="font-size:0.7rem;color:rgba(255,255,225,0.4);">'+(p['Potion Score']!=null?Number(p['Potion Score']).toFixed(2):'?')+'/10</span>'
+        + '<span style="font-size:0.7rem;color:rgba(255,255,225,0.4);">'+(p['Potion Score']!=null?Number(p['Potion Score']).toFixed(2):'?')+'</span>'
         + '</div>' + statLines
         + (data.leveled_up ? '<div style="color:var(--yellow);margin-top:0.35rem;font-size:0.65rem;">Brewing Level Up! Now Lv.'+data.brewing_level+'</div>' : '')
         + '<div style="color:rgba(255,255,225,0.25);font-size:0.6rem;margin-top:0.25rem;">+'+data.xp_gain+' XP | Slot saved</div>';
@@ -3426,7 +3426,7 @@ function togglePotionSlot(safeKey) {
   detail.innerHTML = '<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">'
     + '<img src="'+pImg+'" style="width:36px;height:36px;object-fit:contain;" onerror="this.src=\'/images/potion2.png\'">'
     + '<div><div style="font-family:Space Grotesk,sans-serif;font-size:0.85rem;font-weight:700;color:var(--purple);">'+cleanEmoji(v.name||'Potion')+'</div>'
-    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.35);">Score: '+score+'/10</div></div></div>'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.35);">Score: '+score+'</div></div></div>'
     + stats
     + '<div style="display:flex;gap:0.5rem;margin-top:0.75rem;">'+activateBtn2+discardBtn2+'</div>';
 }
@@ -7432,7 +7432,7 @@ function renderBrewing(s) {
       + '<img src="' + potionImgSrc + '" style="width:28px;height:28px;object-fit:contain;" onerror="this.src=\'/images/potion2.png\'">'
       + '<span style="font-size:0.9rem;font-weight:600;color:var(--purple);">' + cleanEmoji(active.name||'Unknown') + '</span>'
       + '</span>'
-      + (active['Potion Score'] ? '<span class="dr-val" style="color:rgba(255,255,225,0.4);">' + Number(active['Potion Score']).toFixed(2) + '/10</span>' : '')
+      + (active['Potion Score'] ? '<span class="dr-val" style="color:rgba(255,255,225,0.4);">' + Number(active['Potion Score']).toFixed(2) + '</span>' : '')
       + '</div>';
     Object.entries(active).filter(([k])=>!['name','emoji','Potion Score','Potion_Score'].includes(k)).forEach(([k,v])=>{
       const statLabel = k.replace(/_/g,' ');
@@ -7665,7 +7665,7 @@ function renderShopQuests(s, p) {
         hasSunspore ? 'Gemstone owned (+5% SGR)' : 'Herbology Level ' + herbLvl + ' / 100 - reach Lv.100 to unlock',
         herbPct, 'var(--yellow)', hasSunspore)
     + questBlock(img('spirit_gemstone.png'), 'Spirit Gemstone',
-        hasSpirit ? 'Gemstone owned (+5% SGR)' : 'Best stored potion score: ' + bestScore.toFixed(2) + ' / 10',
+        hasSpirit ? 'Gemstone owned (+5% SGR)' : 'Best stored potion score: ' + bestScore.toFixed(2),
         spiritPct, 'var(--purple)', hasSpirit);
 }
 

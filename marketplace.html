@@ -245,6 +245,7 @@
 
     let sporeBalance = 0;
     let pendingSlotKey = null;
+    let browseSort = 'price-asc';
 
     // ---- helpers ----
     function fmt(n) { return Number(n || 0).toLocaleString(); }
@@ -318,9 +319,23 @@
         el.innerHTML = '<div class="empty"><img src="/images/potion.png" onerror="this.style.display=\'none\'"><div>No potions listed right now. Be the first to sell!</div></div>';
         return;
       }
-      // cheapest first
-      listings.sort((a, b) => (a.price || 0) - (b.price || 0));
-      el.innerHTML = '<div class="mkt-grid">' + listings.map(l => {
+      const sorters = {
+        'price-asc':   (a, b) => (a.price || 0) - (b.price || 0),
+        'price-desc':  (a, b) => (b.price || 0) - (a.price || 0),
+        'score-desc':  (a, b) => ((b.potion || {})['Potion Score'] || 0) - ((a.potion || {})['Potion Score'] || 0),
+        'score-asc':   (a, b) => ((a.potion || {})['Potion Score'] || 0) - ((b.potion || {})['Potion Score'] || 0),
+      };
+      listings.sort(sorters[browseSort] || sorters['price-asc']);
+      const sortBar = '<div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">'
+        + '<select id="browse-sort" onchange="setBrowseSort(this.value)" '
+        + 'style="background:var(--dark3);border:1px solid rgba(255,255,225,0.12);border-radius:999px;'
+        + 'padding:0.5rem 1rem;color:var(--cream);font-family:monospace;font-size:0.72rem;cursor:pointer;">'
+        + '<option value="price-asc"' + (browseSort==='price-asc'?' selected':'') + '>Price: Low to High</option>'
+        + '<option value="price-desc"' + (browseSort==='price-desc'?' selected':'') + '>Price: High to Low</option>'
+        + '<option value="score-desc"' + (browseSort==='score-desc'?' selected':'') + '>Score: High to Low</option>'
+        + '<option value="score-asc"' + (browseSort==='score-asc'?' selected':'') + '>Score: Low to High</option>'
+        + '</select></div>';
+      el.innerHTML = sortBar + '<div class="mkt-grid">' + listings.map(l => {
         const p = l.potion || {};
         const mine = DISCORD_ID && String(l.seller_id) === String(DISCORD_ID);
         const canAfford = sporeBalance >= (l.price || 0);
@@ -539,6 +554,7 @@
     };
 
     // ---- tabs ----
+    window.setBrowseSort = function(v) { browseSort = v; loadBrowse(); };
     window.showTab = function(id, btn) {
       document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
