@@ -240,7 +240,7 @@
     const allowSelfBuy = MARKETPLACE_TEST_MODE && String(DISCORD_ID) === String(MARKETPLACE_TEST_ID);
 
     // Non-stat keys we never render as potion stats
-    const NON_STAT = new Set(['name','emoji','Potion_Score','Potion Score',]);
+    const NON_STAT = new Set(['name','emoji','Potion_Score','Potion Score','version']);
     const COUNT_STATS = new Set(['Extra_Brews','Extra Brews','Plant_Limit','Plant Limit']);
 
     let sporeBalance = 0;

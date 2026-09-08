@@ -794,7 +794,7 @@
         <button class="tab" onclick="switchTab('sporebots',this)"><img src="/images/sporebot_helper.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">SporeBots</button>
         <button class="tab" onclick="switchTab('companion',this)"><img src="/images/animals.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Companion</button>
         <button class="tab" onclick="switchTab('inventory',this)"><img src="/images/backpack1.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Inventory</button>
-        <button class="tab" onclick="switchTab('pixie',this)"><img src="/images/pixie.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Pixie XP</button>
+        <button class="tab" onclick="switchTab('pixie',this)"><img src="/images/pixie.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">XP</button>
         
       </div>
 
@@ -915,9 +915,14 @@
                 <option value="Queen Totem Chance">Queen Totem</option>
                 <option value="King Totem Chance">King Totem</option>
                 <option value="Gold Totem Chance">Gold Totem</option>
+                <option value="Bond Speed">Bond Speed</option>
+                <option value="Stage Speed">Stage Speed</option>
                 <option value="Herb Find Rate">Herb Rate</option>
-                <option value="Rare Herb Chance">Rare Herb</option>
                 <option value="Double Herb Chance">Double Herb</option>
+                <option value="Gem Find Rate">Gem Rate</option>
+                <option value="Double Gem Chance">Double Gem</option>
+                <option value="Voidspore Chance">Voidspore</option>
+                <option value="Voidgem Chance">Voidgem</option>
                 <option value="Extra Brews">Extra Brews</option>
               </select>
             </div>
@@ -994,17 +999,44 @@
 
       <!-- INVENTORY TAB -->
       <div class="tab-panel reveal" id="tab-inventory">
-        <div class="info-card">
-          <div class="card-title"><img src="/images/backpack1.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Items</div>
-          <div id="items-content"><div class="empty-hint">No items yet.</div></div>
+        <!-- Sub-tab nav -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.4rem;margin-bottom:1rem;">
+          <button class="inv-sub-tab active" onclick="invSubTab('items',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.6rem 0.25rem;border-radius:12px;border:1px solid rgba(254,206,0,0.45);background:rgba(254,206,0,0.12);color:rgba(254,206,0,0.95);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+            <img src="/images/backpack1.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
+            Items
+          </button>
+          <button class="inv-sub-tab" onclick="invSubTab('herbs',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.6rem 0.25rem;border-radius:12px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,225,0.45);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+            <img src="/images/herbs.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
+            Herbs
+          </button>
+          <button class="inv-sub-tab" onclick="invSubTab('gems',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.72rem;font-weight:700;padding:0.6rem 0.25rem;border-radius:12px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,225,0.45);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+            <img src="/images/gemstones.png" style="width:20px;height:20px;object-fit:contain;" onerror="this.style.display='none'">
+            Gems
+          </button>
         </div>
-        <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><img src="/images/gemstones.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Cave Gems</div>
-          <div class="gem-row" id="gems-content"></div>
+
+        <!-- Items sub-panel -->
+        <div id="inv-sub-items">
+          <div class="info-card">
+            <div class="card-title"><img src="/images/backpack1.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Items</div>
+            <div id="items-content"><div class="empty-hint">No items yet.</div></div>
+          </div>
         </div>
-        <div class="info-card" style="margin-top:1rem;">
-          <div class="card-title"><img src="/images/artifacts.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Artifacts & Scrolls <img src="/images/scroll.png" style="width:14px;height:14px;object-fit:contain;margin-left:2px;" onerror="this.style.display='none'"></div>
-          <div id="artifacts-content"><div class="empty-hint">None found yet. Use !explore to discover.</div></div>
+
+        <!-- Herbs sub-panel -->
+        <div id="inv-sub-herbs" style="display:none;">
+          <div class="info-card">
+            <div class="card-title"><img src="/images/herbs.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Herbs</div>
+            <div id="inv-herbs-content"><div class="empty-hint">No herbs yet. Use !gather to collect some.</div></div>
+          </div>
+        </div>
+
+        <!-- Gems sub-panel -->
+        <div id="inv-sub-gems" style="display:none;">
+          <div class="info-card">
+            <div class="card-title"><img src="/images/gemstones.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Cave Gems</div>
+            <div id="inv-gems-content"><div class="empty-hint">No gems yet. Use !cave to dig some up.</div></div>
+          </div>
         </div>
       </div>
 
@@ -1069,6 +1101,14 @@
       </div>
       <div class="tab-panel reveal" id="tab-pixie">
         <div class="info-card">
+          <div class="card-title"><img src="/images/sporebot.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> In-Game XP</div>
+          <div id="game-xp-content"><div class="empty-hint">Loading...</div></div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
+          <div class="card-title"><img src="/images/xp.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Community XP Breakdown</div>
+          <div id="pixie-xp-bd-content"><div class="empty-hint">Loading...</div></div>
+        </div>
+        <div class="info-card" style="margin-top:1rem;">
           <div class="card-title"><img src="/images/pixie.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Pixie Stats</div>
           <div class="data-grid force-2col" style="grid-template-columns:1fr 1fr;">
             <div>
@@ -1125,6 +1165,25 @@
 
     <!-- STATS TAB -->
       <div class="tab-panel reveal" id="tab-stats">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem;">
+          <button class="stats-sub-tab active" onclick="statsSubTab('stats',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;font-weight:700;padding:0.65rem 0.5rem;border-radius:12px;border:1px solid rgba(254,206,0,0.45);background:rgba(254,206,0,0.12);color:rgba(254,206,0,0.95);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+            <img src="/images/stats.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">
+            Stats
+          </button>
+          <button class="stats-sub-tab" onclick="statsSubTab('skilltree',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;font-weight:700;padding:0.65rem 0.5rem;border-radius:12px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,225,0.45);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+            <img src="/images/sporebot.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">
+            Skill Tree
+          </button>
+        </div>
+
+        <div id="stats-sub-skilltree" style="display:none;">
+          <div class="info-card">
+            <div class="card-title"><img src="/images/sporebot.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Sporebot Skill Tree</div>
+            <div id="skilltree-content"><div class="empty-hint">Loading...</div></div>
+          </div>
+        </div>
+
+        <div id="stats-sub-stats">
         <div class="info-card">
           <div class="card-title"><img src="/images/shroomfarm.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Farm Bonuses</div>
           <div id="stats-farm-content"><div class="empty-hint">Loading...</div></div>
@@ -1137,6 +1196,7 @@
           <div class="card-title"><img src="/images/spore.png" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"> Wallet Overview</div>
           <div id="stats-wallet-content"><div class="empty-hint">Loading...</div></div>
         </div>
+        </div><!-- /stats-sub-stats -->
       </div>
     </div><!-- /panel-discord -->
 
@@ -3228,7 +3288,7 @@ async function doBrew() {
       var potionId = (p.emoji||'').match(/:potion(\d+):/)?.[1];
       var pImg = (potionId && parseInt(potionId) < 100) ? '/images/potion' + potionId + '.png' : '/images/potion2.png';
       var noPercent2 = ['Extra Brews','Extra_Brews','Plant Limit','Plant_Limit'];
-      var statLines = Object.entries(p).filter(function(e){ return !['name','emoji','Potion Score','Potion_Score'].includes(e[0]); })
+      var statLines = Object.entries(p).filter(function(e){ return !['name','emoji','Potion Score','Potion_Score','version','Version'].includes(e[0]); })
         .map(function(e){
           var sl = e[0].replace(/_/g,' ');
           var sv = typeof e[1]==='number' ? (noPercent2.includes(e[0]) ? e[1].toLocaleString() : e[1]+'%') : e[1];
@@ -3305,7 +3365,7 @@ async function doBrewWithIngredients(ings) {
       var potionId = (p.emoji||'').match(/:potion(\d+):/)?.[1];
       var pImg = potionId ? '/images/potion'+potionId+'.png' : '/images/potion2.png';
       var noPercentB = ['Extra Brews','Extra_Brews','Plant Limit','Plant_Limit'];
-      var statLines = Object.entries(p).filter(function(e){ return !['name','emoji','Potion Score','Potion_Score'].includes(e[0]); })
+      var statLines = Object.entries(p).filter(function(e){ return !['name','emoji','Potion Score','Potion_Score','version','Version'].includes(e[0]); })
         .map(function(e){
           var sl = e[0].replace(/_/g,' ');
           var sv = typeof e[1]==='number' ? (noPercentB.includes(e[0]) ? e[1].toLocaleString() : e[1]+'%') : e[1];
@@ -3416,7 +3476,7 @@ function togglePotionSlot(safeKey) {
   var score = v['Potion Score'] != null ? Number(v['Potion Score']).toFixed(2) : '?';
   var potionId = (v.emoji||'').match(/:potion(\d+):/)?.[1]||(v.emoji||'').match(/:(\d+)>/)?.[1];
   var pImg = potionId ? '/images/potion'+potionId+'.png' : '/images/potion2.png';
-  var stats = Object.entries(v).filter(([sk])=>!['name','emoji','Potion Score','Potion_Score'].includes(sk))
+  var stats = Object.entries(v).filter(([sk])=>!['name','emoji','Potion Score','Potion_Score','version','Version'].includes(sk))
     .map(([sk,val])=>{const sl=sk.replace(/_/g,' ');return '<div class="data-row" style="padding:0.3rem 0;"><span class="dr-label" style="font-size:0.75rem;">'+(STAT_EMOJI[sl]||STAT_EMOJI[sk]||'')+sl+'</span><span class="dr-val g" style="font-size:0.75rem;">'+(typeof val==='number'?val+(sl.includes('Limit')||sl.includes('Brews')?'':'%'):val)+'</span></div>';}).join('');
   var activateBtn2 = potionCdRemaining2
     ? '<button disabled style="flex:1;font-family:Space Grotesk,sans-serif;font-size:0.7rem;padding:0.5rem;border-radius:0.75rem;border:1px solid rgba(253,70,79,0.2);background:none;color:rgba(253,70,79,0.5);cursor:not-allowed;">CD: '+potionCdRemaining2+'</button>'
@@ -5211,27 +5271,34 @@ window.closeNftModal = closeNftModal;
 
 // Trait slot -> stat mapping (mirrors sporebot_unique_config.py)
 const TRAIT_SLOT_STAT = {
-  Arms:'Harvest Bonus', Background:'Plant Limit', Cap:'Kid Totem Chance',
-  Eyes:'Queen Totem Chance', Face:'King Totem Chance', Spots:'Gold Totem Chance',
-  Legs:'Double Herb Chance', Hands:'Rare Herb Chance', Pixie:'Spore Yield', Shoes:'Herb Find Rate',
+  Pixie:'Spore Yield', Eyes:'Queen Totem Chance', Face:'King Totem Chance',
+  Spots:'Gold Totem Chance', Cap:'Kid Totem Chance', Background:'Plant Limit',
+  Legs:'Double Herb Chance', Hands:'Double Gem Chance', Arms:'Gem Find Rate',
+  Shoes:'Herb Find Rate',
 };
 const ITEM_BONUSES = {
-  'Red-Shroom-(Rare)':      ['Harvest Bonus', 5],
-  'Pink-Shroom-(Rare)':     ['Harvest Bonus', 2],
-  'Blue-Shroom-(Rare)':     ['Harvest Bonus', 1],
+  'Red-Shroom-(Rare)':      ['Stage Speed', 5],
+  'Pink-Shroom-(Rare)':     ['Voidspore Chance', 5],
+  'Blue-Shroom-(Rare)':     ['Voidgem Chance', 5],
   'Spores':                 ['Spore Yield', 2],
-  'Elder-Pipe-(Super-Rare)':['Pipe Reduction', 1],
-  'Blue-Potion-(Rare)':     ['Extra Brews', 2],
-  'Red-Potion-(Rare)':      ['Extra Brews', 3],
-  'Gold-Shroom-(Legendary)':['Gold Totem Chance', 5],
-  'Gold-Spores-(Legendary)':['Spore Yield', 5],
-  'Gold-Shovel-(Legendary)':['Harvest Bonus', 10],
+  'Elder-Pipe-(Super-Rare)':['Bond Speed', 5],
+  'Blue-Potion-(Rare)':     ['Extra Brews', 3],
+  'Red-Potion-(Rare)':      ['Extra Brews', 5],
+  'Gold-Shroom-(Legendary)':['Forage Bonus', 10],
+  'Gold-Spores-(Legendary)':['Staking Bonus', 5],
+  'Gold-Shovel-(Legendary)':['Spore Yield', 5],
 };
 const MOUTH_BONUSES = {
-  'Gold-(Legendary)':     ['Plant Limit', 1000000],
-  'Excited-(Super-Rare)': ['Rare Herb Chance', 10],
-  'Happy-(Rare)':         ['Double Herb Chance', 10],
-  'Upset-(Rare)':         ['Extra Brews', 2],
+  'Gold-(Legendary)':     ['Staking Bonus', 5],
+  'Excited-(Super-Rare)': ['Forage Bonus', 5],
+  'Happy-(Rare)':         ['Voidspore Chance', 5],
+  'Upset-(Rare)':         ['Voidgem Chance', 5],
+  'Bot':                  ['Plant Limit', 200000],
+  'Evil':                 ['Extra Brews', 2],
+  'Lips':                 ['Double Herb Chance', 2],
+  'Mustache':             ['Herb Find Rate', 5],
+  'Meh':                  ['Double Gem Chance', 2],
+  'Basic':                ['Gem Find Rate', 5],
 };
 const RARITY_BY_NAME = {
   'Common':'Common','Uncommon':'Uncommon','Rare':'Rare',
@@ -5241,25 +5308,32 @@ const RARITY_BY_NAME = {
 const STAT_VALS = { Uncommon:1, Rare:2, 'Super Rare':5 };
 const STAT_EMOJI = {
   'Spore Yield':        '<img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
-  'Harvest Bonus':      '<img src="/images/shroomfarm.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Stage Speed':        '<img src="/images/stagespeed.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Bond Speed':         '<img src="/images/bondspeed.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
   'Queen Totem Chance': '<img src="/images/queen.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
   'King Totem Chance':  '<img src="/images/king.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
   'Kid Totem Chance':   '<img src="/images/kidshroom.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
   'Gold Totem Chance':  '<img src="/images/gold_totem.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
   'Herb Find Rate':     '<img src="/images/herbs.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
-  'Rare Herb Chance':   '<img src="/images/clover.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
-  'Double Herb Chance': '<img src="/images/boost.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Voidspore Chance':   '<img src="/images/voidspore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Double Herb Chance': '<img src="/images/doubleherbs.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
   'Extra Brews':        '<img src="/images/potion2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
   'Plant Limit':        '<img src="/images/shroomfarm.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
-  'Pipe Reduction':     '<img src="/images/pipe.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
-  'Artifact_Discovery': '<img src="/images/artifacts.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
-  'Artifact Discovery': '<img src="/images/artifacts.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
-  'Scroll_Find_Rate':   '<img src="/images/scroll.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
-  'Scroll Find Rate':   '<img src="/images/scroll.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Forage Bonus':       '<img src="/images/forage.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Staking Bonus':      '<img src="/images/apy1.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Bond Speed':         '<img src="/images/bondspeed.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Stage Speed':        '<img src="/images/stagespeed.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Gem Find Rate':      '<img src="/images/gemstones.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Double Gem Chance':  '<img src="/images/double.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Voidspore Chance':   '<img src="/images/voidspore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Voidgem Chance':     '<img src="/images/voidgem.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+  'Gem Find Rate':      '<img src="/images/gemstone.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
+
 };
 const PLANT_LIMIT_VALS = { Uncommon:200000, Rare:500000, 'Super Rare':1000000 };
-const HERB_VALS = { Uncommon:5, Rare:10, 'Super Rare':15 };
-const DOUBLE_HERB_VALS = { Uncommon:5, Rare:10, 'Super Rare':25 };
+const HERB_VALS = { Uncommon:5, Rare:10, 'Super Rare':20 };
+const DOUBLE_HERB_VALS = { Uncommon:2, Rare:5, 'Super Rare':10 };
+const FORAGE_VALS = { Uncommon:2, Rare:5, 'Super Rare':10 };
 
 function openSporebotModal(tokenId, imageUrl, traits, rarityScore) {
   const overlay = document.getElementById('nft-modal-overlay');
@@ -5300,8 +5374,9 @@ function openSporebotModal(tokenId, imageUrl, traits, rarityScore) {
       const statRarity = rarity === 'Legendary' ? 'Super Rare' : rarity;
       let val = STAT_VALS[statRarity] || 0;
       if (stat === 'Plant Limit') val = PLANT_LIMIT_VALS[statRarity] || 0;
-      else if (stat === 'Herb Find Rate' || stat === 'Rare Herb Chance') val = HERB_VALS[statRarity] || 0;
-      else if (stat === 'Double Herb Chance') val = DOUBLE_HERB_VALS[statRarity] || 0;
+      else if (stat === 'Herb Find Rate' || stat === 'Gem Find Rate') val = HERB_VALS[statRarity] || 0;
+      else if (stat === 'Double Herb Chance' || stat === 'Double Gem Chance') val = DOUBLE_HERB_VALS[statRarity] || 0;
+      else if (stat === 'Forage Bonus') val = FORAGE_VALS[statRarity] || 0;
       addBonus(stat, val);
     }
     // Item bonus
@@ -5318,7 +5393,7 @@ function openSporebotModal(tokenId, imageUrl, traits, rarityScore) {
   if (entries.length) {
     statsEl.innerHTML = '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.15em;color:rgba(255,255,225,0.3);margin-bottom:0.5rem;">BONUSES</div>'
       + entries.map(([stat, val]) => {
-          const fmt2 = stat === 'Plant Limit' ? '+' + (val/1000000).toFixed(1) + 'M limit' : '+' + val + (stat.includes('Chance') || stat.includes('Rate') || stat.includes('Bonus') || stat.includes('Yield') ? '%' : '');
+          const fmt2 = stat === 'Plant Limit' ? '+' + (val/1000000).toFixed(1) + 'M limit' : '+' + val + (stat === 'Extra Brews' ? '' : '%');
           return '<div class="data-row"><span class="dr-label">' + (STAT_EMOJI[stat]||'') + stat + '</span><span class="dr-val g">' + fmt2 + '</span></div>';
         }).join('');
   } else {
@@ -5529,8 +5604,9 @@ function calcSporebotBonuses(traits) {
     var statRarity = rarity === 'Legendary' ? 'Super Rare' : rarity;
     var val = STAT_VALS[statRarity] || 0;
     if (stat === 'Plant Limit') val = PLANT_LIMIT_VALS[statRarity] || 0;
-    else if (stat === 'Herb Find Rate' || stat === 'Rare Herb Chance') val = HERB_VALS[statRarity] || 0;
-    else if (stat === 'Double Herb Chance') val = DOUBLE_HERB_VALS[statRarity] || 0;
+    else if (stat === 'Herb Find Rate' || stat === 'Gem Find Rate') val = HERB_VALS[statRarity] || 0;
+    else if (stat === 'Double Herb Chance' || stat === 'Double Gem Chance') val = DOUBLE_HERB_VALS[statRarity] || 0;
+    else if (stat === 'Forage Bonus') val = FORAGE_VALS[statRarity] || 0;
     addB(stat, val);
   }
   var item = traits['Item'];
@@ -5542,7 +5618,7 @@ function calcSporebotBonuses(traits) {
 
 function fmtBonus(stat, val) {
   if (stat === 'Plant Limit') return '+' + (val/1000000).toFixed(1) + 'M limit';
-  return '+' + val + (stat.includes('Chance') || stat.includes('Rate') || stat.includes('Bonus') || stat.includes('Yield') ? '%' : '');
+  return '+' + val + (stat === 'Extra Brews' ? '' : '%');
 }
 
 function renderActiveSporebotCard(active, s) {
@@ -5642,8 +5718,9 @@ function sbRenderPage() {
     if (rarity === 'Common') continue;
     var statRarity = rarity === 'Legendary' ? 'Super Rare' : rarity;
     if (statName === 'Plant Limit') total += PLANT_LIMIT_VALS[statRarity] || 0;
-    else if (statName === 'Herb Find Rate' || statName === 'Rare Herb Chance') total += HERB_VALS[statRarity] || 0;
-    else if (statName === 'Double Herb Chance') total += DOUBLE_HERB_VALS[statRarity] || 0;
+    else if (statName === 'Herb Find Rate' || statName === 'Gem Find Rate') total += HERB_VALS[statRarity] || 0;
+    else if (statName === 'Double Herb Chance' || statName === 'Double Gem Chance') total += DOUBLE_HERB_VALS[statRarity] || 0;
+    else if (statName === 'Forage Bonus') total += FORAGE_VALS[statRarity] || 0;
     else total += STAT_VALS[statRarity] || 0;
   }
   // check item bonus
@@ -6067,8 +6144,9 @@ function megaGetBonusForSlot(slotName, traits) {
   if (rarity === 'Common') return null;
   var val = STAT_VALS[rarity] || 0;
   if (stat === 'Plant Limit') val = PLANT_LIMIT_VALS[rarity] || 0;
-  else if (stat === 'Herb Find Rate' || stat === 'Rare Herb Chance') val = HERB_VALS[rarity] || 0;
-  else if (stat === 'Double Herb Chance') val = DOUBLE_HERB_VALS[rarity] || 0;
+  else if (stat === 'Herb Find Rate' || stat === 'Gem Find Rate') val = HERB_VALS[rarity] || 0;
+  else if (stat === 'Double Herb Chance' || stat === 'Double Gem Chance') val = DOUBLE_HERB_VALS[rarity] || 0;
+  else if (stat === 'Forage Bonus') val = FORAGE_VALS[rarity] || 0;
   return val > 0 ? { stat: stat, val: val } : null;
 }
 
@@ -6861,7 +6939,167 @@ function renderCompanion(s) {
   }).join('');
 }
 
+function invSubTab(name, btn) {
+  document.querySelectorAll('.inv-sub-tab').forEach(function(b) {
+    b.style.background = 'rgba(255,255,255,0.03)';
+    b.style.borderColor = 'rgba(255,255,225,0.1)';
+    b.style.color = 'rgba(255,255,225,0.45)';
+    b.classList.remove('active');
+  });
+  btn.style.background = 'rgba(254,206,0,0.12)';
+  btn.style.borderColor = 'rgba(254,206,0,0.45)';
+  btn.style.color = 'rgba(254,206,0,0.95)';
+  btn.classList.add('active');
+  document.getElementById('inv-sub-items').style.display = name === 'items' ? 'block' : 'none';
+  document.getElementById('inv-sub-herbs').style.display = name === 'herbs' ? 'block' : 'none';
+  document.getElementById('inv-sub-gems').style.display  = name === 'gems'  ? 'block' : 'none';
+}
+window.invSubTab = invSubTab;
+
+// Mirrors build_herbs_embed in profile.py - groups owned ingredients by tier.
+function renderInvHerbs(s) {
+  var el = document.getElementById('inv-herbs-content');
+  if (!el) return;
+  var ing = (s.Inventory || {}).Ingredients || {};
+  var TIERS = [
+    { label:'Common',    color:'rgba(255,255,255,0.4)',  bg:'rgba(255,255,255,0.04)',  bdr:'rgba(255,255,255,0.18)',  keys:['Sunspore','Ashroot','Glowcap'] },
+    { label:'Rare',      color:'rgba(34,197,94,0.9)',    bg:'rgba(34,197,94,0.07)',    bdr:'rgba(34,197,94,0.35)',    keys:['Frostmoss','Veilfruit','Dreamdust'] },
+    { label:'Epic',      color:'rgba(79,168,253,0.9)',   bg:'rgba(79,168,253,0.07)',   bdr:'rgba(79,168,253,0.35)',   keys:['Bloodberry','Elderbloom','Woobud'] },
+    { label:'Mythical',  color:'rgba(192,132,252,0.9)',  bg:'rgba(192,132,252,0.09)',  bdr:'rgba(192,132,252,0.45)',  keys:['Voidspore'] },
+  ];
+  var IMGS = {
+    Sunspore:'sunspore.png', Ashroot:'ashroot.png', Glowcap:'glowcap.png',
+    Frostmoss:'frostmoss.png', Veilfruit:'veilfruit.png', Dreamdust:'dreamdust.png',
+    Bloodberry:'bloodberry.png', Elderbloom:'elderbloom.png', Woobud:'woobud.png',
+    Voidspore:'voidspore.png',
+  };
+  var html = '';
+  TIERS.forEach(function(t) {
+    var rows = t.keys.filter(function(k) { return (ing[k] || 0) > 0; }).map(function(k) {
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem;border-radius:0.65rem;'
+        + 'background:' + t.bg + ';border:1px solid ' + t.bdr + ';margin-bottom:0.35rem;">'
+        + '<span style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:rgba(255,255,225,0.8);">'
+        + '<img src="/images/' + (IMGS[k] || 'herbs.png') + '" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+        + k + '</span>'
+        + '<span style="font-family:Space Grotesk,monospace;font-size:0.8rem;font-weight:700;color:' + t.color + ';">x' + ing[k] + '</span>'
+        + '</div>';
+    }).join('');
+    if (!rows) return;
+    html += '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;letter-spacing:0.12em;color:' + t.color + ';margin:0.75rem 0 0.4rem;">' + t.label.toUpperCase() + '</div>' + rows;
+  });
+  el.innerHTML = html || '<div class="empty-hint">No herbs yet. Use !gather to collect some.</div>';
+}
+window.renderInvHerbs = renderInvHerbs;
+
+// Mirrors build_gems_embed in profile.py - groups owned gems by GEMSTONE_TIERS rarity.
+var GEM_TIERS = {
+  Magenta_Crystal:'Common', Shroomstone_Quartz:'Common',
+  Duskcap_Topaz:'Common', Shroomcap_Ruby:'Common',
+  Moonglow_Amethyst:'Rare', Bloomcap_Jade:'Rare', Sporelight_Sapphire:'Rare',
+  Earthroot_Emerald:'Epic', Prismcap_Diamond:'Epic',
+  Voidgem:'Legendary',
+};
+var GEM_IMGS_INV = {
+  Magenta_Crystal:'magenta_crystal.png', Shroomstone_Quartz:'shroomstone_quartz.png',
+  Duskcap_Topaz:'duskcap_topaz.png', Shroomcap_Ruby:'shroomcap_ruby.png',
+  Moonglow_Amethyst:'moonglow_amethyst.png', Bloomcap_Jade:'bloomcap_jade.png',
+  Sporelight_Sapphire:'sporelight_sapphire.png', Earthroot_Emerald:'earthroot_emerald.png',
+  Prismcap_Diamond:'prismcap_diamond.png', Voidgem:'voidgem.png',
+};
+
+function renderInvGems(s) {
+  var el = document.getElementById('inv-gems-content');
+  if (!el) return;
+  var gems = (s.Inventory || {}).Gemstones || {};
+  var TIERS = [
+    { label:'Common',    color:'rgba(255,255,255,0.4)',  bg:'rgba(255,255,255,0.04)', bdr:'rgba(255,255,255,0.18)' },
+    { label:'Rare',      color:'rgba(34,197,94,0.9)',    bg:'rgba(34,197,94,0.07)',   bdr:'rgba(34,197,94,0.35)' },
+    { label:'Epic',      color:'rgba(79,168,253,0.9)',   bg:'rgba(79,168,253,0.07)',  bdr:'rgba(79,168,253,0.35)' },
+    { label:'Legendary', color:'rgba(254,206,0,0.95)',   bg:'rgba(254,206,0,0.08)',   bdr:'rgba(254,206,0,0.4)' },
+  ];
+  // Bucket every owned gem, including ones not in GEM_TIERS yet.
+  var owned = Object.keys(gems).filter(function(k) { return (gems[k] || 0) > 0; });
+  var buckets = {};
+  owned.forEach(function(k) {
+    var t = GEM_TIERS[k] || 'Common';
+    (buckets[t] = buckets[t] || []).push(k);
+  });
+  var html = '';
+  TIERS.forEach(function(t) {
+    var keys = (buckets[t.label] || []).sort();
+    if (!keys.length) return;
+    html += '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;letter-spacing:0.12em;color:' + t.color + ';margin:0.75rem 0 0.4rem;">' + t.label.toUpperCase() + '</div>';
+    html += keys.map(function(k) {
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem;border-radius:0.65rem;'
+        + 'background:' + t.bg + ';border:1px solid ' + t.bdr + ';margin-bottom:0.35rem;">'
+        + '<span style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:rgba(255,255,225,0.8);">'
+        + '<img src="/images/' + (GEM_IMGS_INV[k] || 'gemstones.png') + '" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+        + k.replace(/_/g,' ') + '</span>'
+        + '<span style="font-family:Space Grotesk,monospace;font-size:0.8rem;font-weight:700;color:' + t.color + ';">x' + gems[k] + '</span>'
+        + '</div>';
+    }).join('');
+  });
+  el.innerHTML = html || '<div class="empty-hint">No gems yet. Use !cave to dig some up.</div>';
+}
+window.renderInvGems = renderInvGems;
+
+function openGemForgeModal(key) {
+  var d = (window._gemForgeData || {})[key];
+  if (!d) return;
+  var body;
+  if (d.owned) {
+    body = '<div style="text-align:center;padding:1rem 0;">'
+      + '<img src="/images/' + d.img + '" style="width:48px;height:48px;object-fit:contain;margin-bottom:0.75rem;" onerror="this.style.display=\'none\'">'
+      + '<div style="font-family:Space Grotesk,monospace;font-size:0.7rem;color:var(--green);margin-bottom:0.5rem;">FORGED</div>'
+      + '<div style="font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.55);">' + d.perk + '</div>'
+      + '</div>';
+  } else {
+    body = '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.75rem;">FORGE AT RHIZO (!shop)</div>';
+    body += Object.keys(d.recipe).map(function(gem) {
+      var need = d.recipe[gem];
+      var have = parseInt(d.have[gem] || 0, 10);
+      var done = have >= need;
+      var pct = Math.min(100, Math.round((have / need) * 100));
+      var col = done ? 'var(--green)' : d.color;
+      return '<div style="margin-bottom:0.75rem;">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;">'
+        + '<span style="display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;color:rgba(255,255,225,0.75);">'
+        + '<img src="/images/' + (GEM_IMGS_INV[gem] || 'gemstones.png') + '" style="width:16px;height:16px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+        + gem.replace(/_/g,' ') + '</span>'
+        + '<span style="font-family:Space Grotesk,monospace;font-size:0.75rem;font-weight:700;color:' + col + ';">'
+        + have.toLocaleString() + ' / ' + need.toLocaleString() + (done ? ' &#10003;' : '') + '</span>'
+        + '</div>'
+        + '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
+        + '<div style="height:100%;width:' + pct + '%;background:' + col + ';border-radius:999px;transition:width 0.8s ease;"></div>'
+        + '</div></div>';
+    }).join('');
+    body += '<div style="border-top:1px solid rgba(255,255,225,0.08);margin-top:0.5rem;padding-top:0.6rem;font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.5);">'
+      + 'Reward: <span style="color:' + d.color + ';">' + d.perk + '</span></div>';
+  }
+  var ov = document.getElementById('gem-forge-modal');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'gem-forge-modal';
+    ov.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;align-items:center;justify-content:center;padding:1rem;';
+    ov.onclick = function(e) { if (e.target === ov) ov.style.display = 'none'; };
+    ov.innerHTML = '<div style="background:var(--dark2);border:1px solid rgba(255,255,225,0.12);border-radius:1.25rem;max-width:400px;width:100%;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;">'
+      + '<div style="padding:1rem 1.25rem 0.75rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,225,0.08);">'
+      + '<div id="gem-forge-title" style="font-family:Space Grotesk,monospace;font-size:0.8rem;color:var(--cream);letter-spacing:0.1em;text-transform:uppercase;"></div>'
+      + '<button onclick="document.getElementById(\'gem-forge-modal\').style.display=\'none\'" style="background:none;border:none;color:rgba(255,255,225,0.5);font-size:1.2rem;cursor:pointer;line-height:1;">x</button>'
+      + '</div>'
+      + '<div id="gem-forge-body" style="padding:1rem 1.25rem;overflow-y:auto;flex:1;"></div>'
+      + '</div>';
+    document.body.appendChild(ov);
+  }
+  document.getElementById('gem-forge-title').textContent = d.label;
+  document.getElementById('gem-forge-body').innerHTML = body;
+  ov.style.display = 'flex';
+}
+window.openGemForgeModal = openGemForgeModal;
+
 function renderInventory(s) {
+  renderInvHerbs(s);
+  renderInvGems(s);
   const inv  = s.Inventory || {};
   const items = inv.Items || {};
   const gems  = inv.Gemstones || {};
@@ -6883,10 +7121,10 @@ function renderInventory(s) {
     const ITEM_IMGS = {
       Golden_Shovel:'/images/shovel.png', Elder_Pipe:'/images/pipe.png',
       Wildtongue_Gemstone:'/images/wildtongue_gemstone.png',
-      Mooshie_Gemstone:'/images/mystical_gemstone.png', King_Totem:'/images/king.png',
+      Mooshie_Gemstone:'/images/mooshie_gemstone.png', King_Totem:'/images/king.png',
       Queen_Totem:'/images/queen.png', Kid_Totem:'/images/kidshroom.png',
       Gold_Totem:'/images/goldmooshie.png', Miner_Helmet:'/images/miner_helmet.png',
-      Well_Access:'/images/well.png', animal_gemstone:'/images/mystical_gemstone.png',
+      Well_Access:'/images/well.png', animal_gemstone:'/images/mooshie_gemstone.png',
     };
     itemsEl.innerHTML = ownedItems.map(([k,v]) => {
       const label = ITEM_MAP[k] || k.replace(/_/g,' ');
@@ -6898,9 +7136,9 @@ function renderInventory(s) {
     itemsEl.innerHTML = '<div class="empty-hint">No items yet.</div>';
   }
 
-  // Gems
+  // Gems - now rendered by renderInvGems (tiered). Legacy chip loop disabled.
   const gemsEl = document.getElementById('gems-content');
-  gemsEl.innerHTML = GEMS.map(g => {
+  if (gemsEl) gemsEl.innerHTML = GEMS.map(g => {
     const owned = gems[g] && gems[g] > 0;
     const qty = owned ? ' x' + gems[g] : '';
     const GEM_IMGS = {
@@ -6962,42 +7200,83 @@ function renderItemsOrganized(s) {
 
   var html = '';
 
-  // ======== 1. GEMSTONES ========
-  html += secHdr('Gemstones', 'gemstones.png');
-
-  const GEM_DEFS = [
-    { key:'Wildtongue_Gemstone',  img:'wildtongue_gemstone.png',  label:'Wildtongue Gemstone', color:'var(--green)',
-      earn:'<b style="color:rgba(255,255,225,0.75);">Goal:</b> Collect all Artifacts in !explore.<br><b style="color:rgba(255,255,225,0.75);">Reward:</b> Lets you talk to animals, unlocks !pets and grants +5% SGR.' },
-    { key:'bondsmith_gemstone',   img:'bondsmith_gemstone.png',   label:'Bondsmith Gemstone',  color:'var(--purple)',
-      earn:'<b style="color:rgba(255,255,225,0.75);">Goal:</b> Max Bond all 12 pets.<br><b style="color:rgba(255,255,225,0.75);">Reward:</b> Grants you +10% SGR and unlocks !campfire.' },
-    { key:'rootsong_gemstone',    img:'rootsong_gemstone.png',    label:'Rootsong Gemstone',   color:'var(--green)',
-      earn:'<b style="color:rgba(255,255,225,0.75);">Goal:</b> Sell Gems to Rhizo.<br><b style="color:rgba(255,255,225,0.75);">Reward:</b> Grants a special book allowing you to !craft and grants +5% SGR.' },
-    { key:'sunspore_gemstone',    img:'sunspore_gemstone1.png',    label:'Sunspore Gemstone',   color:'var(--yellow)',
-      earn:'<b style="color:rgba(255,255,225,0.75);">Goal:</b> Reach Herbology Level 100 via !gather.<br><b style="color:rgba(255,255,225,0.75);">Reward:</b> Grants +5% SGR.' },
-    { key:'spirit_gemstone',      img:'spirit_gemstone.png',      label:'Spirit Gemstone',     color:'var(--purple)',
-      earn:'<b style="color:rgba(255,255,225,0.75);">Goal:</b> Brew a 10/10 potion and trade it to Mycelia.<br><b style="color:rgba(255,255,225,0.75);">Reward:</b> Grants +5% SGR.' },
+  // ======== 1. MASTERY UNLOCKS ========
+  html += secHdr('Mastery Unlocks', 'shroom.png');
+  const UNLOCK_DEFS = [
+    { key:'enchanted_plant', img:'enchanted_plant.png', label:'Enchanted Plant', color:'var(--green)',
+      earn:'Earned at Brewing Lv100 (via Mycelia). Grants +5% Harvest Bonus.' },
+    { key:'mystic_book', img:'book.png', label:'Mystic Book', color:'var(--purple)',
+      earn:'Earned at Herbology Lv100. Grants +5% Forage Boost.' },
+    { key:'mooshie_ring', img:'magic-ring.png', label:'Mooshie Ring', color:'var(--yellow)',
+      earn:'Earned at Explorer Lv100. Grants a farm bonus.' },
+    { key:'magical_mushroom', img:'shroom.png', label:'Magical Mushroom', color:'var(--red)',
+      earn:'Earned at Max Bonds (all 12 pets) via !companions. Grants +5% Forage Boost.' },
   ];
-
-  GEM_DEFS.forEach(function(g) {
-    var owned = !!(items[g.key]);
-    html += itemRow(g.img, g.label, owned, g.earn, g.color);
+  UNLOCK_DEFS.forEach(function(u) {
+    var owned = !!(items[u.key]);
+    html += itemRow(u.img, u.label, owned, u.earn, u.color);
   });
 
-  
+  // ======== 2. GEMSTONES ========
+  html += secHdr('Gemstones', 'gemstones.png');
 
-  // ======== 2. TOTEMS ========
+  // The 3 forgeable Gemstones (Rhizo, !shop). Booleans under Inventory/Items/Gemstones.
+  // Recipes mirror GEMSTONE_RECIPES in shop.py; raw counts come from Inventory/Gemstones.
+  var forgedGems = (inv.Items || {}).Gemstones || {};
+  var rawGems = inv.Gemstones || {};
+  const GEM_DEFS = [
+    { key:'Sunspore_Gemstone', img:'sunspore_gemstone1.png', label:'Sunspore Gemstone', color:'var(--yellow)',
+      perk:'+5% Spore Generation Rate',
+      recipe:{ Duskcap_Topaz:1000, Moonglow_Amethyst:500, Shroomcap_Ruby:200 } },
+    { key:'Rootsong_Gemstone', img:'rootsong_gemstone.png', label:'Rootsong Gemstone', color:'var(--green)',
+      perk:'+10% Forage Boost',
+      recipe:{ Magenta_Crystal:1000, Earthroot_Emerald:500, Prismcap_Diamond:200 } },
+    { key:'Mooshie_Gemstone', img:'mooshie_gemstone.png', label:'Mooshie Gemstone', color:'var(--purple)',
+      perk:'+5% Staking Bonus',
+      recipe:{ Shroomstone_Quartz:1000, Bloomcap_Jade:500, Sporelight_Sapphire:200 } },
+  ];
+
+  window._gemForgeData = {};
+  GEM_DEFS.forEach(function(g) {
+    var owned = !!(forgedGems[g.key]);
+    window._gemForgeData[g.key] = {
+      label: g.label, img: g.img, color: g.color, perk: g.perk,
+      recipe: g.recipe, owned: owned, have: rawGems,
+    };
+    var sub;
+    if (owned) {
+      sub = '<b style="color:rgba(255,255,225,0.75);">Reward:</b> ' + g.perk;
+    } else {
+      var total = 0, met = 0;
+      Object.keys(g.recipe).forEach(function(gem) {
+        total++;
+        if (parseInt(rawGems[gem] || 0, 10) >= g.recipe[gem]) met++;
+      });
+      sub = '<b style="color:rgba(255,255,225,0.75);">Reward:</b> ' + g.perk
+        + '<br><span style="color:' + (met === total ? 'var(--green)' : 'rgba(255,255,225,0.4)') + ';">'
+        + met + ' / ' + total + ' gem requirements met</span>'
+        + ' <span style="color:rgba(79,168,253,0.6);font-family:Space Grotesk,monospace;font-size:0.6rem;">tap for progress</span>';
+    }
+    var row = itemRow(g.img, g.label, owned, sub, g.color);
+    html += row.replace(
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:0.55rem 0;border-bottom:1px solid rgba(255,255,225,0.05);">',
+      '<div onclick="openGemForgeModal(\'' + g.key + '\')" style="display:flex;align-items:flex-start;justify-content:space-between;padding:0.55rem 0;border-bottom:1px solid rgba(255,255,225,0.05);cursor:pointer;">'
+    );
+  });  
+
+  // ======== 3. TOTEMS ========
   html += secHdr('Totems', 'king.png');
   const TOTEM_DEFS = [
-    { key:'King_Totem',   img:'king.png',        label:'King Totem',   color:'var(--yellow)',
-      earn:'Earned at 42-day !forage streak. Adds +5% King Totem Chance on every forage.' },
-    { key:'Queen_Totem',  img:'queen.png',        label:'Queen Totem',  color:'var(--yellow)',
-      earn:'Earned at 21-day !forage streak. Adds +5% Queen Totem Chance on every !mist.' },
     { key:'Kid_Totem',    img:'kidshroom.png',    label:'Kid Totem',    color:'var(--yellow)',
-      earn:'Earned at 69-day !forage streak. Adds +5% Kid Totem Chance on every !mist.' },
+      earn:'Earned at 25-day !forage streak. Adds +5% Kid Totem Chance on every !forage.' },
+    { key:'Queen_Totem',  img:'queen.png',        label:'Queen Totem',  color:'var(--yellow)',
+      earn:'Earned at 50-day !forage streak. Adds +5% Queen Totem Chance on every !forage.' },
+    { key:'King_Totem',   img:'king.png',        label:'King Totem',   color:'var(--yellow)',
+      earn:'Earned at 75-day !forage streak. Adds +5% King Totem Chance on every forage.' },
     { key:'Gold_Totem',   img:'gold_totem.png',   label:'Gold Totem',   color:'var(--yellow)',
-      earn:'Earned at 100-day !forage streak. Adds +5% Gold Totem Chance on every !toss.' },
+      earn:'Earned at 100-day !forage streak. Adds +5% Gold Totem Chance on every !forage.' },
     { key:'House_Totem',  img:'housemooshie.png',  label:'House Mooshie Totem', color:'var(--red)',
-      earn:'Earned at 730-day !forage streak (2 years). All the Mooshies gather to present you with this legendary totem. Permanently increases all totem chances by +5%.' },
+      earn:'Earned at 730-day !forage streak (2 years). Permanently increases all totem chances by +5%.' },
   ];
   TOTEM_DEFS.forEach(function(t) {
     var owned = !!(items[t.key]);
@@ -7008,7 +7287,7 @@ function renderItemsOrganized(s) {
     html += itemRow(t.img, t.label, owned, t.earn, t.color);
   });
 
-  // ======== 3. MISC ========
+  // ======== 4. MISC ========
   html += secHdr('Misc Items', 'backpack1.png');
   const MISC_DEFS = [
     { key:'Golden_Shovel', img:'shovel.png',    label:'Golden Shovel', color:'var(--yellow)',
@@ -7025,22 +7304,6 @@ function renderItemsOrganized(s) {
     var helmetCount = parseInt(items['Miner_Helmet'] || 0);
     if (m.key === 'Miner_Helmet' && helmetCount > 1) lbl += ' x' + helmetCount;
     html += itemRow(m.img, lbl, owned, m.earn, m.color);
-  });
-  // ======== 4. MASTERY UNLOCKS ========
-  html += secHdr('Mastery Unlocks', 'shroom.png');
-  const UNLOCK_DEFS = [
-    { key:'enchanted_plant', img:'grow.png', label:'Enchanted Plant', color:'var(--green)',
-      earn:'Earned at Brewing Lv100 (via Mycelia). Grants +5% Harvest Bonus.' },
-    { key:'mystic_book', img:'book.png', label:'Mystic Book', color:'var(--purple)',
-      earn:'Earned at Herbology Lv100. Grants +5% Forage Boost.' },
-    { key:'mooshie_ring', img:'magic-ring.png', label:'Mooshie Ring', color:'var(--yellow)',
-      earn:'Earned at Explorer Lv100. Grants a farm bonus.' },
-    { key:'magical_mushroom', img:'shroom.png', label:'Magical Mushroom', color:'var(--red)',
-      earn:'Earned at Max Bonds (all 12 pets) via !companions. Grants +5% Forage Boost.' },
-  ];
-  UNLOCK_DEFS.forEach(function(u) {
-    var owned = !!(items[u.key]);
-    html += itemRow(u.img, u.label, owned, u.earn, u.color);
   });
   itemsEl.innerHTML = html;
 }
@@ -7434,7 +7697,7 @@ function renderBrewing(s) {
       + '</span>'
       + (active['Potion Score'] ? '<span class="dr-val" style="color:rgba(255,255,225,0.4);">' + Number(active['Potion Score']).toFixed(2) + '</span>' : '')
       + '</div>';
-    Object.entries(active).filter(([k])=>!['name','emoji','Potion Score','Potion_Score'].includes(k)).forEach(([k,v])=>{
+    Object.entries(active).filter(([k])=>!['name','emoji','Potion Score','Potion_Score','version','Version'].includes(k)).forEach(([k,v])=>{
       const statLabel = k.replace(/_/g,' ');
       const statImg = STAT_EMOJI[statLabel] || STAT_EMOJI[k] || '';
       var noPercent = ['Extra Brews','Extra_Brews','Plant Limit','Plant_Limit'];
@@ -7492,7 +7755,7 @@ function renderBrewing(s) {
         var safeKey2 = slotKey2.replace(/[^a-zA-Z0-9_]/g,'');
         var scoreColor = score2 >= 9 ? 'var(--yellow)' : score2 >= 7 ? 'var(--green)' : 'rgba(255,255,225,0.5)';
         var isSelected = !!_potionSelected[safeKey2];
-        var statLines2 = Object.entries(v2).filter(function(e2){return !['name','emoji','Potion Score','Potion_Score'].includes(e2[0]);})
+        var statLines2 = Object.entries(v2).filter(function(e2){return !['name','emoji','Potion Score','Potion_Score','version','Version'].includes(e2[0]);})
           .map(function(e2){
             var sl2 = e2[0].replace(/_/g,' ');
             var noPercent = ['Extra Brews','Extra_Brews','Plant Limit','Plant_Limit'];
@@ -7741,7 +8004,105 @@ function toggleCollapse(contentId, headerEl) {
 }
 window.toggleCollapse = toggleCollapse;
 
+function statsSubTab(name, btn) {
+  document.querySelectorAll('.stats-sub-tab').forEach(function(b) {
+    b.style.background = 'rgba(255,255,255,0.03)';
+    b.style.borderColor = 'rgba(255,255,225,0.1)';
+    b.style.color = 'rgba(255,255,225,0.45)';
+    b.classList.remove('active');
+  });
+  btn.style.background = 'rgba(254,206,0,0.12)';
+  btn.style.borderColor = 'rgba(254,206,0,0.45)';
+  btn.style.color = 'rgba(254,206,0,0.95)';
+  btn.classList.add('active');
+  document.getElementById('stats-sub-stats').style.display     = name === 'stats'     ? 'block' : 'none';
+  document.getElementById('stats-sub-skilltree').style.display = name === 'skilltree' ? 'block' : 'none';
+}
+window.statsSubTab = statsSubTab;
+
+// Mirrors build_sporebot_skilltree_embed in sporebot.py. Read-only.
+// Allocations: Sporebot/Users/{uid}/SkillTree. Points available: Pixie/Users/{uid}/Game/LvL.
+var SKILLTREE_ORDER = [
+  'Spore Yield','Forage Bonus','Staking Bonus',
+  'Bond Speed','Stage Speed',
+  'Gold Totem Chance','Queen Totem Chance','King Totem Chance','Kid Totem Chance',
+  'Voidspore Chance','Voidgem Chance','Plant Limit',
+  'Extra Brews','Herb Find Rate','Double Herb Chance',
+  'Gem Find Rate','Double Gem Chance',
+];
+// STAT_RARITY -> pts to max (Common 5, Rare 10, Epic 15, Legend 25)
+var SKILLTREE_MAX_PTS = {
+  'Spore Yield':25,'Forage Bonus':25,'Staking Bonus':25,
+  'Bond Speed':15,'Stage Speed':15,
+  'Queen Totem Chance':15,'King Totem Chance':15,'Gold Totem Chance':15,
+  'Kid Totem Chance':10,'Voidspore Chance':10,'Voidgem Chance':10,'Plant Limit':10,
+  'Extra Brews':5,'Herb Find Rate':5,'Double Herb Chance':5,
+  'Gem Find Rate':5,'Double Gem Chance':5,
+};
+var SKILLTREE_TIER = { 25:'Legend', 15:'Epic', 10:'Rare', 5:'Common' };
+var SKILLTREE_TIER_COLOR = {
+  Legend:'var(--yellow)', Epic:'var(--purple)', Rare:'var(--blue)', Common:'rgba(255,255,225,0.45)'
+};
+var SKILLTREE_IMG = {
+  'Spore Yield':'spore.png','Forage Bonus':'forage.png','Staking Bonus':'apy1.png',
+  'Bond Speed':'animals.png','Stage Speed':'growing.png',
+  'Queen Totem Chance':'queen.png','King Totem Chance':'king.png',
+  'Gold Totem Chance':'gold_totem.png','Kid Totem Chance':'kidshroom.png',
+  'Voidspore Chance':'voidspore.png','Voidgem Chance':'voidgem.png',
+  'Plant Limit':'planting.png','Extra Brews':'potion2.png',
+  'Herb Find Rate':'herbs.png','Double Herb Chance':'boost.png',
+  'Gem Find Rate':'gemstones.png','Double Gem Chance':'boost.png',
+};
+
+function renderSkillTree(s, p) {
+  var el = document.getElementById('skilltree-content');
+  if (!el) return;
+  var alloc = s.SkillTree || {};
+  var available = Math.floor(Number(((p || {}).Game || {}).LvL || 0));
+  var spent = 0;
+  Object.keys(alloc).forEach(function(k) { spent += parseInt(alloc[k] || 0, 10) || 0; });
+  var unspent = Math.max(0, available - spent);
+
+  var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:1rem;">'
+    + [['Available', available, 'var(--yellow)'], ['Spent', spent, 'var(--blue)'], ['Unspent', unspent, unspent > 0 ? 'var(--green)' : 'rgba(255,255,225,0.35)']].map(function(c) {
+        return '<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.07);border-radius:0.65rem;padding:0.6rem 0.5rem;text-align:center;">'
+          + '<div style="font-family:Space Grotesk,monospace;font-size:0.55rem;letter-spacing:0.1em;color:rgba(255,255,225,0.3);margin-bottom:0.2rem;">' + c[0].toUpperCase() + '</div>'
+          + '<div style="font-family:Space Grotesk,monospace;font-size:1rem;font-weight:700;color:' + c[2] + ';">' + c[1] + '</div></div>';
+      }).join('')
+    + '</div>';
+
+  var rows = SKILLTREE_ORDER.map(function(stat) {
+    var pts = parseInt(alloc[stat] || alloc[stat.replace(/ /g,'_')] || 0, 10) || 0;
+    var toMax = SKILLTREE_MAX_PTS[stat] || 5;
+    var tier = SKILLTREE_TIER[toMax] || 'Common';
+    var col = SKILLTREE_TIER_COLOR[tier];
+    var pct = Math.min(100, Math.round((pts / toMax) * 100));
+    var dim = pts > 0 ? '1' : '0.4';
+    return '<div style="margin-bottom:0.7rem;opacity:' + dim + ';">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem;">'
+      + '<span style="display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;color:rgba(255,255,225,0.8);">'
+      + '<img src="/images/' + (SKILLTREE_IMG[stat] || 'stats.png') + '" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+      + stat
+      + '<span style="font-family:Space Grotesk,monospace;font-size:0.52rem;padding:0.1em 0.4em;border-radius:999px;border:1px solid ' + col + ';color:' + col + ';">' + tier + '</span>'
+      + '</span>'
+      + '<span style="font-family:Space Grotesk,monospace;font-size:0.75rem;font-weight:700;color:' + (pts >= toMax ? 'var(--green)' : col) + ';">'
+      + pts + ' / ' + toMax + (pts >= toMax ? ' &#10003;' : '') + '</span>'
+      + '</div>'
+      + '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
+      + '<div style="height:100%;width:' + pct + '%;background:' + col + ';border-radius:999px;transition:width 0.8s ease;"></div>'
+      + '</div></div>';
+  }).join('');
+
+  html += '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.6rem;">ALLOCATIONS</div>' + rows;
+  html += '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.25);margin-top:0.6rem;line-height:1.7;border-top:1px solid rgba(255,255,225,0.06);padding-top:0.6rem;">'
+    + 'You earn 1 point per in-game level. Common maxes at 5 pts, Rare 10, Epic 15, Legend 25.<br>'
+    + 'Spend and refund points with <b style="color:rgba(255,255,225,0.5);">!sporebot</b> in Discord.</div>';
+  el.innerHTML = html;
+}
+window.renderSkillTree = renderSkillTree;
+
 function renderStats(s, p) {
+  renderSkillTree(s, p);
   const stats    = s.Stats   || {};
   const farm     = s.Farm    || {};
   const bal      = s.Balance || {};
@@ -7818,34 +8179,104 @@ function renderStats(s, p) {
 
     // Normalize key variants
     const normKey = statKey.replace(/ /g,'_');
+    const isCount = (normKey === 'Extra_Brews' || normKey === 'Plant_Limit');
+    const sfx = isCount ? '' : '%';
 
-    // 1. Sporebot NFT bonus
-    const sbStatMap = {
-      'Spore_Yield':'Spore Yield','Harvest_Bonus':'Harvest Bonus',
-      'Queen_Totem_Chance':'Queen Totem Chance','King_Totem_Chance':'King Totem Chance',
-      'Kid_Totem_Chance':'Kid Totem Chance','Gold_Totem_Chance':'Gold Totem Chance',
-      'Scroll_Find_Rate':'Scroll Find Rate','Artifact_Discovery':'Artifact Discovery',
-      'Rare_Herb_Chance':'Rare Herb Chance','Double_Herb_Chance':'Double Herb Chance',
-      'Herb_Find_Rate':'Herb Find Rate','Extra_Brews':'Extra Brews','Plant_Limit':'Plant Limit',
+    // Forage Bonus has its own breakdown node (Farm/Forage_Breakdown)
+    if (normKey === 'Forage_Bonus') {
+      const fb = farm.Forage_Breakdown || {};
+      const FB_META = {
+        gemstone_pct:    { label: 'Rootsong Gemstone',   img: 'rootsong_gemstone.png', color: 'var(--green)'  },
+        item_pct:        { label: 'Collector Items',     img: 'backpack1.png',         color: 'var(--yellow)' },
+        pixie_pct:       { label: 'Pixie Community',     img: 'pixie.png',             color: 'var(--purple)' },
+        golden_node_pct: { label: 'Golden Nodes',        img: 'mycelium_node.png',     color: 'var(--yellow)' },
+        upkeep_pct:      { label: 'Farm Upkeep',         img: 'shroomfarm.png',        color: 'var(--green)'  },
+        gs_reward_pct:   { label: 'Golden Sporulation',  img: 'sporulation1.webp',     color: 'var(--yellow)' },
+        potion_pct:      { label: 'Active Potion',       img: 'potion2.png',           color: 'var(--purple)' },
+        skilltree_pct:   { label: 'Skill Tree',          img: 'stats.png',             color: 'var(--blue)'   },
+      };
+      Object.keys(FB_META).forEach(function(k) {
+        const v = Number(fb[k] || 0);
+        if (v > 0) sources.push({ label: FB_META[k].label, value: v, img: FB_META[k].img, color: FB_META[k].color, suffix: '%' });
+      });
+      return sources;
+    }
+
+    // Staking Bonus is assembled in recalculate_staking_modifiers (no stored breakdown)
+    if (normKey === 'Staking_Bonus') {
+      sources.push({ label: 'Base Rate', value: 5, img: 'apy1.png', color: 'rgba(255,255,225,0.5)', suffix: '%' });
+      if (Number(potionObj['Staking Bonus'] || potionObj.Staking_Bonus || 0) > 0)
+        sources.push({ label: 'Active Potion', value: 5, img: 'potion2.png', color: 'var(--purple)', suffix: '%' });
+      if (((inv.Items || {}).Gemstones || {}).Mooshie_Gemstone)
+        sources.push({ label: 'Mooshie Gemstone', value: 5, img: 'mooshie_gemstone.png', color: 'var(--yellow)', suffix: '%' });
+      if (Number((farm.gs_reward_bonuses || {}).stake_bonus || 0) > 0)
+        sources.push({ label: 'Golden Sporulation', value: 5, img: 'sporulation1.webp', color: 'var(--yellow)', suffix: '%' });
+      const stStake = Number((s.SkillTree || {})['Staking Bonus'] || (s.SkillTree || {}).Staking_Bonus || 0);
+      if (stStake > 0)
+        sources.push({ label: 'Skill Tree (' + stStake + ' pts)', value: Math.max(0, (stats.Staking_Bonus || 0) - sources.reduce(function(a,x){return a+x.value;},0)), img: 'stats.png', color: 'var(--blue)', suffix: '%' });
+      return sources.filter(function(x) { return x.value > 0; });
+    }
+
+    // Every other stat: read the per-source breakdown the bot writes.
+    const bd = (s.Stats_Breakdown || {})[normKey] || {};
+    const SRC_META = {
+      totem:     { label: 'Totem Items',   img: 'king.png',            color: 'var(--yellow)' },
+      potion:    { label: 'Active Potion', img: 'potion2.png',         color: 'var(--purple)' },
+      companion: { label: 'Companion',     img: 'animals.png',         color: 'var(--purple)' },
+      helper:    { label: 'Sporebot NFT',  img: 'sporebot_helper.png', color: 'var(--blue)'   },
+      skilltree: { label: 'Skill Tree',    img: 'stats.png',           color: 'var(--green)'  },
     };
-    const sbKey = sbStatMap[normKey];
-    if (sbKey && sbBonuses[sbKey] > 0) {
-      const sbName = activeSb.title || ('Sporebot #' + (activeSb.token_id || '?'));
-      sources.push({ label: sbName + ' (NFT)', value: sbBonuses[sbKey], img: 'sporebot_helper.png', color: 'var(--blue)', suffix: normKey === 'Plant_Limit' ? '' : normKey === 'Extra_Brews' ? '' : '%' });
-    }
+    Object.entries(bd).forEach(function(e) {
+      const val = Number(e[1] || 0);
+      if (val <= 0) return;
+      const meta = SRC_META[e[0]] || { label: e[0], img: 'stats.png', color: 'var(--green)' };
+      let lbl = meta.label, im = meta.img;
+      if (e[0] === 'potion' && potionObj.name) {
+        lbl = String(potionObj.name).replace(/<:[^:]+:\d+>/g,'').trim();
+        const pid = (potionObj.emoji||'').match(/:potion(\d+):/);
+        if (pid) im = 'potion' + pid[1] + '.png';
+      } else if (e[0] === 'helper') {
+        lbl = (activeSb.title || ('Sporebot #' + (activeSb.token_id || '?'))) + ' (NFT)';
+      } else if (e[0] === 'companion' && activeKey) {
+        lbl = activeKey.charAt(0).toUpperCase() + activeKey.slice(1) + ' (Bond Lv.' + activeCompBl + ')';
+        im = COMP_IMG[activeKey] || 'animals.png';
+      }
+      sources.push({ label: lbl, value: val, img: im, color: meta.color, suffix: sfx });
+    });
 
-    // 2. Active Potion — potion stores keys as "Harvest Bonus" (space), "Harvest_Bonus" (underscore), or original
-    const potionKeys = [normKey, normKey.replace(/_/g,' '), statKey, statKey.replace(/_/g,' ')];
-    let potionVal = 0;
-    for (const pk of potionKeys) {
-      const v = potionObj[pk];
-      if (v != null && v !== false && Number(v) > 0) { potionVal = Number(v); break; }
-    }
-    if (potionVal > 0) {
-      const pName = String(potionObj.name || 'Active Potion').replace(/<:[^:]+:\d+>/g,'').trim();
-      const potionId = (potionObj.emoji||'').match(/:potion(\d+):/)?.[1] || (potionObj.emoji||'').match(/:(\d+)>/)?.[1];
-      const pImg = potionId ? 'potion' + potionId + '.png' : 'potion2.png';
-      sources.push({ label: pName, value: potionVal, img: pImg, color: 'var(--purple)', suffix: normKey === 'Plant_Limit' ? '' : normKey === 'Extra_Brews' ? '' : '%' });
+    // Fallback: Stats has a total but Stats_Breakdown hasn't been written yet
+    // (it only populates on the next recalculate_stats run). Derive the sources
+    // from the same trait/potion/totem maps the bot uses so the modal isn't blank.
+    if (!sources.length && (stats[normKey] || 0) > 0) {
+      const spaced = normKey.replace(/_/g,' ');
+      if (sbBonuses[spaced] > 0) {
+        sources.push({
+          label: (activeSb.title || ('Sporebot #' + (activeSb.token_id || '?'))) + ' (NFT)',
+          value: sbBonuses[spaced], img: 'sporebot_helper.png', color: 'var(--blue)', suffix: sfx
+        });
+      }
+      let pv = 0;
+      [normKey, spaced].forEach(function(pk) {
+        if (!pv && potionObj[pk] != null && Number(potionObj[pk]) > 0) pv = Number(potionObj[pk]);
+      });
+      if (pv > 0) {
+        const pn = String(potionObj.name || 'Active Potion').replace(/<:[^:]+:\d+>/g,'').trim();
+        const pid = (potionObj.emoji||'').match(/:potion(\d+):/);
+        sources.push({ label: pn, value: pv, img: pid ? 'potion' + pid[1] + '.png' : 'potion2.png', color: 'var(--purple)', suffix: sfx });
+      }
+      const TOTEM_FB = {
+        Queen_Totem_Chance: ['Queen_Totem','queen.png'], King_Totem_Chance: ['King_Totem','king.png'],
+        Kid_Totem_Chance: ['Kid_Totem','kidshroom.png'], Gold_Totem_Chance: ['Gold_Totem','gold_totem.png'],
+      };
+      const tf = TOTEM_FB[normKey];
+      if (tf && (inv.Items || {})[tf[0]]) {
+        sources.push({ label: tf[0].replace(/_/g,' ') + ' (Item)', value: 5, img: tf[1], color: 'var(--yellow)', suffix: '%' });
+      }
+      const stPts = Number((s.SkillTree || {})[spaced] || (s.SkillTree || {})[normKey] || 0);
+      const accounted = sources.reduce(function(a,x){ return a + x.value; }, 0);
+      if (stPts > 0 && (stats[normKey] - accounted) > 0) {
+        sources.push({ label: 'Skill Tree (' + stPts + ' pts)', value: stats[normKey] - accounted, img: 'stats.png', color: 'var(--green)', suffix: sfx });
+      }
     }
 
     // 3b. Companion unique bonus (Bond Lv.5)
@@ -7878,20 +8309,6 @@ function renderStats(s, p) {
           suffix: '%'
         });
       }
-    }
-
-    // 4. Totem items (Queen/King/Kid/Gold give base 5% to their respective chance stats)
-    const TOTEM_STAT_MAP = {
-      Queen_Totem_Chance: 'Queen_Totem', King_Totem_Chance: 'King_Totem',
-      Kid_Totem_Chance: 'Kid_Totem', Gold_Totem_Chance: 'Gold_Totem',
-    };
-    const TOTEM_IMG_MAP = {
-      Queen_Totem_Chance:'queen.png', King_Totem_Chance:'king.png',
-      Kid_Totem_Chance:'kidshroom.png', Gold_Totem_Chance:'gold_totem.png',
-    };
-    const totemKey = TOTEM_STAT_MAP[normKey];
-    if (totemKey && (s.Inventory?.Items || {})[totemKey]) {
-      sources.push({ label: totemKey.replace(/_/g,' ') + ' (Item)', value: 5, img: TOTEM_IMG_MAP[normKey], color: 'var(--yellow)', suffix: '%' });
     }
 
     // 5. Default base sources (Scroll/Artifact always have 5% base)
@@ -7942,6 +8359,14 @@ function renderStats(s, p) {
 
   // --- How-to-get text for zero stats ---
   const HOW_TO_GET = {
+    Forage_Bonus:      'Boosted by the Rootsong Gemstone, collector items, Pixie activity, Golden Nodes, farm upkeep, a Forage Bonus potion, or Skill Tree points.',
+    Staking_Bonus:     'Base 5%. Add 5% each from a Staking Bonus potion, the Mooshie Gemstone, and the Golden Sporulation reward pick, plus 1-5% from Skill Tree points.',
+    Bond_Speed:        'Brew a potion with Bond Speed (Epic stat, 1-10%).',
+    Stage_Speed:       'Brew a potion with Stage Speed (Epic stat, 1-10%).',
+    Voidspore_Chance:  'Brew a potion with Voidspore Chance, or adopt a Fox companion.',
+    Voidgem_Chance:    'Brew a potion with Voidgem Chance, or adopt a Duck companion.',
+    Gem_Find_Rate:     'Brew a potion with Gem Find Rate, or adopt a Raccoon companion.',
+    Double_Gem_Chance: 'Brew a potion with Double Gem Chance, or adopt a Monkey companion.',
     Spore_Yield:      'Equip a Sporebot NFT with a rare Pixie trait, brew a potion with Spore Yield, or adopt a Panda companion.',
     Harvest_Bonus:    'Equip a Sporebot with rare Arms trait, brew a Harvest potion, or adopt a Deer companion.',
     Queen_Totem_Chance:'Equip a Sporebot with rare Eyes trait, or brew a potion with Queen Totem Chance.',
@@ -7987,6 +8412,7 @@ function renderStats(s, p) {
         { label: 'Rootsong Gemstone', key: 'rootsong_bonus',        color: 'var(--green)',  imgSrc: 'rootsong_gemstone.png' },
         { label: 'Sunspore Gemstone', key: 'sunspore_bonus',        color: 'var(--yellow)', imgSrc: 'sunspore_gemstone1.png' },
         { label: 'Spirit Gemstone',   key: 'brewing_bonus',         color: 'var(--purple)', imgSrc: 'spirit_gemstone.png' },
+        { label: 'Golden Sporulation Reward', key: 'gs_spore_bonus', color: 'var(--yellow)', imgSrc: 'sporulation1.webp' },
         { label: 'Sporebot NFT',      key: 'sporebot_bonus',        color: 'var(--blue)',   imgSrc: 'nft.png' },
         { label: 'LP Provider',       key: 'lp_bonus',              color: '#9b8cff',       imgSrc: 'lp.png' },
         { label: 'Guwoo NFT',         key: 'guwoo_bonus',          color: 'var(--yellow)', imgSrc: 'guwoo.png' },
@@ -8005,7 +8431,7 @@ function renderStats(s, p) {
       if (poolCnt3 > 0) mooshieSub3.push({ label: 'King Mooshie Pool x' + poolCnt3 + ' (2% each)', val: poolCnt3 * 2, imgSrc: 'pool_nft.png', color: 'var(--yellow)' });
       if (portraitCnt3 > 0) mooshieSub3.push({ label: 'Mooshie Family Portrait x' + portraitCnt3 + ' (3% each)', val: portraitCnt3 * 3, imgSrc: 'portrait_nft.png', color: 'var(--yellow)' });
       if (lakeCnt3 > 0 && apy.lake_bonus > 0) mooshieSub3.push({ label: 'King Mooshie Lake x' + lakeCnt3 + ' (5%/10% max)', val: apy.lake_bonus, imgSrc: 'lake_nft.png', color: 'var(--yellow)' });
-      const ingameKeys3 = ['stage_bonus','rank_bonus','ingame_sporebot_bonus','potion_bonus','collector_bonus','rootsong_bonus','sunspore_bonus','brewing_bonus'];
+      const ingameKeys3 = ['stage_bonus','rank_bonus','ingame_sporebot_bonus','potion_bonus','collector_bonus','rootsong_bonus','sunspore_bonus','brewing_bonus','gs_spore_bonus'];
       const onchainKeys3 = ['sporebot_bonus','lp_bonus','guwoo_bonus','onchain_spore_bonus'];
       const activeRows3 = sgrRows3.filter(r => apy[r.key] > 0);
       const ingameRows3 = activeRows3.filter(r => ingameKeys3.includes(r.key));
@@ -8106,8 +8532,9 @@ function renderStats(s, p) {
           + (HOW_TO_GET[statKey] || '') + '</div>'
           + '</div>';
       } else {
+        const zeroTotal = total > 0 ? (statKey === 'Extra_Brews' ? '+' + total : '+' + total + '%') : '0';
         html = '<div style="text-align:center;padding:1rem 0;">'
-          + '<div style="font-size:2rem;margin-bottom:0.75rem;opacity:0.3;">0</div>'
+          + '<div style="font-size:2rem;margin-bottom:0.75rem;opacity:0.3;">' + zeroTotal + '</div>'
           + '<div style="font-family:Space Grotesk,monospace;font-size:0.7rem;color:var(--cream);margin-bottom:0.75rem;">' + label + '</div>'
           + '<div style="font-family:Space Grotesk,monospace;font-size:0.65rem;color:rgba(255,255,225,0.4);line-height:1.6;">'
           + (HOW_TO_GET[statKey] || 'No sources found for this stat.') + '</div>'
@@ -8154,20 +8581,20 @@ function renderStats(s, p) {
     { key: 'Spore_Yield',        label: 'Spore Yield',        img: 'spore.png',            group: 'brew',  rarity: 5 },
     { key: 'Forage_Bonus',       label: 'Forage Bonus',       img: 'forage.png',           group: 'brew',  rarity: 5 },
     { key: 'Staking_Bonus',      label: 'Staking Bonus',      img: 'apy1.png',             group: 'brew',  rarity: 5 },
-    { key: 'Bond_Speed',         label: 'Bond Speed',         img: 'animals.png',          group: 'brew',  rarity: 4 },
-    { key: 'Stage_Speed',        label: 'Stage Speed',        img: 'shroomfarm.png',       group: 'brew',  rarity: 4 },
+    { key: 'Bond_Speed',         label: 'Bond Speed',         img: 'bondspeed.png',        group: 'brew',  rarity: 4 },
+    { key: 'Stage_Speed',        label: 'Stage Speed',        img: 'stagespeed.png',       group: 'brew',  rarity: 4 },
     { key: 'Queen_Totem_Chance', label: 'Queen Totem',        img: 'queen.png',            group: 'brew',  rarity: 4 },
     { key: 'King_Totem_Chance',  label: 'King Totem',         img: 'king.png',             group: 'brew',  rarity: 4 },
     { key: 'Gold_Totem_Chance',  label: 'Gold Totem',         img: 'gold_totem.png',       group: 'brew',  rarity: 4 },
     { key: 'Kid_Totem_Chance',   label: 'Kid Totem',          img: 'kidshroom.png',        group: 'brew',  rarity: 3 },
-    { key: 'Plant_Limit',        label: 'Plant Limit',        img: 'planting.png',         group: 'craft', rarity: 3 },
+    { key: 'Plant_Limit',        label: 'Plant Limit',        img: 'shroomfarm.png',       group: 'craft', rarity: 3 },
     { key: 'Voidspore_Chance',   label: 'Voidspore',          img: 'voidspore.png',        group: 'craft', rarity: 3 },
     { key: 'Voidgem_Chance',     label: 'Voidgem',            img: 'voidgem.png',          group: 'craft', rarity: 3 },
     { key: 'Extra_Brews',        label: 'Extra Brews',        img: 'potion2.png',          group: 'craft', rarity: 2 },
     { key: 'Herb_Find_Rate',     label: 'Herb Rate',          img: 'herbs.png',            group: 'craft', rarity: 2 },
-    { key: 'Double_Herb_Chance', label: 'Double Herb',        img: 'boost.png',            group: 'craft', rarity: 2 },
+    { key: 'Double_Herb_Chance', label: 'Double Herb',        img: 'doubleherbs.png',      group: 'craft', rarity: 2 },
     { key: 'Gem_Find_Rate',      label: 'Gem Rate',           img: 'gemstones.png',        group: 'craft', rarity: 2 },
-    { key: 'Double_Gem_Chance',  label: 'Double Gem',         img: 'gemstones.png',        group: 'craft', rarity: 2 },
+    { key: 'Double_Gem_Chance',  label: 'Double Gem',         img: 'double.png',           group: 'craft', rarity: 2 },
   ];
   // Persisted sort mode for the stats grid
   if (typeof window._statSort === 'undefined') window._statSort = 'all';
@@ -8254,7 +8681,84 @@ function toggleHideZeroStats() {
 }
 window.toggleHideZeroStats = toggleHideZeroStats;
 
+// Mirrors build_game_tab in profile.py. Reads Pixie/Users/{uid}/Game.
+function renderGameXP(p) {
+  var el = document.getElementById('game-xp-content');
+  if (!el) return;
+  var game = p.Game || {};
+  var lvl = Number(game.LvL || 1);
+  var bd = game.XP_Breakdown || {};
+  var RANK_IMGS_G = {
+    BRONZE:'bronze.png', SILVER:'silver.png', GOLD:'gold.png', EMERALD:'emerald.png',
+    DIAMOND:'diamond.png', MASTER:'masters.png', GRANDMASTER:'grandmaster.png', LEGEND:'legend1.webp'
+  };
+  var rank = ((profileData.sporebot || {}).Farm || {}).farm_rank || 'BRONZE';
+  var CATS = [
+    { key:'brewing',   label:'Brewing',   img:'potion2.png' },
+    { key:'herbology', label:'Herbology', img:'herbs.png' },
+    { key:'explorer',  label:'Explorer',  img:'cave.png' },
+    { key:'taming',    label:'Taming',    img:'animals.png' },
+    { key:'farm_rank', label:'Farm Rank', img:(RANK_IMGS_G[String(rank).toUpperCase()] || 'bronze.png') },
+  ];
+  var pct = Math.min(100, Math.round((lvl / 100) * 100));
+  var html = '<div style="margin-bottom:0.875rem;">'
+    + '<div style="display:flex;justify-content:space-between;font-family:Space Grotesk,monospace;font-size:0.7rem;color:rgba(255,255,225,0.6);margin-bottom:0.35rem;">'
+    + '<span>Level ' + (Math.round(lvl * 10) / 10) + ' / 100</span>'
+    + '<span style="color:' + (lvl >= 100 ? 'var(--yellow)' : 'var(--green)') + ';">' + (lvl >= 100 ? 'MAX' : pct + '%') + '</span></div>'
+    + '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
+    + '<div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,var(--purple),#a855f7);border-radius:999px;transition:width 1s ease;"></div>'
+    + '</div></div>'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(255,255,225,0.3);margin-bottom:0.5rem;">LEVEL BREAKDOWN (20 PTS EACH)</div>';
+  html += CATS.map(function(c) {
+    var v = Number(bd[c.key] || 0);
+    var p2 = Math.min(100, Math.round((v / 20) * 100));
+    var col = v >= 20 ? 'var(--yellow)' : 'var(--green)';
+    return '<div style="margin-bottom:0.7rem;">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem;">'
+      + '<span style="display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;color:rgba(255,255,225,0.75);">'
+      + '<img src="/images/' + c.img + '" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+      + c.label + '</span>'
+      + '<span style="font-family:Space Grotesk,monospace;font-size:0.75rem;font-weight:700;color:' + col + ';">' + v + ' / 20</span>'
+      + '</div>'
+      + '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
+      + '<div style="height:100%;width:' + p2 + '%;background:' + col + ';border-radius:999px;"></div>'
+      + '</div></div>';
+  }).join('');
+  html += '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;color:rgba(255,255,225,0.25);margin-top:0.5rem;line-height:1.6;">'
+    + 'Each skill maxed (Lv100) + LEGEND rank = Level 100. You earn 1 Skill Point per level - spend them with !sporebot.</div>';
+  el.innerHTML = html;
+}
+window.renderGameXP = renderGameXP;
+
+// Mirrors build_pixie_tab's XP Breakdown field. Reads Pixie/Users/{uid}/Pixie/Community_Breakdown.
+function renderPixieXPBreakdown(p) {
+  var el = document.getElementById('pixie-xp-bd-content');
+  if (!el) return;
+  var pixie = p.Pixie || {};
+  var bd = pixie.Community_Breakdown || {};
+  var ROWS = [
+    { key:'message_xp',         label:'Message XP',      img:'xp.png',         color:'var(--blue)' },
+    { key:'shrooms_tipped',     label:'Shrooms Tipped',  img:'shroom.png',     color:'var(--red)' },
+    { key:'spores_tipped',      label:'Spores Tipped',   img:'spore.png',      color:'var(--blue)' },
+    { key:'goodshroom_received',label:'GS Received',     img:'goodshroom.png', color:'var(--yellow)' },
+  ];
+  var any = ROWS.some(function(r) { return Number(bd[r.key] || 0) > 0; });
+  if (!any) { el.innerHTML = '<div class="empty-hint">No community XP yet.</div>'; return; }
+  el.innerHTML = ROWS.map(function(r) {
+    return '<div class="data-row"><span class="dr-label">'
+      + '<img src="/images/' + r.img + '" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">'
+      + r.label + '</span>'
+      + '<span class="dr-val" style="color:' + r.color + ';">' + fmt(bd[r.key] || 0) + '</span></div>';
+  }).join('')
+  + '<div class="data-row" style="border-top:1px solid rgba(255,255,225,0.1);margin-top:0.35rem;padding-top:0.5rem;border-bottom:none;">'
+  + '<span class="dr-label" style="font-weight:700;">Total Community XP</span>'
+  + '<span class="dr-val y" style="font-weight:700;">' + fmt(pixie.Total_XP || 0) + '</span></div>';
+}
+window.renderPixieXPBreakdown = renderPixieXPBreakdown;
+
 function renderPixie(p) {
+  renderGameXP(p);
+  renderPixieXPBreakdown(p);
   const pixie  = p.Pixie       || {};
   const msgXp  = p.Message_XP  || {};
   const flair  = p.Flair       || {};
