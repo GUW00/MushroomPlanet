@@ -1043,7 +1043,7 @@
       <!-- BREWING TAB -->
       <div class="tab-panel reveal" id="tab-brewing">
         <!-- Sub-tab nav -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-bottom:1rem;">
           <button class="brew-sub-tab active" onclick="brewSubTab('station',this)" style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;font-weight:700;padding:0.65rem 0.5rem;border-radius:12px;border:1px solid rgba(192,132,252,0.45);background:rgba(192,132,252,0.12);color:rgba(192,132,252,0.95);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
             <img src="/images/potionrecipe.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">
             Brewing Station
@@ -1052,7 +1052,10 @@
             <img src="/images/herbs.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">
             Herbs
           </button>
-          
+          <a href="https://mushroomplanet.earth/marketplace" style="font-family:Space Grotesk,sans-serif;font-size:0.78rem;font-weight:700;padding:0.65rem 0.5rem;border-radius:12px;border:1px solid rgba(255,255,225,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,225,0.45);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;text-decoration:none;">
+            <img src="/images/potion.png" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">
+            Marketplace
+          </a>
         </div>
 
         
@@ -4696,9 +4699,9 @@ function renderFarm(s, p) {
       { label: 'Rank Bonus',         key: 'rank_bonus',     suffix: '%', color: 'var(--yellow)', emoji: sgrI(RANK_IMGS[rankName]||'bronze.png') },
       { label: 'Potion Bonus',       key: 'potion_bonus',   suffix: '%', color: 'var(--purple)', emoji: sgrI('potionrecipe.png') },
       { label: 'Skill Tree',         key: 'skilltree_spore_bonus', suffix: '%', color: 'var(--blue)', emoji: sgrI('stats.png') },
-      { label: 'Gemstone',           key: '_gemstone_bonus', suffix: '%', color: 'var(--green)', emoji: sgrI('rootsong_gemstone.png'),
+      { label: 'Gemstone',           key: '_gemstone_bonus', suffix: '%', color: 'var(--green)', emoji: sgrI('sunspore_gemstone.png'),
         val: (Number(apy.sunspore_bonus||0) + Number(apy.rootsong_bonus||0)) },
-      { label: 'Golden Sporulation', key: 'gs_spore_bonus', suffix: '%', color: 'var(--yellow)', emoji: sgrI('goodshroom.png') },
+      { label: 'Golden Sporulation', key: 'gs_spore_bonus', suffix: '%', color: 'var(--yellow)', emoji: sgrI('sporulation.png') },
       { label: 'Sporebot NFT',       key: 'sporebot_bonus', suffix: '%', color: 'var(--purple)', emoji: sgrI('nft.png') },
       { label: 'LP Provider',        key: 'lp_bonus',       suffix: '%', color: '#9b8cff',       emoji: sgrI('lp.png') },
       { label: 'Guwoo NFT',          key: 'guwoo_bonus',    suffix: '%', color: 'var(--yellow)', emoji: sgrI('guwoo.png') },
