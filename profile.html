@@ -5274,8 +5274,7 @@ window.closeNftModal = closeNftModal;
 const TRAIT_SLOT_STAT = {
   Pixie:'Spore Yield', Eyes:'Queen Totem Chance', Face:'King Totem Chance',
   Spots:'Gold Totem Chance', Cap:'Kid Totem Chance', Background:'Plant Limit',
-  Legs:'Double Herb Chance', Hands:'Double Gem Chance', Arms:'Gem Find Rate',
-  Shoes:'Herb Find Rate',
+  Legs:'Double Herb Chance', Hands:'Double Gem Chance', Arms:'Gem Find Rate', Shoes:'Herb Find Rate',
 };
 const ITEM_BONUSES = {
   'Red-Shroom-(Rare)':      ['Stage Speed', 5],
@@ -5307,6 +5306,16 @@ const RARITY_BY_NAME = {
   'Blue-(Rare)':'Uncommon','Pink-(Rare)':'Uncommon',
 };
 const STAT_VALS = { Uncommon:1, Rare:2, 'Super Rare':5 };
+const NFT_STAT_TUPLES = {
+  'Spore Yield':[1,2,5], 'Forage Bonus':[2,5,10], 'Staking Bonus':[1,2,5],
+  'Bond Speed':[1,2,5], 'Stage Speed':[1,2,5],
+  'Gold Totem Chance':[1,2,5], 'Queen Totem Chance':[1,2,5], 'King Totem Chance':[1,2,5],
+  'Kid Totem Chance':[1,2,5], 'Plant Limit':[200000,500000,1000000],
+  'Voidspore Chance':[1,2,5], 'Voidgem Chance':[1,2,5],
+  'Extra Brews':[1,2,5], 'Herb Find Rate':[5,10,20], 'Double Herb Chance':[2,5,10],
+  'Gem Find Rate':[5,10,20], 'Double Gem Chance':[2,5,10],
+};
+const RARITY_IDX = { Uncommon:0, Rare:1, 'Super Rare':2 };
 const STAT_EMOJI = {
   'Spore Yield':        '<img src="/images/spore.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
   'Stage Speed':        '<img src="/images/stagespeed.png" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">',
@@ -5362,23 +5371,14 @@ function openSporebotModal(tokenId, imageUrl, traits, rarityScore) {
     for (const [slot, stat] of Object.entries(TRAIT_SLOT_STAT)) {
       const traitVal = traits[slot];
       if (!traitVal) continue;
-      // Determine rarity from trait value string
-      let rarity = 'Common';
-      if (traitVal.includes('Legendary')) rarity = 'Legendary';
-      else if (traitVal.includes('Super-Rare') || traitVal.includes('Super Rare')) rarity = 'Super Rare';
-      else if (traitVal.includes('Blue') || traitVal.includes('Pink')) rarity = 'Uncommon';
-      else if (traitVal.includes('Rare')) rarity = 'Rare';
-      else if (traitVal.includes('Uncommon')) rarity = 'Uncommon';
-
+      // Rarity from suffix, directly (mirrors get_trait_rarity)
+      const rarity = traitRarity(traitVal);
       if (rarity === 'Common') continue;
-
-      const statRarity = rarity === 'Legendary' ? 'Super Rare' : rarity;
-      let val = STAT_VALS[statRarity] || 0;
-      if (stat === 'Plant Limit') val = PLANT_LIMIT_VALS[statRarity] || 0;
-      else if (stat === 'Herb Find Rate' || stat === 'Gem Find Rate') val = HERB_VALS[statRarity] || 0;
-      else if (stat === 'Double Herb Chance' || stat === 'Double Gem Chance') val = DOUBLE_HERB_VALS[statRarity] || 0;
-      else if (stat === 'Forage Bonus') val = FORAGE_VALS[statRarity] || 0;
-      addBonus(stat, val);
+      const idx = RARITY_IDX[rarity];
+      if (idx == null) continue;
+      const tuple = NFT_STAT_TUPLES[stat];
+      if (!tuple) continue;
+      addBonus(stat, tuple[idx] || 0);
     }
     // Item bonus
     const item = traits['Item'];
