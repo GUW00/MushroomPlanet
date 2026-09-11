@@ -800,6 +800,7 @@
 
       <!-- FARM TAB -->
       <div class="tab-panel active reveal" id="tab-farm">
+        <div id="status-box-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-bottom:1rem;"></div>
         <div id="trial-status-card"></div>
         <div id="withdraw-status-card"></div>
         <div class="info-card">
@@ -837,6 +838,7 @@
               
             </div>
           </div>
+          <div id="f-hydration" style="display:none;margin-top:0.85rem;padding:0.75rem 0.9rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,225,0.08);border-radius:0.75rem;"></div>
           <div id="f-sporulation-hint" style="display:none;margin-top:0.75rem;padding:0.5rem 0.75rem;background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.25);border-radius:0.5rem;font-size:0.72rem;color:rgba(255,200,0,0.9);font-family:'space grotesk',monospace;"></div>
         </div>
         <div class="info-card">
@@ -4525,6 +4527,80 @@ function renderQuickStats(s, p) {
   setEl('qs-mvp',           (currentUser?.mvp || 0).toFixed(1));
 }
 
+// Farm hydration gauges - mirrors farm.py water_gauge / shade_gauge / nutrient_gauge.
+// Water drains over 72h from last_mist (life/death). Shade/Nutrient are 0-100 values,
+// each worth +5% forage at >= 90%. Missing values grandfather to full (100).
+function _fhBar(pct) {
+  pct = Math.max(0, Math.min(100, pct));
+  const w = Math.round(pct);
+  return '<div style="height:6px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;margin-top:0.25rem;">'
+    + '<div style="height:100%;width:' + w + '%;background:var(--barcol,var(--green));border-radius:999px;transition:width 1s ease;"></div></div>';
+}
+function _fhParse(raw) {
+  if (!raw) return null;
+  let n = String(raw).trim().replace(' ', 'T');
+  if (!n.includes('Z')) n += 'Z';
+  const d = new Date(n);
+  return isNaN(d.getTime()) ? null : d;
+}
+function renderFarmHydration(farm, planted, stage) {
+  const el = document.getElementById('f-hydration');
+  if (!el) return;
+
+  // Hide when there's nothing planted (no farm to hydrate) - mirrors "NOTHING TO MIST"
+  const isInactive = !stage || String(stage).toLowerCase() === 'inactive' || !planted || planted <= 0;
+  if (isInactive) { el.style.display = 'none'; return; }
+
+  const MIST_DEADLINE_H = 72;
+  // Panda's Aura pins gauges to full; the web app can't read uniques reliably,
+  // so it derives from stored values only. If a live tend_bonus flag is present, honor it.
+  const tendBonus = !!(farm.tend_bonus || (farm.Panda_Aura));
+
+  // Water: hours left from last_mist. Missing -> full.
+  const lastMist = _fhParse(farm.last_mist);
+  let waterPct, waterTxt;
+  if (tendBonus || !lastMist) {
+    waterPct = 100;
+    waterTxt = tendBonus ? "Panda's Aura - self-watering" : 'Full';
+  } else {
+    const elapsedH = (Date.now() - lastMist.getTime()) / 3600000;
+    const leftH = Math.max(0, MIST_DEADLINE_H - elapsedH);
+    waterPct = Math.max(0, Math.min(100, (leftH / MIST_DEADLINE_H) * 100));
+    if (leftH <= 0) waterTxt = 'OVERDUE - mist now';
+    else {
+      const d = Math.floor(leftH / 24), h = Math.floor(leftH % 24);
+      waterTxt = (d > 0 ? d + 'd ' : '') + h + 'h remaining';
+    }
+  }
+
+  // Shade / Nutrient: stored 0-100, missing -> 100. +5% at >= 90.
+  const shade = tendBonus ? 100 : (farm.shade_value == null ? 100 : Math.max(0, Math.min(100, parseFloat(farm.shade_value))));
+  const nutri = tendBonus ? 100 : (farm.nutrient_value == null ? 100 : Math.max(0, Math.min(100, parseFloat(farm.nutrient_value))));
+  const shadeOn = shade >= 90, nutriOn = nutri >= 90;
+  const boost = (shadeOn ? 5 : 0) + (nutriOn ? 5 : 0);
+
+  const waterCol = waterPct <= 33 ? 'var(--red)' : waterPct <= 66 ? '#f97316' : 'var(--blue)';
+  const row = function(imgSrc, label, barPct, barCol, valTxt, tag, tagCol) {
+    return '<div style="margin-bottom:0.6rem;">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.75);">'
+      + '<span><img src="/images/' + imgSrc + '" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">' + label + '</span>'
+      + '<span style="color:' + tagCol + ';">' + valTxt + '</span></div>'
+      + '<div style="--barcol:' + barCol + ';">' + _fhBar(barPct) + '</div>'
+      + '<div style="font-family:Space Grotesk,monospace;font-size:0.55rem;color:rgba(255,255,225,0.4);margin-top:0.2rem;">' + tag + '</div>'
+      + '</div>';
+  };
+
+  el.style.display = 'block';
+  el.innerHTML =
+      '<div style="font-family:Space Grotesk,monospace;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,225,0.35);margin-bottom:0.6rem;">FARM HYDRATION</div>'
+    + row('water.png', 'Water Level', waterPct, waterCol, waterTxt, 'Keeps your farm alive - mist every 3 days', waterCol)
+    + row('shade.png', 'Shade Level', shade, shadeOn ? 'var(--green)' : 'rgba(255,255,225,0.3)', Math.round(shade) + '%', shadeOn ? '+5% forage active' : 'below 90% - no boost', shadeOn ? 'var(--green)' : 'rgba(255,255,225,0.45)')
+    + row('nutrients.png', 'Nutrient Level', nutri, nutriOn ? 'var(--green)' : 'rgba(255,255,225,0.3)', Math.round(nutri) + '%', nutriOn ? '+5% forage active' : 'below 90% - no boost', nutriOn ? 'var(--green)' : 'rgba(255,255,225,0.45)')
+    + '<div style="display:flex;align-items:center;justify-content:space-between;font-family:Space Grotesk,monospace;font-size:0.68rem;color:rgba(255,255,225,0.75);margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid rgba(255,255,225,0.06);">'
+    + '<span><img src="/images/shroomfarm.png" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">Total Forage Boost</span>'
+    + '<span style="color:' + (boost > 0 ? 'var(--green)' : 'rgba(255,255,225,0.45)') + ';">+' + boost + '%</span></div>';
+}
+
 function renderFarm(s, p) {
   const farm    = s.Farm    || {};
   const bal     = s.Balance || {};
@@ -4629,6 +4705,9 @@ function renderFarm(s, p) {
   setEl('f-total-planted', fmt(planted + nftBoostF));
   setEl('f-plots',    filled + ' / 42');
 
+  // --- Farm Hydration (mirrors farm.py water/shade/nutrient gauges) ---
+  renderFarmHydration(farm, planted, stage);
+
   // Sporulation hint
   const hintEl = document.getElementById('f-sporulation-hint');
   if (hintEl) {
@@ -4645,16 +4724,24 @@ function renderFarm(s, p) {
       } else if (curRankIdx >= 0 && curRankIdx < RANK_ORDER_F.length - 1) {
         nextRankLabel = RANK_ORDER_F[curRankIdx + 1];
       }
-      hintEl.style.display = 'block';
-      if (nextRankLabel === 'Max Stage Reached') {
+      // Golden Sporulation moved to the top 3-box row; keep other rank hints in-card.
+      if (nextRankLabel === 'Golden Sporulation') {
+        hintEl.style.display = 'none';
+        _setStatusBox('sbox-golden', _statusBox('on', '254,206,0', 'Golden Sporulation',
+          'LEGEND stage - activates automatically'));
+      } else if (nextRankLabel === 'Max Stage Reached') {
+        hintEl.style.display = 'block';
         hintEl.textContent = 'You are at the maximum stage!';
-      } else if (nextRankLabel === 'Golden Sporulation') {
-        hintEl.textContent = 'Golden Sporulation is unlocked for LEGEND farmers after Sporulation. This special stage activates automatically!';
+        _setStatusBox('sbox-golden', _statusBox('on', '254,206,0', 'Golden Sporulation', 'Max stage reached'));
       } else if (nextRankLabel) {
+        hintEl.style.display = 'block';
         hintEl.textContent = 'Ready to rank up! Use !harvest in Discord to advance to ' + nextRankLabel + '.';
+        _setStatusBox('sbox-golden', _statusBox('off', '254,206,0', 'Golden Sporulation',
+          'LEGEND rank required'));
       }
     } else {
       hintEl.style.display = 'none';
+      _setStatusBox('sbox-golden', _statusBox('off', '254,206,0', 'Golden Sporulation', 'LEGEND rank required'));
     }
   }
   setEl('f-streak',   safe(farm.streak, 0) + ' days');
@@ -4767,6 +4854,17 @@ function renderFarm(s, p) {
     return m + 'm ' + s + 's';
   }
 
+  // 24h Mega lockout (Turtle Mega Gather / Bear Mega Feed). Returns null if no active mega.
+  function megaCooldown(tsStr) {
+    if (!tsStr) return null;
+    const last = new Date(tsStr.replace(' ', 'T') + (tsStr.includes('Z') ? '' : 'Z'));
+    const diff = 86400000 - (Date.now() - last.getTime());
+    if (diff <= 0) return null;
+    const h = Math.floor(diff / 3600000);
+    const mn = Math.floor((diff % 3600000) / 60000);
+    return h + 'h ' + mn + 'm (Mega)';
+  }
+
   const misc = s.Misc || {};
   const comp = s.Companion || {};
   const turtleUniqueActive = comp.active === 'turtle' && (() => {
@@ -4777,9 +4875,17 @@ function renderFarm(s, p) {
     }
     return days >= 42; // Bond Lv.5 requires 42 days
   })();
-const gatherCD = hourlyCooldown(daily.last_gather, turtleUniqueActive ? 1800000 : 3600000);
-  const caveCD   = hourlyCooldown(daily.last_cave);
-  const feedCD   = hourlyCooldown(misc.last_hourly_feed);
+  // Gather: hourly, unless a 24h Turtle Mega Gather is active
+  const gatherCD = megaCooldown(daily.last_mega_gather) || hourlyCooldown(daily.hourly_gather);
+  // Feed: hourly, unless a 24h Bear Mega Feed is active
+  const feedCD   = megaCooldown(daily.mega_feed) || hourlyCooldown(daily.hourly_feed);
+  // Cave: daily run counter, not an hourly cooldown. 12 base, +12 if Wolf active (24 total).
+  const caveWolfActive = comp.active === 'wolf';
+  const caveMaxRuns = 12 + (caveWolfActive ? 12 : 0);
+  const caveRunsToday = parseInt(daily.cave_runs_today || 0, 10) || 0;
+  const caveRunsLeft = Math.max(0, caveMaxRuns - caveRunsToday);
+  const caveCD = caveRunsToday + '/' + caveMaxRuns + ' used';
+  const caveHasRuns = caveRunsLeft > 0;
 
   // Pipe cooldown (14-day, pipe_bonus reduces it, min 1 day)
   var pipeOwned = !!((s.Inventory || {}).Items || {}).Elder_Pipe;
@@ -4825,8 +4931,7 @@ const gatherCD = hourlyCooldown(daily.last_gather, turtleUniqueActive ? 1800000 
   const DAILY_ACTIONS = [
     { label: 'Forage',  img:'forage.png',    done: daily.daily_forage  === true, cadence: 'Daily',
       info: 'Forage for Shrooms Daily & builds your streak to unlock powerful items.' },
-    { label: 'Mist',    img:'mist.png',      done: daily.daily_mist    === true, cadence: 'Daily',
-      info: 'Mist your farm daily to keep plots healthy. Triggers Kid Shroom if you own the Kid Totem.' },
+
     { label: 'Explore', img:'explore.png',   done: daily.daily_explore === true, cadence: 'Daily',
       info: 'Explore the mushroom forest once per day. Find Artifactd, Scrolls and much more.' },
     { label: 'Toss',    img:'well.png',      done: daily.daily_toss    === true, cadence: 'Daily',
@@ -4844,10 +4949,10 @@ const gatherCD = hourlyCooldown(daily.last_gather, turtleUniqueActive ? 1800000 
       info: 'Elder Pipe - Resets all daily cooldowns. 14-day cooldown. Use !pipe in Discord.' }] : []),
     { label: 'Gather',  img:'herbs.png',     done: gatherCD === 'Ready', cadence: 'Hourly', cooldown: gatherCD,
   info: turtleUniqueActive
-    ? '⚡ Quick Gather active! Gather herbs every 30 minutes. Unique bonus from Turtle (Bond Lv.5).'
+    ? 'Gather herbs once per hour. Turtle (Bond Lv.5) unlocks a Mega Gather with a 24h cooldown.'
     : 'Gather herbs once per hour. Herbs are used for brewing potions. Higher Herbology skill = better herbs.' },
-    { label: 'Cave',    img:'cave.png',      done: caveCD   === 'Ready', cadence: 'Hourly', cooldown: caveCD,
-      info: 'Explore the cave once per hour for gemstones and rare ingredients. Miner Helmet lets you continue your run' },
+    { label: 'Cave',    img:'cave.png',      done: caveHasRuns, cadence: 'Counter', cooldown: caveCD,
+      info: (caveWolfActive ? '24 cave runs/day (Wolf bonus). ' : '12 cave runs/day. ') + 'Explore for gemstones and rare ingredients. Resets at daily reset.' },
     { label: 'Feed',    img:'shroomfarm.png',done: feedCD   === 'Ready', cadence: 'Hourly', cooldown: feedCD,
       info: 'Feed the farm animals once per hour. Total fed SHROOM unlocks companions, forage boosts, and more.' },
   ];
@@ -4864,37 +4969,44 @@ const gatherCD = hourlyCooldown(daily.last_gather, turtleUniqueActive ? 1800000 
     + '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">'
     + '<div style="height:100%;width:' + barPct + '%;background:linear-gradient(90deg,var(--green),#4ade80);border-radius:999px;transition:width 1s ease;"></div>'
     + '</div></div>'
-    + '<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0.4rem;">'
+    + '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.4rem;">'
     + DAILY_ACTIONS.map(a => {
+      const isCounter  = a.cadence === 'Counter';
       const isHourly   = a.cadence === 'Hourly';
       const onCooldown = isHourly && !a.done;
       const hourlyReady = isHourly && a.done;
-      const dailyPending = !isHourly && !a.done;
+      const dailyPending = !isHourly && !isCounter && !a.done;
 
       // Color logic:
+      // Counter (Cave) = green while runs remain, red when used up - always shows the count
       // Daily done = green | Daily pending = red
       // Hourly ready (available) = yellow | Hourly on cooldown (done/cooling) = green
-      const bg     = a.done && !isHourly  ? 'rgba(34,197,94,0.1)'
+      const bg     = isCounter             ? (a.done ? 'rgba(34,197,94,0.1)' : 'rgba(253,70,79,0.08)')
+                   : a.done && !isHourly  ? 'rgba(34,197,94,0.1)'
                    : dailyPending          ? 'rgba(253,70,79,0.08)'
                    : hourlyReady           ? 'rgba(254,206,0,0.08)'
                    : onCooldown            ? 'rgba(34,197,94,0.08)'
                    :                         'rgba(255,255,255,0.02)';
-      const border = a.done && !isHourly  ? 'rgba(34,197,94,0.3)'
+      const border = isCounter             ? (a.done ? 'rgba(34,197,94,0.3)' : 'rgba(253,70,79,0.3)')
+                   : a.done && !isHourly  ? 'rgba(34,197,94,0.3)'
                    : dailyPending          ? 'rgba(253,70,79,0.3)'
                    : hourlyReady           ? 'rgba(254,206,0,0.35)'
                    : onCooldown            ? 'rgba(34,197,94,0.25)'
                    :                         'rgba(255,255,225,0.07)';
-      const labelCol = a.done && !isHourly ? '#22c55e'
+      const labelCol = isCounter           ? (a.done ? '#22c55e' : '#fd464f')
+                     : a.done && !isHourly ? '#22c55e'
                      : dailyPending         ? '#fd464f'
                      : hourlyReady          ? '#fece00'
                      : onCooldown           ? '#22c55e'
                      :                        'rgba(255,255,225,0.75)';
-      const subText  = a.done && !isHourly ? 'Done'
+      const subText  = isCounter           ? (a.cooldown || '0/12 used')
+                     : a.done && !isHourly ? 'Done'
                      : dailyPending         ? 'Available'
                      : hourlyReady          ? a.cooldown || 'Use Now!'
                      : onCooldown           ? a.cooldown
                      :                        a.cadence;
-      const subCol   = a.done && !isHourly ? 'rgba(34,197,94,0.6)'
+      const subCol   = isCounter           ? (a.done ? 'rgba(34,197,94,0.6)' : 'rgba(253,70,79,0.6)')
+                     : a.done && !isHourly ? 'rgba(34,197,94,0.6)'
                      : dailyPending         ? 'rgba(253,70,79,0.6)'
                      : hourlyReady          ? 'rgba(254,206,0,0.7)'
                      : onCooldown           ? 'rgba(34,197,94,0.5)'
@@ -4915,6 +5027,32 @@ const gatherCD = hourlyCooldown(daily.last_gather, turtleUniqueActive ? 1800000 
         + '</div></div>';
     }).join('')
     + '</div>';
+}
+
+// Shared equal-width status box for the top 3-box row.
+// state: 'on' = unlocked (colored), 'off' = locked/in-progress (muted).
+// colorRgb: "r,g,b" base for the unlocked tint. sub is the small dim line.
+function _statusBox(state, colorRgb, title, sub) {
+  const on = state === 'on';
+  const bg = on ? 'rgba(' + colorRgb + ',0.08)' : 'rgba(255,255,255,0.02)';
+  const bd = on ? 'rgba(' + colorRgb + ',0.28)' : 'rgba(255,255,225,0.08)';
+  const dotCol = on ? 'rgb(' + colorRgb + ')' : 'rgba(255,255,225,0.25)';
+  const titleCol = on ? 'rgb(' + colorRgb + ')' : 'rgba(255,255,225,0.5)';
+  const dot = '<div style="width:7px;height:7px;border-radius:50%;background:' + dotCol + ';'
+    + (on ? 'box-shadow:0 0 6px ' + dotCol + ';' : '') + 'flex-shrink:0;"></div>';
+  return '<div style="display:flex;flex-direction:column;gap:0.35rem;background:' + bg + ';border:1px solid ' + bd
+    + ';border-radius:0.875rem;padding:0.7rem 0.85rem;min-height:64px;justify-content:center;">'
+    + '<div style="display:flex;align-items:center;gap:0.45rem;font-family:Space Grotesk,monospace;font-size:0.7rem;font-weight:600;color:' + titleCol + ';">'
+    + dot + '<span>' + title + '</span></div>'
+    + '<div style="font-family:Space Grotesk,monospace;font-size:0.58rem;color:rgba(255,255,225,0.4);line-height:1.4;">' + (sub || '') + '</div>'
+    + '</div>';
+}
+function _setStatusBox(id, html) {
+  const row = document.getElementById('status-box-row');
+  if (!row) return;
+  let slot = document.getElementById(id);
+  if (!slot) { slot = document.createElement('div'); slot.id = id; row.appendChild(slot); }
+  slot.innerHTML = html;
 }
 
 function renderTrialStatus(s, p) {
@@ -4970,21 +5108,19 @@ function renderTrialStatus(s, p) {
   const qualifiesLP      = lpBonus >= 0.1;
   const isQualified      = qualifiesShroom || qualifiesNFT || qualifiesLP;
 
-  // If past trial and qualified — show nothing (or a small green pill)
+  // Farm Active box (unlocked). Tall trial/suspended states render below via el.
   if (ageDays >= 42 && isQualified) {
-    el.innerHTML = '<div style="display:flex;align-items:center;gap:0.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.65rem 1rem;margin-bottom:1rem;font-family:Space Grotesk,monospace;font-size:0.7rem;color:var(--green);">'
-      + '<div style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0;"></div>'
-      + 'Farm Active'
-      + (function() {
-          const tags = [];
-          if (qualifiesShroom) tags.push('500k+');
-          if (qualifiesNFT)    tags.push('NFT Holder');
-          if (qualifiesLP)     tags.push('LP Provider');
-          return ' <span style="opacity:0.5;">(' + tags.join(' & ') + ')</span>';
-        })()
-      + '</div>';
+    const tags = [];
+    if (qualifiesShroom) tags.push('500k+');
+    if (qualifiesNFT)    tags.push('NFT Holder');
+    if (qualifiesLP)     tags.push('LP Provider');
+    _setStatusBox('sbox-farm', _statusBox('on', '34,197,94', 'Farm Active', tags.join(' & ')));
+    el.innerHTML = '';
     return;
   }
+  // Not-yet-active: muted box in the row; tall trial/suspended card still renders in el below.
+  _setStatusBox('sbox-farm', _statusBox('off', '34,197,94', 'Farm Active',
+    ageDays >= 42 ? 'Access suspended' : 'Day ' + ageDays + ' of 42 trial'));
 
   // If past trial and NOT qualified
   if (ageDays >= 42 && !isQualified) {
@@ -5075,13 +5211,13 @@ function renderWithdrawStatus(s, p) {
     const tags = [];
     if (qualifiesShroom) tags.push('500k SHROOM');
     if (qualifiesNFT)    tags.push('NFT Holder');
-    el.innerHTML = '<div style="display:flex;align-items:center;gap:0.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:0.875rem;padding:0.65rem 1rem;margin-bottom:1rem;font-family:Space Grotesk,monospace;font-size:0.7rem;color:var(--green);">'
-      + '<div style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0;"></div>'
-      + 'Withdraw Unlocked'
-      + ' <span style="opacity:0.5;">(' + tags.join(' & ') + ')</span>'
-      + '</div>';
+    _setStatusBox('sbox-withdraw', _statusBox('on', '34,197,94', 'Withdraw Unlocked', tags.join(' & ')));
+    el.innerHTML = '';
     return;
   }
+  // Locked: muted box in the row; tall progress card still renders in el below.
+  _setStatusBox('sbox-withdraw', _statusBox('off', '34,197,94', 'Withdraw Locked',
+    'Best: ' + Math.max(shroomPct, nftPct) + '% to unlock'));
 
   // Not qualified — show progress toward each option
   const pBar = function(pct, color) {
