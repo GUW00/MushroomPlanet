@@ -631,6 +631,7 @@ app.post('/api/marketplace/buy', async (req, res) => {
       potion_name: claimed.potion?.name || 'Unnamed',
       potion_emoji: claimed.potion?.emoji || null,
       potion_score: claimed.potion?.['Potion Score'] || 0,
+      potion: claimed.potion || null,
       price,
       tax,
       seller_payout: sameWallet ? 0 : sellerPayout,

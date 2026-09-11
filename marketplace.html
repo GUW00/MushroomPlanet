@@ -459,6 +459,7 @@
         + '<div class="pc-head"><img class="pc-img" src="' + img + '" onerror="this.src=\'/images/potion2.png\'">'
         + '<span class="pc-name">' + esc(cleanEmoji(s.potion_name) || 'Unnamed Potion') + '</span>'
         + scoreTag + '</div>'
+        + (s.potion ? '<div class="pc-stats">' + statRows(s.potion) + '</div>' : '')
         + '<div class="pc-seller">'
           + esc(cleanEmoji(s.seller_name) || 'Shroomie') + (sellerYou ? ' (you)' : '')
           + ' &rarr; ' + esc(cleanEmoji(s.buyer_name) || 'Shroomie') + (buyerYou ? ' (you)' : '')
